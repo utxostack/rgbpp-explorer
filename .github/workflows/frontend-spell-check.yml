@@ -11,6 +11,8 @@ jobs:
       - uses: pnpm/action-setup@v4
       - name: Install dependencies
         run: pnpm install
+        with:
+          version: 8
 
       - name: Run Check
         run: npx cspell "**/*"
