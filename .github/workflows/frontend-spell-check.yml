@@ -1,0 +1,17 @@
+name: Frontend Spell Check
+
+on:
+  push:
+
+jobs:
+  spellcheck:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: pnpm/action-setup@v4
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run Check
+        run: npx cspell "**/*"
+        working-directory: ./frontend

@@ -1,0 +1,51 @@
+{
+  "name": "utxo-stack-explorer-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "prepare": "panda codegen",
+    "dev": "next dev",
+    "build": "npm run lingui && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "lingui:extract": "lingui extract",
+    "lingui:compile": "lingui compile",
+    "lingui": "npm run lingui:extract && npm run lingui:compile",
+    "cspell": "cspell \"**/*\""
+  },
+  "dependencies": {
+    "@ark-ui/react": "^3.5.0",
+    "@lingui/core": "^4.11.2",
+    "@lingui/macro": "^4.11.2",
+    "@lingui/react": "^4.11.2",
+    "negotiator": "^0.6.3",
+    "next": "14.2.4",
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
+    "@lingui/cli": "^4.11.2",
+    "@lingui/conf": "^4.11.2",
+    "@lingui/swc-plugin": "^4.0.8",
+    "@pandacss/dev": "^0.42.0",
+    "@park-ui/panda-preset": "^0.38.1",
+    "@types/negotiator": "^0.6.3",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@typescript-eslint/eslint-plugin": "^6.10.0",
+    "@typescript-eslint/parser": "^6.5.0",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.4",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-no-relative-import-paths": "^1.5.3",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-simple-import-sort": "^10.0.0",
+    "eslint-plugin-unicorn": "^49.0.0",
+    "eslint-plugin-unused-imports": "^3.0.0",
+    "prettier": "^3.1.0",
+    "typescript": "^5",
+    "cspell": "^8.10.4"
+  }
+}
