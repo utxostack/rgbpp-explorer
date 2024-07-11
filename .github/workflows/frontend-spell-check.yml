@@ -11,10 +11,12 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
 
-      - name: Install dependencies
+      - name: Set up pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 8
+
+      - name: Install dependencies
         run: pnpm install
 
       - name: Run Check
