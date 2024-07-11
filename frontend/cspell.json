@@ -1,0 +1,25 @@
+{
+  "version": "0.1",
+  "language": "en",
+  "words": [
+    "utxo"
+  ],
+  "ignoreWords": [
+    "lingui",
+    "pandacss",
+    "outdir"
+  ],
+  "ignorePaths": [
+    "pnpm-lock.yaml",
+    "package.json",
+    "cspell.json",
+    "tsconfig.tsbuildinfo",
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    ".next/**",
+    "public/**",
+    "src/locales/**",
+    "styled-system"
+  ]
+}
