@@ -1,7 +1,9 @@
 {
   "version": "0.1",
   "language": "en",
-  "words": [],
+  "words": [
+    "utxo"
+  ],
   "ignoreWords": [
     "lingui",
     "pandacss",
