@@ -16,12 +16,11 @@ export interface LinkProps
 const StyledLink = styled(NextLink)
 
 export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link({ children, ...props }, ref) {
-  const {
-    i18n: { locale },
-  } = useLingui()
+  const { i18n } = useLingui()
+  const locale = props.locale ?? i18n.locale
   const href =
     typeof props.href === 'string'
-      ? `/${props.locale ?? locale}${props.href}`
+      ? `/${locale}${props.href}`
       : {
           ...props.href,
           pathname: `/${locale}${props.href.pathname}`,
@@ -32,3 +31,5 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link({ chi
     </StyledLink>
   )
 })
+
+export default Link
