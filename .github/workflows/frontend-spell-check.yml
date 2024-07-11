@@ -18,8 +18,8 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
-        working-directory: ./frontend
+        working-directory: frontend
 
       - name: Run Check
         run: npx cspell "**/*"
-        working-directory: ./frontend
+        working-directory: frontend
