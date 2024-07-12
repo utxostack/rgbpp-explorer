@@ -16,7 +16,7 @@ datasource db {
 model Block {
   id                BigInt   @id @default(autoincrement())
   version           Int      @default(0)
-  epoch             BitInt 
+  // epoch             BitInt
   blockHash         String   @unique @db.Char(64)
   parentHash        String   @db.Char(64)
   blockNumber       BigInt   @unique
@@ -43,6 +43,7 @@ enum TransactionStatus {
 model Transaction {
   id           BigInt   @id @default(autoincrement())
   version      Int      @default(0)
+  blockId      BigInt
   blockHash    String   @db.Char(64)
   blockNumber  BigInt
   txHash       String   @unique @db.Char(64)
@@ -58,7 +59,7 @@ model Transaction {
   createdTime  DateTime @default(now())
   updatedTime  DateTime @updatedAt
 
-  block        Block      @relation(fields: [blockNumber], references: [blockNumber])
+  block        Block      @relation(fields: [blockId], references: [id])
   outputs      Output[]
 
   @@map("transactions")
@@ -69,11 +70,11 @@ model Transaction {
 model Output {
   id                    BigInt    @id @default(autoincrement())
   blockNumber           BigInt
+  txId                  BigInt
   txHash                String    @db.Char(64)
   index                 Int
   capacity              BigInt
   occupiedCapacity      BigInt
-  generatedByTxId       BigInt
   consumedByTxHash      String    @db.Char(64)
   consumedByTxId        BigInt
   consumedByCellIndex   Int
@@ -82,14 +83,14 @@ model Output {
   typeScriptId          BigInt
   udtId                 BigInt
   udtAmount             Decimal   @db.Decimal(39, 0)
-  udtSymbol             String    
-  address               String    
+  udtSymbol             String
+  address               String
   data                  String
   dataSize           Int
   createdTime           DateTime  @default(now())
   updatedTime           DateTime  @updatedAt
 
-  transaction           Transaction @relation(fields: [txHash], references: [txHash])
+  transaction           Transaction @relation(fields: [txId], references: [id])
   lockScript            LockScript  @relation(fields: [lockScriptId], references: [id])
   typeScript            TypeScript? @relation(fields: [typeScriptId], references: [id])
   udt                   UDT?        @relation(fields: [udtId], references: [id])
@@ -103,13 +104,14 @@ model Output {
 model LockScript {
   id           BigInt   @id @default(autoincrement())
   codeHash     String   @db.Char(64)
-  hashType     Int      
-  args         String   
+  hashType     Int
+  args         String
   scriptHash   String   @unique @db.Char(64)
   createdTime  DateTime @default(now())
   updatedTime  DateTime @updatedAt
 
   outputs      Output[]
+  balance     Balance[]
 
   @@map("lock_scripts")
 }
@@ -117,8 +119,8 @@ model LockScript {
 model TypeScript {
   id            BigInt   @id @default(autoincrement())
   codeHash      String   @db.Char(64)
-  hashType      Int      
-  args          String   
+  hashType      Int
+  args          String
   scriptHash    String   @unique @db.Char(64)
   lockScriptId  BigInt
   createdTime   DateTime @default(now())
@@ -137,14 +139,14 @@ model UDT {
   deployerLockScriptId  BigInt
   isFirst               Boolean  @default(false)
   udtTypeHash           String   @unique @db.Char(64)
-  decimal               Int      
-  name                  String   
-  symbol                String   
-  blockTimestamp        DateTime @db.Timestamp(6) 
+  decimal               Int
+  name                  String
+  symbol                String
+  blockTimestamp        DateTime @db.Timestamp(6)
   createdTxHash         String   @db.Char(64)
   uniqueCellScriptHash  String   @unique @db.Char(64)
   typeScriptId          BigInt
-  logo                  String   
+  logo                  String
   isPublished           Boolean  @default(true)
   createdTime           DateTime @default(now())
   updatedTime           DateTime @updatedAt
@@ -156,32 +158,33 @@ model UDT {
   @@map("udts")
 }
 
-model Account {
+model Balance {
   id                BigInt   @id @default(autoincrement())
-  accountNo         String   @unique 
-  assetType         Int      
-  scriptHash        String?  
-  decimal           Int      
+  assetType         Int
+  scriptHash        String?
+  decimal           Int
   lockScriptId      BigInt
-  symbol            Int      
-  symbolStr         String   
+  symbol            Int
+  symbolStr         String
   capacity          Decimal  @db.Decimal(39, 0)
   pendingCapacity   Decimal  @db.Decimal(39, 0)
   occupiedCapacity  Decimal  @db.Decimal(39, 0)
   createdTime       DateTime @default(now())
   updatedTime       DateTime @updatedAt
 
-  @@map("accounts")
+  lockScript        LockScript @relation(fields: [lockScriptId], references: [id])
+
+  @@map("balances")
   @@unique([scriptHash, lockScriptId])
   @@index([lockScriptId])
 }
 
-model Statistics {
+model ChainStats {
   id              BigInt   @id @default(autoincrement())
   totalTxsCount   Int
   h24TxsCount     Int
   createdTime     DateTime @default(now())
   updatedTime     DateTime @updatedAt
 
-  @@map("statistics")
+  @@map("chain_stats")
 }
