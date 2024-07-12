@@ -22,5 +22,6 @@ jobs:
       - name: Install dependency
         run: pnpm install
 
-      - name: Build
+      - name: Run Lint
         run: npm run lint
+        working-directory: frontend
