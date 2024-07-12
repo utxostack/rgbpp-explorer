@@ -29,6 +29,7 @@
     "@nestjs/graphql": "^12.2.0",
     "@nestjs/platform-express": "^10.0.0",
     "@ntegral/nestjs-sentry": "^4.0.1",
+    "@prisma/client": "^5.16.2",
     "@sentry/node": "^8.17.0",
     "@sentry/profiling-node": "^8.17.0",
     "cache-manager": "^5.7.1",
