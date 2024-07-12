@@ -1,0 +1,160 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Block {
+  id                BigInt   @id @default(autoincrement())
+  version           Int      @default(0)
+  blockHash         String   @unique @db.Char(64)
+  parentHash        String   @db.Char(64)
+  blockNumber       BigInt   @unique
+  timestamp         BigInt
+  transactionsCount Int
+  size              Int
+  totalFee          BigInt
+  minFee            BigInt
+  maxFee            BigInt
+  createdTime       DateTime @default(now())
+  updatedTime       DateTime @updatedAt
+
+  @@map("blocks")
+  @@index([blockNumber(sort: Desc)])
+}
+
+model Transaction {
+  id           BigInt   @id @default(autoincrement())
+  version      Int      @default(0)
+  blockHash    String   @db.Char(64)
+  blockNumber  BigInt
+  txHash       String   @unique @db.Char(64)
+  index        Int
+  timestamp    BigInt
+  outputSum    BigInt
+  size         Int
+  fee          BigInt
+  cellDeps     Json     @default('{}')
+  headerDeps   Json     @default('[]')
+  witnesses    Json     @default('[]')
+  createdTime  DateTime @default(now())
+  updatedTime  DateTime @updatedAt
+
+  @@map("transactions")
+  @@index([blockNumber])
+  @@index([timestamp(Sort: Desc)])
+}
+
+model Output {
+  id                    BigInt    @id @default(autoincrement())
+  blockNumber           BigInt
+  txHash                String    @db.Char(64)
+  index                 Int
+  capacity              BigInt
+  occupiedCapacity      BigInt
+  generatedByTxId       BigInt
+  consumedByTxHash      String    @db.Char(64)
+  consumedByTxId        BigInt
+  consumedByCellIndex   Int
+  timestamp             BigInt
+  lockScriptId          BigInt
+  typeScriptId          BigInt
+  udtId                 BigInt
+  udtAmount             Decimal   @db.Decimal(39, 0)
+  udtSymbol             String    
+  address               String    
+  content               Json      @default('{}')
+  contentSize           Int
+  createdTime           DateTime  @default(now())
+  updatedTime           DateTime  @updatedAt
+
+  @@map("outputs")
+  @@unique([txHash, index])
+  @@unique([consumedByTxHash, consumedByCellIndex])
+  @@index([blockNumber])
+}
+
+model LockScript {
+  id           BigInt   @id @default(autoincrement())
+  codeHash     String   @db.Char(64)
+  hashType     Int      
+  args         String   
+  scriptHash   String   @unique @db.Char(64)
+  createdTime  DateTime @default(now())
+  updatedTime  DateTime @updatedAt
+
+  @@map("lock_scripts")
+}
+
+model TypeScript {
+  id            BigInt   @id @default(autoincrement())
+  codeHash      String   @db.Char(64)
+  hashType      Int      
+  args          String   
+  scriptHash    String   @unique @db.Char(64)
+  lockScriptId  BigInt
+  createdTime   DateTime @default(now())
+  updatedTime   DateTime @updatedAt
+
+  @@map("type_scripts")
+  @@index([lockScriptId])
+}
+
+model UDT {
+  id                    BigInt   @id @default(autoincrement())
+  deployerLockScriptId  BigInt
+  isFirst               Boolean  @default(false)
+  udtTypeHash           String   @unique @db.Char(64)
+  decimal               Int      
+  name                  String   
+  symbol                String   
+  blockTimestamp        BigInt
+  createdTxHash         String   @db.Char(64)
+  uniqueCellScriptHash  String   @unique @db.Char(64)
+  typeScriptId          BigInt
+  logo                  String   
+  isPublished           Boolean  @default(true)
+  createdTime           DateTime @default(now())
+  updatedTime           DateTime @updatedAt
+
+  @@map("udts")
+}
+
+model Account {
+  id                BigInt   @id @default(autoincrement())
+  accountNo         String   @unique 
+  assetType         Int      
+  scriptHash        String?  
+  decimal           Int      
+  lockScriptId      BigInt
+  symbol            Int      
+  symbolStr         String   
+  capacity          Decimal  @db.Decimal(39, 0)
+  pendingCapacity   Decimal  @db.Decimal(39, 0)
+  occupiedCapacity  Decimal  @db.Decimal(39, 0)
+  createdTime       DateTime @default(now())
+  updatedTime       DateTime @updatedAt
+
+  @@map("accounts")
+  @@unique([scriptHash, lockScriptId])
+  @@index([lockScriptId])
+}
+
+model ChainStats {
+  id              BigInt   @id @default(autoincrement())
+  totalTxsCount   Int
+  h24TxsCount     Int
+  createdTime     DateTime @default(now())
+  updatedTime     DateTime @updatedAt
+
+  @@map("chain_stats")
+}
