@@ -16,10 +16,11 @@ datasource db {
 model Block {
   id                BigInt   @id @default(autoincrement())
   version           Int      @default(0)
+  epoch             BitInt 
   blockHash         String   @unique @db.Char(64)
   parentHash        String   @db.Char(64)
   blockNumber       BigInt   @unique
-  timestamp         BigInt
+  timestamp         DateTime @db.Timestamp(6)
   transactionsCount Int
   size              Int
   totalFee          BigInt
@@ -28,8 +29,15 @@ model Block {
   createdTime       DateTime @default(now())
   updatedTime       DateTime @updatedAt
 
+  transactions      Transaction[]
+
   @@map("blocks")
   @@index([blockNumber(sort: Desc)])
+}
+
+enum TransactionStatus {
+  pending
+  confirmed
 }
 
 model Transaction {
@@ -39,15 +47,19 @@ model Transaction {
   blockNumber  BigInt
   txHash       String   @unique @db.Char(64)
   index        Int
-  timestamp    BigInt
+  timestamp    DateTime @db.Timestamp(6)
   outputSum    BigInt
   size         Int
   fee          BigInt
   cellDeps     Json     @default('{}')
   headerDeps   Json     @default('[]')
   witnesses    Json     @default('[]')
+  status       TransactionStatus @default(pending)
   createdTime  DateTime @default(now())
   updatedTime  DateTime @updatedAt
+
+  block        Block      @relation(fields: [blockNumber], references: [blockNumber])
+  outputs      Output[]
 
   @@map("transactions")
   @@index([blockNumber])
@@ -65,17 +77,22 @@ model Output {
   consumedByTxHash      String    @db.Char(64)
   consumedByTxId        BigInt
   consumedByCellIndex   Int
-  timestamp             BigInt
+  timestamp             DateTime  @db.Timestamp(6)
   lockScriptId          BigInt
   typeScriptId          BigInt
   udtId                 BigInt
   udtAmount             Decimal   @db.Decimal(39, 0)
   udtSymbol             String    
   address               String    
-  content               Json      @default('{}')
-  contentSize           Int
+  data                  String
+  dataSize           Int
   createdTime           DateTime  @default(now())
   updatedTime           DateTime  @updatedAt
+
+  transaction           Transaction @relation(fields: [txHash], references: [txHash])
+  lockScript            LockScript  @relation(fields: [lockScriptId], references: [id])
+  typeScript            TypeScript? @relation(fields: [typeScriptId], references: [id])
+  udt                   UDT?        @relation(fields: [udtId], references: [id])
 
   @@map("outputs")
   @@unique([txHash, index])
@@ -92,6 +109,8 @@ model LockScript {
   createdTime  DateTime @default(now())
   updatedTime  DateTime @updatedAt
 
+  outputs      Output[]
+
   @@map("lock_scripts")
 }
 
@@ -105,6 +124,10 @@ model TypeScript {
   createdTime   DateTime @default(now())
   updatedTime   DateTime @updatedAt
 
+  lockScript    LockScript @relation(fields: [lockScriptId], references: [id])
+  outputs       Output[]
+  udts          UDT[]
+
   @@map("type_scripts")
   @@index([lockScriptId])
 }
@@ -117,7 +140,7 @@ model UDT {
   decimal               Int      
   name                  String   
   symbol                String   
-  blockTimestamp        BigInt
+  blockTimestamp        DateTime @db.Timestamp(6) 
   createdTxHash         String   @db.Char(64)
   uniqueCellScriptHash  String   @unique @db.Char(64)
   typeScriptId          BigInt
@@ -125,6 +148,10 @@ model UDT {
   isPublished           Boolean  @default(true)
   createdTime           DateTime @default(now())
   updatedTime           DateTime @updatedAt
+
+  typeScript            TypeScript @relation(fields: [typeScriptId], references: [id])
+  deployerLockScript    LockScript @relation(fields: [deployerLockScriptId], references: [id])
+  outputs               Output[]
 
   @@map("udts")
 }
@@ -149,12 +176,12 @@ model Account {
   @@index([lockScriptId])
 }
 
-model ChainStats {
+model Statistics {
   id              BigInt   @id @default(autoincrement())
   totalTxsCount   Int
   h24TxsCount     Int
   createdTime     DateTime @default(now())
   updatedTime     DateTime @updatedAt
 
-  @@map("chain_stats")
+  @@map("statistics")
 }
