@@ -1,10 +1,8 @@
-import type { LinguiConfig } from '@lingui/conf'
+import linguiConfig from 'lingui.config.mjs'
 import Negotiator from 'negotiator'
 import { type NextRequest, NextResponse } from 'next/server'
 
-import linguiConfig from '../lingui.config.mjs'
-
-const { locales } = linguiConfig as LinguiConfig
+const { locales } = linguiConfig
 
 export const config = {
   matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
