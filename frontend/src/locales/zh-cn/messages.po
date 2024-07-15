@@ -12,3 +12,7 @@ msgstr ""
 "Last-Translator: \n"
 "Language-Team: \n"
 "Plural-Forms: \n"
+
+#: src/app/[lang]/page.tsx:11
+msgid "Test"
+msgstr "测试"
