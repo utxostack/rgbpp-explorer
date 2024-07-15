@@ -2,7 +2,7 @@ import { t } from '@lingui/macro'
 
 import { getI18nInstance } from '@/app/[lang]/appRouterI18n'
 import { Link } from '@/components/ui/link'
-import { BaseAppRouterProps } from '@/types/BaseAppRouterProps'
+import type { BaseAppRouterProps } from '@/types/BaseAppRouterProps'
 
 export default function Home({ params: { lang } }: BaseAppRouterProps) {
   const i18n = getI18nInstance(lang)
