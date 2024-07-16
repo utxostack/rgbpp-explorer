@@ -6,6 +6,7 @@ import { TransactionModule } from './transaction/transaction.module';
 import { BlockchainModule } from './blockchain/blockchain.module';
 import { ConfigService } from '@nestjs/config';
 import { SentryService } from '@ntegral/nestjs-sentry';
+import { CellModule } from './cell/cell.module';
 
 @Module({
   imports: [
@@ -17,6 +18,9 @@ import { SentryService } from '@ntegral/nestjs-sentry';
         installSubscriptionHandlers: true,
         introspection: true,
         autoSchemaFile: true,
+        buildSchemaOptions: {
+          dateScalarMode: 'timestamp',
+        },
         context: () => {
           return {
             span: sentryService.instance().startInactiveSpan({
@@ -27,9 +31,10 @@ import { SentryService } from '@ntegral/nestjs-sentry';
         },
       }),
     }),
+    BlockchainModule,
     BlockModule,
     TransactionModule,
-    BlockchainModule,
+    CellModule,
   ],
 })
 export class ApiModule { }

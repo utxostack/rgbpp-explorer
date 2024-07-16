@@ -1,13 +1,12 @@
 import { HttpException, Module } from '@nestjs/common';
 import { CoreModule } from './core/core.module';
-import { ApiModule } from './api/api.module';
-import { DataModule } from './data/data.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CacheModule } from '@nestjs/cache-manager';
 import { SentryInterceptor, SentryModule } from '@ntegral/nestjs-sentry';
 import { nodeProfilingIntegration } from '@sentry/profiling-node';
 import { envSchema } from './env';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ApiModule } from './modules/api.module';
 
 @Module({
   imports: [
@@ -38,7 +37,6 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
       isGlobal: true,
     }),
     CoreModule,
-    DataModule,
     ApiModule,
   ],
   controllers: [],
