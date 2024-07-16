@@ -3,7 +3,7 @@ import * as CKBExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
 import { toNumber } from 'lodash';
 import { Transaction } from 'src/modules/transaction/transaction.model';
 
-export type BlockWithoutResolveFields = Omit<Block, 'minFee' | 'maxFee' | 'transactions'>;
+export type BaseBlock = Omit<Block, 'minFee' | 'maxFee' | 'transactions'>;
 
 @ObjectType({ description: 'block' })
 export class Block {
@@ -37,7 +37,7 @@ export class Block {
   @Field(() => [Transaction])
   transactions: Transaction[];
 
-  public static fromCKBExplorer(block: CKBExplorer.Block): BlockWithoutResolveFields {
+  public static fromCKBExplorer(block: CKBExplorer.Block): BaseBlock {
     return {
       version: toNumber(block.version),
       hash: block.block_hash,

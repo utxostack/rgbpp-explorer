@@ -2,7 +2,7 @@ import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { toNumber } from 'lodash';
 import * as CKBExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
 
-export type CellWithoutResolveFields = Pick<Cell, 'txHash' | 'index' | 'capacity'>;
+export type BaseCell = Pick<Cell, 'txHash' | 'index' | 'capacity'>;
 
 @ObjectType({ description: 'cell' })
 export class Cell {
@@ -20,7 +20,7 @@ export class Cell {
   public static fromCKBExplorer(
     input: CKBExplorer.DisplayInput | CKBExplorer.DisplayOutput,
     index: number,
-  ): CellWithoutResolveFields {
+  ): BaseCell {
     return {
       index,
       txHash: input.generated_tx_hash,

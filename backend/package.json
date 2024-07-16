@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@apollo/server": "^4.10.4",
+    "@applifting-io/nestjs-dataloader": "^1.1.5",
     "@nestjs/apollo": "^12.2.0",
     "@nestjs/cache-manager": "^2.2.2",
     "@nestjs/common": "^10.0.0",
@@ -35,6 +36,7 @@
     "@types/ws": "^8.5.11",
     "axios": "^1.7.2",
     "cache-manager": "^5.7.1",
+    "dataloader": "^2.2.2",
     "graphql": "^16.9.0",
     "lodash": "^4.17.21",
     "reflect-metadata": "^0.2.0",

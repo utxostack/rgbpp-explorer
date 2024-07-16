@@ -7,6 +7,8 @@ import { BlockchainModule } from './blockchain/blockchain.module';
 import { ConfigService } from '@nestjs/config';
 import { SentryService } from '@ntegral/nestjs-sentry';
 import { CellModule } from './cell/cell.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { DataLoaderInterceptor } from '@applifting-io/nestjs-dataloader';
 
 @Module({
   imports: [
@@ -35,6 +37,12 @@ import { CellModule } from './cell/cell.module';
     BlockModule,
     TransactionModule,
     CellModule,
+  ],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: DataLoaderInterceptor,
+    },
   ],
 })
 export class ApiModule { }

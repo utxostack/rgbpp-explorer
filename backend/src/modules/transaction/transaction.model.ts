@@ -1,16 +1,20 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { toNumber } from 'lodash';
 import * as CKBExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
-import { Cell, CellWithoutResolveFields } from '../cell/cell.model';
+import { Cell, BaseCell } from '../cell/cell.model';
+import { Block } from '../block/block.model';
 
-export type TransactionWithoutResolveFields = Transaction & {
-  inputs: CellWithoutResolveFields[];
+export type BaseTransaction = Omit<Transaction, 'block'> & {
+  inputs: BaseCell[];
 };
 
 @ObjectType({ description: 'transaction' })
 export class Transaction {
   @Field(() => Boolean)
   isCellbase: boolean;
+
+  @Field(() => Int)
+  blockNumber: number;
 
   @Field(() => String)
   hash: string;
@@ -33,7 +37,10 @@ export class Transaction {
   @Field(() => [Cell])
   outputs: Cell[];
 
-  public static fromCKBExplorer(tx: CKBExplorer.Transaction): TransactionWithoutResolveFields {
+  @Field(() => Block)
+  block: Block;
+
+  public static fromCKBExplorer(tx: CKBExplorer.Transaction): BaseTransaction {
     const outputSum = tx.display_outputs.reduce(
       (sum, output) => sum + toNumber(output.capacity),
       0,
@@ -43,6 +50,7 @@ export class Transaction {
 
     return {
       isCellbase: tx.is_cellbase,
+      blockNumber: toNumber(tx.block_number),
       hash: tx.transaction_hash,
       index: toNumber(tx.block_number),
       timestamp: new Date(toNumber(tx.block_timestamp)),

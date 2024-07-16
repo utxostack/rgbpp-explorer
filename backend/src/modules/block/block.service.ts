@@ -1,28 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { CKBExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
-import { Block, BlockWithoutResolveFields } from './block.model';
-import { Transaction, TransactionWithoutResolveFields } from '../transaction/transaction.model';
+import { Block, BaseBlock } from './block.model';
+import { Transaction, BaseTransaction } from '../transaction/transaction.model';
 
 @Injectable()
 export class BlockService {
   constructor(private ckbExplorerService: CKBExplorerService) { }
 
-  public async getLatestBlocks(): Promise<BlockWithoutResolveFields[]> {
+  public async getLatestBlockNumbers(): Promise<string[]> {
     const blockList = await this.ckbExplorerService.getBlockList();
-    const blocks = await Promise.all(
-      blockList.data.map(async (block) => {
-        return this.ckbExplorerService.getBlock(block.attributes.number);
-      }),
-    );
-    return blocks.map((block) => Block.fromCKBExplorer(block.data.attributes));
+    return blockList.data.map((block) => block.attributes.number);
   }
 
-  public async getBlock(heightOrHash: string): Promise<BlockWithoutResolveFields> {
+  public async getBlock(heightOrHash: string): Promise<BaseBlock> {
     const block = await this.ckbExplorerService.getBlock(heightOrHash);
     return Block.fromCKBExplorer(block.data.attributes);
   }
 
-  public async getBlockTransactions(blockHash: string): Promise<TransactionWithoutResolveFields[]> {
+  public async getBlockTransactions(blockHash: string): Promise<BaseTransaction[]> {
     const blockTransactions = await this.ckbExplorerService.getBlockTransactions(blockHash);
     return blockTransactions.data.map((transaction) =>
       Transaction.fromCKBExplorer(transaction.attributes),
