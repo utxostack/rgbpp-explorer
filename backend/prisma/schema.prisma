@@ -1,0 +1,192 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Block {
+  id                BigInt   @id @default(autoincrement())
+  version           Int      @default(0)
+  // epoch             BitInt
+  blockHash         String   @unique @db.Char(64)
+  parentHash        String   @db.Char(64)
+  blockNumber       BigInt   @unique
+  timestamp         DateTime @db.Timestamp(6)
+  transactionsCount Int
+  size              Int
+  totalFee          BigInt
+  minFee            BigInt
+  maxFee            BigInt
+  createdTime       DateTime @default(now())
+  updatedTime       DateTime @updatedAt
+
+  transactions Transaction[]
+
+  @@index([blockNumber(sort: Desc)])
+  @@map("blocks")
+}
+
+enum TransactionStatus {
+  pending
+  confirmed
+}
+
+model Transaction {
+  id          BigInt            @id @default(autoincrement())
+  version     Int               @default(0)
+  blockId     BigInt
+  blockHash   String            @db.Char(64)
+  blockNumber BigInt
+  txHash      String            @unique @db.Char(64)
+  index       Int
+  timestamp   DateTime          @db.Timestamp(6)
+  outputSum   BigInt
+  size        Int
+  fee         BigInt
+  cellDeps    Json              @default("{}")
+  headerDeps  Json              @default("[]")
+  witnesses   Json              @default("[]")
+  status      TransactionStatus @default(pending)
+  createdTime DateTime          @default(now())
+  updatedTime DateTime          @updatedAt
+
+  block   Block    @relation(fields: [blockId], references: [id])
+  outputs Output[]
+
+  @@index([blockNumber])
+  @@index([timestamp(Sort: Desc)])
+  @@map("transactions")
+}
+
+model Output {
+  id                  BigInt   @id @default(autoincrement())
+  blockNumber         BigInt
+  txId                BigInt
+  txHash              String   @db.Char(64)
+  index               Int
+  capacity            BigInt
+  occupiedCapacity    BigInt
+  consumedByTxHash    String   @db.Char(64)
+  consumedByTxId      BigInt
+  consumedByCellIndex Int
+  timestamp           DateTime @db.Timestamp(6)
+  lockScriptId        BigInt
+  typeScriptId        BigInt
+  udtId               BigInt
+  udtAmount           Decimal  @db.Decimal(39, 0)
+  udtSymbol           String
+  address             String
+  data                String
+  dataSize            Int
+  createdTime         DateTime @default(now())
+  updatedTime         DateTime @updatedAt
+
+  transaction Transaction @relation(fields: [txId], references: [id])
+  lockScript  LockScript  @relation(fields: [lockScriptId], references: [id])
+  typeScript  TypeScript? @relation(fields: [typeScriptId], references: [id])
+  udt         UDT?        @relation(fields: [udtId], references: [id])
+
+  @@unique([txHash, index])
+  @@unique([consumedByTxHash, consumedByCellIndex])
+  @@index([blockNumber])
+  @@map("outputs")
+}
+
+model LockScript {
+  id          BigInt   @id @default(autoincrement())
+  codeHash    String   @db.Char(64)
+  hashType    Int
+  args        String
+  scriptHash  String   @unique @db.Char(64)
+  createdTime DateTime @default(now())
+  updatedTime DateTime @updatedAt
+
+  outputs    Output[]
+  balance    Balance[]
+  TypeScript TypeScript[]
+  UDT        UDT[]
+
+  @@map("lock_scripts")
+}
+
+model TypeScript {
+  id           BigInt   @id @default(autoincrement())
+  codeHash     String   @db.Char(64)
+  hashType     Int
+  args         String
+  scriptHash   String   @unique @db.Char(64)
+  lockScriptId BigInt
+  createdTime  DateTime @default(now())
+  updatedTime  DateTime @updatedAt
+
+  lockScript LockScript @relation(fields: [lockScriptId], references: [id])
+  outputs    Output[]
+  udts       UDT[]
+
+  @@index([lockScriptId])
+  @@map("type_scripts")
+}
+
+model UDT {
+  id                   BigInt   @id @default(autoincrement())
+  deployerLockScriptId BigInt
+  isFirst              Boolean  @default(false)
+  udtTypeHash          String   @unique @db.Char(64)
+  decimal              Int
+  name                 String
+  symbol               String
+  blockTimestamp       DateTime @db.Timestamp(6)
+  createdTxHash        String   @db.Char(64)
+  uniqueCellScriptHash String   @unique @db.Char(64)
+  typeScriptId         BigInt
+  logo                 String
+  isPublished          Boolean  @default(true)
+  createdTime          DateTime @default(now())
+  updatedTime          DateTime @updatedAt
+
+  typeScript         TypeScript @relation(fields: [typeScriptId], references: [id])
+  deployerLockScript LockScript @relation(fields: [deployerLockScriptId], references: [id])
+  outputs            Output[]
+
+  @@map("udts")
+}
+
+model Balance {
+  id               BigInt   @id @default(autoincrement())
+  assetType        Int
+  scriptHash       String?
+  decimal          Int
+  lockScriptId     BigInt
+  symbol           Int
+  symbolStr        String
+  capacity         Decimal  @db.Decimal(39, 0)
+  pendingCapacity  Decimal  @db.Decimal(39, 0)
+  occupiedCapacity Decimal  @db.Decimal(39, 0)
+  createdTime      DateTime @default(now())
+  updatedTime      DateTime @updatedAt
+
+  lockScript LockScript @relation(fields: [lockScriptId], references: [id])
+
+  @@unique([scriptHash, lockScriptId])
+  @@index([lockScriptId])
+  @@map("balances")
+}
+
+model ChainStats {
+  id            BigInt   @id @default(autoincrement())
+  totalTxsCount Int
+  h24TxsCount   Int
+  createdTime   DateTime @default(now())
+  updatedTime   DateTime @updatedAt
+
+  @@map("chain_stats")
+}
