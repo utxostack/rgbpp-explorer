@@ -1,14 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { NestDataLoader } from '@applifting-io/nestjs-dataloader';
-import { BaseTransaction } from '../transaction/transaction.model';
-import { BlockService } from './block.service';
-import { BaseBlock } from './block.model';
+import { CkbBlockService } from './block.service';
+import * as CkbExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
+
+export type CkbBlockLoaderResponse = CkbExplorer.Block;
 
 @Injectable()
-export class BlockLoader implements NestDataLoader<string, BaseBlock> {
-  private logger = new Logger(BlockLoader.name);
+export class CkbBlockLoader implements NestDataLoader<string, CkbExplorer.Block> {
+  private logger = new Logger(CkbBlockLoader.name);
 
-  constructor(private readonly blockService: BlockService) { }
+  constructor(private blockService: CkbBlockService) {}
 
   public getBatchFunction() {
     return (heightOrHashList: string[]) => {
@@ -20,12 +21,15 @@ export class BlockLoader implements NestDataLoader<string, BaseBlock> {
   }
 }
 
-@Injectable()
-export class BlockTransactionsLoader
-  implements NestDataLoader<string, BaseTransaction[]> {
-  private logger = new Logger(BlockTransactionsLoader.name);
+export type CkbBlockTransactionsLoaderResponse = CkbExplorer.Transaction[];
 
-  constructor(private readonly blockService: BlockService) { }
+@Injectable()
+export class CkbBlockTransactionsLoader
+  implements NestDataLoader<string, CkbBlockTransactionsLoaderResponse>
+{
+  private logger = new Logger(CkbBlockTransactionsLoader.name);
+
+  constructor(private blockService: CkbBlockService) {}
 
   public getBatchFunction() {
     return (hashs: string[]) => {

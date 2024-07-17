@@ -1,15 +1,16 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { toNumber } from 'lodash';
 import * as CKBExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
-import { Cell, BaseCell } from '../cell/cell.model';
-import { Block } from '../block/block.model';
+import { CkbCell, CkbBaseCell } from '../cell/cell.model';
+import { CkbBlock } from '../block/block.model';
 
-export type BaseTransaction = Omit<Transaction, 'block'> & {
-  inputs: BaseCell[];
+export type CkbBaseTransaction = Omit<CkbTransaction, 'block' | 'inputs' | 'outputs'> & {
+  inputs: CkbBaseCell[];
+  outputs: CkbBaseCell[];
 };
 
-@ObjectType({ description: 'transaction' })
-export class Transaction {
+@ObjectType({ description: 'CKB Transaction' })
+export class CkbTransaction {
   @Field(() => Boolean)
   isCellbase: boolean;
 
@@ -31,16 +32,16 @@ export class Transaction {
   @Field(() => Float)
   fee: number;
 
-  @Field(() => [Cell])
-  inputs: Cell[];
+  @Field(() => [CkbCell])
+  inputs: CkbCell[];
 
-  @Field(() => [Cell])
-  outputs: Cell[];
+  @Field(() => [CkbCell])
+  outputs: CkbCell[];
 
-  @Field(() => Block)
-  block: Block;
+  @Field(() => CkbBlock)
+  block: CkbBlock;
 
-  public static fromCKBExplorer(tx: CKBExplorer.Transaction): BaseTransaction {
+  public static fromCKBExplorer(tx: CKBExplorer.Transaction): CkbBaseTransaction {
     const outputSum = tx.display_outputs.reduce(
       (sum, output) => sum + toNumber(output.capacity),
       0,
@@ -54,8 +55,8 @@ export class Transaction {
       hash: tx.transaction_hash,
       index: toNumber(tx.block_number),
       timestamp: new Date(toNumber(tx.block_timestamp)),
-      inputs: tx.display_inputs.map((input, index) => Cell.fromCKBExplorer(input, index)),
-      outputs: tx.display_outputs.map((output, index) => Cell.fromCKBExplorer(output, index)),
+      inputs: tx.display_inputs.map((input, index) => CkbCell.fromCKBExplorer(input, index)),
+      outputs: tx.display_outputs.map((output, index) => CkbCell.fromCKBExplorer(output, index)),
       outputSum,
       fee,
     };

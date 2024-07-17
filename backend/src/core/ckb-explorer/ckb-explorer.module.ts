@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { CKBExplorerService } from './ckb-explorer.service';
+import { CkbExplorerService } from './ckb-explorer.service';
 
 @Module({
-  providers: [CKBExplorerService],
-  exports: [CKBExplorerService],
+  providers: [CkbExplorerService],
+  exports: [CkbExplorerService],
 })
-export class CKBExplorerModule {}
+export class CkbExplorerModule {}

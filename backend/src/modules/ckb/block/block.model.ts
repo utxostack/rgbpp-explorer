@@ -1,12 +1,12 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import * as CKBExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
 import { toNumber } from 'lodash';
-import { Transaction } from 'src/modules/transaction/transaction.model';
+import { CkbTransaction } from '../transaction/transaction.model';
 
-export type BaseBlock = Omit<Block, 'minFee' | 'maxFee' | 'transactions'>;
+export type BaseCkbBlock = Omit<CkbBlock, 'minFee' | 'maxFee' | 'transactions'>;
 
-@ObjectType({ description: 'block' })
-export class Block {
+@ObjectType({ description: 'CKB Block' })
+export class CkbBlock {
   @Field(() => Int)
   version: number;
 
@@ -34,10 +34,11 @@ export class Block {
   @Field(() => Float)
   maxFee: number;
 
-  @Field(() => [Transaction])
-  transactions: Transaction[];
+  @Field(() => [CkbTransaction])
+  transactions: CkbTransaction[];
 
-  public static fromCKBExplorer(block: CKBExplorer.Block): BaseBlock {
+  public static fromCKBExplorer(block: CKBExplorer.Block): BaseCkbBlock {
+    console.log(block);
     return {
       version: toNumber(block.version),
       hash: block.block_hash,

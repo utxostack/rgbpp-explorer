@@ -20,13 +20,13 @@ export enum BlockSortType {
 }
 
 @Injectable()
-export class CKBExplorerService {
-  private logger = new Logger(CKBExplorerService.name);
+export class CkbExplorerService {
+  private logger = new Logger(CkbExplorerService.name);
   private request: Axios;
 
   constructor(private configService: ConfigService<Env>) {
     this.request = axios.create({
-      baseURL: this.configService.get('CKB_EXPLORER_API_ENDPOINT'),
+      baseURL: this.configService.get('CKB_EXPLORER_API_URL'),
       headers: {
         'Content-Type': 'application/vnd.api+json',
         Accept: 'application/vnd.api+json',

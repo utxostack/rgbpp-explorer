@@ -1,11 +1,12 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { toNumber } from 'lodash';
 import * as CKBExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
+import { CkbScript } from '../script/script.model';
 
-export type BaseCell = Pick<Cell, 'txHash' | 'index' | 'capacity'>;
+export type CkbBaseCell = Pick<CkbCell, 'txHash' | 'index' | 'capacity'>;
 
-@ObjectType({ description: 'cell' })
-export class Cell {
+@ObjectType({ description: 'CKB Cell' })
+export class CkbCell {
   @Field(() => String)
   txHash: string;
 
@@ -15,12 +16,16 @@ export class Cell {
   @Field(() => Float)
   capacity: number;
 
-  // TODO: add type script and lock script fields
+  @Field(() => CkbScript, { nullable: true })
+  type: CkbScript;
+
+  @Field(() => CkbScript)
+  lock: CkbScript;
 
   public static fromCKBExplorer(
     input: CKBExplorer.DisplayInput | CKBExplorer.DisplayOutput,
     index: number,
-  ): BaseCell {
+  ): CkbBaseCell {
     return {
       index,
       txHash: input.generated_tx_hash,

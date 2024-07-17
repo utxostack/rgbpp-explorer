@@ -3,7 +3,7 @@ export interface PaginationMeta {
   page_size: number;
 }
 
-export interface CKBExplorerResponse<T extends {}, IsPaginated extends boolean = false> {
+export interface CkbExplorerResponse<T extends {}, IsPaginated extends boolean = false> {
   data: IsPaginated extends true
   ? {
     id: string;
@@ -18,9 +18,9 @@ export interface CKBExplorerResponse<T extends {}, IsPaginated extends boolean =
   meta: IsPaginated extends true ? PaginationMeta : never;
 }
 
-export type NonPaginatedResponse<T extends {}> = CKBExplorerResponse<T, false>;
+export type NonPaginatedResponse<T extends {}> = CkbExplorerResponse<T, false>;
 
-export type PaginatedResponse<T extends {}> = CKBExplorerResponse<T, true>;
+export type PaginatedResponse<T extends {}> = CkbExplorerResponse<T, true>;
 
 export interface BlockList {
   miner_hash: string;

@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 // import { DatabaseModule } from './database/database.module';
-import { CKBExplorerModule } from './ckb-explorer/ckb-explorer.module';
-import { CKBExplorerService } from './ckb-explorer/ckb-explorer.service';
+import { CkbExplorerModule } from './ckb-explorer/ckb-explorer.module';
+import { CkbExplorerService } from './ckb-explorer/ckb-explorer.service';
 
 @Module({
   imports: [
     // DatabaseModule,
-    CKBExplorerModule,
+    CkbExplorerModule,
   ],
-  providers: [CKBExplorerService],
-  exports: [CKBExplorerService],
+  providers: [CkbExplorerService],
+  exports: [CkbExplorerService],
 })
 export class CoreModule { }

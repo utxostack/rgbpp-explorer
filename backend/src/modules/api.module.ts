@@ -1,14 +1,11 @@
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { BlockModule } from './block/block.module';
-import { TransactionModule } from './transaction/transaction.module';
-import { BlockchainModule } from './blockchain/blockchain.module';
 import { ConfigService } from '@nestjs/config';
 import { SentryService } from '@ntegral/nestjs-sentry';
-import { CellModule } from './cell/cell.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { DataLoaderInterceptor } from '@applifting-io/nestjs-dataloader';
+import { CkbModule } from './ckb/ckb.module';
 
 @Module({
   imports: [
@@ -33,10 +30,7 @@ import { DataLoaderInterceptor } from '@applifting-io/nestjs-dataloader';
         },
       }),
     }),
-    BlockchainModule,
-    BlockModule,
-    TransactionModule,
-    CellModule,
+    CkbModule,
   ],
   providers: [
     {
@@ -45,4 +39,4 @@ import { DataLoaderInterceptor } from '@applifting-io/nestjs-dataloader';
     },
   ],
 })
-export class ApiModule { }
+export class ApiModule {}
