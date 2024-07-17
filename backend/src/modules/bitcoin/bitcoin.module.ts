@@ -1,4 +1,7 @@
 import { Module } from '@nestjs/common';
+import { TransactionModule } from './transaction/transaction.module';
 
-@Module({})
+@Module({
+  imports: [TransactionModule]
+})
 export class BitcoinModule {}

@@ -1,7 +1,12 @@
 import z from 'zod';
+import { NetworkType } from './constants';
 
 export const envSchema = z
   .object({
+    NETWORK: z
+      .enum([NetworkType.mainnet, NetworkType.testnet])
+      .default(NetworkType.testnet),
+
     // DATABASE_URL: z.string(),
     // REDIS_URL: z.string(),
 

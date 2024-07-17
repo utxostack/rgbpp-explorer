@@ -1,8 +1,9 @@
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import * as CkbExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
+import { BitcoinTransaction } from 'src/modules/bitcoin/transaction/transaction.model';
 import { CkbTransaction } from 'src/modules/ckb/transaction/transaction.model';
 
-export type RgbppBaseTransaction = Omit<RgbppTransaction, 'ckbTransaction'>;
+export type RgbppBaseTransaction = Omit<RgbppTransaction, 'ckbTransaction' | 'btcTransaction'>;
 
 enum LeapDirection {
   LeapIn = 'leap_in',
@@ -37,6 +38,9 @@ export class RgbppTransaction {
 
   @Field(() => CkbTransaction)
   ckbTransaction: CkbTransaction;
+
+  @Field(() => BitcoinTransaction, { nullable: true })
+  btcTransaction: BitcoinTransaction;
 
   public static fromCkbExplorer(tx: CkbExplorer.RgbppTransaction) {
     return {
