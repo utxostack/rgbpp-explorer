@@ -1,9 +1,9 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { toNumber } from 'lodash';
-import * as CKBExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
+import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
 import { CkbScript } from '../script/script.model';
 
-export type CkbBaseCell = Pick<CkbCell, 'txHash' | 'index' | 'capacity'>;
+export type CkbBaseCell = CkbCell;
 
 @ObjectType({ description: 'CKB Cell' })
 export class CkbCell {
@@ -22,14 +22,14 @@ export class CkbCell {
   @Field(() => CkbScript)
   lock: CkbScript;
 
-  public static fromCKBExplorer(
-    input: CKBExplorer.DisplayInput | CKBExplorer.DisplayOutput,
-    index: number,
-  ): CkbBaseCell {
+  public static from(tx: CkbRpc.Transaction, index: number): CkbBaseCell {
+    const output = tx.outputs[index];
     return {
+      txHash: tx.hash,
       index,
-      txHash: input.generated_tx_hash,
-      capacity: toNumber(input.capacity),
-    };
+      capacity: toNumber(output.capacity),
+      type: output.type ? CkbScript.from(output.type) : null,
+      lock: CkbScript.from(output.lock),
+    }
   }
 }

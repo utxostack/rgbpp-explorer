@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class CkbCellService {
-}
+export class CkbCellService {}

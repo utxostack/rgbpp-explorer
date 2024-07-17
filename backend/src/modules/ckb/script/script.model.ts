@@ -12,7 +12,7 @@ export class CkbScript {
   @Field(() => String)
   args: string;
 
-  public static fromCKBRpc(script: CkbRpc.Script): CkbScript {
+  public static from(script: CkbRpc.Script): CkbScript {
     return {
       codeHash: script.code_hash,
       hashType: script.hash_type,

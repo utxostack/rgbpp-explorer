@@ -1,9 +1,9 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
-import * as CKBExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
 import { toNumber } from 'lodash';
 import { CkbTransaction } from '../transaction/transaction.model';
+import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
 
-export type BaseCkbBlock = Omit<CkbBlock, 'minFee' | 'maxFee' | 'transactions'>;
+export type BaseCkbBlock = Omit<CkbBlock, 'totalFee' | 'transactions'>;
 
 @ObjectType({ description: 'CKB Block' })
 export class CkbBlock {
@@ -22,31 +22,19 @@ export class CkbBlock {
   @Field(() => Int)
   transactionsCount: number;
 
-  @Field(() => Int)
-  size: number;
-
   @Field(() => Float)
   totalFee: number;
-
-  @Field(() => Float)
-  minFee: number;
-
-  @Field(() => Float)
-  maxFee: number;
 
   @Field(() => [CkbTransaction])
   transactions: CkbTransaction[];
 
-  public static fromCKBExplorer(block: CKBExplorer.Block): BaseCkbBlock {
-    console.log(block);
+  public static fromCkbRpc(block: CkbRpc.Block): BaseCkbBlock {
     return {
-      version: toNumber(block.version),
-      hash: block.block_hash,
-      number: toNumber(block.number),
-      timestamp: new Date(toNumber(block.timestamp)),
-      transactionsCount: toNumber(block.transactions_count),
-      size: block.size,
-      totalFee: toNumber(block.total_transaction_fee),
+      version: toNumber(block.header.version),
+      hash: block.header.hash,
+      number: toNumber(block.header.number),
+      timestamp: new Date(toNumber(block.header.timestamp)),
+      transactionsCount: block.transactions.length,
     };
   }
 }

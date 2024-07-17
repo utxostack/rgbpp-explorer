@@ -3,63 +3,41 @@ import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/grap
 import { CkbBlock, BaseCkbBlock } from './block.model';
 import { CkbBaseTransaction, CkbTransaction } from '../transaction/transaction.model';
 import {
+  CkbBlockEconomicStateLoader,
+  CkbBlockEconomicStateLoaderResponse,
   CkbBlockLoader,
   CkbBlockLoaderResponse,
-  CkbBlockTransactionsLoader,
-  CkbBlockTransactionsLoaderResponse,
 } from './block.dataloader';
 import { Loader } from '@applifting-io/nestjs-dataloader';
+import { BI } from '@ckb-lumos/bi';
 
 @Resolver(() => CkbBlock)
 export class CkbBlockResolver {
-  @Query(() => CkbBlock)
-  public async block(
+  @Query(() => CkbBlock, { name: 'getCkbBlock' })
+  public async getBlock(
     @Args('heightOrHash', { type: () => String }) heightOrHash: string,
     @Loader(CkbBlockLoader) blockLoader: DataLoader<string, CkbBlockLoaderResponse>,
   ): Promise<BaseCkbBlock> {
     const block = await blockLoader.load(heightOrHash);
-    return CkbBlock.fromCKBExplorer(block);
+    return CkbBlock.fromCkbRpc(block);
   }
 
   @ResolveField(() => Float)
-  public async minFee(
+  public async totalFee(
     @Parent() block: CkbBlock,
-    @Loader(CkbBlockTransactionsLoader)
-    blockTransactionsLoader: DataLoader<string, CkbBlockTransactionsLoaderResponse>,
+    @Loader(CkbBlockEconomicStateLoader)
+    blockTransactionsLoader: DataLoader<string, CkbBlockEconomicStateLoaderResponse>,
   ): Promise<number> {
-    const transactions = await blockTransactionsLoader.load(block.hash);
-    const nonCellbaseTransactions = transactions
-      .map((tx) => CkbTransaction.fromCKBExplorer(tx))
-      .filter((tx) => !tx.isCellbase);
-    if (nonCellbaseTransactions.length === 0) {
-      return 0;
-    }
-    return Math.min(...nonCellbaseTransactions.map((tx) => tx.fee));
-  }
-
-  @ResolveField(() => Float)
-  public async maxFee(
-    @Parent() block: CkbBlock,
-    @Loader(CkbBlockTransactionsLoader)
-    blockTransactionsLoader: DataLoader<string, CkbBlockTransactionsLoaderResponse>,
-  ): Promise<number> {
-    const transactions = await blockTransactionsLoader.load(block.hash);
-    const nonCellbaseTransactions = transactions
-      .map((tx) => CkbTransaction.fromCKBExplorer(tx))
-      .filter((tx) => !tx.isCellbase);
-    if (nonCellbaseTransactions.length === 0) {
-      return 0;
-    }
-    return Math.max(...nonCellbaseTransactions.map((tx) => tx.fee), 0);
+    const blockEconomicState = await blockTransactionsLoader.load(block.hash);
+    return BI.from(blockEconomicState.txs_fee).toNumber();
   }
 
   @ResolveField(() => [String])
   public async transactions(
-    @Parent() block: CkbBlock,
-    @Loader(CkbBlockTransactionsLoader)
-    blockTransactionsLoader: DataLoader<string, CkbBlockTransactionsLoaderResponse>,
+    @Parent() { hash }: CkbBlock,
+    @Loader(CkbBlockLoader) blockLoader: DataLoader<string, CkbBlockLoaderResponse>,
   ): Promise<CkbBaseTransaction[]> {
-    const transactions = await blockTransactionsLoader.load(block.hash);
-    return transactions.map((tx) => CkbTransaction.fromCKBExplorer(tx));
+    const block = await blockLoader.load(hash);
+    return block.transactions.map((tx) => CkbTransaction.from(block, tx));
   }
 }

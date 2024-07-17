@@ -1,13 +1,11 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { toNumber } from 'lodash';
-import * as CKBExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
-import { CkbCell, CkbBaseCell } from '../cell/cell.model';
+import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
+import { CkbCell } from '../cell/cell.model';
 import { CkbBlock } from '../block/block.model';
+import { BI } from '@ckb-lumos/bi';
 
-export type CkbBaseTransaction = Omit<CkbTransaction, 'block' | 'inputs' | 'outputs'> & {
-  inputs: CkbBaseCell[];
-  outputs: CkbBaseCell[];
-};
+export type CkbBaseTransaction = Omit<CkbTransaction, 'fee' | 'block' | 'inputs'>;
 
 @ObjectType({ description: 'CKB Transaction' })
 export class CkbTransaction {
@@ -19,9 +17,6 @@ export class CkbTransaction {
 
   @Field(() => String)
   hash: string;
-
-  @Field(() => Int)
-  index: number;
 
   @Field(() => Date)
   timestamp: Date;
@@ -41,24 +36,20 @@ export class CkbTransaction {
   @Field(() => CkbBlock)
   block: CkbBlock;
 
-  public static fromCKBExplorer(tx: CKBExplorer.Transaction): CkbBaseTransaction {
-    const outputSum = tx.display_outputs.reduce(
-      (sum, output) => sum + toNumber(output.capacity),
+  public static from(block: CkbRpc.Block, tx: CkbRpc.Transaction) {
+    const isCellbase = tx.inputs[0].previous_output.tx_hash.endsWith('0'.repeat(64));
+    const outputSum = tx.outputs.reduce(
+      (sum, output) => sum + BI.from(output.capacity).toNumber(),
       0,
     );
-    const inputSum = tx.display_inputs.reduce((sum, input) => sum + toNumber(input.capacity), 0);
-    const fee = inputSum - outputSum;
 
     return {
-      isCellbase: tx.is_cellbase,
-      blockNumber: toNumber(tx.block_number),
-      hash: tx.transaction_hash,
-      index: toNumber(tx.block_number),
-      timestamp: new Date(toNumber(tx.block_timestamp)),
-      inputs: tx.display_inputs.map((input, index) => CkbCell.fromCKBExplorer(input, index)),
-      outputs: tx.display_outputs.map((output, index) => CkbCell.fromCKBExplorer(output, index)),
+      isCellbase,
+      hash: tx.hash,
+      blockNumber: toNumber(block.header.number),
+      timestamp: new Date(BI.from(block.header.timestamp).toNumber()),
       outputSum,
-      fee,
+      outputs: tx.outputs.map((_, index) => CkbCell.from(tx, index)),
     };
   }
 }

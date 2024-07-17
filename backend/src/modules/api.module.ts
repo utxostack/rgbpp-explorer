@@ -6,6 +6,8 @@ import { SentryService } from '@ntegral/nestjs-sentry';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { DataLoaderInterceptor } from '@applifting-io/nestjs-dataloader';
 import { CkbModule } from './ckb/ckb.module';
+import { RgbppModule } from './rgbpp/rgbpp.module';
+import { BitcoinModule } from './bitcoin/bitcoin.module';
 
 @Module({
   imports: [
@@ -31,6 +33,8 @@ import { CkbModule } from './ckb/ckb.module';
       }),
     }),
     CkbModule,
+    BitcoinModule,
+    RgbppModule,
   ],
   providers: [
     {

@@ -1,26 +1,58 @@
+export enum BlockSortType {
+  HeightAsc = 'height.asc',
+  HeightDesc = 'height.desc',
+  TransactionsAsc = 'transactions.asc',
+  TransactionsDesc = 'transactions.desc',
+  RewardAsc = 'reward.asc',
+  RewardDesc = 'reward.desc',
+}
+
+export enum TransactionSortType {
+  NumberAsc = 'number.asc',
+  NumberDesc = 'number.desc',
+  TimeAsc = 'time.asc',
+  TimeDesc = 'time.desc',
+}
+
+// https://github.com/nervosnetwork/ckb-explorer/blob/f2b9823e1a1ece1b74901ca3090565d62b251dcd/app/workers/bitcoin_transaction_detect_worker.rb#L123C4-L137C8
+export enum LeapDirection {
+  In = 'in',
+  LeapoutBTC = 'leapoutBTC',
+  WithinBTC = 'withinBtc',
+}
+
+export enum TransferStep {
+  Isomorphic = 'isomorphic',
+  Unlock = 'unlock',
+}
+
 export interface PaginationMeta {
   total: number;
   page_size: number;
 }
 
-export interface CkbExplorerResponse<T extends {}, IsPaginated extends boolean = false> {
-  data: IsPaginated extends true
-  ? {
-    id: string;
-    type: string;
-    attributes: T;
-  }[]
-  : {
-    id: string;
-    type: string;
-    attributes: T;
-  };
+export interface CkbExplorerResponse<T, IsPaginated extends boolean = false> {
+  data: T;
   meta: IsPaginated extends true ? PaginationMeta : never;
 }
 
-export type NonPaginatedResponse<T extends {}> = CkbExplorerResponse<T, false>;
+export type NonPaginatedResponse<T extends {}> = CkbExplorerResponse<
+  {
+    id: string;
+    type: string;
+    attributes: T;
+  },
+  false
+>;
 
-export type PaginatedResponse<T extends {}> = CkbExplorerResponse<T, true>;
+export type PaginatedResponse<T extends {}> = CkbExplorerResponse<
+  {
+    id: string;
+    type: string;
+    attributes: T;
+  }[],
+  true
+>;
 
 export interface BlockList {
   miner_hash: string;
@@ -107,4 +139,16 @@ export interface Transaction {
   rgb_transfer_step: null;
   created_at: string;
   create_timestamp: string;
+}
+
+export interface RgbppTransaction {
+  id: number;
+  tx_hash: string;
+  block_id: number;
+  block_number: number;
+  block_timestamp: number;
+  leap_direction: LeapDirection;
+  transfer_step: TransferStep;
+  rgb_cell_changes: number;
+  rgb_txid: string;
 }

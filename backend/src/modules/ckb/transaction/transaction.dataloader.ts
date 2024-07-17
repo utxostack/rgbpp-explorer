@@ -2,11 +2,11 @@ import { NestDataLoader } from '@applifting-io/nestjs-dataloader';
 import { Injectable, Logger } from '@nestjs/common';
 import { CkbTransactionService } from './transaction.service';
 import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
+import { DataLoaderResponse } from 'src/common/type/dataloader';
 
-export type CkbTransactionLoaderResponse = CkbRpc.TransactionWithStatusResponse;
 
 @Injectable()
-export class CkbTransactionLoader implements NestDataLoader<string, CkbTransactionLoaderResponse> {
+export class CkbTransactionLoader implements NestDataLoader<string, CkbRpc.TransactionWithStatusResponse> {
   private logger = new Logger(CkbTransactionLoader.name);
 
   constructor(private transactionService: CkbTransactionService) {}
@@ -18,3 +18,4 @@ export class CkbTransactionLoader implements NestDataLoader<string, CkbTransacti
     };
   }
 }
+export type CkbTransactionLoaderResponse = DataLoaderResponse<CkbTransactionLoader>;
