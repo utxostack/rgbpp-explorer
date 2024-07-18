@@ -2,13 +2,13 @@ import { NestDataLoader } from '@applifting-io/nestjs-dataloader';
 import { Injectable, Logger } from '@nestjs/common';
 import * as BitcoinApi from 'src/core/bitcoin-api/bitcoin-api.schema';
 import { DataLoaderResponse } from 'src/common/type/dataloader';
-import { BitcoinAPIService } from 'src/core/bitcoin-api/bitcoin-api.service';
+import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 
 @Injectable()
 export class BitcoinTransactionLoader implements NestDataLoader<string, BitcoinApi.Transaction | null> {
   private logger = new Logger(BitcoinTransactionLoader.name);
 
-  constructor(private bitcoinApiService: BitcoinAPIService) { }
+  constructor(private bitcoinApiService: BitcoinApiService) { }
 
   public getBatchFunction() {
     return async (ids: string[]) => {

@@ -1,13 +1,13 @@
 import { z } from 'zod';
 
-export const BlockchainInfo = z.object({
+export const ChainInfo = z.object({
   chain: z.string(),
   blocks: z.number(),
   bestblockhash: z.string(),
   difficulty: z.number(),
   mediantime: z.number(),
 });
-export type BlockchainInfo = z.infer<typeof BlockchainInfo>;
+export type ChainInfo = z.infer<typeof ChainInfo>;
 
 export const Block = z.object({
   id: z.string(),

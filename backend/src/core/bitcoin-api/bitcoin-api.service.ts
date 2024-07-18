@@ -6,7 +6,7 @@ import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 import { MempoolService } from './provider/mempool.service';
 import { ElectrsService } from './provider/electrs.service';
 import { IBitcoinDataProvider } from './bitcoin-api.interface';
-import { BlockchainInfo } from './bitcoin-api.schema';
+import { ChainInfo } from './bitcoin-api.schema';
 import { Env } from 'src/env';
 
 type MethodParameters<T, K extends keyof T> = T[K] extends (...args: infer P) => any ? P : never;
@@ -51,8 +51,8 @@ export class BitcoinServiceError extends Error {
 }
 
 @Injectable()
-export class BitcoinAPIService {
-  private logger = new Logger(BitcoinAPIService.name);
+export class BitcoinApiService {
+  private logger = new Logger(BitcoinApiService.name);
 
   private source: IBitcoinDataProvider;
   private fallback?: IBitcoinDataProvider;
@@ -151,7 +151,7 @@ export class BitcoinAPIService {
     }
   }
 
-  public async getBlockchainInfo(): Promise<BlockchainInfo> {
+  public async getBlockchainInfo(): Promise<ChainInfo> {
     const hash = await this.getBlocksTipHash();
     const tip = await this.getBlock({ hash });
 

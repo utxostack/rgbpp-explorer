@@ -8,4 +8,4 @@ import { BitcoinTransactionLoader } from './transaction.dataloader';
   providers: [BitcoinTransactionResolver, BitcoinTransactionLoader],
   exports: [BitcoinTransactionLoader],
 })
-export class TransactionModule {}
+export class BitcoinTransactionModule {}

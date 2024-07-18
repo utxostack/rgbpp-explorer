@@ -39,4 +39,10 @@ export class CkbRpcWebsocketService {
     const blockEconomicState = await this.websocket.call('get_block_economic_state', [blockHash]);
     return blockEconomicState as BlockEconomicState;
   }
+
+  public async getTipBlockNumber(): Promise<number> {
+    this.logger.debug('get_tip_block_number');
+    const tipBlockNumber = await this.websocket.call('get_tip_block_number', []);
+    return BI.from(tipBlockNumber).toNumber();
+  }
 }
