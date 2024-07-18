@@ -152,3 +152,37 @@ export interface RgbppTransaction {
   rgb_cell_changes: number;
   rgb_txid: string;
 }
+
+export enum XUDTTag {
+  RgbppCompatible = 'rgbpp-compatible',
+  Layer1Asset = 'layer-1-asset',
+  Layer2Asset = 'layer-2-asset',
+  SupplyLimited = 'supply-limited',
+  SupplyUnlimited = 'supply-unlimited',
+  Suspicious = 'suspicious',
+  Invalid = 'invalid',
+}
+
+export interface XUDT {
+  symbol: string;
+  full_name: string;
+  icon_file: string | null;
+  published: boolean;
+  description: string | null;
+  type_hash: string;
+  type_script: {
+    args: string;
+    code_hash: string;
+    hash_type: string;
+  };
+  issuer_address: string;
+  udt_type: string;
+  operator_website: string | null;
+  email: string | null;
+  total_amount: string;
+  addresses_count: string;
+  decimal: string;
+  h24_ckb_transactions_count: string;
+  created_at: string;
+  xudt_tags: XUDTTag[];
+}

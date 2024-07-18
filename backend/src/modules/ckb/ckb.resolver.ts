@@ -6,8 +6,8 @@ import { CkbRpcWebsocketService } from 'src/core/ckb-rpc/ckb-rpc-websocket.servi
 export class CkbResolver {
   constructor(private ckbRpcService: CkbRpcWebsocketService) {}
 
-  @Query(() => CkbChainInfo)
-  public async getCkbChainInfo(): Promise<CkbChainInfo> {
+  @Query(() => CkbChainInfo, { name: 'ckbChainInfo' })
+  public async chainInfo(): Promise<CkbChainInfo> {
     const tipBlockNumber = await this.ckbRpcService.getTipBlockNumber();
     return {
       tipBlockNumber,

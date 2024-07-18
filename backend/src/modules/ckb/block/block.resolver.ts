@@ -13,7 +13,7 @@ import { BI } from '@ckb-lumos/bi';
 
 @Resolver(() => CkbBlock)
 export class CkbBlockResolver {
-  @Query(() => CkbBlock, { name: 'getCkbBlock' })
+  @Query(() => CkbBlock, { name: 'ckbBlock' })
   public async getBlock(
     @Args('heightOrHash', { type: () => String }) heightOrHash: string,
     @Loader(CkbBlockLoader) blockLoader: DataLoader<string, CkbBlockLoaderResponse>,

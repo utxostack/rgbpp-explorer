@@ -1,6 +1,5 @@
-import { Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Int, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { RgbppBaseTransaction, RgbppTransaction } from './transaction.model';
-import { RgbppTransactionService } from './transaction.service';
 import { CkbTransaction } from 'src/modules/ckb/transaction/transaction.model';
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import {
@@ -14,15 +13,24 @@ import {
   BitcoinTransactionLoader,
   BitcoinTransactionLoaderResponse,
 } from 'src/modules/bitcoin/transaction/transaction.dataloader';
+import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
 
 @Resolver(() => RgbppTransaction)
 export class RgbppTransactionResolver {
-  constructor(private rgbppTransactionService: RgbppTransactionService) { }
+  constructor(private ckbExplorerService: CkbExplorerService) { }
 
-  @Query(() => [RgbppTransaction], { name: 'getRgbppLatestTransactions' })
-  public async getLatestRransaction(): Promise<RgbppBaseTransaction[]> {
-    const transactions = await this.rgbppTransactionService.getLatestTransaction();
-    return transactions.map((transaction) => RgbppTransaction.fromCkbExplorer(transaction));
+  @Query(() => [RgbppTransaction], { name: 'rgbppLatestTransactions' })
+  public async getLatestRransaction(
+    @Args('page', { type: () => Int, nullable: true }) page: number = 1,
+    @Args('pageSize', { type: () => Int, nullable: true }) pageSize: number = 10,
+  ): Promise<RgbppBaseTransaction[]> {
+    const response = await this.ckbExplorerService.getRgbppTransactions({
+      page,
+      pageSize,
+    });
+    return response.data.ckb_transactions.map((transaction) =>
+      RgbppTransaction.fromCkbExplorer(transaction),
+    );
   }
 
   @ResolveField(() => CkbTransaction)

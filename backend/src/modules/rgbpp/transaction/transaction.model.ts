@@ -36,6 +36,9 @@ export class RgbppTransaction {
   @Field(() => Int)
   blockNumber: number;
 
+  @Field(() => Date)
+  timestamp: Date;
+
   @Field(() => CkbTransaction)
   ckbTransaction: CkbTransaction;
 
@@ -48,6 +51,7 @@ export class RgbppTransaction {
       btcTxid: tx.rgb_txid,
       leapDirection: LeapDirectionMap[tx.leap_direction],
       blockNumber: tx.block_number,
+      timestamp: new Date(tx.block_timestamp),
     };
   }
 }

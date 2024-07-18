@@ -12,6 +12,8 @@ import {
   RgbppTransaction,
   Transaction,
   TransactionSortType,
+  XUDT,
+  XUDTTag,
 } from './ckb-explorer.interface';
 
 type BasePaginationParams = {
@@ -26,6 +28,11 @@ type GetBlockListParams = BasePaginationParams & {
 type GetRgbppTransactionsParams = BasePaginationParams & {
   sort?: TransactionSortType;
   leapDirection?: 'in' | 'out';
+};
+
+type GetXUDTListParams = BasePaginationParams & {
+  symbol?: string;
+  tags?: XUDTTag[];
 };
 
 @Injectable()
@@ -94,6 +101,30 @@ export class CkbExplorerService {
       params.append('leap_direction', leapDirection);
     }
     const response = await this.request.get(`/v2/rgb_transactions?${params.toString()}`);
+    return response.data;
+  }
+
+  public async getXUDTList({
+    symbol,
+    tags,
+    page = 1,
+    pageSize = 10,
+  }: GetXUDTListParams): Promise<PaginatedResponse<XUDT>> {
+    const params = new URLSearchParams();
+    params.append('page', page.toString());
+    params.append('page_size', pageSize.toString());
+    if (symbol) {
+      params.append('symbol', symbol);
+    }
+    if (tags) {
+      params.append('tags', tags.join(','));
+    }
+    const response = await this.request.get(`/v1/xudts?${params.toString()}`);
+    return response.data;
+  }
+
+  public async getXUDT(typeHash: string): Promise<NonPaginatedResponse<XUDT>> {
+    const response = await this.request.get(`/v1/xudts/${typeHash}`);
     return response.data;
   }
 }
