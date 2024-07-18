@@ -9,6 +9,7 @@ import { CkbModule } from './ckb/ckb.module';
 import { RgbppModule } from './rgbpp/rgbpp.module';
 import { BitcoinModule } from './bitcoin/bitcoin.module';
 import { Env } from 'src/env';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { Env } from 'src/env';
         playground: configService.get('ENABLED_GRAPHQL_PLAYGROUND'),
         installSubscriptionHandlers: true,
         introspection: true,
-        autoSchemaFile: true,
+        autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
         buildSchemaOptions: {
           dateScalarMode: 'timestamp',
         },
