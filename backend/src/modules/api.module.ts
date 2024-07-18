@@ -8,14 +8,15 @@ import { DataLoaderInterceptor } from '@applifting-io/nestjs-dataloader';
 import { CkbModule } from './ckb/ckb.module';
 import { RgbppModule } from './rgbpp/rgbpp.module';
 import { BitcoinModule } from './bitcoin/bitcoin.module';
+import { Env } from 'src/env';
 
 @Module({
   imports: [
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
       inject: [ConfigService, SentryService],
-      useFactory: async (configService: ConfigService, sentryService: SentryService) => ({
-        playground: configService.get('NODE_ENV') !== 'production',
+      useFactory: async (configService: ConfigService<Env>, sentryService: SentryService) => ({
+        playground: configService.get('ENABLED_GRAPHQL_PLAYGROUND'),
         installSubscriptionHandlers: true,
         introspection: true,
         autoSchemaFile: true,

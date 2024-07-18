@@ -6,6 +6,7 @@ export const envSchema = z
     NETWORK: z
       .enum([NetworkType.mainnet, NetworkType.testnet])
       .default(NetworkType.testnet),
+    ENABLED_GRAPHQL_PLAYGROUND: z.boolean().default(true),
 
     // DATABASE_URL: z.string(),
     // REDIS_URL: z.string(),
