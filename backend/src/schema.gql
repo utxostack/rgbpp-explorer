@@ -1,0 +1,199 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+"""CKB Script"""
+type CkbScript {
+  codeHash: String!
+  hashType: String!
+  args: String!
+}
+
+"""CKB XUDT Info"""
+type CkbXUDTInfo {
+  symbol: String!
+  amount: Float!
+  decimal: Int!
+  typeHash: String!
+}
+
+"""CKB Cell"""
+type CkbCell {
+  txHash: String!
+  index: Int!
+  capacity: Float!
+  type: CkbScript
+  lock: CkbScript!
+  xudtInfo: CkbXUDTInfo
+}
+
+"""CKB Transaction"""
+type CkbTransaction {
+  isCellbase: Boolean!
+  blockNumber: Int!
+  hash: String!
+  fee: Float!
+  inputs: [CkbCell!]!
+  outputs: [CkbCell!]!
+  block: CkbBlock!
+}
+
+"""CKB Block"""
+type CkbBlock {
+  version: Int!
+  hash: String!
+  number: Int!
+  timestamp: Timestamp!
+  transactionsCount: Int!
+  totalFee: Float!
+  transactions: [CkbTransaction!]!
+}
+
+"""
+`Date` type as integer. Type represents date and time as number of milliseconds from start of UNIX epoch.
+"""
+scalar Timestamp
+
+"""CKB ChainInfo"""
+type CkbChainInfo {
+  tipBlockNumber: Float!
+}
+
+"""Bitcoin Address"""
+type BitcoinAddress {
+  address: String!
+  satoshi: Float!
+  pendingSatoshi: Float!
+  transactionCount: Float!
+  transactions: [BitcoinTransaction!]!
+}
+
+"""Bitcoin Output"""
+type BitcoinOutput {
+  scriptpubkey: String!
+  scriptpubkeyAsm: String!
+  scriptpubkeyType: String!
+  scriptpubkeyAddress: String
+  value: Float!
+  address: BitcoinAddress
+}
+
+"""Bitcoin Input"""
+type BitcoinInput {
+  txid: String!
+  vout: Int!
+  prevout: BitcoinOutput
+  scriptsig: String!
+  scriptsigAsm: String!
+  isCoinbase: Boolean!
+  sequence: Int!
+}
+
+"""Bitcoin Transaction"""
+type BitcoinTransaction {
+  blockHeight: Float!
+  blockHash: String!
+  txid: String!
+  version: Int!
+  vin: [BitcoinInput!]!
+  vout: [BitcoinOutput!]!
+  size: Float!
+  locktime: Timestamp!
+  weight: Float!
+  fee: Float!
+  confirmed: Boolean!
+}
+
+"""RGB++ Transaction"""
+type RgbppTransaction {
+  ckbTxHash: String!
+  btcTxid: String
+  leapDirection: LeapDirection
+  blockNumber: Int!
+  timestamp: Timestamp!
+  ckbTransaction: CkbTransaction
+  btcTransaction: BitcoinTransaction
+}
+
+enum LeapDirection {
+  LeapIn
+  LeapOut
+  Within
+}
+
+"""RGB++ Coin"""
+type RgbppCoin {
+  name: String!
+  description: String
+  symbol: String!
+  decimal: Float!
+  icon: String
+  typeHash: String!
+  typeScript: CkbScript!
+  holdersCount: Int!
+  h24CkbTransactionsCount: Int!
+  totalAmount: Float!
+  issuer: String!
+  deployedAt: Timestamp!
+  transactions(page: Int, pageSize: Int): [RgbppTransaction!]!
+}
+
+"""RGB++ Coin List"""
+type RgbppCoinList {
+  coins: [RgbppCoin!]!
+  total: Int!
+  page: Int!
+}
+
+"""Bitcoin Fees"""
+type BitcoinFees {
+  fastest: Float!
+  halfHour: Float!
+  hour: Float!
+  economy: Float!
+  minimum: Float!
+}
+
+"""Bitcoin ChainInfo"""
+type BitcoinChainInfo {
+  tipBlockHeight: Float!
+  tipBlockHash: String!
+  difficulty: Float!
+  fees: BitcoinFees!
+}
+
+"""Fee Rate Range"""
+type FeeRateRange {
+  min: Float!
+  max: Float!
+}
+
+"""Bitcoin Block"""
+type BitcoinBlock {
+  id: String!
+  height: Float!
+  version: Int!
+  timestamp: Timestamp!
+  txCount: Float!
+  size: Float!
+  weight: Float!
+  bits: Float!
+  difficulty: Float!
+  miner: BitcoinAddress!
+  totalFee: Float!
+  feeRateRange: FeeRateRange!
+  transactions: [BitcoinTransaction!]!
+}
+
+type Query {
+  ckbChainInfo: CkbChainInfo!
+  ckbBlock(heightOrHash: String!): CkbBlock!
+  ckbTransaction(txHash: String!): CkbTransaction
+  btcChainInfo: BitcoinChainInfo!
+  btcBlock(hashOrHeight: String!): BitcoinBlock!
+  btcTransaction(txid: String!): BitcoinTransaction
+  rgbppLatestTransactions(page: Int, pageSize: Int): [RgbppTransaction!]!
+  rgbppTransaction(txidOrTxHash: String!): RgbppTransaction
+  rgbppCoinList(page: Int, pageSize: Int): RgbppCoinList!
+  rgbppCoin(typeHash: String!): RgbppCoin!
+}
