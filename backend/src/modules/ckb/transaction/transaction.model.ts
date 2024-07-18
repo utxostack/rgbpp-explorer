@@ -3,9 +3,8 @@ import { toNumber } from 'lodash';
 import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
 import { CkbBaseCell, CkbCell } from '../cell/cell.model';
 import { CkbBlock } from '../block/block.model';
-import { BI } from '@ckb-lumos/bi';
 
-export type CkbBaseTransaction = Omit<CkbTransaction, 'fee' | 'block' | 'inputs'>;
+export type CkbBaseTransaction = Omit<CkbTransaction, 'block' | 'inputs'>;
 
 @ObjectType({ description: 'CKB Transaction' })
 export class CkbTransaction {
@@ -17,12 +16,6 @@ export class CkbTransaction {
 
   @Field(() => String)
   hash: string;
-
-  @Field(() => Date)
-  timestamp: Date;
-
-  @Field(() => Float)
-  outputSum: number;
 
   @Field(() => Float)
   fee: number;
@@ -36,20 +29,16 @@ export class CkbTransaction {
   @Field(() => CkbBlock)
   block: CkbBlock;
 
-  public static from(block: CkbRpc.Block, tx: CkbRpc.Transaction) {
-    const isCellbase = tx.inputs[0].previous_output.tx_hash.endsWith('0'.repeat(64));
-    const outputSum = tx.outputs.reduce(
-      (sum, output) => sum + BI.from(output.capacity).toNumber(),
-      0,
-    );
+  public static from(transactionWithStatus: CkbRpc.TransactionWithStatusResponse) {
+    const { transaction, tx_status, fee } = transactionWithStatus;
+    const isCellbase = transaction.inputs[0].previous_output.tx_hash.endsWith('0'.repeat(64));
 
     return {
       isCellbase,
-      hash: tx.hash,
-      blockNumber: toNumber(block.header.number),
-      timestamp: new Date(BI.from(block.header.timestamp).toNumber()),
-      outputSum,
-      outputs: tx.outputs.map((_, index) => CkbCell.from(tx, index)),
+      hash: transaction.hash,
+      blockNumber: toNumber(tx_status.block_number),
+      fee: toNumber(fee),
+      outputs: transaction.outputs.map((_, index) => CkbCell.from(transaction, index)),
     };
   }
 }

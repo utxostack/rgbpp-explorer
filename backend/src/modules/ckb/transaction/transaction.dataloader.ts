@@ -13,7 +13,7 @@ export class CkbTransactionLoader implements NestDataLoader<string, CkbRpc.Trans
 
   public getBatchFunction() {
     return (hashs: string[]) => {
-      this.logger.debug(`Loading transactions: ${hashs.join(', ')}`);
+      this.logger.debug(`Loading CKB transactions: ${hashs.join(', ')}`);
       return Promise.all(hashs.map((key) => this.transactionService.getTransaction(key)));
     };
   }

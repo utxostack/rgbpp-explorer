@@ -39,7 +39,7 @@ export class RgbppTransaction {
   @Field(() => Date)
   timestamp: Date;
 
-  @Field(() => CkbTransaction)
+  @Field(() => CkbTransaction, { nullable: true })
   ckbTransaction: CkbTransaction;
 
   @Field(() => BitcoinTransaction, { nullable: true })

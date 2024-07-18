@@ -1,6 +1,6 @@
 import DataLoader from 'dataloader';
 import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { CkbBlock, BaseCkbBlock } from './block.model';
+import { CkbBlock, CkbBaseBlock } from './block.model';
 import { CkbBaseTransaction, CkbTransaction } from '../transaction/transaction.model';
 import {
   CkbBlockEconomicStateLoader,
@@ -10,6 +10,10 @@ import {
 } from './block.dataloader';
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import { BI } from '@ckb-lumos/bi';
+import {
+  CkbTransactionLoader,
+  CkbTransactionLoaderResponse,
+} from '../transaction/transaction.dataloader';
 
 @Resolver(() => CkbBlock)
 export class CkbBlockResolver {
@@ -17,9 +21,9 @@ export class CkbBlockResolver {
   public async getBlock(
     @Args('heightOrHash', { type: () => String }) heightOrHash: string,
     @Loader(CkbBlockLoader) blockLoader: DataLoader<string, CkbBlockLoaderResponse>,
-  ): Promise<BaseCkbBlock> {
+  ): Promise<CkbBaseBlock> {
     const block = await blockLoader.load(heightOrHash);
-    return CkbBlock.fromCkbRpc(block);
+    return CkbBlock.from(block);
   }
 
   @ResolveField(() => Float)
@@ -36,8 +40,16 @@ export class CkbBlockResolver {
   public async transactions(
     @Parent() { hash }: CkbBlock,
     @Loader(CkbBlockLoader) blockLoader: DataLoader<string, CkbBlockLoaderResponse>,
+    @Loader(CkbTransactionLoader)
+    transactionLoader: DataLoader<string, CkbTransactionLoaderResponse>,
   ): Promise<CkbBaseTransaction[]> {
     const block = await blockLoader.load(hash);
-    return block.transactions.map((tx) => CkbTransaction.from(block, tx));
+    const transactions = await Promise.all(
+      block.transactions.map(async (tx) => {
+        const transaction = await transactionLoader.load(tx.hash);
+        return CkbTransaction.from(transaction);
+      }),
+    );
+    return transactions;
   }
 }

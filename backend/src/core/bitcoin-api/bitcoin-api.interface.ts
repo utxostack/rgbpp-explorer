@@ -13,6 +13,7 @@ export interface IBitcoinDataProvider {
   getTx({ txid }: { txid: string }): Promise<Transaction>;
   getTxHex({ txid }: { txid: string }): Promise<string>;
   getBlock({ hash }: { hash: string }): Promise<Block>;
+  getBlockTxs({ hash }: { hash: string }): Promise<Transaction[]>;
   getBlockHeight({ height }: { height: number }): Promise<string>;
   getBlockHeader({ hash }: { hash: string }): Promise<string>;
   getBlockTxids({ hash }: { hash: string }): Promise<string[]>;

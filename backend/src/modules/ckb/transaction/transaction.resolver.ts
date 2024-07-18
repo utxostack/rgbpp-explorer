@@ -1,24 +1,26 @@
 import DataLoader from 'dataloader';
-import { Float, Parent, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { CkbTransaction, CkbBaseTransaction } from './transaction.model';
 import { CkbBlockLoader, CkbBlockLoaderResponse } from '../block/block.dataloader';
 import { Loader } from '@applifting-io/nestjs-dataloader';
-import { BaseCkbBlock, CkbBlock } from '../block/block.model';
+import { CkbBaseBlock, CkbBlock } from '../block/block.model';
 import { CkbBaseCell, CkbCell } from '../cell/cell.model';
 import { CkbTransactionLoader, CkbTransactionLoaderResponse } from './transaction.dataloader';
 import { BI } from '@ckb-lumos/bi';
 
 @Resolver(() => CkbTransaction)
 export class CkbTransactionResolver {
-  @ResolveField(() => [Float])
-  public async fee(
-    @Parent() transaction: CkbBaseTransaction,
+  @Query(() => CkbTransaction, { name: 'ckbTransaction', nullable: true })
+  public async getTransaction(
+    @Args('txHash') txHash: string,
     @Loader(CkbTransactionLoader)
     transactionLoader: DataLoader<string, CkbTransactionLoaderResponse>,
-  ): Promise<number> {
-    const inputs = await this.inputs(transaction, transactionLoader);
-    const inputSum = inputs.reduce((sum, input) => sum + BI.from(input.capacity).toNumber(), 0);
-    return inputSum - transaction.outputSum;
+  ): Promise<CkbBaseTransaction | null> {
+    const transaction = await transactionLoader.load(txHash);
+    if (!transaction) {
+      return null;
+    }
+    return CkbTransaction.from(transaction);
   }
 
   @ResolveField(() => [CkbCell])
@@ -47,8 +49,8 @@ export class CkbTransactionResolver {
     @Parent() transaction: CkbBaseTransaction,
     @Loader(CkbBlockLoader)
     blockLoader: DataLoader<string, CkbBlockLoaderResponse>,
-  ): Promise<BaseCkbBlock> {
+  ): Promise<CkbBaseBlock> {
     const block = await blockLoader.load(transaction.blockNumber.toString());
-    return CkbBlock.fromCkbRpc(block);
+    return CkbBlock.from(block);
   }
 }

@@ -125,6 +125,12 @@ export class MempoolService implements IBitcoinDataProvider {
     return Block.parse(response);
   }
 
+  public async getBlockTxs({ hash }: { hash: string }) {
+    const response = await this.mempool.bitcoin.blocks.getBlockTxs({ hash });
+    // XXX: This is a workaround to fix the type issue, need to fix the type in the mempool.js
+    return (response as unknown as Transaction[]).map((tx) => Transaction.parse(tx));
+  }
+
   public async getBlockHeight({ height }: { height: number }) {
     const response = await this.mempool.bitcoin.blocks.getBlockHeight({ height });
     return response;

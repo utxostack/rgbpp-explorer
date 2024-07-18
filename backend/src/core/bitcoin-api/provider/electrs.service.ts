@@ -44,6 +44,11 @@ export class ElectrsService implements IBitcoinDataProvider {
     return Block.parse(response.data);
   }
 
+  public async getBlockTxs({ hash }: { hash: string }) {
+    const response = await this.request.get<Transaction[]>(`/block/${hash}/txs`);
+    return response.data.map((tx: unknown) => Transaction.parse(tx));
+  }
+
   public async getBlockHeight({ height }: { height: number }) {
     const response = await this.request.get<string>(`/block-height/${height}`);
     return response.data;

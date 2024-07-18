@@ -3,7 +3,7 @@ import { toNumber } from 'lodash';
 import { CkbTransaction } from '../transaction/transaction.model';
 import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
 
-export type BaseCkbBlock = Omit<CkbBlock, 'totalFee' | 'transactions'>;
+export type CkbBaseBlock = Omit<CkbBlock, 'totalFee' | 'transactions'>;
 
 @ObjectType({ description: 'CKB Block' })
 export class CkbBlock {
@@ -28,7 +28,7 @@ export class CkbBlock {
   @Field(() => [CkbTransaction])
   transactions: CkbTransaction[];
 
-  public static fromCkbRpc(block: CkbRpc.Block): BaseCkbBlock {
+  public static from(block: CkbRpc.Block): CkbBaseBlock {
     return {
       version: toNumber(block.header.version),
       hash: block.header.hash,

@@ -7,52 +7,58 @@ import {
   CkbTransactionLoaderResponse,
 } from 'src/modules/ckb/transaction/transaction.dataloader';
 import DataLoader from 'dataloader';
-import { CkbBlockLoader, CkbBlockLoaderResponse } from 'src/modules/ckb/block/block.dataloader';
 import { BitcoinTransaction } from 'src/modules/bitcoin/transaction/transaction.model';
 import {
   BitcoinTransactionLoader,
   BitcoinTransactionLoaderResponse,
 } from 'src/modules/bitcoin/transaction/transaction.dataloader';
-import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
+import { RgbppTransactionService } from './transaction.service';
 
 @Resolver(() => RgbppTransaction)
 export class RgbppTransactionResolver {
-  constructor(private ckbExplorerService: CkbExplorerService) { }
+  constructor(private transactionService: RgbppTransactionService) { }
 
   @Query(() => [RgbppTransaction], { name: 'rgbppLatestTransactions' })
   public async getLatestRransaction(
     @Args('page', { type: () => Int, nullable: true }) page: number = 1,
     @Args('pageSize', { type: () => Int, nullable: true }) pageSize: number = 10,
   ): Promise<RgbppBaseTransaction[]> {
-    const response = await this.ckbExplorerService.getRgbppTransactions({
-      page,
-      pageSize,
-    });
-    return response.data.ckb_transactions.map((transaction) =>
-      RgbppTransaction.from(transaction),
-    );
+    const transactions = await this.transactionService.getLatestTransactions(page, pageSize);
+    return transactions;
   }
 
-  @ResolveField(() => CkbTransaction)
+  @Query(() => RgbppTransaction, { name: 'rgbppTransaction', nullable: true })
+  public async getTransaction(
+    @Args('txidOrTxHash') txidOrTxHash: string,
+  ): Promise<RgbppBaseTransaction | null> {
+    return txidOrTxHash.startsWith('ck')
+      ? this.transactionService.getTransactionByCkbTxHash(txidOrTxHash)
+      : this.transactionService.getTransactionByBtcTxid(txidOrTxHash);
+  }
+
+  @ResolveField(() => CkbTransaction, { nullable: true })
   public async ckbTransaction(
     @Parent() tx: RgbppBaseTransaction,
     @Loader(CkbTransactionLoader)
     ckbTxLoader: DataLoader<string, CkbTransactionLoaderResponse>,
-    @Loader(CkbBlockLoader)
-    ckbBlockLoader: DataLoader<string, CkbBlockLoaderResponse>,
   ) {
-    const ckbBlock = await ckbBlockLoader.load(tx.blockNumber.toString());
     const ckbTx = await ckbTxLoader.load(tx.ckbTxHash);
-    return CkbTransaction.from(ckbBlock, ckbTx.transaction);
+    if (!ckbTx) {
+      return null;
+    }
+    return CkbTransaction.from(ckbTx);
   }
 
-  @ResolveField(() => BitcoinTransaction)
+  @ResolveField(() => BitcoinTransaction, { nullable: true })
   public async btcTransaction(
     @Parent() tx: RgbppBaseTransaction,
     @Loader(BitcoinTransactionLoader)
     btcTxLoader: DataLoader<string, BitcoinTransactionLoaderResponse>,
   ) {
     const btcTx = await btcTxLoader.load(tx.btcTxid);
+    if (!btcTx) {
+      return null;
+    }
     return BitcoinTransaction.from(btcTx);
   }
 }

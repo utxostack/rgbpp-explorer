@@ -190,6 +190,10 @@ export class BitcoinApiService {
     return this.call('getBlock', { hash });
   }
 
+  public async getBlockTxs({ hash }: { hash: string }) {
+    return this.call('getBlockTxs', { hash });
+  }
+
   public async getBlockHeight({ height }: { height: number }) {
     return this.call('getBlockHeight', { height });
   }

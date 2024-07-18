@@ -12,6 +12,9 @@ export class CkbRpcWebsocketService {
 
   constructor(private configService: ConfigService<Env>) {
     this.websocket = new RpcWebsocketsClient(this.configService.get('CKB_RPC_WEBSOCKET_URL'));
+    this.websocket.on('error', (error) => {
+      this.logger.error(error.message);
+    });
   }
 
   public async getTransaction(txHash: string): Promise<TransactionWithStatusResponse> {
