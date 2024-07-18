@@ -4,7 +4,7 @@ import { CkbTransaction, CkbBaseTransaction } from './transaction.model';
 import { CkbBlockLoader, CkbBlockLoaderResponse } from '../block/block.dataloader';
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import { BaseCkbBlock, CkbBlock } from '../block/block.model';
-import { CkbCell } from '../cell/cell.model';
+import { CkbBaseCell, CkbCell } from '../cell/cell.model';
 import { CkbTransactionLoader, CkbTransactionLoaderResponse } from './transaction.dataloader';
 import { BI } from '@ckb-lumos/bi';
 
@@ -26,17 +26,18 @@ export class CkbTransactionResolver {
     @Parent() transaction: CkbBaseTransaction,
     @Loader(CkbTransactionLoader)
     transactionLoader: DataLoader<string, CkbTransactionLoaderResponse>,
-  ): Promise<CkbCell[]> {
+  ): Promise<CkbBaseCell[]> {
     const tx = await transactionLoader.load(transaction.hash);
     const inputs = Promise.all(
       tx.transaction.inputs
         // Filter out cellbase transaction
         .filter((input) => !input.previous_output.tx_hash.endsWith('0'.repeat(64)))
-        .map(async (_, index) => {
-          const input = tx.transaction.inputs[index];
+        .map(async (_, i) => {
+          const input = tx.transaction.inputs[i];
           const previousTx = await transactionLoader.load(input.previous_output.tx_hash);
+          const index = BI.from(input.previous_output.index).toNumber();
           return CkbCell.from(previousTx.transaction, index);
-        }),
+        })
     );
     return inputs;
   }

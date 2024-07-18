@@ -103,8 +103,18 @@ export interface DisplayInput {
   capacity: string;
   occupied_capacity: string;
   address_hash: string;
-  target_block_number: string;
   generated_tx_hash: string;
+  target_block_number?: string;
+
+  // XUDT
+  cell_type: string;
+  xudt_info: {
+    symbol: string;
+    amount: string;
+    decimal: string;
+    type_hash: string;
+    published: boolean;
+  };
 }
 
 export interface DisplayOutput {
@@ -121,6 +131,16 @@ export interface DisplayOutput {
   consumed_tx_hash: string;
   generated_tx_hash: string;
   cell_index: string;
+
+  // XUDT
+  cell_type: string;
+  xudt_info: {
+    symbol: string;
+    amount: string;
+    decimal: string;
+    type_hash: string;
+    published: boolean;
+  };
 }
 
 export interface Transaction {

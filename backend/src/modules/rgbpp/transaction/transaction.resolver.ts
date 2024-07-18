@@ -29,7 +29,7 @@ export class RgbppTransactionResolver {
       pageSize,
     });
     return response.data.ckb_transactions.map((transaction) =>
-      RgbppTransaction.fromCkbExplorer(transaction),
+      RgbppTransaction.from(transaction),
     );
   }
 

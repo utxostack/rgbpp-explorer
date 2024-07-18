@@ -26,7 +26,7 @@ export class RgbppTransaction {
   @Field(() => String)
   ckbTxHash: string;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   btcTxid: string;
 
   // FIXME: need to be fixed, don't know why it's null from the explorer api
@@ -45,12 +45,22 @@ export class RgbppTransaction {
   @Field(() => BitcoinTransaction, { nullable: true })
   btcTransaction: BitcoinTransaction;
 
-  public static fromCkbExplorer(tx: CkbExplorer.RgbppTransaction) {
+  public static from(tx: CkbExplorer.RgbppTransaction) {
     return {
       ckbTxHash: tx.tx_hash,
       btcTxid: tx.rgb_txid,
       leapDirection: LeapDirectionMap[tx.leap_direction],
       blockNumber: tx.block_number,
+      timestamp: new Date(tx.block_timestamp),
+    };
+  }
+
+  public static fromCkbTransaction(tx: CkbExplorer.Transaction) {
+    return {
+      ckbTxHash: tx.transaction_hash,
+      btcTxid: tx.rgb_txid,
+      leapDirection: null,
+      blockNumber: parseInt(tx.block_number),
       timestamp: new Date(tx.block_timestamp),
     };
   }

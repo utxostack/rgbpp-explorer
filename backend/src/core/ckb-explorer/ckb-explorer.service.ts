@@ -35,6 +35,11 @@ type GetXUDTListParams = BasePaginationParams & {
   tags?: XUDTTag[];
 };
 
+type GetXUDTTransactionsParams = BasePaginationParams & {
+  txHash?: string;
+  addressHash?: string;
+};
+
 @Injectable()
 export class CkbExplorerService {
   private logger = new Logger(CkbExplorerService.name);
@@ -104,6 +109,11 @@ export class CkbExplorerService {
     return response.data;
   }
 
+  public async getTransaction(txHash: string): Promise<NonPaginatedResponse<Transaction>> {
+    const response = await this.request.get(`/v1/transactions/${txHash}`);
+    return response.data;
+  }
+
   public async getXUDTList({
     symbol,
     tags,
@@ -125,6 +135,25 @@ export class CkbExplorerService {
 
   public async getXUDT(typeHash: string): Promise<NonPaginatedResponse<XUDT>> {
     const response = await this.request.get(`/v1/xudts/${typeHash}`);
+    return response.data;
+  }
+
+  public async getXUDTTransactions(
+    typeHash: string,
+    { page = 1, pageSize = 10, txHash, addressHash }: GetXUDTTransactionsParams = {},
+  ): Promise<PaginatedResponse<Transaction>> {
+    const params = new URLSearchParams();
+    params.append('page', page.toString());
+    params.append('page_size', pageSize.toString());
+    if (txHash) {
+      params.append('tx_hash', txHash);
+    }
+    if (addressHash) {
+      params.append('address_hash', addressHash);
+    }
+    const response = await this.request.get(
+      `/v1/udt_transactions/${typeHash}?${params.toString()}`,
+    );
     return response.data;
   }
 }

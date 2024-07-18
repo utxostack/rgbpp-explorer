@@ -1,7 +1,7 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { toNumber } from 'lodash';
 import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
-import { CkbCell } from '../cell/cell.model';
+import { CkbBaseCell, CkbCell } from '../cell/cell.model';
 import { CkbBlock } from '../block/block.model';
 import { BI } from '@ckb-lumos/bi';
 
@@ -28,10 +28,10 @@ export class CkbTransaction {
   fee: number;
 
   @Field(() => [CkbCell])
-  inputs: CkbCell[];
+  inputs: CkbBaseCell[];
 
   @Field(() => [CkbCell])
-  outputs: CkbCell[];
+  outputs: CkbBaseCell[];
 
   @Field(() => CkbBlock)
   block: CkbBlock;

@@ -2,6 +2,9 @@ import { Field, Float, Int, ObjectType } from "@nestjs/graphql";
 import { CkbScript } from "src/modules/ckb/script/script.model";
 import * as CkbExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
 import { toNumber } from "lodash";
+import { RgbppTransaction } from "../transaction/transaction.model";
+
+export type RgbppBaseCoin = Omit<RgbppCoin, 'transactions'>;
 
 @ObjectType({ description: 'RGB++ Coin' })
 export class RgbppCoin {
@@ -41,7 +44,10 @@ export class RgbppCoin {
   @Field(() => Date)
   deployedAt: Date;
 
-  public static from(xudt: CkbExplorer.XUDT): RgbppCoin {
+  @Field(() => [RgbppTransaction])
+  transactions: RgbppTransaction[];
+
+  public static from(xudt: CkbExplorer.XUDT): RgbppBaseCoin {
     return {
       name: xudt.full_name,
       description: xudt.description,
@@ -62,7 +68,7 @@ export class RgbppCoin {
 @ObjectType({ description: 'RGB++ Coin List' })
 export class RgbppCoinList {
   @Field(() => [RgbppCoin])
-  coins: RgbppCoin[];
+  coins: RgbppBaseCoin[];
 
   @Field(() => Int)
   total: number;
