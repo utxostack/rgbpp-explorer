@@ -1,9 +1,12 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import * as BitcoinApi from 'src/core/bitcoin-api/bitcoin-api.schema';
-import { BitcoinAddress } from '../address/address.model';
 import { BitcoinTransaction } from '../transaction/transaction.model';
+import { BitcoinAddress } from '../address/address.model';
 
-export type BitcoinBaseBlock = Omit<BitcoinBlock, 'miner' | 'totalFee' | 'feeRateRange' | 'transactions'>;
+export type BitcoinBaseBlock = Omit<
+  BitcoinBlock,
+  'miner' | 'totalFee' | 'feeRateRange' | 'transactions'
+>;
 
 @ObjectType({ description: 'Fee Rate Range' })
 export class FeeRateRange {

@@ -9,4 +9,3 @@ export class CkbTransactionService {
     return this.ckbRpcService.getTransaction(txHash);
   }
 }
-

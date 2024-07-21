@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { NestDataLoader } from '@applifting-io/nestjs-dataloader';
-import { CkbBlockService } from './block.service';
-import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
 import { DataLoaderResponse } from 'src/common/type/dataloader';
+import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
+import { CkbBlockService } from './block.service';
 
 @Injectable()
 export class CkbBlockLoader implements NestDataLoader<string, CkbRpc.Block> {

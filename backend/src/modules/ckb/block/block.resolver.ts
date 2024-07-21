@@ -1,15 +1,15 @@
 import DataLoader from 'dataloader';
+import { BI } from '@ckb-lumos/bi';
+import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { CkbBlock, CkbBaseBlock } from './block.model';
 import { CkbBaseTransaction, CkbTransaction } from '../transaction/transaction.model';
+import { CkbBlock, CkbBaseBlock } from './block.model';
 import {
   CkbBlockEconomicStateLoader,
   CkbBlockEconomicStateLoaderResponse,
   CkbBlockLoader,
   CkbBlockLoaderResponse,
 } from './block.dataloader';
-import { Loader } from '@applifting-io/nestjs-dataloader';
-import { BI } from '@ckb-lumos/bi';
 import {
   CkbTransactionLoader,
   CkbTransactionLoaderResponse,

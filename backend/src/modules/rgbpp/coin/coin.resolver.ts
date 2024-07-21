@@ -1,12 +1,12 @@
 import { Args, Int, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { RgbppBaseCoin, RgbppCoin, RgbppCoinList } from './coin.model';
 import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
 import { XUDTTag } from 'src/core/ckb-explorer/ckb-explorer.interface';
 import { RgbppTransaction } from '../transaction/transaction.model';
+import { RgbppBaseCoin, RgbppCoin, RgbppCoinList } from './coin.model';
 
 @Resolver(() => RgbppCoin)
 export class RgbppCoinResolver {
-  constructor(private ckbExplorerService: CkbExplorerService) { }
+  constructor(private ckbExplorerService: CkbExplorerService) {}
 
   @Query(() => RgbppCoinList, { name: 'rgbppCoinList' })
   public async coins(

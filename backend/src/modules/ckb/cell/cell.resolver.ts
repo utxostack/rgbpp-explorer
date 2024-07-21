@@ -1,6 +1,6 @@
 import { Parent, ResolveField, Resolver } from '@nestjs/graphql';
-import { CkbCell, CkbXUDTInfo } from './cell.model';
 import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
+import { CkbCell, CkbXUDTInfo } from './cell.model';
 
 @Resolver(() => CkbCell)
 export class CellResolver {

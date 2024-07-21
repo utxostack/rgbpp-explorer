@@ -1,6 +1,6 @@
 import { Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { BitcoinBaseChainInfo, BitcoinChainInfo, BitcoinFees } from './bitcoin.model';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
+import { BitcoinBaseChainInfo, BitcoinChainInfo, BitcoinFees } from './bitcoin.model';
 
 @Resolver(() => BitcoinChainInfo)
 export class BitcoinResolver {

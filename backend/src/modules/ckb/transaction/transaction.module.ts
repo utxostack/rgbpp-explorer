@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
+import { CkbRpcModule } from 'src/core/ckb-rpc/ckb-rpc.module';
 import { CkbTransactionResolver } from './transaction.resolver';
 import { CkbTransactionService } from './transaction.service';
-import { CkbRpcModule } from 'src/core/ckb-rpc/ckb-rpc.module';
 import { CkbTransactionLoader } from './transaction.dataloader';
 
 @Module({

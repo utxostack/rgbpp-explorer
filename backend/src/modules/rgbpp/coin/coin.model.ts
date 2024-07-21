@@ -1,8 +1,8 @@
-import { Field, Float, Int, ObjectType } from "@nestjs/graphql";
-import { CkbScript } from "src/modules/ckb/script/script.model";
+import { toNumber } from 'lodash';
+import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
+import { CkbScript } from 'src/modules/ckb/script/script.model';
 import * as CkbExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
-import { toNumber } from "lodash";
-import { RgbppTransaction } from "../transaction/transaction.model";
+import { RgbppTransaction } from '../transaction/transaction.model';
 
 export type RgbppBaseCoin = Omit<RgbppCoin, 'transactions'>;
 

@@ -1,8 +1,11 @@
-import { Args, Query, Resolver } from '@nestjs/graphql';
-import { BitcoinBaseTransaction, BitcoinTransaction } from './transaction.model';
-import { Loader } from '@applifting-io/nestjs-dataloader';
-import { BitcoinTransactionLoader, BitcoinTransactionLoaderResponse } from './transaction.dataloader';
 import DataLoader from 'dataloader';
+import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Loader } from '@applifting-io/nestjs-dataloader';
+import { BitcoinBaseTransaction, BitcoinTransaction } from './transaction.model';
+import {
+  BitcoinTransactionLoader,
+  BitcoinTransactionLoaderResponse,
+} from './transaction.dataloader';
 
 @Resolver(() => BitcoinTransaction)
 export class BitcoinTransactionResolver {

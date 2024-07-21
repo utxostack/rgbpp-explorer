@@ -1,13 +1,13 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { HttpStatusCode, isAxiosError } from 'axios';
-import { NetworkType } from 'src/constants';
+import { ConfigService } from '@nestjs/config';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
-import { MempoolService } from './provider/mempool.service';
-import { ElectrsService } from './provider/electrs.service';
-import { IBitcoinDataProvider } from './bitcoin-api.interface';
-import { ChainInfo } from './bitcoin-api.schema';
+import { NetworkType } from 'src/constants';
 import { Env } from 'src/env';
+import { IBitcoinDataProvider } from './bitcoin-api.interface';
+import { ElectrsService } from './provider/electrs.service';
+import { MempoolService } from './provider/mempool.service';
+import { ChainInfo } from './bitcoin-api.schema';
 
 type MethodParameters<T, K extends keyof T> = T[K] extends (...args: infer P) => any ? P : never;
 type MethodReturnType<T, K extends keyof T> = T[K] extends (...args: any[]) => infer R ? R : never;

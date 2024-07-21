@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { BitcoinBlockResolver } from './block.resolver';
-import { BitcoinBlockLoader, BitcoinBlockTransactionsLoader } from './block.dataloader';
 import { BitcoinApiModule } from 'src/core/bitcoin-api/bitcoin-api.module';
+import { BitcoinBlockLoader, BitcoinBlockTransactionsLoader } from './block.dataloader';
+import { BitcoinBlockResolver } from './block.resolver';
 
 @Module({
   imports: [BitcoinApiModule],

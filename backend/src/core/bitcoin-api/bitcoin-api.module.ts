@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { BitcoinApiService } from './bitcoin-api.service';
 import { ConfigService } from '@nestjs/config';
+import { BitcoinApiService } from './bitcoin-api.service';
 import { Env } from 'src/env';
 
 @Module({
@@ -8,7 +8,10 @@ import { Env } from 'src/env';
   exports: [BitcoinApiService],
 })
 export class BitcoinApiModule {
-  constructor(private bitcoinAPIService: BitcoinApiService, private configService: ConfigService<Env>) {
+  constructor(
+    private bitcoinAPIService: BitcoinApiService,
+    private configService: ConfigService<Env>,
+  ) {
     const network = this.configService.get('NETWORK');
     this.bitcoinAPIService.checkNetwork(network);
   }

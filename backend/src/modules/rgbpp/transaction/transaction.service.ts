@@ -8,7 +8,7 @@ export class RgbppTransactionService {
   constructor(
     private ckbExplorerService: CkbExplorerService,
     private bitcoinApiService: BitcoinApiService,
-  ) { }
+  ) {}
 
   public async getLatestTransactions(
     page: number,

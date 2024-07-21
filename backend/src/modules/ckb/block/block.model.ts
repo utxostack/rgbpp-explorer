@@ -1,7 +1,7 @@
-import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { toNumber } from 'lodash';
-import { CkbTransaction } from '../transaction/transaction.model';
+import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
+import { CkbTransaction } from '../transaction/transaction.model';
 
 export type CkbBaseBlock = Omit<CkbBlock, 'totalFee' | 'transactions'>;
 

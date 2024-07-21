@@ -1,12 +1,13 @@
-import { NestDataLoader } from '@applifting-io/nestjs-dataloader';
 import { Injectable, Logger } from '@nestjs/common';
-import { CkbTransactionService } from './transaction.service';
-import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
+import { NestDataLoader } from '@applifting-io/nestjs-dataloader';
 import { DataLoaderResponse } from 'src/common/type/dataloader';
-
+import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
+import { CkbTransactionService } from './transaction.service';
 
 @Injectable()
-export class CkbTransactionLoader implements NestDataLoader<string, CkbRpc.TransactionWithStatusResponse> {
+export class CkbTransactionLoader
+  implements NestDataLoader<string, CkbRpc.TransactionWithStatusResponse>
+{
   private logger = new Logger(CkbTransactionLoader.name);
 
   constructor(private transactionService: CkbTransactionService) {}
