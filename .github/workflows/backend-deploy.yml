@@ -1,0 +1,31 @@
+name: Backend Deploy
+
+on:
+  push:
+    branches: [main, deploy-testnet]
+  workflow_dispatch:
+
+jobs:
+  deploy-testnet:
+    environment:
+      name: testnet
+      url: https://testnet-api.explorer.rgbpp.io/graphql
+    runs-on: ubuntu-latest
+  
+    steps:
+      - name: Deploy to testnet
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ${{ secrets.SSH_WORK_DIR }}
+            git status
+            git fetch origin main
+            git checkout origin/main
+            git status
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker compose ps
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker compose build
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker compose up -d
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker compose ps
