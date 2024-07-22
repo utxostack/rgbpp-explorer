@@ -1,4 +1,4 @@
-import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Field, Float, ObjectType } from '@nestjs/graphql';
 import * as BitcoinApi from 'src/core/bitcoin-api/bitcoin-api.schema';
 import { BitcoinOutput } from '../output/output.model';
 
@@ -7,7 +7,7 @@ export class BitcoinInput {
   @Field(() => String)
   txid: string;
 
-  @Field(() => Int)
+  @Field(() => Float)
   vout: number;
 
   @Field(() => BitcoinOutput, { nullable: true })
@@ -22,7 +22,7 @@ export class BitcoinInput {
   @Field(() => Boolean)
   isCoinbase: boolean;
 
-  @Field(() => Int)
+  @Field(() => Float)
   sequence: number;
 
   public static from(input: BitcoinApi.Input) {

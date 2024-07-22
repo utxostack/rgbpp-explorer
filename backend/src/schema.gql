@@ -81,12 +81,12 @@ type BitcoinOutput {
 """Bitcoin Input"""
 type BitcoinInput {
   txid: String!
-  vout: Int!
+  vout: Float!
   prevout: BitcoinOutput
   scriptsig: String!
   scriptsigAsm: String!
   isCoinbase: Boolean!
-  sequence: Int!
+  sequence: Float!
 }
 
 """Bitcoin Transaction"""
