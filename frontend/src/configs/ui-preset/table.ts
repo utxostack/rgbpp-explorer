@@ -32,21 +32,12 @@ export const table = defineSlotRecipe({
       verticalAlign: 'middle',
     },
     row: {
-      borderBottomWidth: 0,
       transitionDuration: 'normal',
       transitionProperty: 'background, color',
       transitionTimingFunction: 'default',
       position: 'relative',
-      _before: {
-        content: "' '",
-        display: 'block',
-        w: 'calc(100% - 60px)',
-        h: '1px',
-        bottom: 0,
-        left: '30px',
-        bg: 'border.primary',
-        position: 'absolute',
-      },
+      borderBottom: '1px solid',
+      borderBottomColor: 'border.primary',
     },
   },
   defaultVariants: {

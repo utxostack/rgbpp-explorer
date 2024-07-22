@@ -37,7 +37,7 @@ msgstr "{secondsDiff}s ago"
 msgid "🔥 Popular RGB++ Assets"
 msgstr "🔥 Popular RGB++ Assets"
 
-#: src/app/[lang]/address/[address]/layout.tsx:16
+#: src/app/[lang]/address/[address]/layout.tsx:17
 msgid "Address"
 msgstr "Address"
 
@@ -194,7 +194,7 @@ msgstr "Overflow"
 msgid "RGB++"
 msgstr "RGB++"
 
-#: src/app/[lang]/address/[address]/layout.tsx:30
+#: src/app/[lang]/address/[address]/layout.tsx:31
 #: src/components/navbar.tsx:20
 msgid "RGB++ Assets"
 msgstr "RGB++ Assets"
@@ -253,7 +253,7 @@ msgstr "Time"
 msgid "Total {0} Items"
 msgstr "Total {0} Items"
 
-#: src/app/[lang]/address/[address]/layout.tsx:26
+#: src/app/[lang]/address/[address]/layout.tsx:27
 #: src/app/[lang]/assets/coins/[codeHash]/layout.tsx:36
 #: src/app/[lang]/transaction/[tx]/page.tsx:14
 msgid "Transactions"
