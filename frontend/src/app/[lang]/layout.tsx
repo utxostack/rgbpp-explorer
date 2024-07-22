@@ -1,26 +1,35 @@
 import '@/styles/globals.css'
 
-import { setI18n } from '@lingui/react/server'
 import type { Metadata } from 'next'
+import { Montserrat } from 'next/font/google'
 
-import { getI18nInstance } from '@/app/[lang]/appRouterI18n'
-import { LinguiClientProvider } from '@/app/[lang]/LinguiClientProvider'
-import { BaseAppRouterProps } from '@/types/BaseAppRouterProps'
+import { Footer } from '@/components/footer'
+import { Navbar } from '@/components/navbar'
+import { Providers } from '@/components/providers'
+import { BaseAppRouterPropsWithChildren } from '@/lib/types/BaseAppRouterProps'
+
+const montserrat = Montserrat({
+  weight: ['400', '500', '600', '700'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-montserrat',
+  fallback: ['Arial', 'sans-serif'],
+})
 
 export const metadata: Metadata = {
-  title: 'UTXO Stack Explorer',
+  title: 'RGB++ Explorer',
+  icons: '/logo.svg',
 }
 
-export default function RootLayout({ params: { lang }, children }: BaseAppRouterProps) {
-  const i18n = getI18nInstance(lang)
-  setI18n(i18n)
-
+export default function RootLayout({ params: { lang }, children }: BaseAppRouterPropsWithChildren) {
   return (
     <html lang={lang}>
-      <body>
-        <LinguiClientProvider initialLocale={lang} initialMessages={i18n.messages}>
+      <body className={montserrat.variable}>
+        <Providers lang={lang}>
+          <Navbar />
           {children}
-        </LinguiClientProvider>
+          <Footer />
+        </Providers>
       </body>
     </html>
   )

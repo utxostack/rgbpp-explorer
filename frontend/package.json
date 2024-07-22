@@ -19,10 +19,13 @@
     "@lingui/core": "^4.11.2",
     "@lingui/macro": "^4.11.2",
     "@lingui/react": "^4.11.2",
+    "@tanstack/react-query": "^5.51.11",
+    "dayjs": "^1.11.12",
     "negotiator": "^0.6.3",
     "next": "14.2.4",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "usehooks-ts": "^3.1.0"
   },
   "devDependencies": {
     "@lingui/cli": "^4.11.2",
@@ -30,12 +33,15 @@
     "@lingui/swc-plugin": "^4.0.8",
     "@pandacss/dev": "^0.42.0",
     "@park-ui/panda-preset": "^0.38.1",
+    "@svgr/core": "^8.1.0",
+    "@svgr/webpack": "^8.1.0",
     "@types/negotiator": "^0.6.3",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@typescript-eslint/eslint-plugin": "^6.10.0",
     "@typescript-eslint/parser": "^6.5.0",
+    "cspell": "^8.10.4",
     "eslint": "^8",
     "eslint-config-next": "14.2.4",
     "eslint-plugin-import": "^2.29.0",
@@ -46,7 +52,6 @@
     "eslint-plugin-unicorn": "^49.0.0",
     "eslint-plugin-unused-imports": "^3.0.0",
     "prettier": "^3.1.0",
-    "typescript": "^5",
-    "cspell": "^8.10.4"
+    "typescript": "^5"
   }
 }

@@ -13,6 +13,278 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: src/app/[lang]/page.tsx:11
-msgid "Test"
-msgstr "Test"
+#: src/components/ago-time-formatter.tsx:35
+msgid "{hoursDiff}h {remainingMinutes}m ago"
+msgstr "{hoursDiff}h {remainingMinutes}m ago"
+
+#: src/components/ago-time-formatter.tsx:37
+msgid "{hoursDiff}h ago"
+msgstr "{hoursDiff}h ago"
+
+#: src/components/ago-time-formatter.tsx:28
+msgid "{minutesDiff}m {remainingSeconds}s ago"
+msgstr "{minutesDiff}m {remainingSeconds}s ago"
+
+#: src/components/ago-time-formatter.tsx:30
+msgid "{minutesDiff}m ago"
+msgstr "{minutesDiff}m ago"
+
+#: src/components/ago-time-formatter.tsx:24
+msgid "{secondsDiff}s ago"
+msgstr "{secondsDiff}s ago"
+
+#: src/app/[lang]/explorer/btc/page.tsx:17
+msgid "🔥 Popular RGB++ Assets"
+msgstr "🔥 Popular RGB++ Assets"
+
+#: src/app/[lang]/address/[address]/layout.tsx:16
+msgid "Address"
+msgstr "Address"
+
+#: src/components/last-rgbpp-txns-table/index.tsx:19
+msgid "Amount"
+msgstr "Amount"
+
+#: src/app/[lang]/explorer/btc/info.tsx:19
+#: src/components/footer.tsx:87
+#: src/components/network-cards.tsx:48
+msgid "Bitcoin"
+msgstr "Bitcoin"
+
+#: src/app/[lang]/explorer/btc/info.tsx:32
+#: src/app/[lang]/transaction/[tx]/overflow.tsx:36
+#: src/components/network-cards.tsx:55
+#: src/components/network-cards.tsx:88
+msgid "Block Height"
+msgstr "Block Height"
+
+#: src/app/[lang]/transaction/[tx]/overflow.tsx:44
+msgid "bytes"
+msgstr "bytes"
+
+#: src/components/footer.tsx:90
+#: src/components/network-cards.tsx:81
+msgid "CKB"
+msgstr "CKB"
+
+#: src/app/[lang]/address/[address]/overflow.tsx:27
+msgid "CKB Balance"
+msgstr "CKB Balance"
+
+#: src/app/[lang]/assets/coins/page.tsx:22
+msgid "Coin"
+msgstr "Coin"
+
+#: src/app/[lang]/assets/layout.tsx:17
+msgid "Coins"
+msgstr "Coins"
+
+#: src/app/[lang]/assets/coins/[codeHash]/holders/page.tsx:14
+#: src/app/[lang]/assets/dobs/page.tsx:13
+msgid "Coming soon, please stay tuned"
+msgstr "Coming soon, please stay tuned"
+
+#: src/app/[lang]/address/[address]/overflow.tsx:31
+msgid "Confirmed"
+msgstr "Confirmed"
+
+#: src/components/copier.tsx:60
+msgid "Copied"
+msgstr "Copied"
+
+#: src/components/copier.tsx:60
+msgid "Copy"
+msgstr "Copy"
+
+#: src/app/[lang]/assets/coins/page.tsx:26
+msgid "Deploy Time"
+msgstr "Deploy Time"
+
+#: src/app/[lang]/assets/layout.tsx:21
+msgid "DOBs"
+msgstr "DOBs"
+
+#: src/app/[lang]/explorer/btc/info.tsx:84
+msgid "Drop"
+msgstr "Drop"
+
+#: src/app/[lang]/page.tsx:21
+msgid "Explore the BTC Ecosystem"
+msgstr "Explore the BTC Ecosystem"
+
+#: src/components/footer.tsx:84
+#: src/components/navbar.tsx:19
+msgid "Explorer"
+msgstr "Explorer"
+
+#: src/app/[lang]/transaction/[tx]/overflow.tsx:59
+msgid "Fee"
+msgstr "Fee"
+
+#: src/app/[lang]/transaction/[tx]/overflow.tsx:68
+msgid "Fee rate"
+msgstr "Fee rate"
+
+#: src/app/[lang]/explorer/btc/info.tsx:48
+msgid "High"
+msgstr "High"
+
+#: src/app/[lang]/assets/coins/[codeHash]/layout.tsx:32
+msgid "Holders"
+msgstr "Holders"
+
+#: src/components/layer-type.tsx:25
+#: src/components/layer-type.tsx:39
+#: src/components/layer-type.tsx:52
+msgid "L1"
+msgstr "L1"
+
+#: src/app/[lang]/assets/coins/page.tsx:23
+msgid "L1 and L2 Holders"
+msgstr "L1 and L2 Holders"
+
+#: src/app/[lang]/explorer/btc/info.tsx:36
+msgid "L1 RGB++ Txns(24H)"
+msgstr "L1 RGB++ Txns(24H)"
+
+#: src/components/layer-type.tsx:32
+#: src/components/layer-type.tsx:42
+#: src/components/layer-type.tsx:49
+msgid "L2"
+msgstr "L2"
+
+#: src/app/[lang]/address/[address]/overflow.tsx:53
+msgid "L2 RGB++ Assets"
+msgstr "L2 RGB++ Assets"
+
+#: src/app/[lang]/explorer/btc/page.tsx:14
+msgid "Latest L2 RGB++ transaction"
+msgstr "Latest L2 RGB++ transaction"
+
+#: src/app/[lang]/page.tsx:32
+msgid "Latest RGB++ Txns"
+msgstr "Latest RGB++ Txns"
+
+#: src/components/last-rgbpp-txns-table/index.tsx:19
+#~ msgid "Layer"
+#~ msgstr "Layer"
+
+#: src/app/[lang]/explorer/btc/info.tsx:72
+msgid "Low"
+msgstr "Low"
+
+#: src/app/[lang]/explorer/btc/info.tsx:60
+msgid "Medium"
+msgstr "Medium"
+
+#: src/components/footer.tsx:109
+msgid "More Info"
+msgstr "More Info"
+
+#: src/components/footer.tsx:112
+msgid "Nervos CKB"
+msgstr "Nervos CKB"
+
+#: src/app/[lang]/address/[address]/overflow.tsx:14
+#: src/app/[lang]/transaction/[tx]/overflow.tsx:17
+msgid "Overflow"
+msgstr "Overflow"
+
+#: src/components/footer.tsx:95
+msgid "RGB++"
+msgstr "RGB++"
+
+#: src/app/[lang]/address/[address]/layout.tsx:30
+#: src/components/navbar.tsx:20
+msgid "RGB++ Assets"
+msgstr "RGB++ Assets"
+
+#: src/app/[lang]/explorer/btc/info.tsx:40
+msgid "RGB++ Assets Holders"
+msgstr "RGB++ Assets Holders"
+
+#: src/components/footer.tsx:21
+#: src/components/navbar.tsx:16
+msgid "RGB++ Explorer"
+msgstr "RGB++ Explorer"
+
+#: src/app/[lang]/page.tsx:30
+msgid "RGB++ Networks"
+msgstr "RGB++ Networks"
+
+#: src/app/[lang]/transaction/[tx]/overflow.tsx:72
+msgid "sat/VB"
+msgstr "sat/VB"
+
+#: src/app/[lang]/transaction/[tx]/overflow.tsx:63
+msgid "sats"
+msgstr "sats"
+
+#: src/components/footer.tsx:101
+msgid "Script"
+msgstr "Script"
+
+#: src/components/footer.tsx:104
+msgid "SDK"
+msgstr "SDK"
+
+#: src/components/search-bar.tsx:15
+msgid "Search by Address/Tx Hash/Block Hash"
+msgstr "Search by Address/Tx Hash/Block Hash"
+
+#: src/app/[lang]/transaction/[tx]/overflow.tsx:40
+msgid "Size"
+msgstr "Size"
+
+#: src/app/[lang]/assets/coins/page.tsx:25
+msgid "Supply"
+msgstr "Supply"
+
+#: src/app/[lang]/layout.tsx:19
+#~ msgid "Test"
+#~ msgstr "Test"
+
+#: src/components/last-rgbpp-txns-table/index.tsx:20
+msgid "Time"
+msgstr "Time"
+
+#: src/app/[lang]/assets/coins/[codeHash]/transactions/page.tsx:18
+#: src/app/[lang]/assets/coins/page.tsx:45
+msgid "Total {0} Items"
+msgstr "Total {0} Items"
+
+#: src/app/[lang]/address/[address]/layout.tsx:26
+#: src/app/[lang]/assets/coins/[codeHash]/layout.tsx:36
+#: src/app/[lang]/transaction/[tx]/page.tsx:14
+msgid "Transactions"
+msgstr "Transactions"
+
+#: src/components/last-rgbpp-txns-table/index.tsx:17
+msgid "Tx hash"
+msgstr "Tx hash"
+
+#: src/app/[lang]/address/[address]/overflow.tsx:49
+msgid "Txns"
+msgstr "Txns"
+
+#: src/app/[lang]/assets/coins/page.tsx:24
+#: src/components/network-cards.tsx:59
+#: src/components/network-cards.tsx:92
+msgid "Txns(24H)"
+msgstr "Txns(24H)"
+
+#: src/components/last-rgbpp-txns-table/index.tsx:18
+msgid "Type"
+msgstr "Type"
+
+#: src/app/[lang]/address/[address]/overflow.tsx:35
+msgid "Unconfirmed"
+msgstr "Unconfirmed"
+
+#: src/components/footer.tsx:115
+msgid "UTXO Stack"
+msgstr "UTXO Stack"
+
+#: src/components/footer.tsx:98
+msgid "Whitepaper"
+msgstr "Whitepaper"

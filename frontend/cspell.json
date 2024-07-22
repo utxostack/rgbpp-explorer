@@ -2,12 +2,20 @@
   "version": "0.1",
   "language": "en",
   "words": [
-    "utxo"
+    "utxo",
+    "rgbpp",
+    "nervos",
+    "nums"
   ],
   "ignoreWords": [
     "lingui",
     "pandacss",
-    "outdir"
+    "outdir",
+    "txns",
+    "svgr",
+    "deepmerge",
+    "usehooks",
+    "hstack"
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",
@@ -20,6 +28,7 @@
     ".next/**",
     "public/**",
     "src/locales/**",
-    "styled-system"
+    "styled-system",
+    "src/assets/**"
   ]
 }

@@ -5,9 +5,8 @@ import type { HTMLArkProps } from '@ark-ui/react/factory'
 import { useLingui } from '@lingui/react'
 import NextLink, { LinkProps as NextLinkProps } from 'next/link'
 import { forwardRef, PropsWithChildren } from 'react'
-
-import { styled } from '../../../styled-system/jsx'
-import type { JsxStyleProps } from '../../../styled-system/types'
+import { styled } from 'styled-system/jsx'
+import type { JsxStyleProps } from 'styled-system/types'
 
 export interface LinkProps
   extends Assign<JsxStyleProps, Omit<HTMLArkProps<'a'>, 'href'>>,
