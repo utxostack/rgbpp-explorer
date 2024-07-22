@@ -1,6 +1,6 @@
 import { Parent, ResolveField, Resolver } from '@nestjs/graphql';
-import { BitcoinOutput } from './output.model';
 import { BitcoinAddress, BitcoinBaseAddress } from '../address/address.model';
+import { BitcoinOutput } from './output.model';
 
 @Resolver(() => BitcoinOutput)
 export class BitcoinOutputResolver {

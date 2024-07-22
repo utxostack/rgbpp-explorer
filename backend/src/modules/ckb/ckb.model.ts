@@ -1,4 +1,3 @@
-
 import { Field, Float, ObjectType } from '@nestjs/graphql';
 
 @ObjectType({ description: 'CKB ChainInfo' })

@@ -3,9 +3,7 @@ import { NetworkType } from './constants';
 
 export const envSchema = z
   .object({
-    NETWORK: z
-      .enum([NetworkType.mainnet, NetworkType.testnet])
-      .default(NetworkType.testnet),
+    NETWORK: z.enum([NetworkType.mainnet, NetworkType.testnet]).default(NetworkType.testnet),
     ENABLED_GRAPHQL_PLAYGROUND: z.boolean().default(true),
 
     // DATABASE_URL: z.string(),

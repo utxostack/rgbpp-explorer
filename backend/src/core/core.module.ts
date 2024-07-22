@@ -17,4 +17,4 @@ import { BitcoinApiService } from './bitcoin-api/bitcoin-api.service';
   providers: [CkbExplorerService, CkbRpcWebsocketService, BitcoinApiService],
   exports: [CkbExplorerService, CkbRpcWebsocketService, BitcoinApiService],
 })
-export class CoreModule { }
+export class CoreModule {}

@@ -1,15 +1,15 @@
+import { join } from 'node:path';
 import { Module } from '@nestjs/common';
-import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { ConfigService } from '@nestjs/config';
-import { SentryService } from '@ntegral/nestjs-sentry';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
+import { GraphQLModule } from '@nestjs/graphql';
+import { SentryService } from '@ntegral/nestjs-sentry';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { DataLoaderInterceptor } from '@applifting-io/nestjs-dataloader';
+import { Env } from 'src/env';
 import { CkbModule } from './ckb/ckb.module';
 import { RgbppModule } from './rgbpp/rgbpp.module';
 import { BitcoinModule } from './bitcoin/bitcoin.module';
-import { Env } from 'src/env';
-import { join } from 'path';
 
 @Module({
   imports: [

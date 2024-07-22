@@ -27,17 +27,6 @@ type CkbCell {
   xudtInfo: CkbXUDTInfo
 }
 
-"""CKB Transaction"""
-type CkbTransaction {
-  isCellbase: Boolean!
-  blockNumber: Int!
-  hash: String!
-  fee: Float!
-  inputs: [CkbCell!]!
-  outputs: [CkbCell!]!
-  block: CkbBlock!
-}
-
 """CKB Block"""
 type CkbBlock {
   version: Int!
@@ -53,6 +42,17 @@ type CkbBlock {
 `Date` type as integer. Type represents date and time as number of milliseconds from start of UNIX epoch.
 """
 scalar Timestamp
+
+"""CKB Transaction"""
+type CkbTransaction {
+  isCellbase: Boolean!
+  blockNumber: Int!
+  hash: String!
+  fee: Float!
+  inputs: [CkbCell!]!
+  outputs: [CkbCell!]!
+  block: CkbBlock!
+}
 
 """CKB ChainInfo"""
 type CkbChainInfo {
@@ -81,12 +81,12 @@ type BitcoinOutput {
 """Bitcoin Input"""
 type BitcoinInput {
   txid: String!
-  vout: Int!
+  vout: Float!
   prevout: BitcoinOutput
   scriptsig: String!
   scriptsigAsm: String!
   isCoinbase: Boolean!
-  sequence: Int!
+  sequence: Float!
 }
 
 """Bitcoin Transaction"""

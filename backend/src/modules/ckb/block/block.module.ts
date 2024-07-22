@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
+import { CkbRpcModule } from 'src/core/ckb-rpc/ckb-rpc.module';
+import { CkbExplorerModule } from 'src/core/ckb-explorer/ckb-explorer.module';
 import { CkbBlockResolver } from './block.resolver';
 import { CkbBlockService } from './block.service';
-import { CkbExplorerModule } from 'src/core/ckb-explorer/ckb-explorer.module';
 import { CkbBlockEconomicStateLoader, CkbBlockLoader } from './block.dataloader';
-import { CkbRpcModule } from 'src/core/ckb-rpc/ckb-rpc.module';
 
 @Module({
   imports: [CkbExplorerModule, CkbRpcModule],

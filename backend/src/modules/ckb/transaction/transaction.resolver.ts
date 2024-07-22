@@ -1,12 +1,12 @@
 import DataLoader from 'dataloader';
+import { BI } from '@ckb-lumos/bi';
+import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { CkbTransaction, CkbBaseTransaction } from './transaction.model';
+import { CkbTransactionLoader, CkbTransactionLoaderResponse } from './transaction.dataloader';
 import { CkbBlockLoader, CkbBlockLoaderResponse } from '../block/block.dataloader';
-import { Loader } from '@applifting-io/nestjs-dataloader';
 import { CkbBaseBlock, CkbBlock } from '../block/block.model';
 import { CkbBaseCell, CkbCell } from '../cell/cell.model';
-import { CkbTransactionLoader, CkbTransactionLoaderResponse } from './transaction.dataloader';
-import { BI } from '@ckb-lumos/bi';
 
 @Resolver(() => CkbTransaction)
 export class CkbTransactionResolver {
@@ -39,7 +39,7 @@ export class CkbTransactionResolver {
           const previousTx = await transactionLoader.load(input.previous_output.tx_hash);
           const index = BI.from(input.previous_output.index).toNumber();
           return CkbCell.from(previousTx.transaction, index);
-        })
+        }),
     );
     return inputs;
   }

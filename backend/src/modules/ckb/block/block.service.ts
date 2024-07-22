@@ -9,7 +9,7 @@ export class CkbBlockService {
   constructor(
     private ckbExplorerService: CkbExplorerService,
     private ckbRpcService: CkbRpcWebsocketService,
-  ) { }
+  ) {}
 
   public async getLatestBlockNumbers(): Promise<string[]> {
     const blockList = await this.ckbExplorerService.getBlockList();

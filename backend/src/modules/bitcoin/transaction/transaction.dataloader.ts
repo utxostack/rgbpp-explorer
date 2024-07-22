@@ -1,19 +1,23 @@
-import { NestDataLoader } from '@applifting-io/nestjs-dataloader';
 import { Injectable, Logger } from '@nestjs/common';
+import { NestDataLoader } from '@applifting-io/nestjs-dataloader';
 import * as BitcoinApi from 'src/core/bitcoin-api/bitcoin-api.schema';
-import { DataLoaderResponse } from 'src/common/type/dataloader';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
+import { DataLoaderResponse } from 'src/common/type/dataloader';
 
 @Injectable()
-export class BitcoinTransactionLoader implements NestDataLoader<string, BitcoinApi.Transaction | null> {
+export class BitcoinTransactionLoader
+  implements NestDataLoader<string, BitcoinApi.Transaction | null>
+{
   private logger = new Logger(BitcoinTransactionLoader.name);
 
-  constructor(private bitcoinApiService: BitcoinApiService) { }
+  constructor(private bitcoinApiService: BitcoinApiService) {}
 
   public getBatchFunction() {
     return async (ids: string[]) => {
       this.logger.debug(`Loading bitcoin transactions: ${ids.join(', ')}`);
-      const results = await Promise.allSettled(ids.map((key) => this.bitcoinApiService.getTx({ txid: key })));
+      const results = await Promise.allSettled(
+        ids.map((key) => this.bitcoinApiService.getTx({ txid: key })),
+      );
       return results.map((result) => {
         if (result.status === 'fulfilled') {
           return result.value;

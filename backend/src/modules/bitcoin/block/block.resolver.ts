@@ -1,4 +1,8 @@
+import DataLoader from 'dataloader';
+import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { BitcoinBaseTransaction, BitcoinTransaction } from '../transaction/transaction.model';
+import { BitcoinAddress, BitcoinBaseAddress } from '../address/address.model';
 import { BitcoinBaseBlock, BitcoinBlock, FeeRateRange } from './block.model';
 import {
   BitcoinBlockLoader,
@@ -6,10 +10,6 @@ import {
   BitcoinBlockTransactionsLoader,
   BitcoinBlockTransactionsLoaderResponse,
 } from './block.dataloader';
-import { Loader } from '@applifting-io/nestjs-dataloader';
-import DataLoader from 'dataloader';
-import { BitcoinAddress, BitcoinBaseAddress } from '../address/address.model';
-import { BitcoinBaseTransaction, BitcoinTransaction } from '../transaction/transaction.model';
 
 @Resolver(() => BitcoinBlock)
 export class BitcoinBlockResolver {

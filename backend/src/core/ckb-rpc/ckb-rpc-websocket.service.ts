@@ -1,9 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Injectable, Logger } from '@nestjs/common';
 import { Client as RpcWebsocketsClient } from 'rpc-websockets';
+import { BI } from '@ckb-lumos/bi';
 import { Env } from 'src/env';
 import { Block, BlockEconomicState, TransactionWithStatusResponse } from './ckb-rpc.interface';
-import { BI } from '@ckb-lumos/bi';
 
 @Injectable()
 export class CkbRpcWebsocketService {

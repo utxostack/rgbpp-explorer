@@ -1,6 +1,6 @@
 import { Query, Resolver } from '@nestjs/graphql';
-import { CkbChainInfo } from './ckb.model';
 import { CkbRpcWebsocketService } from 'src/core/ckb-rpc/ckb-rpc-websocket.service';
+import { CkbChainInfo } from './ckb.model';
 
 @Resolver(() => CkbChainInfo)
 export class CkbResolver {
