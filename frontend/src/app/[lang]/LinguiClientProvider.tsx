@@ -2,10 +2,9 @@
 
 import { type Messages, setupI18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
-import { ReactNode, useState } from 'react'
+import { type PropsWithChildren, useState } from 'react'
 
-interface Props {
-  children: ReactNode
+interface Props extends PropsWithChildren {
   initialLocale: string
   initialMessages: Messages
 }

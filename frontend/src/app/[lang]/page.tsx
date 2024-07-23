@@ -1,15 +1,40 @@
 import { t } from '@lingui/macro'
+import { Box, Center, Flex } from 'styled-system/jsx'
 
-import { getI18nInstance } from '@/app/[lang]/appRouterI18n'
-import { Link } from '@/components/ui/link'
-import type { BaseAppRouterProps } from '@/types/BaseAppRouterProps'
+import { getI18nFromHeaders } from '@/app/[lang]/appRouterI18n'
+import HomeBgSVG from '@/assets/home-bg.svg'
+import { HomeQuickInfo } from '@/components/home-quick-info'
+import { LastRgbppTxnsTable } from '@/components/last-rgbpp-txns-table'
+import { NetworkCards } from '@/components/network-cards'
+import { SearchBar } from '@/components/search-bar'
+import { Heading } from '@/components/ui'
 
-export default function Home({ params: { lang } }: BaseAppRouterProps) {
-  const i18n = getI18nInstance(lang)
+export default function Home() {
+  const i18n = getI18nFromHeaders()
   return (
-    <Link href="/about" bg="#000" color="white" locale="en">
-      {t(i18n)`Test`}
-      /About
-    </Link>
+    <>
+      <Center w="100%" position="relative" mb="-25%" px="30px">
+        <HomeBgSVG w="100%" pos="absolute" top="50px" left="0" />
+        <Flex w="100%" direction="column" pos="relative" aspectRatio={1440 / 1063}>
+          <Flex w="100%" direction="column" textAlign="center" align="center" justify="start">
+            <Heading mt="10%" mb="54px" fontSize="62px" fontWeight="semibold">
+              {t(i18n)`Explore the BTC Ecosystem`}
+            </Heading>
+            <HomeQuickInfo />
+            <SearchBar mt="60px" />
+          </Flex>
+        </Flex>
+      </Center>
+      <Center w="100%" position="relative" mb="54px" px="30px">
+        <Flex maxW="content" direction="column" alignItems="center" justify="start" w="100%">
+          <Heading fontSize="40px" fontWeight="semibold" mb="60px">{t(i18n)`RGB++ Networks`}</Heading>
+          <NetworkCards />
+          <Heading fontSize="40px" fontWeight="semibold" mb="60px" mt="100px">{t(i18n)`Latest RGB++ Txns`}</Heading>
+          <Box w="100%" bg="bg.card" pt="30px" pb="20px" rounded="8px">
+            <LastRgbppTxnsTable />
+          </Box>
+        </Flex>
+      </Center>
+    </>
   )
 }
