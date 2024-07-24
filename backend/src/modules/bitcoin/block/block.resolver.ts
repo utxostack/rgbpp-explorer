@@ -23,25 +23,52 @@ export class BitcoinBlockResolver {
   }
 
   @ResolveField(() => BitcoinAddress)
-  public async miner(@Parent() block: BitcoinBaseBlock): Promise<BitcoinBaseAddress> {
-    // TODO: Implement this resolver
+  public async miner(
+    @Parent() block: BitcoinBaseBlock,
+    @Loader(BitcoinBlockTransactionsLoader)
+    blockTxsLoader: DataLoader<string, BitcoinBlockTransactionsLoaderResponse>,
+  ): Promise<BitcoinBaseAddress> {
+    const txs = await blockTxsLoader.load(block.id);
+    const coinbaseTx = BitcoinTransaction.from(txs[0]);
     return {
-      address: '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa',
+      address: coinbaseTx.vout[0].scriptpubkeyAddress,
     };
   }
 
   @ResolveField(() => Float)
-  public async totalFee(@Parent() block: BitcoinBaseBlock): Promise<number> {
-    // TODO: Implement this resolver
-    return 0;
+  public async totalFee(
+    @Parent() block: BitcoinBaseBlock,
+    @Loader(BitcoinBlockTransactionsLoader)
+    blockTxsLoader: DataLoader<string, BitcoinBlockTransactionsLoaderResponse>,
+  ): Promise<number> {
+    const txs = await blockTxsLoader.load(block.id);
+    return txs.reduce((sum, tx) => sum + tx.fee, 0);
   }
 
   @ResolveField(() => FeeRateRange)
-  public async feeRateRange(@Parent() block: BitcoinBaseBlock): Promise<FeeRateRange> {
-    // TODO: Implement this resolver
+  public async feeRateRange(
+    @Parent() block: BitcoinBaseBlock,
+    @Loader(BitcoinBlockTransactionsLoader)
+    blockTxsLoader: DataLoader<string, BitcoinBlockTransactionsLoaderResponse>,
+  ): Promise<FeeRateRange> {
+    // TODO: The BitcoinApiService.getBlockTxs() only returns the first 25 transactions
+    const txs = await blockTxsLoader.load(block.id);
+
+    let min = Infinity;
+    let max = 0;
+    for (const tx of txs.slice(1)) {
+      const vSize = Math.ceil(tx.weight / 4);
+      const feeRate = tx.fee / vSize;
+      if (feeRate < min) {
+        min = feeRate;
+      }
+      if (feeRate > max) {
+        max = feeRate;
+      }
+    }
     return {
-      min: 0,
-      max: 1,
+      min,
+      max,
     };
   }
 

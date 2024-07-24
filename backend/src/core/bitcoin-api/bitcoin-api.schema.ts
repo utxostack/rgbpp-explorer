@@ -34,6 +34,25 @@ export const Status = z.object({
 });
 export type Status = z.infer<typeof Status>;
 
+export const Address = z.object({
+  address: z.string(),
+  chain_stats: z.object({
+    funded_txo_count: z.number(),
+    funded_txo_sum: z.number(),
+    spent_txo_count: z.number(),
+    spent_txo_sum: z.number(),
+    tx_count: z.number(),
+  }),
+  mempool_stats: z.object({
+    funded_txo_count: z.number(),
+    funded_txo_sum: z.number(),
+    spent_txo_count: z.number(),
+    spent_txo_sum: z.number(),
+    tx_count: z.number(),
+  }),
+});
+export type Address = z.infer<typeof Address>;
+
 export const Balance = z.object({
   address: z.string(),
   satoshi: z.number(),
