@@ -149,7 +149,7 @@ type RgbppCoin {
 type RgbppCoinList {
   coins: [RgbppCoin!]!
   total: Int!
-  page: Int!
+  pageSize: Int!
 }
 
 """Bitcoin Fees"""

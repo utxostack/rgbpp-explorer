@@ -22,7 +22,7 @@ export class RgbppCoinResolver {
     return {
       coins,
       total: response.meta.total,
-      page: response.meta.page_size,
+      pageSize: response.meta.page_size,
     };
   }
 
