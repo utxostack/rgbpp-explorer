@@ -43,7 +43,7 @@ export class BitcoinAddressResolver {
     @Parent() address: BitcoinAddress,
     @Loader(BitcoinAddressLoader) addressLoader: DataLoader<string, BitcoinAddressLoaderResponse>,
   ): Promise<number> {
-    // XXX: addressInfo.mempool_stats.tx_count is not included in the response, not sure if it should be included
+    // TODO: addressInfo.mempool_stats.tx_count is not included in the response, not sure if it should be included
     const stats = await addressLoader.load(address.address);
     return stats.chain_stats.tx_count;
   }
