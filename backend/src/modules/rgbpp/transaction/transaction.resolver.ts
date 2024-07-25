@@ -11,20 +11,19 @@ import {
   BitcoinTransactionLoader,
   BitcoinTransactionLoaderResponse,
 } from 'src/modules/bitcoin/transaction/transaction.dataloader';
-import { RgbppBaseTransaction, RgbppTransaction } from './transaction.model';
+import { RgbppBaseTransaction, RgbppLatestTransactionList, RgbppTransaction } from './transaction.model';
 import { RgbppTransactionService } from './transaction.service';
 
 @Resolver(() => RgbppTransaction)
 export class RgbppTransactionResolver {
   constructor(private transactionService: RgbppTransactionService) {}
 
-  @Query(() => [RgbppTransaction], { name: 'rgbppLatestTransactions' })
+  @Query(() => RgbppLatestTransactionList, { name: 'rgbppLatestTransactions' })
   public async getLatestTransaction(
     @Args('page', { type: () => Int, nullable: true }) page: number = 1,
     @Args('pageSize', { type: () => Int, nullable: true }) pageSize: number = 10,
-  ): Promise<RgbppBaseTransaction[]> {
-    const transactions = await this.transactionService.getLatestTransactions(page, pageSize);
-    return transactions;
+  ): Promise<RgbppLatestTransactionList> {
+    return await this.transactionService.getLatestTransactions(page, pageSize);
   }
 
   @Query(() => RgbppTransaction, { name: 'rgbppTransaction', nullable: true })

@@ -121,6 +121,13 @@ enum LeapDirection {
   Within
 }
 
+"""RGB++ latest transaction list"""
+type RgbppLatestTransactionList {
+  txs: [RgbppTransaction!]!
+  total: Int!
+  pageSize: Int!
+}
+
 """RGB++ Coin"""
 type RgbppCoin {
   name: String!
@@ -142,7 +149,7 @@ type RgbppCoin {
 type RgbppCoinList {
   coins: [RgbppCoin!]!
   total: Int!
-  page: Int!
+  pageSize: Int!
 }
 
 """Bitcoin Fees"""
@@ -192,7 +199,7 @@ type Query {
   btcChainInfo: BitcoinChainInfo!
   btcBlock(hashOrHeight: String!): BitcoinBlock!
   btcTransaction(txid: String!): BitcoinTransaction
-  rgbppLatestTransactions(page: Int, pageSize: Int): [RgbppTransaction!]!
+  rgbppLatestTransactions(page: Int, pageSize: Int): RgbppLatestTransactionList!
   rgbppTransaction(txidOrTxHash: String!): RgbppTransaction
   rgbppCoinList(page: Int, pageSize: Int): RgbppCoinList!
   rgbppCoin(typeHash: String!): RgbppCoin!

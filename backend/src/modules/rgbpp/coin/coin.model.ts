@@ -74,5 +74,5 @@ export class RgbppCoinList {
   total: number;
 
   @Field(() => Int)
-  page: number;
+  pageSize: number;
 }
