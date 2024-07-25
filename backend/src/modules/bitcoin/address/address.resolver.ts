@@ -5,8 +5,6 @@ import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import { BitcoinBaseTransaction, BitcoinTransaction } from '../transaction/transaction.model';
 import { BitcoinAddress } from './address.model';
 import {
-  BitcoinAddressBalanceLoader,
-  BitcoinAddressBalanceLoaderResponse,
   BitcoinAddressLoader,
   BitcoinAddressLoaderResponse,
   BitcoinAddressTransactionsLoader,
@@ -21,21 +19,19 @@ export class BitcoinAddressResolver {
   @ResolveField(() => Float)
   public async satoshi(
     @Parent() address: BitcoinAddress,
-    @Loader(BitcoinAddressBalanceLoader)
-    addressBalanceLoader: DataLoader<string, BitcoinAddressBalanceLoaderResponse>,
+    @Loader(BitcoinAddressLoader) addressLoader: DataLoader<string, BitcoinAddressLoaderResponse>,
   ): Promise<number> {
-    const { satoshi } = await addressBalanceLoader.load(address.address);
-    return satoshi;
+    const addressStats = await addressLoader.load(address.address);
+    return addressStats.chain_stats.funded_txo_sum - addressStats.chain_stats.spent_txo_sum;
   }
 
   @ResolveField(() => Float)
   public async pendingSatoshi(
     @Parent() address: BitcoinAddress,
-    @Loader(BitcoinAddressBalanceLoader)
-    addressBalanceLoader: DataLoader<string, BitcoinAddressBalanceLoaderResponse>,
+    @Loader(BitcoinAddressLoader) addressLoader: DataLoader<string, BitcoinAddressLoaderResponse>,
   ): Promise<number> {
-    const { pendingSatoshi } = await addressBalanceLoader.load(address.address);
-    return pendingSatoshi;
+    const addressStats = await addressLoader.load(address.address);
+    return addressStats.mempool_stats.funded_txo_sum - addressStats.mempool_stats.spent_txo_sum;
   }
 
   @ResolveField(() => Float)

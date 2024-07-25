@@ -22,44 +22,6 @@ export class BitcoinAddressLoader implements NestDataLoader<string, Address> {
 }
 export type BitcoinAddressLoaderResponse = DataLoaderResponse<BitcoinAddressLoader>;
 
-export interface BitcoinAddressBalance {
-  satoshi: number;
-  pendingSatoshi: number;
-}
-
-@Injectable()
-export class BitcoinAddressBalanceLoader implements NestDataLoader<string, BitcoinAddressBalance> {
-  private logger = new Logger(BitcoinAddressBalanceLoader.name);
-
-  constructor(private bitcoinApiService: BitcoinApiService) {}
-
-  public getBatchFunction() {
-    return (addresses: string[]) => {
-      this.logger.debug(`Loading bitcoin addresses balance: ${addresses.join(', ')}`);
-      return Promise.all(
-        addresses.map(async (address) => {
-          // XXX: Miners has higher chance of getting this error: Too many unspent transaction outputs (>9000). Contact support to raise limits.
-          const utxos = await this.bitcoinApiService.getAddressTxsUtxo({ address });
-
-          let satoshi = 0;
-          let pendingSatoshi = 0;
-          utxos.forEach((utxo) => {
-            satoshi += utxo.value;
-            if (!utxo.status.confirmed) {
-              pendingSatoshi += utxo.value;
-            }
-          });
-          return {
-            satoshi,
-            pendingSatoshi,
-          };
-        }),
-      );
-    };
-  }
-}
-export type BitcoinAddressBalanceLoaderResponse = DataLoaderResponse<BitcoinAddressBalanceLoader>;
-
 export interface BitcoinAddressTransactionsLoaderProps {
   address: string;
   afterTxid?: string;
