@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import { Block, RecommendedFees, Transaction, UTXO } from '../bitcoin-api.schema';
+import { Address, Block, RecommendedFees, Transaction, UTXO } from '../bitcoin-api.schema';
 import { IBitcoinDataProvider } from '../bitcoin-api.interface';
 
 export class ElectrsService implements IBitcoinDataProvider {
@@ -13,6 +13,11 @@ export class ElectrsService implements IBitcoinDataProvider {
 
   public async getFeesRecommended(): Promise<RecommendedFees> {
     throw new Error('Electrs: Recommended fees not available');
+  }
+
+  public async getAddress({ address }: { address: string }) {
+    const response = await this.request.get<Address>(`/address/${address}`);
+    return response.data;
   }
 
   public async getAddressTxsUtxo({ address }: { address: string }) {

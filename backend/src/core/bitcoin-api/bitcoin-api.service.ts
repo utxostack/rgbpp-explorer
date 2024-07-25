@@ -170,6 +170,10 @@ export class BitcoinApiService {
     return this.call('getFeesRecommended');
   }
 
+  public async getAddress({ address }: { address: string }) {
+    return this.call('getAddress', { address });
+  }
+
   public async getAddressTxsUtxo({ address }: { address: string }) {
     return this.call('getAddressTxsUtxo', { address });
   }

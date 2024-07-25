@@ -1,7 +1,8 @@
-import { Block, RecommendedFees, Transaction, UTXO } from './bitcoin-api.schema';
+import { Address, Block, RecommendedFees, Transaction, UTXO } from './bitcoin-api.schema';
 
 export interface IBitcoinDataProvider {
   getFeesRecommended(): Promise<RecommendedFees>;
+  getAddress({ address }: { address: string }): Promise<Address>;
   getAddressTxsUtxo({ address }: { address: string }): Promise<UTXO[]>;
   getAddressTxs({
     address,

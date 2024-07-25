@@ -38,7 +38,8 @@ export class BitcoinBlockTransactionsLoader
 
   public getBatchFunction() {
     return (hashes: string[]) => {
-      this.logger.debug(`Loading bitcoin blocks: ${hashes.join(', ')}`);
+      // TODO: this method only returns the first 25 transactions of each block
+      this.logger.debug(`Loading bitcoin block transactions: ${hashes.join(', ')}`);
       return Promise.all(hashes.map((hash) => this.bitcoinApiService.getBlockTxs({ hash })));
     };
   }

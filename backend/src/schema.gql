@@ -65,7 +65,7 @@ type BitcoinAddress {
   satoshi: Float!
   pendingSatoshi: Float!
   transactionCount: Float!
-  transactions: [BitcoinTransaction!]!
+  transactions(afterTxid: String): [BitcoinTransaction!]!
 }
 
 """Bitcoin Output"""

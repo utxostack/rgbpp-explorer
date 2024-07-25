@@ -23,26 +23,52 @@ export class BitcoinBlockResolver {
   }
 
   @ResolveField(() => BitcoinAddress)
-  public async miner(@Parent() block: BitcoinBaseBlock): Promise<BitcoinBaseAddress> {
-    // TODO: Implement this resolver
+  public async miner(
+    @Parent() block: BitcoinBaseBlock,
+    @Loader(BitcoinBlockTransactionsLoader)
+    blockTxsLoader: DataLoader<string, BitcoinBlockTransactionsLoaderResponse>,
+  ): Promise<BitcoinBaseAddress> {
+    const txs = await blockTxsLoader.load(block.id);
+    const coinbaseTx = BitcoinTransaction.from(txs[0]);
     return {
-      address: '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa',
+      address: coinbaseTx.vout[0].scriptpubkeyAddress,
     };
   }
 
   @ResolveField(() => Float)
-  public async totalFee(@Parent() block: BitcoinBaseBlock): Promise<number> {
-    // TODO: Implement this resolver
-    return 0;
+  public async totalFee(
+    @Parent() block: BitcoinBaseBlock,
+    @Loader(BitcoinBlockLoader) blockLoader: DataLoader<string, BitcoinBlockLoaderResponse>,
+  ): Promise<number> {
+    // XXX: only the "mempool" mode returns the "extra" field
+    const detail = await blockLoader.load(block.id);
+    if (detail.extras) {
+      return detail.extras.totalFees;
+    } else {
+      // TODO: what should be returned when using the "electrs" mode?
+      return 0;
+    }
   }
 
   @ResolveField(() => FeeRateRange)
-  public async feeRateRange(@Parent() block: BitcoinBaseBlock): Promise<FeeRateRange> {
-    // TODO: Implement this resolver
-    return {
-      min: 0,
-      max: 1,
-    };
+  public async feeRateRange(
+    @Parent() block: BitcoinBaseBlock,
+    @Loader(BitcoinBlockLoader) blockLoader: DataLoader<string, BitcoinBlockLoaderResponse>,
+  ): Promise<FeeRateRange> {
+    // XXX: only the "mempool" mode returns the "extra" field
+    const detail = await blockLoader.load(block.id);
+    if (detail.extras) {
+      return {
+        min: detail.extras.feeRange[0],
+        max: detail.extras.feeRange[detail.extras.feeRange.length - 1],
+      };
+    } else {
+      // TODO: what should be returned when using the "electrs" mode?
+      return {
+        min: 0,
+        max: 0,
+      };
+    }
   }
 
   @ResolveField(() => [BitcoinTransaction])

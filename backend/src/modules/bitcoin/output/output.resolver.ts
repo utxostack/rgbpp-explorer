@@ -5,10 +5,13 @@ import { BitcoinOutput } from './output.model';
 @Resolver(() => BitcoinOutput)
 export class BitcoinOutputResolver {
   @ResolveField(() => BitcoinAddress)
-  public async address(@Parent() output: BitcoinOutput): Promise<BitcoinBaseAddress> {
-    // TODO: Implement this resolver
+  public async address(@Parent() output: BitcoinOutput): Promise<BitcoinBaseAddress | null> {
+    // XXX: OP_RETURN outputs don't have address
+    if (!output.scriptpubkeyAddress) {
+      return null;
+    }
     return {
-      address: '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa',
+      address: output.scriptpubkeyAddress,
     };
   }
 }

@@ -23,6 +23,13 @@ export const Block = z.object({
   nonce: z.number(),
   bits: z.number(),
   difficulty: z.number(),
+  extras: z.object({
+    totalFees: z.number(),
+    avgFee: z.number(),
+    avgFeeRate: z.number(),
+    feeRange: z.number().array(),
+    coinbaseAddress: z.string(),
+  }).optional(),
 });
 export type Block = z.infer<typeof Block>;
 
@@ -33,6 +40,25 @@ export const Status = z.object({
   block_time: z.number().optional(),
 });
 export type Status = z.infer<typeof Status>;
+
+export const Address = z.object({
+  address: z.string(),
+  chain_stats: z.object({
+    funded_txo_count: z.number(),
+    funded_txo_sum: z.number(),
+    spent_txo_count: z.number(),
+    spent_txo_sum: z.number(),
+    tx_count: z.number(),
+  }),
+  mempool_stats: z.object({
+    funded_txo_count: z.number(),
+    funded_txo_sum: z.number(),
+    spent_txo_count: z.number(),
+    spent_txo_sum: z.number(),
+    tx_count: z.number(),
+  }),
+});
+export type Address = z.infer<typeof Address>;
 
 export const Balance = z.object({
   address: z.string(),
