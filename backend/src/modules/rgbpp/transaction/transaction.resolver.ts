@@ -31,7 +31,7 @@ export class RgbppTransactionResolver {
   public async getTransaction(
     @Args('txidOrTxHash') txidOrTxHash: string,
   ): Promise<RgbppBaseTransaction | null> {
-    // TODO: not sure if the txidOrTxHash is a ckb txHash or a btc txid
+    // FIXME: not sure if the txidOrTxHash is a ckb txHash or a btc txid
     return txidOrTxHash.startsWith('ck')
       ? this.transactionService.getTransactionByCkbTxHash(txidOrTxHash)
       : this.transactionService.getTransactionByBtcTxid(txidOrTxHash);

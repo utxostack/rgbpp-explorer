@@ -41,6 +41,7 @@ export class BitcoinBlockResolver {
     @Loader(BitcoinBlockTransactionsLoader)
     blockTxsLoader: DataLoader<string, BitcoinBlockTransactionsLoaderResponse>,
   ): Promise<number> {
+    // TODO: The BitcoinApiService.getBlockTxs() only returns the first 25 transactions
     const txs = await blockTxsLoader.load(block.id);
     return txs.reduce((sum, tx) => sum + tx.fee, 0);
   }
