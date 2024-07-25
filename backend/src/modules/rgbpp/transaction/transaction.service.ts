@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
-import { RgbppBaseTransaction, RgbppTransaction } from './transaction.model';
+import { RgbppBaseTransaction, RgbppLatestTransactionList, RgbppTransaction } from './transaction.model';
 
 @Injectable()
 export class RgbppTransactionService {
@@ -13,12 +13,16 @@ export class RgbppTransactionService {
   public async getLatestTransactions(
     page: number,
     pageSize: number,
-  ): Promise<RgbppBaseTransaction[]> {
+  ): Promise<RgbppLatestTransactionList> {
     const response = await this.ckbExplorerService.getRgbppTransactions({
       page,
       pageSize,
     });
-    return response.data.ckb_transactions.map((transaction) => RgbppTransaction.from(transaction));
+    return {
+      txs: response.data.ckb_transactions.map((tx) => RgbppTransaction.from(tx)),
+      total: response.meta.total,
+      pageSize: response.meta.page_size,
+    };
   }
 
   public async getTransactionByCkbTxHash(txHash: string): Promise<RgbppBaseTransaction | null> {

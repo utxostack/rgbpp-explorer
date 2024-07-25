@@ -65,3 +65,15 @@ export class RgbppTransaction {
     };
   }
 }
+
+@ObjectType({ description: 'RGB++ latest transaction list' })
+export class RgbppLatestTransactionList {
+  @Field(() => [RgbppTransaction])
+  txs: RgbppBaseTransaction[];
+
+  @Field(() => Int)
+  total: number;
+
+  @Field(() => Int)
+  pageSize: number;
+}
