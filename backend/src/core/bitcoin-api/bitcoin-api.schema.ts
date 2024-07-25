@@ -23,6 +23,13 @@ export const Block = z.object({
   nonce: z.number(),
   bits: z.number(),
   difficulty: z.number(),
+  extras: z.object({
+    totalFees: z.number(),
+    avgFee: z.number(),
+    avgFeeRate: z.number(),
+    feeRange: z.number().array(),
+    coinbaseAddress: z.string(),
+  }).optional(),
 });
 export type Block = z.infer<typeof Block>;
 

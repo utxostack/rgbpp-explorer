@@ -38,39 +38,37 @@ export class BitcoinBlockResolver {
   @ResolveField(() => Float)
   public async totalFee(
     @Parent() block: BitcoinBaseBlock,
-    @Loader(BitcoinBlockTransactionsLoader)
-    blockTxsLoader: DataLoader<string, BitcoinBlockTransactionsLoaderResponse>,
+    @Loader(BitcoinBlockLoader) blockLoader: DataLoader<string, BitcoinBlockLoaderResponse>,
   ): Promise<number> {
-    // TODO: The BitcoinApiService.getBlockTxs() only returns the first 25 transactions
-    const txs = await blockTxsLoader.load(block.id);
-    return txs.reduce((sum, tx) => sum + tx.fee, 0);
+    // XXX: only the "mempool" mode returns the "extra" field
+    const detail = await blockLoader.load(block.id);
+    if (detail.extras) {
+      return detail.extras.totalFees;
+    } else {
+      // TODO: what should be returned when using the "electrs" mode?
+      return 0;
+    }
   }
 
   @ResolveField(() => FeeRateRange)
   public async feeRateRange(
     @Parent() block: BitcoinBaseBlock,
-    @Loader(BitcoinBlockTransactionsLoader)
-    blockTxsLoader: DataLoader<string, BitcoinBlockTransactionsLoaderResponse>,
+    @Loader(BitcoinBlockLoader) blockLoader: DataLoader<string, BitcoinBlockLoaderResponse>,
   ): Promise<FeeRateRange> {
-    // TODO: The BitcoinApiService.getBlockTxs() only returns the first 25 transactions
-    const txs = await blockTxsLoader.load(block.id);
-
-    let min = Infinity;
-    let max = 0;
-    for (const tx of txs.slice(1)) {
-      const vSize = Math.ceil(tx.weight / 4);
-      const feeRate = tx.fee / vSize;
-      if (feeRate < min) {
-        min = feeRate;
-      }
-      if (feeRate > max) {
-        max = feeRate;
-      }
+    // XXX: only the "mempool" mode returns the "extra" field
+    const detail = await blockLoader.load(block.id);
+    if (detail.extras) {
+      return {
+        min: detail.extras.feeRange[0],
+        max: detail.extras.feeRange[detail.extras.feeRange.length - 1],
+      };
+    } else {
+      // TODO: what should be returned when using the "electrs" mode?
+      return {
+        min: 0,
+        max: 0,
+      };
     }
-    return {
-      min,
-      max,
-    };
   }
 
   @ResolveField(() => [BitcoinTransaction])
