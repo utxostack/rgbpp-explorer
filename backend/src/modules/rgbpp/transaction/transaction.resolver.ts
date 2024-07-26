@@ -11,7 +11,11 @@ import {
   BitcoinTransactionLoader,
   BitcoinTransactionLoaderResponse,
 } from 'src/modules/bitcoin/transaction/transaction.dataloader';
-import { RgbppBaseTransaction, RgbppLatestTransactionList, RgbppTransaction } from './transaction.model';
+import {
+  RgbppTransaction,
+  RgbppBaseTransaction,
+  RgbppLatestTransactionList,
+} from './transaction.model';
 import { RgbppTransactionService } from './transaction.service';
 
 @Resolver(() => RgbppTransaction)

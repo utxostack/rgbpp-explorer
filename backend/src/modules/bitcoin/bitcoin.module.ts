@@ -2,19 +2,19 @@ import { Module } from '@nestjs/common';
 import { BitcoinApiModule } from 'src/core/bitcoin-api/bitcoin-api.module';
 import { BitcoinTransactionModule } from './transaction/transaction.module';
 import { BitcoinResolver } from './bitcoin.resolver';
-import { BlockModule } from './block/block.module';
-import { AddressModule } from './address/address.module';
-import { InputModule } from './input/input.module';
-import { OutputModule } from './output/output.module';
+import { BitcoinBlockModule } from './block/block.module';
+import { BitcoinAddressModule } from './address/address.module';
+import { BitcoinInputModule } from './input/input.module';
+import { BitcoinOutputModule } from './output/output.module';
 
 @Module({
   imports: [
     BitcoinApiModule,
-    BlockModule,
+    BitcoinBlockModule,
     BitcoinTransactionModule,
-    AddressModule,
-    InputModule,
-    OutputModule,
+    BitcoinAddressModule,
+    BitcoinInputModule,
+    BitcoinOutputModule,
   ],
   providers: [BitcoinResolver],
 })

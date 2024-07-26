@@ -14,4 +14,10 @@ export class BitcoinOutputResolver {
       address: output.scriptpubkeyAddress,
     };
   }
+
+  @ResolveField(() => Boolean)
+  public async spent(@Parent() output: BitcoinOutput): Promise<boolean> {
+    // TODO: implement this resolver
+    return false;
+  }
 }

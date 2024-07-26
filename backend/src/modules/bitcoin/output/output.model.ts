@@ -2,6 +2,8 @@ import { Field, Float, ObjectType } from '@nestjs/graphql';
 import * as BitcoinApi from 'src/core/bitcoin-api/bitcoin-api.schema';
 import { BitcoinAddress, BitcoinBaseAddress } from '../address/address.model';
 
+export type BitcoinBaseOutput = Omit<BitcoinOutput, 'spent'>;
+
 @ObjectType({ description: 'Bitcoin Output' })
 export class BitcoinOutput {
   @Field(() => String)
@@ -22,7 +24,10 @@ export class BitcoinOutput {
   @Field(() => BitcoinAddress, { nullable: true })
   address: BitcoinBaseAddress;
 
-  public static from(output: BitcoinApi.Output) {
+  @Field(() => Boolean)
+  spent: boolean;
+
+  public static from(output: BitcoinApi.Output): BitcoinBaseOutput {
     return {
       scriptpubkey: output.scriptpubkey,
       scriptpubkeyAsm: output.scriptpubkey_asm,

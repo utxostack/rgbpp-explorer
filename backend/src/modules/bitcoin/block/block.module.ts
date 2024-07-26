@@ -7,4 +7,4 @@ import { BitcoinBlockResolver } from './block.resolver';
   imports: [BitcoinApiModule],
   providers: [BitcoinBlockResolver, BitcoinBlockLoader, BitcoinBlockTransactionsLoader],
 })
-export class BlockModule {}
+export class BitcoinBlockModule {}

@@ -1,6 +1,7 @@
 import DataLoader from 'dataloader';
-import { Args, Query, Resolver } from '@nestjs/graphql';
+import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { Loader } from '@applifting-io/nestjs-dataloader';
+import { BitcoinApiService } from '../../../core/bitcoin-api/bitcoin-api.service';
 import { BitcoinBaseTransaction, BitcoinTransaction } from './transaction.model';
 import {
   BitcoinTransactionLoader,
@@ -9,6 +10,8 @@ import {
 
 @Resolver(() => BitcoinTransaction)
 export class BitcoinTransactionResolver {
+  constructor(private bitcoinApiService: BitcoinApiService) {}
+
   @Query(() => BitcoinTransaction, { name: 'btcTransaction', nullable: true })
   public async getTransaction(
     @Args('txid') txid: string,
@@ -17,5 +20,16 @@ export class BitcoinTransactionResolver {
   ): Promise<BitcoinBaseTransaction | null> {
     const transaction = await transactionLoader.load(txid);
     return BitcoinTransaction.from(transaction);
+  }
+
+  @ResolveField(() => Float)
+  public async confirmations(@Parent() transaction: BitcoinTransaction): Promise<number> {
+    if (!transaction.confirmed) {
+      return 0;
+    }
+
+    // TODO: should this resolver be refactored with a dataloader?
+    const info = await this.bitcoinApiService.getBlockchainInfo();
+    return info.blocks - transaction.blockHeight + 1;
   }
 }

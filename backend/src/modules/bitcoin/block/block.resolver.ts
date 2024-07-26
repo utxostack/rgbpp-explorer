@@ -25,14 +25,33 @@ export class BitcoinBlockResolver {
   @ResolveField(() => BitcoinAddress)
   public async miner(
     @Parent() block: BitcoinBaseBlock,
-    @Loader(BitcoinBlockTransactionsLoader)
-    blockTxsLoader: DataLoader<string, BitcoinBlockTransactionsLoaderResponse>,
+    @Loader(BitcoinBlockLoader) blockLoader: DataLoader<string, BitcoinBlockLoaderResponse>,
   ): Promise<BitcoinBaseAddress> {
-    const txs = await blockTxsLoader.load(block.id);
-    const coinbaseTx = BitcoinTransaction.from(txs[0]);
-    return {
-      address: coinbaseTx.vout[0].scriptpubkeyAddress,
-    };
+    // XXX: only the "mempool" mode returns the "extra" field
+    const detail = await blockLoader.load(block.id);
+    if (detail.extras) {
+      return {
+        address: detail.extras.coinbaseAddress,
+      };
+    } else {
+      // TODO: what should be returned when using the "electrs" mode?
+      return null;
+    }
+  }
+
+  @ResolveField(() => Float)
+  public async reward(
+    @Parent() block: BitcoinBaseBlock,
+    @Loader(BitcoinBlockLoader) blockLoader: DataLoader<string, BitcoinBlockLoaderResponse>,
+  ): Promise<number> {
+    // XXX: only the "mempool" mode returns the "extra" field
+    const detail = await blockLoader.load(block.id);
+    if (detail.extras) {
+      return detail.extras.reward;
+    } else {
+      // TODO: what should be returned when using the "electrs" mode?
+      return 0;
+    }
   }
 
   @ResolveField(() => Float)

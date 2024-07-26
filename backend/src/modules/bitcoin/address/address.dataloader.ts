@@ -3,7 +3,7 @@ import { NestDataLoader } from '@applifting-io/nestjs-dataloader';
 import { Address } from 'src/core/bitcoin-api/bitcoin-api.schema';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import { DataLoaderResponse } from 'src/common/type/dataloader';
-import { BitcoinTransaction } from '../transaction/transaction.model';
+import { BitcoinBaseTransaction, BitcoinTransaction } from '../transaction/transaction.model';
 
 @Injectable()
 export class BitcoinAddressLoader implements NestDataLoader<string, Address> {
@@ -29,7 +29,7 @@ export interface BitcoinAddressTransactionsLoaderProps {
 
 @Injectable()
 export class BitcoinAddressTransactionsLoader
-  implements NestDataLoader<BitcoinAddressTransactionsLoaderProps, BitcoinTransaction[]>
+  implements NestDataLoader<BitcoinAddressTransactionsLoaderProps, BitcoinBaseTransaction[]>
 {
   private logger = new Logger(BitcoinAddressTransactionsLoader.name);
 
