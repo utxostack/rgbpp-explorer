@@ -1,7 +1,7 @@
 import mempoolJS from '@cell-studio/mempool.js';
 import * as Sentry from '@sentry/node';
 import { FeesMempoolBlocks } from '@cell-studio/mempool.js/lib/interfaces/bitcoin/fees';
-import { Block, RecommendedFees, Transaction, UTXO } from '../bitcoin-api.schema';
+import { Block, OutSpend, RecommendedFees, Transaction, UTXO } from '../bitcoin-api.schema';
 import { IBitcoinDataProvider } from '../bitcoin-api.interface';
 
 export class MempoolService implements IBitcoinDataProvider {
@@ -128,12 +128,22 @@ export class MempoolService implements IBitcoinDataProvider {
     return response;
   }
 
+  public async getTxOutSpend({ txid, vout }: { txid: string; vout: number }) {
+    const response = await this.mempool.bitcoin.transactions.getTxOutspend({ txid, vout });
+    return OutSpend.parse(response);
+  }
+
+  public async getTxOutSpends({ txid }: { txid: string }) {
+    const response = await this.mempool.bitcoin.transactions.getTxOutspends({ txid });
+    return response.map((outSpend) => OutSpend.parse(outSpend));
+  }
+
   public async getBlock({ hash }: { hash: string }) {
     const response = await this.mempool.bitcoin.blocks.getBlock({ hash });
     return Block.parse(response);
   }
 
-  public async getBlockTxs({ hash, startIndex }: { hash: string; startIndex?: number}) {
+  public async getBlockTxs({ hash, startIndex }: { hash: string; startIndex?: number }) {
     const response = await this.mempool.bitcoin.blocks.getBlockTxs({
       hash,
       start_index: startIndex,

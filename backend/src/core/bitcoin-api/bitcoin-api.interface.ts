@@ -1,4 +1,4 @@
-import { Address, Block, RecommendedFees, Transaction, UTXO } from './bitcoin-api.schema';
+import { Address, Block, OutSpend, RecommendedFees, Transaction, UTXO } from './bitcoin-api.schema';
 
 export interface IBitcoinDataProvider {
   getFeesRecommended(): Promise<RecommendedFees>;
@@ -7,6 +7,8 @@ export interface IBitcoinDataProvider {
   getAddressTxs(props: { address: string; afterTxid?: string }): Promise<Transaction[]>;
   getTx(props: { txid: string }): Promise<Transaction>;
   getTxHex(props: { txid: string }): Promise<string>;
+  getTxOutSpend(props: { txid: string; vout: number }): Promise<OutSpend>;
+  getTxOutSpends(props: { txid: string }): Promise<OutSpend[]>;
   getBlock(props: { hash: string }): Promise<Block>;
   getBlockTxs(props: { hash: string; startIndex: number }): Promise<Transaction[]>;
   getBlockHeight(props: { height: number }): Promise<string>;

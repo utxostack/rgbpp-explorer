@@ -53,7 +53,6 @@ type BitcoinOutput {
   scriptpubkeyAddress: String
   value: Float!
   address: BitcoinAddress
-  spent: Boolean!
 }
 
 """Bitcoin Input"""
@@ -67,6 +66,13 @@ type BitcoinInput {
   sequence: Float!
 }
 
+"""Bitcoin Output Spend Status"""
+type BitcoinOutputSpend {
+  spent: Boolean!
+  txid: String
+  vin: Float
+}
+
 """Bitcoin Transaction"""
 type BitcoinTransaction {
   blockHeight: Float!
@@ -75,6 +81,7 @@ type BitcoinTransaction {
   version: Int!
   vin: [BitcoinInput!]!
   vout: [BitcoinOutput!]!
+  outSpends: [BitcoinOutputSpend!]!
   size: Float!
   locktime: Timestamp!
   weight: Float!

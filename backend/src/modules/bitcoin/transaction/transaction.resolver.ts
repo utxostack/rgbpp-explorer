@@ -7,6 +7,7 @@ import {
   BitcoinTransactionLoader,
   BitcoinTransactionLoaderResponse,
 } from './transaction.dataloader';
+import { BitcoinOutputSpend } from '../spend/spend.model';
 
 @Resolver(() => BitcoinTransaction)
 export class BitcoinTransactionResolver {
@@ -20,6 +21,14 @@ export class BitcoinTransactionResolver {
   ): Promise<BitcoinBaseTransaction | null> {
     const transaction = await transactionLoader.load(txid);
     return BitcoinTransaction.from(transaction);
+  }
+
+  @ResolveField(() => [BitcoinOutputSpend])
+  public async outSpends(@Parent() transaction: BitcoinTransaction): Promise<BitcoinOutputSpend[]> {
+    const outSpends = await this.bitcoinApiService.getTxOutSpends({
+      txid: transaction.txid,
+    });
+    return outSpends.map(BitcoinOutputSpend.from);
   }
 
   @ResolveField(() => Float)

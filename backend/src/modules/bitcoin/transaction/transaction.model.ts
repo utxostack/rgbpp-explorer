@@ -2,8 +2,9 @@ import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import * as BitcoinApi from 'src/core/bitcoin-api/bitcoin-api.schema';
 import { BitcoinInput } from '../input/input.model';
 import { BitcoinBaseOutput, BitcoinOutput } from '../output/output.model';
+import { BitcoinOutputSpend } from '../spend/spend.model';
 
-export type BitcoinBaseTransaction = Omit<BitcoinTransaction, 'confirmations'>;
+export type BitcoinBaseTransaction = Omit<BitcoinTransaction, 'confirmations' | 'outSpends'>;
 
 @ObjectType({ description: 'Bitcoin Transaction' })
 export class BitcoinTransaction {
@@ -24,6 +25,9 @@ export class BitcoinTransaction {
 
   @Field(() => [BitcoinOutput])
   vout: BitcoinBaseOutput[];
+
+  @Field(() => [BitcoinOutputSpend])
+  outSpends: BitcoinOutputSpend[];
 
   @Field(() => Float)
   size: number;

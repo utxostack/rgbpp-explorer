@@ -1,4 +1,4 @@
-import { Parent, ResolveField, Resolver } from '@nestjs/graphql';
+import { Parent, ResolveField, Resolver, Root } from '@nestjs/graphql';
 import { BitcoinAddress, BitcoinBaseAddress } from '../address/address.model';
 import { BitcoinOutput } from './output.model';
 
@@ -13,11 +13,5 @@ export class BitcoinOutputResolver {
     return {
       address: output.scriptpubkeyAddress,
     };
-  }
-
-  @ResolveField(() => Boolean)
-  public async spent(@Parent() output: BitcoinOutput): Promise<boolean> {
-    // TODO: implement this resolver
-    return false;
   }
 }
