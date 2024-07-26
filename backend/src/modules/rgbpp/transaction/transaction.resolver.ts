@@ -56,6 +56,9 @@ export class RgbppTransactionResolver {
     @Loader(BitcoinTransactionLoader)
     btcTxLoader: DataLoader<string, BitcoinTransactionLoaderResponse>,
   ) {
+    if (!tx.btcTxid) {
+      return null;
+    }
     const btcTx = await btcTxLoader.load(tx.btcTxid);
     if (!btcTx) {
       return null;
