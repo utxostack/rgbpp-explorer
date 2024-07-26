@@ -110,8 +110,11 @@ export class MempoolService implements IBitcoinDataProvider {
     return response.map((utxo) => UTXO.parse(utxo));
   }
 
-  public async getAddressTxs({ address, after_txid }: { address: string; after_txid?: string }) {
-    const response = await this.mempool.bitcoin.addresses.getAddressTxs({ address, after_txid });
+  public async getAddressTxs({ address, afterTxId }: { address: string; afterTxId?: string }) {
+    const response = await this.mempool.bitcoin.addresses.getAddressTxs({
+      address,
+      after_txid: afterTxId,
+    });
     return response.map((tx) => Transaction.parse(tx));
   }
 
@@ -130,8 +133,11 @@ export class MempoolService implements IBitcoinDataProvider {
     return Block.parse(response);
   }
 
-  public async getBlockTxs({ hash }: { hash: string }) {
-    const response = await this.mempool.bitcoin.blocks.getBlockTxs({ hash });
+  public async getBlockTxs({ hash, startIndex }: { hash: string; startIndex?: number}) {
+    const response = await this.mempool.bitcoin.blocks.getBlockTxs({
+      hash,
+      start_index: startIndex,
+    });
     // XXX: This is a workaround to fix the type issue, need to fix the type in the mempool.js
     return (response as unknown as Transaction[]).map((tx) => Transaction.parse(tx));
   }

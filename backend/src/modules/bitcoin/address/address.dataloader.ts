@@ -42,7 +42,7 @@ export class BitcoinAddressTransactionsLoader
         batchProps.map(async (props) => {
           const txs = await this.bitcoinApiService.getAddressTxs({
             address: props.address,
-            after_txid: props.afterTxid,
+            afterTxid: props.afterTxid,
           });
           return txs.map((tx) => BitcoinTransaction.from(tx));
         }),

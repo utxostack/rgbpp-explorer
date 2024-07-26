@@ -9,6 +9,7 @@ import {
   BitcoinBlockLoader,
   BitcoinBlockLoaderResponse,
   BitcoinBlockTransactionsLoader,
+  BitcoinBlockTransactionsLoaderProps,
   BitcoinBlockTransactionsLoaderResponse,
 } from './block.dataloader';
 
@@ -97,9 +98,20 @@ export class BitcoinBlockResolver {
   public async transactions(
     @Parent() block: BitcoinBaseBlock,
     @Loader(BitcoinBlockTransactionsLoader)
-    blockTxsLoader: DataLoader<string, BitcoinBlockTransactionsLoaderResponse>,
+    blockTxsLoader: DataLoader<
+      BitcoinBlockTransactionsLoaderProps,
+      BitcoinBlockTransactionsLoaderResponse
+    >,
+    @Args('startIndex', {
+      nullable: true,
+      description: 'For pagination, must be a multiplication of 25',
+    })
+    startIndex?: number,
   ): Promise<BitcoinBaseTransaction[]> {
-    const txs = await blockTxsLoader.load(block.id);
+    const txs = await blockTxsLoader.load({
+      hash: block.id,
+      startIndex,
+    });
     return txs.map((tx) => BitcoinTransaction.from(tx));
   }
 }

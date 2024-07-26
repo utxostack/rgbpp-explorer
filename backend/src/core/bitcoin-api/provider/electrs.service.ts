@@ -25,10 +25,10 @@ export class ElectrsService implements IBitcoinDataProvider {
     return response.data;
   }
 
-  public async getAddressTxs({ address, after_txid }: { address: string; after_txid?: string }) {
+  public async getAddressTxs({ address, afterTxid }: { address: string; afterTxid?: string }) {
     let url = `/address/${address}/txs`;
-    if (after_txid) {
-      url += `?after_txid=${after_txid}`;
+    if (afterTxid) {
+      url += `?after_txid=${afterTxid}`;
     }
     const response = await this.request.get<Transaction[]>(url);
     return response.data.map((tx: unknown) => Transaction.parse(tx));
@@ -49,8 +49,12 @@ export class ElectrsService implements IBitcoinDataProvider {
     return Block.parse(response.data);
   }
 
-  public async getBlockTxs({ hash }: { hash: string }) {
-    const response = await this.request.get<Transaction[]>(`/block/${hash}/txs`);
+  public async getBlockTxs({ hash, startIndex }: { hash: string; startIndex?: number }) {
+    let url = `/block/${hash}/txs`;
+    if (startIndex) {
+      url += `/${startIndex}`;
+    }
+    const response = await this.request.get<Transaction[]>(url);
     return response.data.map((tx: unknown) => Transaction.parse(tx));
   }
 

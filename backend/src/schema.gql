@@ -110,7 +110,10 @@ type BitcoinBlock {
   reward: Float!
   totalFee: Float!
   feeRateRange: FeeRateRange!
-  transactions: [BitcoinTransaction!]!
+  transactions(
+    """For pagination, must be a multiplication of 25"""
+    startIndex: Float
+  ): [BitcoinTransaction!]!
 }
 
 """CKB Block"""
