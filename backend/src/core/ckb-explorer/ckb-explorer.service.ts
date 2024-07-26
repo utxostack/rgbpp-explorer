@@ -9,6 +9,7 @@ import {
   CkbExplorerResponse,
   NonPaginatedResponse,
   PaginatedResponse,
+  RgbppDigest,
   RgbppTransaction,
   Transaction,
   TransactionSortType,
@@ -111,6 +112,11 @@ export class CkbExplorerService {
 
   public async getTransaction(txHash: string): Promise<NonPaginatedResponse<Transaction>> {
     const response = await this.request.get(`/v1/transactions/${txHash}`);
+    return response.data;
+  }
+
+  public async getRgbppDigest(txHash: string): Promise<CkbExplorerResponse<RgbppDigest>> {
+    const response = await this.request.get(`/v2/ckb_transactions/${txHash}/rgb_digest`);
     return response.data;
   }
 

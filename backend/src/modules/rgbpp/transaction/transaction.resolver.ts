@@ -1,4 +1,5 @@
 import DataLoader from 'dataloader';
+import { Logger } from '@nestjs/common';
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Int, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { CkbTransaction } from 'src/modules/ckb/transaction/transaction.model';
@@ -7,6 +8,7 @@ import {
   CkbTransactionLoaderResponse,
 } from 'src/modules/ckb/transaction/transaction.dataloader';
 import { BitcoinTransaction } from 'src/modules/bitcoin/transaction/transaction.model';
+import { RgbppTransactionService } from './transaction.service';
 import {
   BitcoinTransactionLoader,
   BitcoinTransactionLoaderResponse,
@@ -15,11 +17,14 @@ import {
   RgbppTransaction,
   RgbppBaseTransaction,
   RgbppLatestTransactionList,
+  LeapDirectionMap,
+  LeapDirection,
 } from './transaction.model';
-import { RgbppTransactionService } from './transaction.service';
 
 @Resolver(() => RgbppTransaction)
 export class RgbppTransactionResolver {
+  private logger = new Logger(RgbppTransactionResolver.name);
+
   constructor(private transactionService: RgbppTransactionService) {}
 
   @Query(() => RgbppLatestTransactionList, { name: 'rgbppLatestTransactions' })
@@ -34,11 +39,28 @@ export class RgbppTransactionResolver {
   public async getTransaction(
     @Args('txidOrTxHash') txidOrTxHash: string,
   ): Promise<RgbppBaseTransaction | null> {
-    // FIXME: not sure if the txidOrTxHash is a ckb txHash or a btc txid
-    // 'ck' is a ckbAddress prefix, not a txid prefix.
-    return txidOrTxHash.startsWith('ck')
-      ? this.transactionService.getTransactionByCkbTxHash(txidOrTxHash)
-      : this.transactionService.getTransactionByBtcTxid(txidOrTxHash);
+    this.logger.debug('getTransaction', txidOrTxHash);
+    let tx: RgbppBaseTransaction | undefined;
+    try {
+      tx = await this.transactionService.getTransactionByCkbTxHash(txidOrTxHash);
+    } catch {
+      // if throws, the txidOrTxHash is not a ckb txHash or the tx is not rgbpp tx
+      this.logger.debug('not txHash or not rgbpp tx', txidOrTxHash);
+    }
+    try {
+      tx = await this.transactionService.getTransactionByBtcTxid(txidOrTxHash);
+    } catch {
+      // if throws, the txidOrTxHash is not a btc txid or the tx is not rgbpp tx
+      this.logger.debug('not txid or not rgbpp tx', txidOrTxHash);
+    }
+
+    return tx ?? null;
+  }
+
+  @ResolveField(() => LeapDirection, { nullable: true })
+  public async leapDirection(@Parent() tx: RgbppBaseTransaction): Promise<LeapDirection | null> {
+    const digest = await this.transactionService.getRgbppDigest(tx.ckbTxHash);
+    return digest?.leap_direction ? LeapDirectionMap[digest.leap_direction] : null;
   }
 
   @ResolveField(() => CkbTransaction, { nullable: true })
