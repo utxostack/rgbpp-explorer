@@ -3,6 +3,8 @@ import { BI } from '@ckb-lumos/bi';
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { CkbBaseTransaction, CkbTransaction } from '../transaction/transaction.model';
+import { FeeRateRange } from '../../bitcoin/block/block.model';
+import { CkbAddress } from '../address/address.model';
 import { CkbBlock, CkbBaseBlock } from './block.model';
 import {
   CkbBlockEconomicStateLoader,
@@ -34,6 +36,21 @@ export class CkbBlockResolver {
   ): Promise<number> {
     const blockEconomicState = await blockTransactionsLoader.load(block.hash);
     return BI.from(blockEconomicState.txs_fee).toNumber();
+  }
+
+  @ResolveField(() => FeeRateRange)
+  public async feeRateRange(@Parent() block: CkbBlock): Promise<FeeRateRange> {
+    // TODO: implement this resolver
+    return {
+      min: 0,
+      max: 0,
+    };
+  }
+
+  @ResolveField(() => CkbAddress)
+  public async miner(@Parent() block: CkbBlock): Promise<CkbAddress> {
+    // TODO: implement this resolver
+    return null;
   }
 
   @ResolveField(() => [String])

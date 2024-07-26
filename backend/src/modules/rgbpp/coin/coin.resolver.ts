@@ -8,7 +8,7 @@ import { RgbppBaseCoin, RgbppCoin, RgbppCoinList } from './coin.model';
 export class RgbppCoinResolver {
   constructor(private ckbExplorerService: CkbExplorerService) {}
 
-  @Query(() => RgbppCoinList, { name: 'rgbppCoinList' })
+  @Query(() => RgbppCoinList, { name: 'rgbppCoins' })
   public async coins(
     @Args('page', { type: () => Int, nullable: true }) page: number = 1,
     @Args('pageSize', { type: () => Int, nullable: true }) pageSize: number = 10,

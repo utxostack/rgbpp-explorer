@@ -25,6 +25,7 @@ export const Block = z.object({
   difficulty: z.number(),
   extras: z
     .object({
+      reward: z.number(),
       totalFees: z.number(),
       avgFee: z.number(),
       avgFeeRate: z.number(),

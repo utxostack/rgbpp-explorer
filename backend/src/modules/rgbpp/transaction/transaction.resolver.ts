@@ -11,7 +11,11 @@ import {
   BitcoinTransactionLoader,
   BitcoinTransactionLoaderResponse,
 } from 'src/modules/bitcoin/transaction/transaction.dataloader';
-import { RgbppBaseTransaction, RgbppLatestTransactionList, RgbppTransaction } from './transaction.model';
+import {
+  RgbppTransaction,
+  RgbppBaseTransaction,
+  RgbppLatestTransactionList,
+} from './transaction.model';
 import { RgbppTransactionService } from './transaction.service';
 
 @Resolver(() => RgbppTransaction)
@@ -19,7 +23,7 @@ export class RgbppTransactionResolver {
   constructor(private transactionService: RgbppTransactionService) {}
 
   @Query(() => RgbppLatestTransactionList, { name: 'rgbppLatestTransactions' })
-  public async getLatestTransaction(
+  public async getLatestTransactions(
     @Args('page', { type: () => Int, nullable: true }) page: number = 1,
     @Args('pageSize', { type: () => Int, nullable: true }) pageSize: number = 10,
   ): Promise<RgbppLatestTransactionList> {
@@ -56,6 +60,9 @@ export class RgbppTransactionResolver {
     @Loader(BitcoinTransactionLoader)
     btcTxLoader: DataLoader<string, BitcoinTransactionLoaderResponse>,
   ) {
+    if (!tx.btcTxid) {
+      return null;
+    }
     const btcTx = await btcTxLoader.load(tx.btcTxid);
     if (!btcTx) {
       return null;

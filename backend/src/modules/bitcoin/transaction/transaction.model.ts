@@ -1,9 +1,9 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import * as BitcoinApi from 'src/core/bitcoin-api/bitcoin-api.schema';
 import { BitcoinInput } from '../input/input.model';
-import { BitcoinOutput } from '../output/output.model';
+import { BitcoinBaseOutput, BitcoinOutput } from '../output/output.model';
 
-export type BitcoinBaseTransaction = BitcoinTransaction;
+export type BitcoinBaseTransaction = Omit<BitcoinTransaction, 'confirmations'>;
 
 @ObjectType({ description: 'Bitcoin Transaction' })
 export class BitcoinTransaction {
@@ -23,7 +23,7 @@ export class BitcoinTransaction {
   vin: BitcoinInput[];
 
   @Field(() => [BitcoinOutput])
-  vout: BitcoinOutput[];
+  vout: BitcoinBaseOutput[];
 
   @Field(() => Float)
   size: number;
@@ -37,10 +37,18 @@ export class BitcoinTransaction {
   @Field(() => Float)
   fee: number;
 
+  @Field(() => Float)
+  feeRate: number;
+
   @Field(() => Boolean)
   confirmed: boolean;
 
+  @Field(() => Float)
+  confirmations: number;
+
   public static from(tx: BitcoinApi.Transaction): BitcoinBaseTransaction {
+    const vSize = Math.ceil(tx.weight / 4);
+
     return {
       blockHeight: tx.status.block_height,
       blockHash: tx.status.block_hash,
@@ -52,6 +60,7 @@ export class BitcoinTransaction {
       locktime: new Date(tx.locktime),
       weight: tx.weight,
       fee: tx.fee,
+      feeRate: tx.fee / vSize,
       confirmed: tx.status.confirmed,
     };
   }

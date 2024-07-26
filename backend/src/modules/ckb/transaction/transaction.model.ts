@@ -4,7 +4,10 @@ import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
 import { CkbBaseCell, CkbCell } from '../cell/cell.model';
 import { CkbBlock } from '../block/block.model';
 
-export type CkbBaseTransaction = Omit<CkbTransaction, 'block' | 'inputs'>;
+export type CkbBaseTransaction = Omit<
+  CkbTransaction,
+  'block' | 'feeRate' | 'size' | 'inputs' | 'confirmations'
+>;
 
 @ObjectType({ description: 'CKB Transaction' })
 export class CkbTransaction {
@@ -20,6 +23,12 @@ export class CkbTransaction {
   @Field(() => Float)
   fee: number;
 
+  @Field(() => Float)
+  feeRate: number;
+
+  @Field(() => Float)
+  size: number;
+
   @Field(() => [CkbCell])
   inputs: CkbBaseCell[];
 
@@ -28,6 +37,9 @@ export class CkbTransaction {
 
   @Field(() => CkbBlock)
   block: CkbBlock;
+
+  @Field(() => Float)
+  confirmations: number;
 
   public static from(transactionWithStatus: CkbRpc.TransactionWithStatusResponse) {
     const { transaction, tx_status, fee } = transactionWithStatus;

@@ -18,7 +18,7 @@ export class CkbXUDTInfo {
   typeHash: string;
 }
 
-export type CkbBaseCell = Omit<CkbCell, 'xudtInfo'>;
+export type CkbBaseCell = Omit<CkbCell, 'xudtInfo' | 'spent'>;
 
 @ObjectType({ description: 'CKB Cell' })
 export class CkbCell {
@@ -39,6 +39,9 @@ export class CkbCell {
 
   @Field(() => CkbXUDTInfo, { nullable: true })
   xudtInfo: CkbXUDTInfo;
+
+  @Field(() => Boolean)
+  spent: boolean;
 
   public static from(tx: CkbRpc.Transaction, index: number): CkbBaseCell {
     const output = tx.outputs[index];

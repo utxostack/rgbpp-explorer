@@ -5,7 +5,7 @@ import { BitcoinAddress } from '../address/address.model';
 
 export type BitcoinBaseBlock = Omit<
   BitcoinBlock,
-  'miner' | 'totalFee' | 'feeRateRange' | 'transactions'
+  'miner' | 'reward' | 'totalFee' | 'feeRateRange' | 'transactions'
 >;
 
 @ObjectType({ description: 'Fee Rate Range' })
@@ -48,6 +48,9 @@ export class BitcoinBlock {
 
   @Field(() => BitcoinAddress)
   miner: BitcoinAddress;
+
+  @Field(() => Float)
+  reward: number;
 
   @Field(() => Float)
   totalFee: number;

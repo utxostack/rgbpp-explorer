@@ -1,7 +1,7 @@
 import DataLoader from 'dataloader';
 import { BI } from '@ckb-lumos/bi';
 import { Loader } from '@applifting-io/nestjs-dataloader';
-import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { CkbTransaction, CkbBaseTransaction } from './transaction.model';
 import { CkbTransactionLoader, CkbTransactionLoaderResponse } from './transaction.dataloader';
 import { CkbBlockLoader, CkbBlockLoaderResponse } from '../block/block.dataloader';
@@ -52,5 +52,23 @@ export class CkbTransactionResolver {
   ): Promise<CkbBaseBlock> {
     const block = await blockLoader.load(transaction.blockNumber.toString());
     return CkbBlock.from(block);
+  }
+
+  @ResolveField(() => Float)
+  public async feeRate(@Parent() transaction: CkbBaseTransaction): Promise<number> {
+    // TODO: implement this resolver
+    return 0;
+  }
+
+  @ResolveField(() => Float)
+  public async size(@Parent() transaction: CkbBaseTransaction): Promise<number> {
+    // TODO: implement this resolver
+    return 0;
+  }
+
+  @ResolveField(() => Float)
+  public async confirmations(@Parent() transaction: CkbBaseTransaction): Promise<number> {
+    // TODO: implement this resolver
+    return 0;
   }
 }

@@ -1,7 +1,6 @@
 import DataLoader from 'dataloader';
 import { Loader } from '@applifting-io/nestjs-dataloader';
-import { Args, Float, Parent, ResolveField, Resolver } from '@nestjs/graphql';
-import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
+import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { BitcoinBaseTransaction, BitcoinTransaction } from '../transaction/transaction.model';
 import { BitcoinAddress } from './address.model';
 import {
@@ -14,7 +13,13 @@ import {
 
 @Resolver(() => BitcoinAddress)
 export class BitcoinAddressResolver {
-  constructor(private bitcoinApiService: BitcoinApiService) {}
+  @Query(() => BitcoinAddress, { name: 'btcAddress', nullable: true })
+  public async getBtcAddress(
+    @Loader(BitcoinAddressLoader) addressLoader: DataLoader<string, BitcoinAddress>,
+    @Args('address') address: string,
+  ): Promise<BitcoinAddress> {
+    return await addressLoader.load(address);
+  }
 
   @ResolveField(() => Float)
   public async satoshi(

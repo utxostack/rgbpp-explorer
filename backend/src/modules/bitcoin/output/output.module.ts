@@ -4,4 +4,4 @@ import { BitcoinOutputResolver } from './output.resolver';
 @Module({
   providers: [BitcoinOutputResolver],
 })
-export class OutputModule {}
+export class BitcoinOutputModule {}

@@ -11,4 +11,10 @@ export class CellResolver {
     const tx = await this.ckbExplorerService.getTransaction(cell.txHash);
     return tx.data.attributes.display_outputs[cell.index].xudt_info;
   }
+
+  @ResolveField(() => Boolean)
+  public async spent(@Parent() cell: CkbCell): Promise<boolean> {
+    // TODO: implement this resolver
+    return false;
+  }
 }

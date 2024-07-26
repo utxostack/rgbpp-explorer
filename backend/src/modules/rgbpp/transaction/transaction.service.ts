@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
-import { RgbppBaseTransaction, RgbppLatestTransactionList, RgbppTransaction } from './transaction.model';
+import {
+  RgbppTransaction,
+  RgbppBaseTransaction,
+  RgbppLatestTransactionList,
+} from './transaction.model';
 
 @Injectable()
 export class RgbppTransactionService {
