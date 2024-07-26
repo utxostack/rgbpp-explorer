@@ -2,21 +2,15 @@ import { Address, Block, RecommendedFees, Transaction, UTXO } from './bitcoin-ap
 
 export interface IBitcoinDataProvider {
   getFeesRecommended(): Promise<RecommendedFees>;
-  getAddress({ address }: { address: string }): Promise<Address>;
-  getAddressTxsUtxo({ address }: { address: string }): Promise<UTXO[]>;
-  getAddressTxs({
-    address,
-    afterTxid,
-  }: {
-    address: string;
-    afterTxid?: string;
-  }): Promise<Transaction[]>;
-  getTx({ txid }: { txid: string }): Promise<Transaction>;
-  getTxHex({ txid }: { txid: string }): Promise<string>;
-  getBlock({ hash }: { hash: string }): Promise<Block>;
-  getBlockTxs({ hash, startIndex }: { hash: string; startIndex: number }): Promise<Transaction[]>;
-  getBlockHeight({ height }: { height: number }): Promise<string>;
-  getBlockHeader({ hash }: { hash: string }): Promise<string>;
-  getBlockTxids({ hash }: { hash: string }): Promise<string[]>;
+  getAddress(props: { address: string }): Promise<Address>;
+  getAddressTxsUtxo(props: { address: string }): Promise<UTXO[]>;
+  getAddressTxs(props: { address: string; afterTxid?: string }): Promise<Transaction[]>;
+  getTx(props: { txid: string }): Promise<Transaction>;
+  getTxHex(props: { txid: string }): Promise<string>;
+  getBlock(props: { hash: string }): Promise<Block>;
+  getBlockTxs(props: { hash: string; startIndex: number }): Promise<Transaction[]>;
+  getBlockHeight(props: { height: number }): Promise<string>;
+  getBlockHeader(props: { hash: string }): Promise<string>;
+  getBlockTxids(props: { hash: string }): Promise<string[]>;
   getBlocksTipHash(): Promise<string>;
 }
