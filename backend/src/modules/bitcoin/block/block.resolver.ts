@@ -1,4 +1,5 @@
 import DataLoader from 'dataloader';
+import { Logger } from '@nestjs/common';
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { BitcoinBaseTransaction, BitcoinTransaction } from '../transaction/transaction.model';
@@ -13,6 +14,8 @@ import {
 
 @Resolver(() => BitcoinBlock)
 export class BitcoinBlockResolver {
+  private logger = new Logger(BitcoinBlockResolver.name);
+
   @Query(() => BitcoinBlock, { name: 'btcBlock' })
   public async getBlock(
     @Args('hashOrHeight', { type: () => String }) hashOrHeight: string,
@@ -34,7 +37,7 @@ export class BitcoinBlockResolver {
         address: detail.extras.coinbaseAddress,
       };
     } else {
-      // TODO: what should be returned when using the "electrs" mode?
+      this.logger.error('"miner" cannot be resolved in "electrs" mode');
       return null;
     }
   }
@@ -49,7 +52,7 @@ export class BitcoinBlockResolver {
     if (detail.extras) {
       return detail.extras.reward;
     } else {
-      // TODO: what should be returned when using the "electrs" mode?
+      this.logger.error('"reward" cannot be resolved in "electrs" mode');
       return 0;
     }
   }
@@ -64,7 +67,7 @@ export class BitcoinBlockResolver {
     if (detail.extras) {
       return detail.extras.totalFees;
     } else {
-      // TODO: what should be returned when using the "electrs" mode?
+      this.logger.error('"totalFee" cannot be resolved in "electrs" mode');
       return 0;
     }
   }
@@ -82,7 +85,7 @@ export class BitcoinBlockResolver {
         max: detail.extras.feeRange[detail.extras.feeRange.length - 1],
       };
     } else {
-      // TODO: what should be returned when using the "electrs" mode?
+      this.logger.error('"feeRateRange" cannot be resolved in "electrs" mode');
       return {
         min: 0,
         max: 0,
