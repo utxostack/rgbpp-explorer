@@ -19,7 +19,7 @@ export class RgbppTransactionResolver {
   constructor(private transactionService: RgbppTransactionService) {}
 
   @Query(() => RgbppLatestTransactionList, { name: 'rgbppLatestTransactions' })
-  public async getLatestTransaction(
+  public async getLatestTransactions(
     @Args('page', { type: () => Int, nullable: true }) page: number = 1,
     @Args('pageSize', { type: () => Int, nullable: true }) pageSize: number = 10,
   ): Promise<RgbppLatestTransactionList> {

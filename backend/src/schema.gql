@@ -202,6 +202,6 @@ type Query {
   btcAddress(address: String!): BitcoinAddress
   rgbppLatestTransactions(page: Int, pageSize: Int): RgbppLatestTransactionList!
   rgbppTransaction(txidOrTxHash: String!): RgbppTransaction
-  rgbppCoinList(page: Int, pageSize: Int): RgbppCoinList!
+  rgbppCoins(page: Int, pageSize: Int): RgbppCoinList!
   rgbppCoin(typeHash: String!): RgbppCoin!
 }
