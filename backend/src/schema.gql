@@ -199,6 +199,7 @@ type Query {
   btcChainInfo: BitcoinChainInfo!
   btcBlock(hashOrHeight: String!): BitcoinBlock!
   btcTransaction(txid: String!): BitcoinTransaction
+  btcAddress(address: String!): BitcoinAddress
   rgbppLatestTransactions(page: Int, pageSize: Int): RgbppLatestTransactionList!
   rgbppTransaction(txidOrTxHash: String!): RgbppTransaction
   rgbppCoinList(page: Int, pageSize: Int): RgbppCoinList!
