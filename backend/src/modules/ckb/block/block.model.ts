@@ -5,7 +5,10 @@ import { CkbAddress } from '../address/address.model';
 import { FeeRateRange } from '../../bitcoin/block/block.model';
 import { CkbTransaction } from '../transaction/transaction.model';
 
-export type CkbBaseBlock = Omit<CkbBlock, 'totalFee' | 'feeRateRange' | 'miner' | 'transactions'>;
+export type CkbBaseBlock = Omit<
+  CkbBlock,
+  'totalFee' | 'feeRateRange' | 'miner' | 'reward' | 'transactions'
+>;
 
 @ObjectType({ description: 'CKB Block' })
 export class CkbBlock {
@@ -32,6 +35,9 @@ export class CkbBlock {
 
   @Field(() => CkbAddress)
   miner: CkbAddress;
+
+  @Field(() => Float)
+  reward: number;
 
   @Field(() => [CkbTransaction])
   transactions: CkbTransaction[];

@@ -133,6 +133,7 @@ type CkbBlock {
   totalFee: Float!
   feeRateRange: FeeRateRange!
   miner: CkbAddress!
+  reward: Float!
   transactions: [CkbTransaction!]!
 }
 
