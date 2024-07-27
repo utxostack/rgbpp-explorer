@@ -13,8 +13,8 @@ import {
   CkbBlockLoaderResponse,
 } from './block.dataloader';
 import {
-  CkbTransactionLoader,
-  CkbTransactionLoaderResponse,
+  CkbRpcTransactionLoader,
+  CkbRpcTransactionLoaderType,
 } from '../transaction/transaction.dataloader';
 
 @Resolver(() => CkbBlock)
@@ -57,16 +57,14 @@ export class CkbBlockResolver {
   public async transactions(
     @Parent() { hash }: CkbBlock,
     @Loader(CkbBlockLoader) blockLoader: DataLoader<string, CkbBlockLoaderResponse>,
-    @Loader(CkbTransactionLoader)
-    transactionLoader: DataLoader<string, CkbTransactionLoaderResponse>,
+    @Loader(CkbRpcTransactionLoader) ckbRpcTxLoader: CkbRpcTransactionLoaderType,
   ): Promise<CkbBaseTransaction[]> {
     const block = await blockLoader.load(hash);
-    const transactions = await Promise.all(
+    return Promise.all(
       block.transactions.map(async (tx) => {
-        const transaction = await transactionLoader.load(tx.hash);
+        const transaction = await ckbRpcTxLoader.load(tx.hash);
         return CkbTransaction.from(transaction);
       }),
     );
-    return transactions;
   }
 }

@@ -4,8 +4,8 @@ import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Int, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { CkbTransaction } from 'src/modules/ckb/transaction/transaction.model';
 import {
-  CkbTransactionLoader,
-  CkbTransactionLoaderResponse,
+  CkbRpcTransactionLoader,
+  CkbRpcTransactionLoaderType,
 } from 'src/modules/ckb/transaction/transaction.dataloader';
 import { BitcoinTransaction } from 'src/modules/bitcoin/transaction/transaction.model';
 import { RgbppTransactionService } from './transaction.service';
@@ -66,10 +66,9 @@ export class RgbppTransactionResolver {
   @ResolveField(() => CkbTransaction, { nullable: true })
   public async ckbTransaction(
     @Parent() tx: RgbppBaseTransaction,
-    @Loader(CkbTransactionLoader)
-    ckbTxLoader: DataLoader<string, CkbTransactionLoaderResponse>,
+    @Loader(CkbRpcTransactionLoader) ckbRpcTxLoader: CkbRpcTransactionLoaderType,
   ) {
-    const ckbTx = await ckbTxLoader.load(tx.ckbTxHash);
+    const ckbTx = await ckbRpcTxLoader.load(tx.ckbTxHash);
     if (!ckbTx) {
       return null;
     }

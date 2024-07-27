@@ -139,7 +139,7 @@ type CkbBlock {
 """CKB Transaction"""
 type CkbTransaction {
   isCellbase: Boolean!
-  blockNumber: Int!
+  blockNumber: Float!
   hash: String!
   fee: Float!
   feeRate: Float!
@@ -147,6 +147,7 @@ type CkbTransaction {
   inputs: [CkbCell!]!
   outputs: [CkbCell!]!
   block: CkbBlock!
+  confirmed: Boolean!
   confirmations: Float!
 }
 

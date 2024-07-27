@@ -1,3 +1,5 @@
+import { CellDep, Script } from '../ckb-rpc/ckb-rpc.interface';
+
 export enum BlockSortType {
   HeightAsc = 'height.asc',
   HeightDesc = 'height.desc',
@@ -10,6 +12,11 @@ export enum BlockSortType {
 export enum TransactionSortType {
   NumberAsc = 'number.asc',
   NumberDesc = 'number.desc',
+  TimeAsc = 'time.asc',
+  TimeDesc = 'time.desc',
+}
+
+export enum AddressTransactionSortType {
   TimeAsc = 'time.asc',
   TimeDesc = 'time.desc',
 }
@@ -161,6 +168,21 @@ export interface Transaction {
   create_timestamp: string;
 }
 
+export interface DetailTransaction extends Transaction {
+  version: string;
+  cell_deps: CellDep[];
+  witnesses: string[];
+  transaction_fee: string;
+  bytes: number;
+  largest_tx_in_epoch: number;
+  largest_tx: number;
+  cycles: number;
+  max_cycles_in_epoch: number;
+  max_cycles: number;
+  // TODO: replace with actual literal status, e.g. "committed"
+  tx_status: string;
+}
+
 export interface RgbppTransaction {
   id: number;
   tx_hash: string;
@@ -207,125 +229,47 @@ export interface XUDT {
   xudt_tags: XUDTTag[];
 }
 
+// https://github.com/nervosnetwork/ckb-explorer-frontend/blob/develop/src/models/Address/index.ts
+export interface LockInfo {
+  status: 'locked' | 'unlocked';
+  epoch_number: string;
+  epoch_index: string;
+  estimated_unlock_time: string;
+}
+export enum AddressType {
+  Address = 'Address',
+  LockHash = 'LockHash',
+  Unknown = 'Unknown',
+}
+export interface AddressInfo {
+  addressHash: string;
+  bitcoin_address_hash?: string;
+  lockHash: string;
+  balance: string;
+  balanceOccupied: string;
+  transactions_count: string;
+  lock_script: Script;
+  pending_reward_blocks_count: string;
+  type: AddressType;
+  dao_deposit: string;
+  interest: string;
+  dao_compensation: string;
+  lock_info: LockInfo;
+  live_cells_count: string;
+  mined_blocks_count: string;
+  is_special: boolean;
+  special_address: string;
+  // TODO: describe this type
+  udt_accounts?: unknown[];
+}
+
+// https://github.com/nervosnetwork/ckb-explorer-frontend/blob/develop/src/services/ExplorerService/types.ts#L331-L337
 export interface RgbppDigest {
   txid: string;
   commitment: string;
   confirmations: number;
   leap_direction: LeapDirection | null;
   transfer_step: TransferStep | null;
-  transfers: TransactionRecord[];
-}
-
-export interface TransactionRecord {
-  address: string;
-  transfers: LiteTransfer.Transfer[];
-}
-
-// https://github.com/nervosnetwork/ckb-explorer-frontend/blob/develop/src/services/ExplorerService/types.ts#L303
-// eslint-disable-next-line @typescript-eslint/no-namespace
-export namespace LiteTransfer {
-  // Plain CKB Transfer
-  export interface CKBTransfer {
-    capacity: string;
-    cell_type: 'normal';
-  }
-
-  // MNFT
-  export interface NFTTransfer {
-    capacity: string;
-    cell_type: 'm_nft_token';
-    // FIXME: This is a typo in the api, should be fixed
-    toekn_id?: string;
-    token_id: string;
-    name: string;
-    count: string;
-  }
-
-  export interface NFTClassTransfer {
-    capacity: string;
-    cell_type: 'm_nft_class';
-  }
-
-  export interface NFTIssuerTransfer {
-    capacity: string;
-    cell_type: 'm_nft_issuer';
-  }
-  // NRC 721
-  export interface NRC721Transfer {
-    capacity: string;
-    cell_type: 'nrc_721_token';
-    // FIXME: This is a typo in the api, should be fixed
-    toekn_id?: string;
-    token_id: string;
-    name: string;
-    count: string;
-  }
-
-  export interface NRC721FactoryTransfer {
-    capacity: string;
-    cell_type: 'nrc_721_factory';
-  }
-
-  // Spore
-  export interface SporeTransfer {
-    capacity: string;
-    cell_type: 'spore_cell' | 'did_cell';
-    // FIXME: This is a typo in the api, should be fixed
-    toekn_id?: string;
-    token_id: string;
-    name: string;
-    count: string;
-  }
-
-  export interface SporeClusterTransfer {
-    capacity: string;
-    cellType: 'spore_cluster';
-  }
-
-  // udt
-  export interface UDTTransfer {
-    capacity: string;
-    cellType: 'udt';
-    udtInfo: Record<'symbol' | 'decimal' | 'typeHash' | 'amount', string>;
-  }
-
-  // Cota
-  export interface CotaTransfer {
-    capacity: string;
-    cell_type: 'cota_regular';
-    cota_info: Record<'name' | 'count' | 'tokenId', string>[];
-  }
-
-  export interface CotaRegistryTransfer {
-    capacity: string;
-    cell_type: 'cota_registry';
-  }
-
-  export interface OmigaTransfer {
-    capacity: string;
-    cell_type: 'omiga_inscription';
-    name: string;
-    count: string;
-    udtInfo: Record<'symbol' | 'decimal' | 'typeHash' | 'amount', string>;
-  }
-  export interface XudtTransfer {
-    capacity: string;
-    cell_type: 'xudt' | 'xudt_compatible';
-    udt_info: Record<'symbol' | 'decimal' | 'typeHash' | 'amount', string>;
-  }
-
-  export type Transfer =
-    | CKBTransfer
-    | NFTTransfer
-    | NFTClassTransfer
-    | NFTIssuerTransfer
-    | NRC721Transfer
-    | NRC721FactoryTransfer
-    | SporeTransfer
-    | SporeClusterTransfer
-    | UDTTransfer
-    | CotaTransfer
-    | CotaRegistryTransfer
-    | OmigaTransfer
-    | XudtTransfer;
+  // TODO: describe this type
+  transfers: unknown[];
 }
