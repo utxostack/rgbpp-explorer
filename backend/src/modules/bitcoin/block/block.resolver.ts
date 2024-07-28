@@ -1,4 +1,3 @@
-import DataLoader from 'dataloader';
 import { Logger } from '@nestjs/common';
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
@@ -7,10 +6,9 @@ import { BitcoinAddress, BitcoinBaseAddress } from '../address/address.model';
 import { BitcoinBaseBlock, BitcoinBlock, FeeRateRange } from './block.model';
 import {
   BitcoinBlockLoader,
-  BitcoinBlockLoaderResponse,
+  BitcoinBlockLoaderType,
   BitcoinBlockTransactionsLoader,
-  BitcoinBlockTransactionsLoaderProps,
-  BitcoinBlockTransactionsLoaderResponse,
+  BitcoinBlockTransactionsLoaderType,
 } from './block.dataloader';
 
 @Resolver(() => BitcoinBlock)
@@ -20,7 +18,7 @@ export class BitcoinBlockResolver {
   @Query(() => BitcoinBlock, { name: 'btcBlock' })
   public async getBlock(
     @Args('hashOrHeight', { type: () => String }) hashOrHeight: string,
-    @Loader(BitcoinBlockLoader) blockLoader: DataLoader<string, BitcoinBlockLoaderResponse>,
+    @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
   ): Promise<BitcoinBaseBlock> {
     const block = await blockLoader.load(hashOrHeight);
     return BitcoinBlock.from(block);
@@ -29,7 +27,7 @@ export class BitcoinBlockResolver {
   @ResolveField(() => BitcoinAddress)
   public async miner(
     @Parent() block: BitcoinBaseBlock,
-    @Loader(BitcoinBlockLoader) blockLoader: DataLoader<string, BitcoinBlockLoaderResponse>,
+    @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
   ): Promise<BitcoinBaseAddress> {
     // XXX: only the "mempool" mode returns the "extra" field
     const detail = await blockLoader.load(block.id);
@@ -46,7 +44,7 @@ export class BitcoinBlockResolver {
   @ResolveField(() => Float)
   public async reward(
     @Parent() block: BitcoinBaseBlock,
-    @Loader(BitcoinBlockLoader) blockLoader: DataLoader<string, BitcoinBlockLoaderResponse>,
+    @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
   ): Promise<number> {
     // XXX: only the "mempool" mode returns the "extra" field
     const detail = await blockLoader.load(block.id);
@@ -61,7 +59,7 @@ export class BitcoinBlockResolver {
   @ResolveField(() => Float)
   public async totalFee(
     @Parent() block: BitcoinBaseBlock,
-    @Loader(BitcoinBlockLoader) blockLoader: DataLoader<string, BitcoinBlockLoaderResponse>,
+    @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
   ): Promise<number> {
     // XXX: only the "mempool" mode returns the "extra" field
     const detail = await blockLoader.load(block.id);
@@ -76,7 +74,7 @@ export class BitcoinBlockResolver {
   @ResolveField(() => FeeRateRange)
   public async feeRateRange(
     @Parent() block: BitcoinBaseBlock,
-    @Loader(BitcoinBlockLoader) blockLoader: DataLoader<string, BitcoinBlockLoaderResponse>,
+    @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
   ): Promise<FeeRateRange> {
     // XXX: only the "mempool" mode returns the "extra" field
     const detail = await blockLoader.load(block.id);
@@ -97,11 +95,7 @@ export class BitcoinBlockResolver {
   @ResolveField(() => [BitcoinTransaction])
   public async transactions(
     @Parent() block: BitcoinBaseBlock,
-    @Loader(BitcoinBlockTransactionsLoader)
-    blockTxsLoader: DataLoader<
-      BitcoinBlockTransactionsLoaderProps,
-      BitcoinBlockTransactionsLoaderResponse
-    >,
+    @Loader(BitcoinBlockTransactionsLoader) blockTxsLoader: BitcoinBlockTransactionsLoaderType,
     @Args('startIndex', {
       nullable: true,
       description: 'For pagination, must be a multiplication of 25',

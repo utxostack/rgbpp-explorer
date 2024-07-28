@@ -49,7 +49,7 @@ export class CkbTransaction {
   public static from(
     transactionWithStatus: CkbRpc.TransactionWithStatusResponse,
   ): CkbBaseTransaction {
-    const { transaction, tx_status, fee } = transactionWithStatus;
+    const { transaction, tx_status } = transactionWithStatus;
     const isCellbase = transaction.inputs[0].previous_output.tx_hash.endsWith('0'.repeat(64));
 
     const resultTx = ResultFormatter.toTransaction(transaction as RPCTypes.Transaction);

@@ -1,3 +1,4 @@
+import DataLoader from 'dataloader';
 import { Injectable, Logger } from '@nestjs/common';
 import { NestDataLoader } from '@applifting-io/nestjs-dataloader';
 import { DataLoaderResponse } from 'src/common/type/dataloader';
@@ -19,30 +20,30 @@ export class BitcoinBlockLoader implements NestDataLoader<string, BitcoinApi.Blo
           if (!hash.startsWith('0')) {
             hash = await this.bitcoinApiService.getBlockHeight({ height: parseInt(key, 10) });
           }
-          const block = await this.bitcoinApiService.getBlock({ hash });
-          return block;
+          return this.bitcoinApiService.getBlock({ hash });
         }),
       );
     };
   }
 }
+export type BitcoinBlockLoaderType = DataLoader<string, BitcoinApi.Block>;
 export type BitcoinBlockLoaderResponse = DataLoaderResponse<BitcoinBlockLoader>;
 
-export interface BitcoinBlockTransactionsLoaderProps {
+export interface BitcoinBlockTransactionsLoaderParams {
   hash: string;
   startIndex?: number;
 }
 
 @Injectable()
 export class BitcoinBlockTransactionsLoader
-  implements NestDataLoader<BitcoinBlockTransactionsLoaderProps, BitcoinApi.Transaction[]>
+  implements NestDataLoader<BitcoinBlockTransactionsLoaderParams, BitcoinApi.Transaction[]>
 {
   private logger = new Logger(BitcoinBlockLoader.name);
 
   constructor(private bitcoinApiService: BitcoinApiService) {}
 
   public getBatchFunction() {
-    return (batchProps: BitcoinBlockTransactionsLoaderProps[]) => {
+    return (batchProps: BitcoinBlockTransactionsLoaderParams[]) => {
       this.logger.debug(`Loading bitcoin block transactions: ${batchProps}`);
       return Promise.all(
         batchProps.map((props) =>
@@ -55,5 +56,9 @@ export class BitcoinBlockTransactionsLoader
     };
   }
 }
+export type BitcoinBlockTransactionsLoaderType = DataLoader<
+  BitcoinBlockTransactionsLoaderParams,
+  BitcoinApi.Transaction[]
+>;
 export type BitcoinBlockTransactionsLoaderResponse =
   DataLoaderResponse<BitcoinBlockTransactionsLoader>;

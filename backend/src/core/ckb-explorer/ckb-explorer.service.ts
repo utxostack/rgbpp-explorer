@@ -78,7 +78,12 @@ export class CkbExplorerService {
     page = 1,
     pageSize = 10,
   }: GetAddressParams): Promise<PaginatedResponse<AddressInfo>> {
-    const response = await this.request.get(`/v1/addresses/${address}`);
+    const response = await this.request.get(`/v1/addresses/${address}`, {
+      params: {
+        page,
+        pageSize,
+      },
+    });
     return response.data;
   }
 
@@ -88,7 +93,13 @@ export class CkbExplorerService {
     page = 1,
     pageSize = 10,
   }: GetAddressTransactionsParams): Promise<PaginatedResponse<Transaction>> {
-    const response = await this.request.get(`/v1/address_transactions/${address}`);
+    const response = await this.request.get(`/v1/address_transactions/${address}`, {
+      params: {
+        sort,
+        page,
+        pageSize,
+      },
+    });
     return response.data;
   }
 

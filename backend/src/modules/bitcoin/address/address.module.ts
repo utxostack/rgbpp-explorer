@@ -6,5 +6,6 @@ import { BitcoinAddressLoader, BitcoinAddressTransactionsLoader } from './addres
 @Module({
   imports: [BitcoinApiModule],
   providers: [BitcoinAddressResolver, BitcoinAddressLoader, BitcoinAddressTransactionsLoader],
+  exports: [BitcoinAddressLoader, BitcoinAddressTransactionsLoader],
 })
 export class BitcoinAddressModule {}

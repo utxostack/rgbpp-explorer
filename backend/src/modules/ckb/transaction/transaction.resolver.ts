@@ -21,9 +21,9 @@ export class CkbTransactionResolver {
   @Query(() => CkbTransaction, { name: 'ckbTransaction', nullable: true })
   public async getTransaction(
     @Args('txHash') txHash: string,
-    @Loader(CkbRpcTransactionLoader) ckbRpcTxLoader: CkbRpcTransactionLoaderType,
+    @Loader(CkbRpcTransactionLoader) rpcTxLoader: CkbRpcTransactionLoaderType,
   ): Promise<CkbBaseTransaction | null> {
-    const tx = await ckbRpcTxLoader.load(txHash);
+    const tx = await rpcTxLoader.load(txHash);
     if (!tx) {
       return null;
     }
@@ -33,16 +33,16 @@ export class CkbTransactionResolver {
   @ResolveField(() => [CkbCell])
   public async inputs(
     @Parent() tx: CkbBaseTransaction,
-    @Loader(CkbRpcTransactionLoader) ckbRpcTxLoader: CkbRpcTransactionLoaderType,
+    @Loader(CkbRpcTransactionLoader) rpcTxLoader: CkbRpcTransactionLoaderType,
   ): Promise<CkbBaseCell[]> {
-    const rpcTx = await ckbRpcTxLoader.load(tx.hash);
+    const rpcTx = await rpcTxLoader.load(tx.hash);
     return Promise.all(
       rpcTx.transaction.inputs
         // Filter out cellbase transaction
         .filter((input) => !input.previous_output.tx_hash.endsWith('0'.repeat(64)))
         .map(async (_, i) => {
           const input = rpcTx.transaction.inputs[i];
-          const previousTx = await ckbRpcTxLoader.load(input.previous_output.tx_hash);
+          const previousTx = await rpcTxLoader.load(input.previous_output.tx_hash);
           const index = BI.from(input.previous_output.index).toNumber();
           return CkbCell.from(previousTx.transaction, index);
         }),
@@ -52,27 +52,27 @@ export class CkbTransactionResolver {
   @ResolveField(() => CkbBlock)
   public async block(
     @Parent() tx: CkbBaseTransaction,
-    @Loader(CkbRpcBlockLoader) ckbBlockLoader: CkbRpcBlockLoaderType,
+    @Loader(CkbRpcBlockLoader) rpcBlockLoader: CkbRpcBlockLoaderType,
   ): Promise<CkbBaseBlock> {
-    const block = await ckbBlockLoader.load(tx.blockNumber.toString());
+    const block = await rpcBlockLoader.load(tx.blockNumber.toString());
     return CkbBlock.from(block);
   }
 
   @ResolveField(() => Float)
   public async fee(
     @Parent() tx: CkbBaseTransaction,
-    @Loader(CkbExplorerTransactionLoader) ckbExplorerTxLoader: CkbExplorerTransactionLoaderType,
+    @Loader(CkbExplorerTransactionLoader) explorerTxLoader: CkbExplorerTransactionLoaderType,
   ): Promise<number> {
-    const explorerTx = await ckbExplorerTxLoader.load(tx.hash);
+    const explorerTx = await explorerTxLoader.load(tx.hash);
     return toNumber(explorerTx.transaction_fee);
   }
 
   @ResolveField(() => Float)
   public async feeRate(
     @Parent() tx: CkbBaseTransaction,
-    @Loader(CkbExplorerTransactionLoader) ckbExplorerTxLoader: CkbExplorerTransactionLoaderType,
+    @Loader(CkbExplorerTransactionLoader) explorerTxLoader: CkbExplorerTransactionLoaderType,
   ): Promise<number> {
-    const explorerTx = await ckbExplorerTxLoader.load(tx.hash);
+    const explorerTx = await explorerTxLoader.load(tx.hash);
     const fee = BI.from(explorerTx.transaction_fee);
     const size = BI.from(tx.size);
     const ratio = BI.from(1000);

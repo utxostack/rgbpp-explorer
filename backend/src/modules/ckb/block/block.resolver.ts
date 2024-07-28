@@ -32,7 +32,7 @@ export class CkbBlockResolver {
 
   @ResolveField(() => Float)
   public async totalFee(
-    @Parent() block: CkbBlock,
+    @Parent() block: CkbBaseBlock,
     @Loader(CkbBlockEconomicStateLoader) blockEconomicLoader: CkbBlockEconomicStateLoaderType,
   ): Promise<number> {
     const blockEconomicState = await blockEconomicLoader.load(block.hash);
@@ -40,7 +40,7 @@ export class CkbBlockResolver {
   }
 
   @ResolveField(() => FeeRateRange)
-  public async feeRateRange(@Parent() block: CkbBlock): Promise<FeeRateRange> {
+  public async feeRateRange(@Parent() block: CkbBaseBlock): Promise<FeeRateRange> {
     // TODO: implement this resolver
     return {
       min: 0,
@@ -50,7 +50,7 @@ export class CkbBlockResolver {
 
   @ResolveField(() => CkbAddress)
   public async miner(
-    @Parent() block: CkbBlock,
+    @Parent() block: CkbBaseBlock,
     @Loader(CkbExplorerBlockLoader) explorerBlockLoader: CkbExplorerBlockLoaderType,
   ): Promise<CkbBaseAddress> {
     const explorerBlock = await explorerBlockLoader.load(block.hash);
@@ -59,7 +59,7 @@ export class CkbBlockResolver {
 
   @ResolveField(() => Float)
   public async reward(
-    @Parent() block: CkbBlock,
+    @Parent() block: CkbBaseBlock,
     @Loader(CkbExplorerBlockLoader) explorerBlockLoader: CkbExplorerBlockLoaderType,
   ): Promise<number> {
     const explorerBlock = await explorerBlockLoader.load(block.hash);
@@ -68,14 +68,14 @@ export class CkbBlockResolver {
 
   @ResolveField(() => [String])
   public async transactions(
-    @Parent() { hash }: CkbBlock,
-    @Loader(CkbRpcBlockLoader) ckbBlockLoader: CkbRpcBlockLoaderType,
-    @Loader(CkbRpcTransactionLoader) ckbRpcTxLoader: CkbRpcTransactionLoaderType,
+    @Parent() { hash }: CkbBaseBlock,
+    @Loader(CkbRpcBlockLoader) rpcBlockLoader: CkbRpcBlockLoaderType,
+    @Loader(CkbRpcTransactionLoader) rpcTxLoader: CkbRpcTransactionLoaderType,
   ): Promise<CkbBaseTransaction[]> {
-    const block = await ckbBlockLoader.load(hash);
+    const block = await rpcBlockLoader.load(hash);
     return Promise.all(
       block.transactions.map(async (tx) => {
-        const transaction = await ckbRpcTxLoader.load(tx.hash);
+        const transaction = await rpcTxLoader.load(tx.hash);
         return CkbTransaction.from(transaction);
       }),
     );

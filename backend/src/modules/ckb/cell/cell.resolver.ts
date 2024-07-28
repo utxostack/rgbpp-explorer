@@ -7,13 +7,13 @@ import {
   CkbRpcTransactionLoader,
   CkbRpcTransactionLoaderType,
 } from '../transaction/transaction.dataloader';
-import { CkbCell, CkbXUDTInfo, CkbBaseCellStatus, CkbCellStatus } from './cell.model';
+import { CkbCell, CkbXUDTInfo, CkbBaseCellStatus, CkbCellStatus, CkbBaseCell } from './cell.model';
 
 @Resolver(() => CkbCell)
 export class CkbCellResolver {
   @ResolveField(() => CkbXUDTInfo)
   public async xudtInfo(
-    @Parent() cell: CkbCell,
+    @Parent() cell: CkbBaseCell,
     @Loader(CkbExplorerTransactionLoader) explorerTxLoader: CkbExplorerTransactionLoaderType,
   ) {
     const tx = await explorerTxLoader.load(cell.txHash);
@@ -22,7 +22,7 @@ export class CkbCellResolver {
 
   @ResolveField(() => CkbCellStatus)
   public async status(
-    @Parent() cell: CkbCell,
+    @Parent() cell: CkbBaseCell,
     @Loader(CkbRpcTransactionLoader) rpcTxLoader: CkbRpcTransactionLoaderType,
     @Loader(CkbExplorerTransactionLoader) explorerTxLoader: CkbExplorerTransactionLoaderType,
   ): Promise<CkbCellStatus | CkbBaseCellStatus> {

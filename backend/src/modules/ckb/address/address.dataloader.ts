@@ -2,7 +2,7 @@ import DataLoader from 'dataloader';
 import { Injectable, Logger } from '@nestjs/common';
 import { NestDataLoader } from '@applifting-io/nestjs-dataloader';
 import { DataLoaderResponse } from 'src/common/type/dataloader';
-import * as CkbExplorerInterface from 'src/core/ckb-explorer/ckb-explorer.interface';
+import * as CkbExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
 import {
   CkbExplorerService,
   GetAddressParams,
@@ -11,7 +11,7 @@ import {
 
 @Injectable()
 export class CkbAddressLoader
-  implements NestDataLoader<GetAddressParams, CkbExplorerInterface.AddressInfo[]>
+  implements NestDataLoader<GetAddressParams, CkbExplorer.AddressInfo[]>
 {
   private logger = new Logger(CkbAddressLoader.name);
 
@@ -29,11 +29,11 @@ export class CkbAddressLoader
     };
   }
 }
-export type CkbAddressLoaderType = DataLoader<GetAddressParams, CkbExplorerInterface.AddressInfo[]>;
+export type CkbAddressLoaderType = DataLoader<GetAddressParams, CkbExplorer.AddressInfo[]>;
 export type CkbAddressLoaderResponse = DataLoaderResponse<CkbAddressLoader>;
 
 export interface CkbAddressTransactionLoaderResult {
-  txs: CkbExplorerInterface.Transaction[];
+  txs: CkbExplorer.Transaction[];
   total: number;
 }
 

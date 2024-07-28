@@ -40,7 +40,7 @@ export class CkbAddressResolver {
 
   @ResolveField(() => Float)
   public async shannon(
-    @Parent() address: CkbAddress,
+    @Parent() address: CkbBaseAddress,
     @Loader(CkbAddressLoader) addressLoader: CkbAddressLoaderType,
   ): Promise<number> {
     const [info] = await addressLoader.load({ address: address.address });
@@ -49,7 +49,7 @@ export class CkbAddressResolver {
 
   @ResolveField(() => Float)
   public async transactionCount(
-    @Parent() address: CkbAddress,
+    @Parent() address: CkbBaseAddress,
     @Loader(CkbAddressLoader) addressLoader: CkbAddressLoaderType,
   ): Promise<number> {
     const [info] = await addressLoader.load({ address: address.address });
@@ -58,9 +58,9 @@ export class CkbAddressResolver {
 
   @ResolveField(() => [CkbTransaction])
   public async transactions(
-    @Parent() address: CkbAddress,
+    @Parent() address: CkbBaseAddress,
     @Loader(CkbAddressTransactionsLoader) addressTxsLoader: CkbAddressTransactionsLoaderType,
-    @Loader(CkbRpcTransactionLoader) ckbRpcTxLoader: CkbRpcTransactionLoaderType,
+    @Loader(CkbRpcTransactionLoader) rpcTxLoader: CkbRpcTransactionLoaderType,
     @Args('page', { nullable: true }) page?: number,
     @Args('pageSize', { nullable: true }) pageSize?: number,
   ): Promise<CkbBaseTransaction[]> {
@@ -71,7 +71,7 @@ export class CkbAddressResolver {
     });
     return Promise.all(
       res.txs.map(async (tx) => {
-        const rpcTx = await ckbRpcTxLoader.load(tx.transaction_hash);
+        const rpcTx = await rpcTxLoader.load(tx.transaction_hash);
         return CkbTransaction.from(rpcTx);
       }),
     );

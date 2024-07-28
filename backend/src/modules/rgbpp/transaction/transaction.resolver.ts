@@ -1,4 +1,3 @@
-import DataLoader from 'dataloader';
 import { Logger } from '@nestjs/common';
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Int, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
@@ -11,7 +10,7 @@ import { BitcoinTransaction } from 'src/modules/bitcoin/transaction/transaction.
 import { RgbppTransactionService } from './transaction.service';
 import {
   BitcoinTransactionLoader,
-  BitcoinTransactionLoaderResponse,
+  BitcoinTransactionLoaderType,
 } from 'src/modules/bitcoin/transaction/transaction.dataloader';
 import {
   RgbppTransaction,
@@ -78,13 +77,12 @@ export class RgbppTransactionResolver {
   @ResolveField(() => BitcoinTransaction, { nullable: true })
   public async btcTransaction(
     @Parent() tx: RgbppBaseTransaction,
-    @Loader(BitcoinTransactionLoader)
-    btcTxLoader: DataLoader<string, BitcoinTransactionLoaderResponse>,
+    @Loader(BitcoinTransactionLoader) txLoader: BitcoinTransactionLoaderType,
   ) {
     if (!tx.btcTxid) {
       return null;
     }
-    const btcTx = await btcTxLoader.load(tx.btcTxid);
+    const btcTx = await txLoader.load(tx.btcTxid);
     if (!btcTx) {
       return null;
     }
