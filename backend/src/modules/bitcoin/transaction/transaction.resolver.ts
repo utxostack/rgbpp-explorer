@@ -1,9 +1,8 @@
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
-import { BitcoinTransactionLoader, BitcoinTransactionLoaderType } from './transaction.dataloader';
 import { BitcoinBaseTransaction, BitcoinTransaction } from './transaction.model';
-import { BitcoinOutputSpend } from '../spend/spend.model';
+import { BitcoinTransactionLoader, BitcoinTransactionLoaderType } from './transaction.dataloader';
 
 @Resolver(() => BitcoinTransaction)
 export class BitcoinTransactionResolver {
@@ -16,14 +15,6 @@ export class BitcoinTransactionResolver {
   ): Promise<BitcoinBaseTransaction | null> {
     const transaction = await txLoader.load(txid);
     return BitcoinTransaction.from(transaction);
-  }
-
-  @ResolveField(() => [BitcoinOutputSpend])
-  public async outSpends(@Parent() tx: BitcoinBaseTransaction): Promise<BitcoinOutputSpend[]> {
-    const outSpends = await this.bitcoinApiService.getTxOutSpends({
-      txid: tx.txid,
-    });
-    return outSpends.map(BitcoinOutputSpend.from);
   }
 
   @ResolveField(() => Float)

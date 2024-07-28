@@ -30,3 +30,24 @@ export class BitcoinTransactionLoader
 }
 export type BitcoinTransactionLoaderType = DataLoader<string, BitcoinApi.Transaction | null>;
 export type BitcoinTransactionLoaderResponse = DataLoaderResponse<BitcoinTransactionLoader>;
+
+@Injectable()
+export class BitcoinTransactionOutSpendsLoader
+  implements NestDataLoader<string, BitcoinApi.OutSpend[]>
+{
+  private logger = new Logger(BitcoinTransactionLoader.name);
+
+  constructor(private bitcoinApiService: BitcoinApiService) {}
+
+  public getBatchFunction() {
+    return async (txids: string[]) => {
+      this.logger.debug(`Loading bitcoin transactions: ${txids.join(', ')}`);
+      return Promise.all(
+        txids.map(async (txid) => this.bitcoinApiService.getTxOutSpends({ txid: txid })),
+      );
+    };
+  }
+}
+export type BitcoinTransactionOutSpendsLoaderType = DataLoader<string, BitcoinApi.OutSpend[]>;
+export type BitcoinTransactionOutSpendsLoaderResponse =
+  DataLoaderResponse<BitcoinTransactionOutSpendsLoader>;
