@@ -1,3 +1,4 @@
+import { toNumber } from 'lodash';
 import { Float, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { CkbRpcWebsocketService } from 'src/core/ckb-rpc/ckb-rpc-websocket.service';
 import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
@@ -20,8 +21,8 @@ export class CkbResolver {
 
   @ResolveField(() => Float)
   public async txCountIn24Hours(): Promise<number> {
-    // TODO: implement this resolver
-    return 0;
+    const ckbStatsRes = await this.ckbExplorerService.getStatistics();
+    return toNumber(ckbStatsRes.data.attributes.transactions_last_24hrs);
   }
 
   @ResolveField(() => CkbFees)

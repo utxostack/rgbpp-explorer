@@ -274,6 +274,38 @@ export interface RgbppDigest {
   transfers: unknown[];
 }
 
+// https://github.com/nervosnetwork/ckb-explorer-frontend/blob/develop/src/services/ExplorerService/fetcher.ts#L524-L539
+export interface RgbppCells {
+  [outputAsArrayInString: string]: NonPaginatedResponse<LiveCell[]>;
+}
+export interface LiveCell {
+  cell_id: string;
+  cell_type: string;
+  tx_hash: string;
+  cell_index: number;
+  type_hash: string;
+  data: string;
+  capacity: string;
+  occupied_capacity: string;
+  block_timestamp: string;
+  block_number: string;
+  type_script: Script;
+  lock_script: Script;
+  extra_info: {
+    type: 'ckb' | 'udt' | 'nrc_721' | 'm_nft';
+    collection: {
+      type_hash: string;
+    };
+    symbol: string;
+    amount: string;
+    decimal: string;
+    type_hash: string;
+    published: boolean;
+    className: string;
+    token_id: string;
+  };
+}
+
 // https://github.com/nervosnetwork/ckb-explorer-frontend/blob/develop/src/services/ExplorerService/fetcher.ts#L376-L390
 export interface Statistics {
   tip_block_number: string;

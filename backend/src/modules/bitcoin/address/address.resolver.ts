@@ -1,5 +1,6 @@
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
 import { BitcoinBaseTransaction, BitcoinTransaction } from '../transaction/transaction.model';
 import { BitcoinAddress, BitcoinBaseAddress } from './address.model';
 import {
@@ -11,6 +12,8 @@ import {
 
 @Resolver(() => BitcoinAddress)
 export class BitcoinAddressResolver {
+  constructor(private ckbExplorerService: CkbExplorerService) {}
+
   @Query(() => BitcoinAddress, { name: 'btcAddress', nullable: true })
   public async getBtcAddress(@Args('address') address: string): Promise<BitcoinBaseAddress> {
     return BitcoinAddress.from(address);
@@ -36,8 +39,10 @@ export class BitcoinAddressResolver {
 
   @ResolveField(() => Float)
   public async rgbppUtxoCount(@Parent() address: BitcoinBaseAddress): Promise<number> {
-    // TODO: implement this resolver
-    return 0;
+    const cells = await this.ckbExplorerService.getAddressRgbppCells({
+      address: address.address,
+    });
+    return cells.meta.total;
   }
 
   @ResolveField(() => Float)

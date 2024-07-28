@@ -155,6 +155,22 @@ export class CkbExplorerService {
     return response.data;
   }
 
+  public async getAddressRgbppCells({
+    address,
+    sort,
+    page = 1,
+    pageSize = 10,
+  }: GetAddressTransactionsParams): Promise<PaginatedResponse<AddressInfo>> {
+    const response = await this.request.get(`/v2/bitcoin_addresses/${address}/rgb_cells`, {
+      params: {
+        sort,
+        page,
+        pageSize,
+      },
+    });
+    return response.data;
+  }
+
   public async getTransaction(txHash: string): Promise<NonPaginatedResponse<DetailTransaction>> {
     const response = await this.request.get(`/v1/transactions/${txHash}`);
     return response.data;

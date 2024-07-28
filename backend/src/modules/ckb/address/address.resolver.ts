@@ -17,7 +17,6 @@ import {
   CkbRpcTransactionLoader,
   CkbRpcTransactionLoaderType,
 } from '../transaction/transaction.dataloader';
-import { BitcoinBaseAddress } from '../../bitcoin/address/address.model';
 
 @Resolver(() => CkbAddress)
 export class CkbAddressResolver {
@@ -49,8 +48,9 @@ export class CkbAddressResolver {
   }
 
   @ResolveField(() => Float)
-  public async rgbppCellCount(@Parent() address: BitcoinBaseAddress): Promise<number> {
+  public async rgbppCellCount(@Parent() address: CkbBaseAddress): Promise<number> {
     // TODO: implement this resolver
+    // XXX: how to relate ckb address with rgbpp cells? (except the address is rgbpp-lock/btc-time-lock)
     return 0;
   }
 
