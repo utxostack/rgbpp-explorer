@@ -35,6 +35,12 @@ export class BitcoinAddressResolver {
   }
 
   @ResolveField(() => Float)
+  public async rgbppUtxoCount(@Parent() address: BitcoinBaseAddress): Promise<number> {
+    // TODO: implement this resolver
+    return 0;
+  }
+
+  @ResolveField(() => Float)
   public async transactionCount(
     @Parent() address: BitcoinBaseAddress,
     @Loader(BitcoinAddressLoader) addressLoader: BitcoinAddressLoaderType,

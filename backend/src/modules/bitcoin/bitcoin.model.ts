@@ -1,8 +1,6 @@
 import { Field, Float, ObjectType } from '@nestjs/graphql';
 import * as BitcoinApi from 'src/core/bitcoin-api/bitcoin-api.schema';
 
-export type BitcoinBaseChainInfo = Omit<BitcoinChainInfo, 'fees'>;
-
 @ObjectType({ description: 'Bitcoin Fees' })
 export class BitcoinFees {
   @Field(() => Float)
@@ -31,6 +29,8 @@ export class BitcoinFees {
   }
 }
 
+export type BitcoinBaseChainInfo = Omit<BitcoinChainInfo, 'txCountIn24Hours' | 'fees'>;
+
 @ObjectType({ description: 'Bitcoin ChainInfo' })
 export class BitcoinChainInfo {
   @Field(() => Float)
@@ -42,10 +42,13 @@ export class BitcoinChainInfo {
   @Field(() => Float)
   difficulty: number;
 
+  @Field(() => Float)
+  txCountIn24Hours: number;
+
   @Field(() => BitcoinFees)
   fees: BitcoinFees;
 
-  public static from(info: BitcoinApi.ChainInfo) {
+  public static from(info: BitcoinApi.ChainInfo): BitcoinBaseChainInfo {
     return {
       tipBlockHeight: info.blocks,
       tipBlockHash: info.bestblockhash,

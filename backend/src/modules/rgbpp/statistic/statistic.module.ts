@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { CkbExplorerModule } from 'src/core/ckb-explorer/ckb-explorer.module';
-import { RgbppCoinResolver } from './coin.resolver';
+import { RgbppStatisticResolver } from './statistic.resolver';
 
 @Module({
   imports: [CkbExplorerModule],
-  providers: [RgbppCoinResolver],
+  providers: [RgbppStatisticResolver],
 })
-export class RgbppCoinModule {}
+export class RgbppStatisticModule {}

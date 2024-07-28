@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
-import { CoinModule } from './coin/coin.module';
-import { TransactionModule } from './transaction/transaction.module';
+import { RgbppCoinModule } from './coin/coin.module';
+import { RgbppStatisticModule } from './statistic/statistic.module';
+import { RgbppTransactionModule } from './transaction/transaction.module';
 
 @Module({
-  imports: [TransactionModule, CoinModule],
+  imports: [RgbppTransactionModule, RgbppCoinModule, RgbppStatisticModule],
 })
 export class RgbppModule {}

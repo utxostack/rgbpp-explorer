@@ -17,6 +17,7 @@ import {
   CkbRpcTransactionLoader,
   CkbRpcTransactionLoaderType,
 } from '../transaction/transaction.dataloader';
+import { BitcoinBaseAddress } from '../../bitcoin/address/address.model';
 
 @Resolver(() => CkbAddress)
 export class CkbAddressResolver {
@@ -45,6 +46,12 @@ export class CkbAddressResolver {
   ): Promise<number> {
     const [info] = await addressLoader.load({ address: address.address });
     return Number(info.balance);
+  }
+
+  @ResolveField(() => Float)
+  public async rgbppCellCount(@Parent() address: BitcoinBaseAddress): Promise<number> {
+    // TODO: implement this resolver
+    return 0;
   }
 
   @ResolveField(() => Float)

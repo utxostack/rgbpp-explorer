@@ -9,4 +9,4 @@ import { RgbppTransactionService } from './transaction.service';
   imports: [CkbExplorerModule, CkbTransactionModule, BitcoinApiModule],
   providers: [RgbppTransactionResolver, RgbppTransactionService],
 })
-export class TransactionModule {}
+export class RgbppTransactionModule {}

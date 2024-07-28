@@ -18,6 +18,8 @@ import {
   TransactionSortType,
   XUDT,
   XUDTTag,
+  Statistics,
+  TransactionFeesStatistic,
 } from './ckb-explorer.interface';
 
 type BasePaginationParams = {
@@ -203,6 +205,18 @@ export class CkbExplorerService {
     const response = await this.request.get(
       `/v1/udt_transactions/${typeHash}?${params.toString()}`,
     );
+    return response.data;
+  }
+
+  public async getStatistics(): Promise<NonPaginatedResponse<Statistics>> {
+    const response = await this.request.get('/v1/statistics');
+    return response.data;
+  }
+
+  public async getTransactionFeesStatistic(): Promise<
+    NonPaginatedResponse<TransactionFeesStatistic>
+  > {
+    const response = await this.request.get('/v2/statistics/transaction_fees');
     return response.data;
   }
 }

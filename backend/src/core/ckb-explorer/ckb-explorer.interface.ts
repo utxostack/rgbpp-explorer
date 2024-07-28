@@ -273,3 +273,41 @@ export interface RgbppDigest {
   // TODO: describe this type
   transfers: unknown[];
 }
+
+// https://github.com/nervosnetwork/ckb-explorer-frontend/blob/develop/src/services/ExplorerService/fetcher.ts#L376-L390
+export interface Statistics {
+  tip_block_number: string;
+  average_block_time: string;
+  current_epoch_difficulty: string;
+  hash_rate: string;
+  epoch_info: {
+    epoch_number: string;
+    epoch_length: string;
+    index: string;
+  };
+  estimated_epoch_time: string;
+  transactions_last_24hrs: string;
+  transactions_count_per_minute: string;
+  reorg_started_at: string | null;
+}
+
+// https://github.com/nervosnetwork/ckb-explorer-frontend/blob/develop/src/services/ExplorerService/fetcher.ts#L1178-L1199
+export interface TransactionFeesStatistic {
+  transaction_fee_rates: TransactionFeeRate[];
+  pending_transaction_fee_rates: PendingTransactionFeeRate[];
+  last_n_days_transaction_fee_rates: LastNDaysTransactionFeeRate[];
+}
+export interface TransactionFeeRate {
+  id: number;
+  timestamp: number;
+  fee_rate: number;
+  confirmation_time: number;
+}
+export interface PendingTransactionFeeRate {
+  id: number;
+  fee_rate: number;
+}
+export interface LastNDaysTransactionFeeRate {
+  date: string;
+  feeRate: string;
+}
