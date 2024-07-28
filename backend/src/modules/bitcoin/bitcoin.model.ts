@@ -29,7 +29,7 @@ export class BitcoinFees {
   }
 }
 
-export type BitcoinBaseChainInfo = Omit<BitcoinChainInfo, 'txCountIn24Hours' | 'fees'>;
+export type BitcoinBaseChainInfo = Omit<BitcoinChainInfo, 'transactionsCountIn24Hours' | 'fees'>;
 
 @ObjectType({ description: 'Bitcoin ChainInfo' })
 export class BitcoinChainInfo {
@@ -43,7 +43,7 @@ export class BitcoinChainInfo {
   difficulty: number;
 
   @Field(() => Float)
-  txCountIn24Hours: number;
+  transactionsCountIn24Hours: number;
 
   @Field(() => BitcoinFees)
   fees: BitcoinFees;

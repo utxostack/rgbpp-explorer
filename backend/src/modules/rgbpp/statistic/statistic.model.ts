@@ -5,7 +5,7 @@ export type RgbppBaseStatistic = Record<string, never>;
 @ObjectType({ description: 'RGB++ Coin' })
 export class RgbppStatistic {
   @Field(() => Number)
-  txsCount: number;
+  transactionsCount: number;
 
   @Field(() => Number)
   holdersCount: number;

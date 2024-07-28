@@ -39,8 +39,8 @@ type CkbCell {
 type CkbAddress {
   address: String!
   shannon: Float!
-  rgbppCellCount: Float!
-  transactionCount: Float!
+  rgbppCellsCount: Float!
+  transactionsCount: Float!
   transactions(page: Float, pageSize: Float): [CkbTransaction!]!
 }
 
@@ -49,8 +49,8 @@ type BitcoinAddress {
   address: String!
   satoshi: Float!
   pendingSatoshi: Float!
-  rgbppUtxoCount: Float!
-  transactionCount: Float!
+  rgbppUtxosCount: Float!
+  transactionsCount: Float!
   transactions(afterTxid: String): [BitcoinTransaction!]!
 }
 
@@ -119,7 +119,6 @@ type BitcoinBlock {
   height: Float!
   version: Int!
   timestamp: Timestamp!
-  txCount: Float!
   size: Float!
   weight: Float!
   bits: Float!
@@ -128,6 +127,7 @@ type BitcoinBlock {
   reward: Float!
   totalFee: Float!
   feeRateRange: FeeRateRange!
+  transactionsCount: Float!
   transactions(
     """For pagination, must be a multiplication of 25"""
     startIndex: Float
@@ -173,7 +173,7 @@ type CkbFees {
 """CKB ChainInfo"""
 type CkbChainInfo {
   tipBlockNumber: Float!
-  txCountIn24Hours: Float!
+  transactionsCountIn24Hours: Float!
   fees: CkbFees!
 }
 
@@ -227,7 +227,7 @@ type RgbppCoinList {
 
 """RGB++ Coin"""
 type RgbppStatistic {
-  txsCount: Float!
+  transactionsCount: Float!
   holdersCount: Float!
 }
 
@@ -245,7 +245,7 @@ type BitcoinChainInfo {
   tipBlockHeight: Float!
   tipBlockHash: String!
   difficulty: Float!
-  txCountIn24Hours: Float!
+  transactionsCountIn24Hours: Float!
   fees: BitcoinFees!
 }
 

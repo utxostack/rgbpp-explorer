@@ -38,7 +38,7 @@ export class BitcoinAddressResolver {
   }
 
   @ResolveField(() => Float)
-  public async rgbppUtxoCount(@Parent() address: BitcoinBaseAddress): Promise<number> {
+  public async rgbppUtxosCount(@Parent() address: BitcoinBaseAddress): Promise<number> {
     const cells = await this.ckbExplorerService.getAddressRgbppCells({
       address: address.address,
     });
@@ -46,7 +46,7 @@ export class BitcoinAddressResolver {
   }
 
   @ResolveField(() => Float)
-  public async transactionCount(
+  public async transactionsCount(
     @Parent() address: BitcoinBaseAddress,
     @Loader(BitcoinAddressLoader) addressLoader: BitcoinAddressLoaderType,
   ): Promise<number> {

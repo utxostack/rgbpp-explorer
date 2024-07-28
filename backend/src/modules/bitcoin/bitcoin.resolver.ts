@@ -13,7 +13,7 @@ export class BitcoinResolver {
   }
 
   @ResolveField(() => Float)
-  public async txCountIn24Hours(): Promise<number> {
+  public async transactionsCountIn24Hours(): Promise<number> {
     // TODO: implement this resolver
     return 0;
   }

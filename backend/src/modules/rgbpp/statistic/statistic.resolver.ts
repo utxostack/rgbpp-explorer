@@ -12,7 +12,7 @@ export class RgbppStatisticResolver {
   }
 
   @ResolveField(() => Float)
-  public async txsCount(): Promise<number> {
+  public async transactionsCount(): Promise<number> {
     const rgbppTxs = await this.ckbExplorerService.getRgbppTransactions();
     return rgbppTxs.meta.total;
   }

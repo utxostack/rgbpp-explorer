@@ -20,7 +20,7 @@ export class CkbResolver {
   }
 
   @ResolveField(() => Float)
-  public async txCountIn24Hours(): Promise<number> {
+  public async transactionsCountIn24Hours(): Promise<number> {
     const ckbStatsRes = await this.ckbExplorerService.getStatistics();
     return toNumber(ckbStatsRes.data.attributes.transactions_last_24hrs);
   }
