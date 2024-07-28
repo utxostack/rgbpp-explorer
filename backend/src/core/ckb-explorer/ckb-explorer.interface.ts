@@ -134,7 +134,7 @@ export interface DisplayOutput {
   commit_reward: string;
   proposal_reward: string;
   secondary_reward: string;
-  status: string;
+  status: 'live' | 'dead';
   consumed_tx_hash: string;
   generated_tx_hash: string;
   cell_index: string;

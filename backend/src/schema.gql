@@ -17,6 +17,13 @@ type CkbXUDTInfo {
   typeHash: String!
 }
 
+"""CKB Cell Status"""
+type CkbCellStatus {
+  consumed: Boolean!
+  txHash: String
+  index: Float
+}
+
 """CKB Cell"""
 type CkbCell {
   txHash: String!
@@ -25,7 +32,7 @@ type CkbCell {
   type: CkbScript
   lock: CkbScript!
   xudtInfo: CkbXUDTInfo
-  spent: Boolean!
+  status: CkbCellStatus!
 }
 
 """CKB Address"""
