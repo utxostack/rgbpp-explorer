@@ -3,7 +3,7 @@ import * as BitcoinApi from 'src/core/bitcoin-api/bitcoin-api.schema';
 import { BitcoinBaseOutput, BitcoinOutput } from '../output/output.model';
 import { BitcoinInput } from '../input/input.model';
 
-export type BitcoinBaseTransaction = Omit<BitcoinTransaction, 'confirmations' | 'outSpends'>;
+export type BitcoinBaseTransaction = Omit<BitcoinTransaction, 'confirmations'>;
 
 @ObjectType({ description: 'Bitcoin Transaction' })
 export class BitcoinTransaction {
