@@ -153,6 +153,7 @@ type BitcoinTransaction {
   feeRate: Float!
   confirmed: Boolean!
   confirmations: Float!
+  rgbppTransaction: RgbppTransaction
 }
 
 """RGB++ Transaction"""
@@ -262,10 +263,10 @@ type Query {
   btcChainInfo: BitcoinChainInfo!
   btcBlock(hashOrHeight: String!): BitcoinBlock!
   btcTransaction(txid: String!): BitcoinTransaction
-  btcAddress(address: String!): BitcoinAddress
-  rgbppAddress(address: String!): RgbppAddress
   rgbppLatestTransactions(page: Int, pageSize: Int): RgbppLatestTransactionList!
   rgbppTransaction(txidOrTxHash: String!): RgbppTransaction
+  btcAddress(address: String!): BitcoinAddress
+  rgbppAddress(address: String!): RgbppAddress
   rgbppCoins(page: Int, pageSize: Int): RgbppCoinList!
   rgbppCoin(typeHash: String!): RgbppCoin!
   rgbppStatistic: RgbppStatistic!

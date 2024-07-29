@@ -3,7 +3,13 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Client as RpcWebsocketsClient } from 'rpc-websockets';
 import { BI } from '@ckb-lumos/bi';
 import { Env } from 'src/env';
-import { Block, BlockEconomicState, TransactionWithStatusResponse } from './ckb-rpc.interface';
+import {
+  Block,
+  BlockEconomicState,
+  GetTransactionsResult,
+  SearchKey,
+  TransactionWithStatusResponse,
+} from './ckb-rpc.interface';
 
 @Injectable()
 export class CkbRpcWebsocketService {
@@ -47,5 +53,17 @@ export class CkbRpcWebsocketService {
     this.logger.debug('get_tip_block_number');
     const tipBlockNumber = await this.websocket.call('get_tip_block_number', []);
     return BI.from(tipBlockNumber).toNumber();
+  }
+
+  public async getTransactions(
+    searchKey: SearchKey,
+    order: 'asc' | 'desc',
+    limit: string,
+  ): Promise<GetTransactionsResult> {
+    this.logger.debug(
+      `get_transactions - searchKey: ${JSON.stringify(searchKey)}, order: ${order}, limit: ${limit}`,
+    );
+    const transactions = await this.websocket.call('get_transactions', [searchKey, order, limit]);
+    return transactions as GetTransactionsResult;
   }
 }

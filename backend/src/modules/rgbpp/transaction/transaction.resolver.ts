@@ -1,4 +1,3 @@
-import { Logger } from '@nestjs/common';
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Int, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { CkbTransaction } from 'src/modules/ckb/transaction/transaction.model';
@@ -19,11 +18,10 @@ import {
   LeapDirectionMap,
   LeapDirection,
 } from './transaction.model';
+import { RgbppTransactionLoader, RgbppTransactionLoaderType } from './transaction.dataloader';
 
 @Resolver(() => RgbppTransaction)
 export class RgbppTransactionResolver {
-  private logger = new Logger(RgbppTransactionResolver.name);
-
   constructor(private transactionService: RgbppTransactionService) {}
 
   @Query(() => RgbppLatestTransactionList, { name: 'rgbppLatestTransactions' })
@@ -37,23 +35,9 @@ export class RgbppTransactionResolver {
   @Query(() => RgbppTransaction, { name: 'rgbppTransaction', nullable: true })
   public async getTransaction(
     @Args('txidOrTxHash') txidOrTxHash: string,
+    @Loader(RgbppTransactionLoader) txLoader: RgbppTransactionLoaderType,
   ): Promise<RgbppBaseTransaction | null> {
-    this.logger.debug('getTransaction', txidOrTxHash);
-    let tx: RgbppBaseTransaction | undefined;
-    try {
-      tx = await this.transactionService.getTransactionByCkbTxHash(txidOrTxHash);
-    } catch {
-      // if throws, the txidOrTxHash is not a ckb txHash or the tx is not rgbpp tx
-      this.logger.debug('not txHash or not rgbpp tx', txidOrTxHash);
-    }
-    try {
-      tx = await this.transactionService.getTransactionByBtcTxid(txidOrTxHash);
-    } catch {
-      // if throws, the txidOrTxHash is not a btc txid or the tx is not rgbpp tx
-      this.logger.debug('not txid or not rgbpp tx', txidOrTxHash);
-    }
-
-    return tx ?? null;
+    return await txLoader.load(txidOrTxHash);
   }
 
   @ResolveField(() => LeapDirection, { nullable: true })

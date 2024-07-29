@@ -5,9 +5,10 @@ import {
   BitcoinTransactionLoader,
   BitcoinTransactionOutSpendsLoader,
 } from './transaction.dataloader';
+import { RgbppTransactionModule } from 'src/modules/rgbpp/transaction/transaction.module';
 
 @Module({
-  imports: [BitcoinApiModule],
+  imports: [BitcoinApiModule, RgbppTransactionModule],
   providers: [
     BitcoinTransactionResolver,
     BitcoinTransactionLoader,
