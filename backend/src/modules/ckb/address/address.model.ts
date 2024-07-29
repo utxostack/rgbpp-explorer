@@ -12,9 +12,6 @@ export class CkbAddress {
   shannon: number;
 
   @Field(() => Float)
-  rgbppCellsCount: number;
-
-  @Field(() => Float)
   transactionsCount: number;
 
   @Field(() => [CkbTransaction])

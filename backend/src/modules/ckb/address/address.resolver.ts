@@ -48,13 +48,6 @@ export class CkbAddressResolver {
   }
 
   @ResolveField(() => Float)
-  public async rgbppCellsCount(@Parent() address: CkbBaseAddress): Promise<number> {
-    // TODO: implement this resolver
-    // XXX: how to relate ckb address with rgbpp cells? (except the address is rgbpp-lock/btc-time-lock)
-    return 0;
-  }
-
-  @ResolveField(() => Float)
   public async transactionsCount(
     @Parent() address: CkbBaseAddress,
     @Loader(CkbAddressLoader) addressLoader: CkbAddressLoaderType,
