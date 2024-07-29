@@ -46,8 +46,8 @@ export interface TransactionWithStatusResponse {
   time_added_to_pool: string | null;
   transaction: Transaction;
   tx_status: {
-    block_hash: string;
-    block_number: string;
+    block_hash: string | null;
+    block_number: string | null;
     reason: string | null;
     status: string;
   };
