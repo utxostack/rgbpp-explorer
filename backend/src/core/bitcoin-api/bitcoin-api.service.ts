@@ -178,8 +178,8 @@ export class BitcoinApiService {
     return this.call('getAddressTxsUtxo', { address });
   }
 
-  public async getAddressTxs({ address, after_txid }: { address: string; after_txid?: string }) {
-    return this.call('getAddressTxs', { address, after_txid });
+  public async getAddressTxs({ address, afterTxid }: { address: string; afterTxid?: string }) {
+    return this.call('getAddressTxs', { address, afterTxid });
   }
 
   public async getTx({ txid }: { txid: string }) {
@@ -190,12 +190,20 @@ export class BitcoinApiService {
     return this.call('getTxHex', { txid });
   }
 
+  public async getTxOutSpend({ txid, vout }: { txid: string; vout: number }) {
+    return this.call('getTxOutSpend', { txid, vout });
+  }
+
+  public async getTxOutSpends({ txid }: { txid: string }) {
+    return this.call('getTxOutSpends', { txid });
+  }
+
   public async getBlock({ hash }: { hash: string }) {
     return this.call('getBlock', { hash });
   }
 
-  public async getBlockTxs({ hash }: { hash: string }) {
-    return this.call('getBlockTxs', { hash });
+  public async getBlockTxs({ hash, startIndex }: { hash: string; startIndex?: number }) {
+    return this.call('getBlockTxs', { hash, startIndex });
   }
 
   public async getBlockHeight({ height }: { height: number }) {

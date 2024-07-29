@@ -15,7 +15,10 @@ export class BitcoinAddress {
   pendingSatoshi: number;
 
   @Field(() => Float)
-  transactionCount: number;
+  rgbppUtxosCount: number;
+
+  @Field(() => Float)
+  transactionsCount: number;
 
   @Field(() => [BitcoinTransaction])
   transactions: BitcoinTransaction[];

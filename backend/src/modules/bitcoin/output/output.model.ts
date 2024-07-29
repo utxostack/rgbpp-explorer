@@ -2,10 +2,41 @@ import { Field, Float, ObjectType } from '@nestjs/graphql';
 import * as BitcoinApi from 'src/core/bitcoin-api/bitcoin-api.schema';
 import { BitcoinAddress, BitcoinBaseAddress } from '../address/address.model';
 
-export type BitcoinBaseOutput = Omit<BitcoinOutput, 'spent'>;
+export interface BitcoinOutputWithSource extends BitcoinApi.Output {
+  txid: string;
+  vout: number;
+}
+
+@ObjectType({ description: 'Bitcoin Output Spend Status' })
+export class BitcoinOutputStatus {
+  @Field(() => Boolean)
+  spent: boolean;
+
+  @Field(() => String, { nullable: true })
+  txid: string;
+
+  @Field(() => Float, { nullable: true })
+  vin: number;
+
+  public static from(outSpend: BitcoinApi.OutSpend): BitcoinOutputStatus {
+    return {
+      spent: outSpend.spent,
+      txid: outSpend.spent ? outSpend.txid : null,
+      vin: outSpend.spent ? outSpend.vin : null,
+    };
+  }
+}
+
+export type BitcoinBaseOutput = Omit<BitcoinOutput, 'status'>;
 
 @ObjectType({ description: 'Bitcoin Output' })
 export class BitcoinOutput {
+  @Field(() => String)
+  txid: string;
+
+  @Field(() => Float)
+  vout: number;
+
   @Field(() => String)
   scriptpubkey: string;
 
@@ -24,11 +55,13 @@ export class BitcoinOutput {
   @Field(() => BitcoinAddress, { nullable: true })
   address: BitcoinBaseAddress;
 
-  @Field(() => Boolean)
-  spent: boolean;
+  @Field(() => BitcoinOutputStatus)
+  status: BitcoinOutputStatus;
 
-  public static from(output: BitcoinApi.Output): BitcoinBaseOutput {
+  public static from(output: BitcoinOutputWithSource): BitcoinBaseOutput {
     return {
+      txid: output.txid,
+      vout: output.vout,
       scriptpubkey: output.scriptpubkey,
       scriptpubkeyAsm: output.scriptpubkey_asm,
       scriptpubkeyType: output.scriptpubkey_type,

@@ -18,7 +18,21 @@ export class CkbXUDTInfo {
   typeHash: string;
 }
 
-export type CkbBaseCell = Omit<CkbCell, 'xudtInfo' | 'spent'>;
+export type CkbBaseCellStatus = Omit<CkbCellStatus, 'txHash' | 'index'>;
+
+@ObjectType({ description: 'CKB Cell Status' })
+export class CkbCellStatus {
+  @Field(() => Boolean)
+  consumed: boolean;
+
+  @Field(() => String, { nullable: true })
+  txHash: string;
+
+  @Field(() => Float, { nullable: true })
+  index: number;
+}
+
+export type CkbBaseCell = Omit<CkbCell, 'xudtInfo' | 'status'>;
 
 @ObjectType({ description: 'CKB Cell' })
 export class CkbCell {
@@ -40,8 +54,8 @@ export class CkbCell {
   @Field(() => CkbXUDTInfo, { nullable: true })
   xudtInfo: CkbXUDTInfo;
 
-  @Field(() => Boolean)
-  spent: boolean;
+  @Field(() => CkbCellStatus)
+  status: CkbCellStatus;
 
   public static from(tx: CkbRpc.Transaction, index: number): CkbBaseCell {
     const output = tx.outputs[index];

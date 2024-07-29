@@ -1,9 +1,12 @@
 import { Module } from '@nestjs/common';
-import { BitcoinApiModule } from 'src/core/bitcoin-api/bitcoin-api.module';
+import { CkbExplorerModule } from 'src/core/ckb-explorer/ckb-explorer.module';
+import { CkbTransactionModule } from '../transaction/transaction.module';
 import { CkbAddressResolver } from './address.resolver';
+import { CkbAddressLoader, CkbAddressTransactionsLoader } from './address.dataloader';
 
 @Module({
-  imports: [BitcoinApiModule],
-  providers: [CkbAddressResolver],
+  imports: [CkbExplorerModule, CkbTransactionModule],
+  providers: [CkbAddressResolver, CkbAddressLoader, CkbAddressTransactionsLoader],
+  exports: [CkbAddressLoader, CkbAddressTransactionsLoader],
 })
 export class CkbAddressModule {}

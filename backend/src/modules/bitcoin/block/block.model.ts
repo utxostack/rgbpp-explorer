@@ -32,9 +32,6 @@ export class BitcoinBlock {
   timestamp: Date;
 
   @Field(() => Float)
-  txCount: number;
-
-  @Field(() => Float)
   size: number;
 
   @Field(() => Float)
@@ -58,6 +55,9 @@ export class BitcoinBlock {
   @Field(() => FeeRateRange)
   feeRateRange: FeeRateRange;
 
+  @Field(() => Float)
+  transactionsCount: number;
+
   @Field(() => [BitcoinTransaction])
   transactions: BitcoinTransaction[];
 
@@ -67,7 +67,7 @@ export class BitcoinBlock {
       height: block.height,
       version: block.version,
       timestamp: new Date(block.timestamp),
-      txCount: block.tx_count,
+      transactionsCount: block.tx_count,
       size: block.size,
       weight: block.weight,
       bits: block.bits,

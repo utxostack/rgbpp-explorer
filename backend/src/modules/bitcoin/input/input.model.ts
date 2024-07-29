@@ -29,7 +29,13 @@ export class BitcoinInput {
     return {
       txid: input.txid,
       vout: input.vout,
-      prevout: input.prevout ? BitcoinOutput.from(input.prevout) : null,
+      prevout: input.prevout
+        ? BitcoinOutput.from({
+            ...input.prevout,
+            txid: input.txid,
+            vout: input.vout,
+          })
+        : null,
       scriptsig: input.scriptsig,
       scriptsigAsm: input.scriptsig_asm,
       isCoinbase: input.is_coinbase,

@@ -1,4 +1,4 @@
-import DataLoader from 'dataloader';
+import { Logger } from '@nestjs/common';
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { BitcoinBaseTransaction, BitcoinTransaction } from '../transaction/transaction.model';
@@ -6,17 +6,19 @@ import { BitcoinAddress, BitcoinBaseAddress } from '../address/address.model';
 import { BitcoinBaseBlock, BitcoinBlock, FeeRateRange } from './block.model';
 import {
   BitcoinBlockLoader,
-  BitcoinBlockLoaderResponse,
+  BitcoinBlockLoaderType,
   BitcoinBlockTransactionsLoader,
-  BitcoinBlockTransactionsLoaderResponse,
+  BitcoinBlockTransactionsLoaderType,
 } from './block.dataloader';
 
 @Resolver(() => BitcoinBlock)
 export class BitcoinBlockResolver {
+  private logger = new Logger(BitcoinBlockResolver.name);
+
   @Query(() => BitcoinBlock, { name: 'btcBlock' })
   public async getBlock(
     @Args('hashOrHeight', { type: () => String }) hashOrHeight: string,
-    @Loader(BitcoinBlockLoader) blockLoader: DataLoader<string, BitcoinBlockLoaderResponse>,
+    @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
   ): Promise<BitcoinBaseBlock> {
     const block = await blockLoader.load(hashOrHeight);
     return BitcoinBlock.from(block);
@@ -25,7 +27,7 @@ export class BitcoinBlockResolver {
   @ResolveField(() => BitcoinAddress)
   public async miner(
     @Parent() block: BitcoinBaseBlock,
-    @Loader(BitcoinBlockLoader) blockLoader: DataLoader<string, BitcoinBlockLoaderResponse>,
+    @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
   ): Promise<BitcoinBaseAddress> {
     // XXX: only the "mempool" mode returns the "extra" field
     const detail = await blockLoader.load(block.id);
@@ -34,7 +36,7 @@ export class BitcoinBlockResolver {
         address: detail.extras.coinbaseAddress,
       };
     } else {
-      // TODO: what should be returned when using the "electrs" mode?
+      this.logger.error('"miner" cannot be resolved in "electrs" mode');
       return null;
     }
   }
@@ -42,14 +44,14 @@ export class BitcoinBlockResolver {
   @ResolveField(() => Float)
   public async reward(
     @Parent() block: BitcoinBaseBlock,
-    @Loader(BitcoinBlockLoader) blockLoader: DataLoader<string, BitcoinBlockLoaderResponse>,
+    @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
   ): Promise<number> {
     // XXX: only the "mempool" mode returns the "extra" field
     const detail = await blockLoader.load(block.id);
     if (detail.extras) {
       return detail.extras.reward;
     } else {
-      // TODO: what should be returned when using the "electrs" mode?
+      this.logger.error('"reward" cannot be resolved in "electrs" mode');
       return 0;
     }
   }
@@ -57,14 +59,14 @@ export class BitcoinBlockResolver {
   @ResolveField(() => Float)
   public async totalFee(
     @Parent() block: BitcoinBaseBlock,
-    @Loader(BitcoinBlockLoader) blockLoader: DataLoader<string, BitcoinBlockLoaderResponse>,
+    @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
   ): Promise<number> {
     // XXX: only the "mempool" mode returns the "extra" field
     const detail = await blockLoader.load(block.id);
     if (detail.extras) {
       return detail.extras.totalFees;
     } else {
-      // TODO: what should be returned when using the "electrs" mode?
+      this.logger.error('"totalFee" cannot be resolved in "electrs" mode');
       return 0;
     }
   }
@@ -72,7 +74,7 @@ export class BitcoinBlockResolver {
   @ResolveField(() => FeeRateRange)
   public async feeRateRange(
     @Parent() block: BitcoinBaseBlock,
-    @Loader(BitcoinBlockLoader) blockLoader: DataLoader<string, BitcoinBlockLoaderResponse>,
+    @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
   ): Promise<FeeRateRange> {
     // XXX: only the "mempool" mode returns the "extra" field
     const detail = await blockLoader.load(block.id);
@@ -82,7 +84,7 @@ export class BitcoinBlockResolver {
         max: detail.extras.feeRange[detail.extras.feeRange.length - 1],
       };
     } else {
-      // TODO: what should be returned when using the "electrs" mode?
+      this.logger.error('"feeRateRange" cannot be resolved in "electrs" mode');
       return {
         min: 0,
         max: 0,
@@ -93,10 +95,17 @@ export class BitcoinBlockResolver {
   @ResolveField(() => [BitcoinTransaction])
   public async transactions(
     @Parent() block: BitcoinBaseBlock,
-    @Loader(BitcoinBlockTransactionsLoader)
-    blockTxsLoader: DataLoader<string, BitcoinBlockTransactionsLoaderResponse>,
+    @Loader(BitcoinBlockTransactionsLoader) blockTxsLoader: BitcoinBlockTransactionsLoaderType,
+    @Args('startIndex', {
+      nullable: true,
+      description: 'For pagination, must be a multiplication of 25',
+    })
+    startIndex?: number,
   ): Promise<BitcoinBaseTransaction[]> {
-    const txs = await blockTxsLoader.load(block.id);
+    const txs = await blockTxsLoader.load({
+      hash: block.id,
+      startIndex,
+    });
     return txs.map((tx) => BitcoinTransaction.from(tx));
   }
 }

@@ -1,3 +1,5 @@
+import { CellDep, Script } from '../ckb-rpc/ckb-rpc.interface';
+
 export enum BlockSortType {
   HeightAsc = 'height.asc',
   HeightDesc = 'height.desc',
@@ -14,11 +16,16 @@ export enum TransactionSortType {
   TimeDesc = 'time.desc',
 }
 
+export enum AddressTransactionSortType {
+  TimeAsc = 'time.asc',
+  TimeDesc = 'time.desc',
+}
+
 // https://github.com/nervosnetwork/ckb-explorer/blob/f2b9823e1a1ece1b74901ca3090565d62b251dcd/app/workers/bitcoin_transaction_detect_worker.rb#L123C4-L137C8
 export enum LeapDirection {
   In = 'in',
-  LeapoutBTC = 'leapoutBTC',
-  WithinBTC = 'withinBtc',
+  LeapOutBtc = 'leapoutBTC',
+  WithinBtc = 'withinBTC',
 }
 
 export enum TransferStep {
@@ -127,7 +134,7 @@ export interface DisplayOutput {
   commit_reward: string;
   proposal_reward: string;
   secondary_reward: string;
-  status: string;
+  status: 'live' | 'dead';
   consumed_tx_hash: string;
   generated_tx_hash: string;
   cell_index: string;
@@ -159,6 +166,21 @@ export interface Transaction {
   rgb_transfer_step: null;
   created_at: string;
   create_timestamp: string;
+}
+
+export interface DetailTransaction extends Transaction {
+  version: string;
+  cell_deps: CellDep[];
+  witnesses: string[];
+  transaction_fee: string;
+  bytes: number;
+  largest_tx_in_epoch: number;
+  largest_tx: number;
+  cycles: number;
+  max_cycles_in_epoch: number;
+  max_cycles: number;
+  // TODO: replace with actual literal status, e.g. "committed"
+  tx_status: string;
 }
 
 export interface RgbppTransaction {
@@ -205,4 +227,119 @@ export interface XUDT {
   h24_ckb_transactions_count: string;
   created_at: string;
   xudt_tags: XUDTTag[];
+}
+
+// https://github.com/nervosnetwork/ckb-explorer-frontend/blob/develop/src/models/Address/index.ts
+export interface LockInfo {
+  status: 'locked' | 'unlocked';
+  epoch_number: string;
+  epoch_index: string;
+  estimated_unlock_time: string;
+}
+export enum AddressType {
+  Address = 'Address',
+  LockHash = 'LockHash',
+  Unknown = 'Unknown',
+}
+export interface AddressInfo {
+  addressHash: string;
+  bitcoin_address_hash?: string;
+  lockHash: string;
+  balance: string;
+  balanceOccupied: string;
+  transactions_count: string;
+  lock_script: Script;
+  pending_reward_blocks_count: string;
+  type: AddressType;
+  dao_deposit: string;
+  interest: string;
+  dao_compensation: string;
+  lock_info: LockInfo;
+  live_cells_count: string;
+  mined_blocks_count: string;
+  is_special: boolean;
+  special_address: string;
+  // TODO: describe this type
+  udt_accounts?: unknown[];
+}
+
+// https://github.com/nervosnetwork/ckb-explorer-frontend/blob/develop/src/services/ExplorerService/types.ts#L331-L337
+export interface RgbppDigest {
+  txid: string;
+  commitment: string;
+  confirmations: number;
+  leap_direction: LeapDirection | null;
+  transfer_step: TransferStep | null;
+  // TODO: describe this type
+  transfers: unknown[];
+}
+
+// https://github.com/nervosnetwork/ckb-explorer-frontend/blob/develop/src/services/ExplorerService/fetcher.ts#L524-L539
+export interface RgbppCells {
+  [outputAsArrayInString: string]: NonPaginatedResponse<LiveCell[]>;
+}
+export interface LiveCell {
+  cell_id: string;
+  cell_type: string;
+  tx_hash: string;
+  cell_index: number;
+  type_hash: string;
+  data: string;
+  capacity: string;
+  occupied_capacity: string;
+  block_timestamp: string;
+  block_number: string;
+  type_script: Script;
+  lock_script: Script;
+  extra_info: {
+    type: 'ckb' | 'udt' | 'nrc_721' | 'm_nft';
+    collection: {
+      type_hash: string;
+    };
+    symbol: string;
+    amount: string;
+    decimal: string;
+    type_hash: string;
+    published: boolean;
+    className: string;
+    token_id: string;
+  };
+}
+
+// https://github.com/nervosnetwork/ckb-explorer-frontend/blob/develop/src/services/ExplorerService/fetcher.ts#L376-L390
+export interface Statistics {
+  tip_block_number: string;
+  average_block_time: string;
+  current_epoch_difficulty: string;
+  hash_rate: string;
+  epoch_info: {
+    epoch_number: string;
+    epoch_length: string;
+    index: string;
+  };
+  estimated_epoch_time: string;
+  transactions_last_24hrs: string;
+  transactions_count_per_minute: string;
+  reorg_started_at: string | null;
+}
+
+// https://github.com/nervosnetwork/ckb-explorer-frontend/blob/develop/src/services/ExplorerService/fetcher.ts#L1178-L1199
+export interface TransactionFeesStatistic {
+  transaction_fee_rates: TransactionFeeRate[];
+  pending_transaction_fee_rates: PendingTransactionFeeRate[];
+  last_n_days_transaction_fee_rates: LastNDaysTransactionFeeRate[];
+}
+export interface TransactionFeeRate {
+  id: number;
+  timestamp: number;
+  fee_rate: number;
+  confirmation_time: number;
+}
+export interface PendingTransactionFeeRate {
+  id: number;
+  fee_rate: number;
+}
+export interface LastNDaysTransactionFeeRate {
+  date: string;
+  feeRate: string;
 }

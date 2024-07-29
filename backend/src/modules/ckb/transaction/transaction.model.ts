@@ -1,12 +1,14 @@
 import { toNumber } from 'lodash';
-import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
+import { Field, Float, ObjectType } from '@nestjs/graphql';
+import { ResultFormatter, RPCTypes } from '@ckb-lumos/lumos/rpc';
+import { blockchain } from '@ckb-lumos/lumos/codec';
 import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
 import { CkbBaseCell, CkbCell } from '../cell/cell.model';
 import { CkbBlock } from '../block/block.model';
 
 export type CkbBaseTransaction = Omit<
   CkbTransaction,
-  'block' | 'feeRate' | 'size' | 'inputs' | 'confirmations'
+  'block' | 'inputs' | 'fee' | 'feeRate' | 'confirmations'
 >;
 
 @ObjectType({ description: 'CKB Transaction' })
@@ -14,7 +16,7 @@ export class CkbTransaction {
   @Field(() => Boolean)
   isCellbase: boolean;
 
-  @Field(() => Int)
+  @Field(() => Float)
   blockNumber: number;
 
   @Field(() => String)
@@ -38,19 +40,29 @@ export class CkbTransaction {
   @Field(() => CkbBlock)
   block: CkbBlock;
 
+  @Field(() => Boolean)
+  confirmed: boolean;
+
   @Field(() => Float)
   confirmations: number;
 
-  public static from(transactionWithStatus: CkbRpc.TransactionWithStatusResponse) {
-    const { transaction, tx_status, fee } = transactionWithStatus;
+  public static from(
+    transactionWithStatus: CkbRpc.TransactionWithStatusResponse,
+  ): CkbBaseTransaction {
+    const { transaction, tx_status } = transactionWithStatus;
     const isCellbase = transaction.inputs[0].previous_output.tx_hash.endsWith('0'.repeat(64));
+
+    const resultTx = ResultFormatter.toTransaction(transaction as RPCTypes.Transaction);
+    const binaryTx = blockchain.Transaction.pack(resultTx);
+    const txBytes = binaryTx.byteLength;
 
     return {
       isCellbase,
       hash: transaction.hash,
+      confirmed: tx_status.status === 'committed',
       blockNumber: toNumber(tx_status.block_number),
-      fee: toNumber(fee),
       outputs: transaction.outputs.map((_, index) => CkbCell.from(transaction, index)),
+      size: txBytes,
     };
   }
 }
