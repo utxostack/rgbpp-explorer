@@ -19,12 +19,7 @@ export class BitcoinTransactionLoader
       const results = await Promise.allSettled(
         ids.map((key) => this.bitcoinApiService.getTx({ txid: key })),
       );
-      return results.map((result) => {
-        if (result.status === 'fulfilled') {
-          return result.value;
-        }
-        return null;
-      });
+      return results.map((result) => (result.status === 'fulfilled' ? result.value : null));
     };
   }
 }
@@ -33,7 +28,7 @@ export type BitcoinTransactionLoaderResponse = DataLoaderResponse<BitcoinTransac
 
 @Injectable()
 export class BitcoinTransactionOutSpendsLoader
-  implements NestDataLoader<string, BitcoinApi.OutSpend[]>
+  implements NestDataLoader<string, BitcoinApi.OutSpend[] | null>
 {
   private logger = new Logger(BitcoinTransactionLoader.name);
 
@@ -42,12 +37,16 @@ export class BitcoinTransactionOutSpendsLoader
   public getBatchFunction() {
     return async (txids: string[]) => {
       this.logger.debug(`Loading bitcoin transactions: ${txids.join(', ')}`);
-      return Promise.all(
+      const results = await Promise.allSettled(
         txids.map(async (txid) => this.bitcoinApiService.getTxOutSpends({ txid: txid })),
       );
+      return results.map((result) => (result.status === 'fulfilled' ? result.value : null));
     };
   }
 }
-export type BitcoinTransactionOutSpendsLoaderType = DataLoader<string, BitcoinApi.OutSpend[]>;
+export type BitcoinTransactionOutSpendsLoaderType = DataLoader<
+  string,
+  BitcoinApi.OutSpend[] | null
+>;
 export type BitcoinTransactionOutSpendsLoaderResponse =
   DataLoaderResponse<BitcoinTransactionOutSpendsLoader>;

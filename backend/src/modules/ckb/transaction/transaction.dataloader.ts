@@ -8,44 +8,48 @@ import { CkbTransactionService } from './transaction.service';
 
 @Injectable()
 export class CkbRpcTransactionLoader
-  implements NestDataLoader<string, CkbRpcInterface.TransactionWithStatusResponse>
+  implements NestDataLoader<string, CkbRpcInterface.TransactionWithStatusResponse | null>
 {
   private logger = new Logger(CkbRpcTransactionLoader.name);
 
   constructor(private transactionService: CkbTransactionService) {}
 
   public getBatchFunction() {
-    return (hashes: string[]) => {
+    return async (hashes: string[]) => {
       this.logger.debug(`Loading CKB transactions from CkbRpcService: ${hashes.join(', ')}`);
-      return Promise.all(hashes.map((key) => this.transactionService.getTransactionFromRpc(key)));
+      const results = await Promise.allSettled(
+        hashes.map((key) => this.transactionService.getTransactionFromRpc(key)),
+      );
+      return results.map((result) => (result.status === 'fulfilled' ? result.value : null));
     };
   }
 }
 export type CkbRpcTransactionLoaderType = DataLoader<
   string,
-  CkbRpcInterface.TransactionWithStatusResponse
+  CkbRpcInterface.TransactionWithStatusResponse | null
 >;
 export type CkbRpcTransactionLoaderResponse = DataLoaderResponse<CkbRpcTransactionLoader>;
 
 @Injectable()
 export class CkbExplorerTransactionLoader
-  implements NestDataLoader<string, CkbExplorerInterface.DetailTransaction>
+  implements NestDataLoader<string, CkbExplorerInterface.DetailTransaction | null>
 {
   private logger = new Logger(CkbExplorerTransactionLoader.name);
 
   constructor(private transactionService: CkbTransactionService) {}
 
   public getBatchFunction() {
-    return (hashes: string[]) => {
+    return async (hashes: string[]) => {
       this.logger.debug(`Loading CKB transactions from CkbExplorerService: ${hashes.join(', ')}`);
-      return Promise.all(
+      const results = await Promise.allSettled(
         hashes.map((key) => this.transactionService.getTransactionFromExplorer(key)),
       );
+      return results.map((result) => (result.status === 'fulfilled' ? result.value : null));
     };
   }
 }
 export type CkbExplorerTransactionLoaderType = DataLoader<
   string,
-  CkbExplorerInterface.DetailTransaction
+  CkbExplorerInterface.DetailTransaction | null
 >;
 export type CkbExplorerTransactionLoaderResponse = DataLoaderResponse<CkbExplorerTransactionLoader>;
