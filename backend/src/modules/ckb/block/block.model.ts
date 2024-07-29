@@ -2,10 +2,12 @@ import { toNumber } from 'lodash';
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
 import { CkbAddress } from '../address/address.model';
-import { FeeRateRange } from '../../bitcoin/block/block.model';
 import { CkbTransaction } from '../transaction/transaction.model';
 
-export type CkbBaseBlock = Omit<CkbBlock, 'totalFee' | 'feeRateRange' | 'miner' | 'transactions'>;
+export type CkbBaseBlock = Omit<
+  CkbBlock,
+  'totalFee' | 'feeRateRange' | 'miner' | 'reward' | 'transactions'
+>;
 
 @ObjectType({ description: 'CKB Block' })
 export class CkbBlock {
@@ -27,11 +29,11 @@ export class CkbBlock {
   @Field(() => Float)
   totalFee: number;
 
-  @Field(() => FeeRateRange)
-  feeRateRange: FeeRateRange;
-
   @Field(() => CkbAddress)
   miner: CkbAddress;
+
+  @Field(() => Float)
+  reward: number;
 
   @Field(() => [CkbTransaction])
   transactions: CkbTransaction[];

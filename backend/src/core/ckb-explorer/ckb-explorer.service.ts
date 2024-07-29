@@ -3,22 +3,37 @@ import { ConfigService } from '@nestjs/config';
 import axios, { Axios } from 'axios';
 import { Env } from 'src/env';
 import {
+  AddressInfo,
+  AddressTransactionSortType,
   Block,
   BlockList,
   BlockSortType,
   CkbExplorerResponse,
+  DetailTransaction,
   NonPaginatedResponse,
   PaginatedResponse,
+  RgbppDigest,
   RgbppTransaction,
   Transaction,
   TransactionSortType,
   XUDT,
   XUDTTag,
+  Statistics,
+  TransactionFeesStatistic,
 } from './ckb-explorer.interface';
 
 type BasePaginationParams = {
   page?: number;
   pageSize?: number;
+};
+
+export type GetAddressParams = BasePaginationParams & {
+  address: string;
+};
+
+export type GetAddressTransactionsParams = BasePaginationParams & {
+  address: string;
+  sort?: AddressTransactionSortType;
 };
 
 type GetBlockListParams = BasePaginationParams & {
@@ -57,6 +72,37 @@ export class CkbExplorerService {
       this.logger.debug(`${request.method?.toUpperCase()} ${request.url}`);
       return request;
     });
+  }
+
+  // https://github.com/nervosnetwork/ckb-explorer-frontend/blob/b9dd537f836e8c827f1d4741e07c84484170d671/src/pages/Address/AddressPage.tsx#L50-L54
+  public async getAddress({
+    address,
+    page = 1,
+    pageSize = 10,
+  }: GetAddressParams): Promise<PaginatedResponse<AddressInfo>> {
+    const response = await this.request.get(`/v1/addresses/${address}`, {
+      params: {
+        page,
+        pageSize,
+      },
+    });
+    return response.data;
+  }
+
+  public async getAddressTransactions({
+    address,
+    sort,
+    page = 1,
+    pageSize = 10,
+  }: GetAddressTransactionsParams): Promise<PaginatedResponse<Transaction>> {
+    const response = await this.request.get(`/v1/address_transactions/${address}`, {
+      params: {
+        sort,
+        page,
+        pageSize,
+      },
+    });
+    return response.data;
   }
 
   public async getBlockList({
@@ -109,8 +155,29 @@ export class CkbExplorerService {
     return response.data;
   }
 
-  public async getTransaction(txHash: string): Promise<NonPaginatedResponse<Transaction>> {
+  public async getAddressRgbppCells({
+    address,
+    sort,
+    page = 1,
+    pageSize = 10,
+  }: GetAddressTransactionsParams): Promise<PaginatedResponse<AddressInfo>> {
+    const response = await this.request.get(`/v2/bitcoin_addresses/${address}/rgb_cells`, {
+      params: {
+        sort,
+        page,
+        pageSize,
+      },
+    });
+    return response.data;
+  }
+
+  public async getTransaction(txHash: string): Promise<NonPaginatedResponse<DetailTransaction>> {
     const response = await this.request.get(`/v1/transactions/${txHash}`);
+    return response.data;
+  }
+
+  public async getRgbppDigest(txHash: string): Promise<CkbExplorerResponse<RgbppDigest>> {
+    const response = await this.request.get(`/v2/ckb_transactions/${txHash}/rgb_digest`);
     return response.data;
   }
 
@@ -154,6 +221,18 @@ export class CkbExplorerService {
     const response = await this.request.get(
       `/v1/udt_transactions/${typeHash}?${params.toString()}`,
     );
+    return response.data;
+  }
+
+  public async getStatistics(): Promise<NonPaginatedResponse<Statistics>> {
+    const response = await this.request.get('/v1/statistics');
+    return response.data;
+  }
+
+  public async getTransactionFeesStatistic(): Promise<
+    NonPaginatedResponse<TransactionFeesStatistic>
+  > {
+    const response = await this.request.get('/v2/statistics/transaction_fees');
     return response.data;
   }
 }

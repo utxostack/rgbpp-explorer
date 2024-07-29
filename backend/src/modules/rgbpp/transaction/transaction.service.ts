@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { RgbppDigest } from 'src/core/ckb-explorer/ckb-explorer.interface';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
 import {
@@ -41,5 +42,10 @@ export class RgbppTransactionService {
     // TODO: implement this method
     const response = await this.bitcoinApiService.getTx({ txid });
     return null;
+  }
+
+  public async getRgbppDigest(txHash: string): Promise<RgbppDigest | null> {
+    const response = await this.ckbExplorerService.getRgbppDigest(txHash);
+    return response.data ?? null;
   }
 }

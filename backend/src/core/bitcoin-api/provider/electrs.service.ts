@@ -1,6 +1,13 @@
 import axios, { AxiosInstance } from 'axios';
-import { Address, Block, RecommendedFees, Transaction, UTXO } from '../bitcoin-api.schema';
 import { IBitcoinDataProvider } from '../bitcoin-api.interface';
+import {
+  Address,
+  Block,
+  OutSpend,
+  RecommendedFees,
+  Transaction,
+  UTXO,
+} from '../bitcoin-api.schema';
 
 export class ElectrsService implements IBitcoinDataProvider {
   private request: AxiosInstance;
@@ -25,10 +32,10 @@ export class ElectrsService implements IBitcoinDataProvider {
     return response.data;
   }
 
-  public async getAddressTxs({ address, after_txid }: { address: string; after_txid?: string }) {
+  public async getAddressTxs({ address, afterTxid }: { address: string; afterTxid?: string }) {
     let url = `/address/${address}/txs`;
-    if (after_txid) {
-      url += `?after_txid=${after_txid}`;
+    if (afterTxid) {
+      url += `?after_txid=${afterTxid}`;
     }
     const response = await this.request.get<Transaction[]>(url);
     return response.data.map((tx: unknown) => Transaction.parse(tx));
@@ -44,13 +51,27 @@ export class ElectrsService implements IBitcoinDataProvider {
     return response.data;
   }
 
+  public async getTxOutSpend({ txid, vout }: { txid: string; vout: number }) {
+    const response = await this.request.get<OutSpend>(`/tx/${txid}/outspend/${vout}`);
+    return OutSpend.parse(response.data);
+  }
+
+  public async getTxOutSpends({ txid }: { txid: string }) {
+    const response = await this.request.get<OutSpend[]>(`/tx/${txid}/outspends`);
+    return response.data.map((outSpend) => OutSpend.parse(outSpend));
+  }
+
   public async getBlock({ hash }: { hash: string }) {
     const response = await this.request.get<Block>(`/block/${hash}`);
     return Block.parse(response.data);
   }
 
-  public async getBlockTxs({ hash }: { hash: string }) {
-    const response = await this.request.get<Transaction[]>(`/block/${hash}/txs`);
+  public async getBlockTxs({ hash, startIndex }: { hash: string; startIndex?: number }) {
+    let url = `/block/${hash}/txs`;
+    if (startIndex) {
+      url += `/${startIndex}`;
+    }
+    const response = await this.request.get<Transaction[]>(url);
     return response.data.map((tx: unknown) => Transaction.parse(tx));
   }
 

@@ -1,3 +1,4 @@
+import DataLoader from 'dataloader';
 import { Injectable, Logger } from '@nestjs/common';
 import { NestDataLoader } from '@applifting-io/nestjs-dataloader';
 import { DataLoaderResponse } from 'src/common/type/dataloader';
@@ -19,30 +20,45 @@ export class BitcoinBlockLoader implements NestDataLoader<string, BitcoinApi.Blo
           if (!hash.startsWith('0')) {
             hash = await this.bitcoinApiService.getBlockHeight({ height: parseInt(key, 10) });
           }
-          const block = await this.bitcoinApiService.getBlock({ hash });
-          return block;
+          return this.bitcoinApiService.getBlock({ hash });
         }),
       );
     };
   }
 }
+export type BitcoinBlockLoaderType = DataLoader<string, BitcoinApi.Block>;
 export type BitcoinBlockLoaderResponse = DataLoaderResponse<BitcoinBlockLoader>;
+
+export interface BitcoinBlockTransactionsLoaderParams {
+  hash: string;
+  startIndex?: number;
+}
 
 @Injectable()
 export class BitcoinBlockTransactionsLoader
-  implements NestDataLoader<string, BitcoinApi.Transaction[]>
+  implements NestDataLoader<BitcoinBlockTransactionsLoaderParams, BitcoinApi.Transaction[]>
 {
   private logger = new Logger(BitcoinBlockLoader.name);
 
   constructor(private bitcoinApiService: BitcoinApiService) {}
 
   public getBatchFunction() {
-    return (hashes: string[]) => {
-      // TODO: this method only returns the first 25 transactions of each block
-      this.logger.debug(`Loading bitcoin block transactions: ${hashes.join(', ')}`);
-      return Promise.all(hashes.map((hash) => this.bitcoinApiService.getBlockTxs({ hash })));
+    return (batchProps: BitcoinBlockTransactionsLoaderParams[]) => {
+      this.logger.debug(`Loading bitcoin block transactions: ${batchProps}`);
+      return Promise.all(
+        batchProps.map((props) =>
+          this.bitcoinApiService.getBlockTxs({
+            hash: props.hash,
+            startIndex: props.startIndex,
+          }),
+        ),
+      );
     };
   }
 }
+export type BitcoinBlockTransactionsLoaderType = DataLoader<
+  BitcoinBlockTransactionsLoaderParams,
+  BitcoinApi.Transaction[]
+>;
 export type BitcoinBlockTransactionsLoaderResponse =
   DataLoaderResponse<BitcoinBlockTransactionsLoader>;
