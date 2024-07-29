@@ -65,7 +65,7 @@ export function LastRgbppTxnsTable() {
       <Table.Body>
         {data?.rgbppLatestTransactions.txs.map((tx) => {
           const txHash = resolveRGBppTxHash(tx)
-          const cellDiff = resolveCellDiff(tx)
+          const cellDiff = resolveCellDiff(tx.ckbTransaction)
           return (
             <Table.Row key={tx.ckbTxHash}>
               <Table.Cell>
