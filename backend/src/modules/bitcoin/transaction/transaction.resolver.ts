@@ -11,6 +11,8 @@ import {
   RgbppTransactionLoader,
   RgbppTransactionLoaderType,
 } from 'src/modules/rgbpp/transaction/transaction.dataloader';
+import { BitcoinBaseBlock, BitcoinBlock } from '../block/block.model';
+import { BitcoinBlockLoader, BitcoinBlockLoaderType } from '../block/block.dataloader';
 
 @Resolver(() => BitcoinTransaction)
 export class BitcoinTransactionResolver {
@@ -37,6 +39,15 @@ export class BitcoinTransactionResolver {
     // TODO: should this resolver be refactored with a dataloader?
     const info = await this.bitcoinApiService.getBlockchainInfo();
     return info.blocks - tx.blockHeight + 1;
+  }
+
+  @ResolveField(() => BitcoinBlock)
+  public async block(
+    @Parent() tx: BitcoinBaseTransaction,
+    @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
+  ): Promise<BitcoinBaseBlock | null> {
+    const block = await blockLoader.load(tx.blockHash);
+    return BitcoinBlock.from(block);
   }
 
   @ResolveField(() => RgbppTransaction)

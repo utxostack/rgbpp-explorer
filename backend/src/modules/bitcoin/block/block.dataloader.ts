@@ -20,7 +20,8 @@ export class BitcoinBlockLoader implements NestDataLoader<string, BitcoinApi.Blo
           if (!hash.startsWith('0')) {
             hash = await this.bitcoinApiService.getBlockHeight({ height: parseInt(key, 10) });
           }
-          return this.bitcoinApiService.getBlock({ hash });
+          const block = await this.bitcoinApiService.getBlock({ hash });
+          return block;
         }),
       );
       return results.map((result) => (result.status === 'fulfilled' ? result.value : null));

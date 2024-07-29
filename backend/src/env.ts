@@ -7,7 +7,7 @@ export const envSchema = z
     ENABLED_GRAPHQL_PLAYGROUND: z.boolean().default(true),
 
     // DATABASE_URL: z.string(),
-    // REDIS_URL: z.string(),
+    REDIS_URL: z.string(),
 
     BITCOIN_PRIMARY_DATA_PROVIDER: z.enum(['mempool', 'electrs']),
 
