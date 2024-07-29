@@ -20,12 +20,15 @@ import {
 
 @Resolver(() => CkbBlock)
 export class CkbBlockResolver {
-  @Query(() => CkbBlock, { name: 'ckbBlock' })
+  @Query(() => CkbBlock, { name: 'ckbBlock', nullable: true })
   public async getBlock(
     @Args('heightOrHash', { type: () => String }) heightOrHash: string,
     @Loader(CkbRpcBlockLoader) rpcBlockLoader: CkbRpcBlockLoaderType,
-  ): Promise<CkbBaseBlock> {
+  ): Promise<CkbBaseBlock | null> {
     const block = await rpcBlockLoader.load(heightOrHash);
+    if (!block) {
+      return null;
+    }
     return CkbBlock.from(block);
   }
 

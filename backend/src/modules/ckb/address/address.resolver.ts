@@ -33,8 +33,7 @@ export class CkbAddressResolver {
         address,
       };
     } catch (e) {
-      this.logger.error(`getCkbAddress error: ${address} is not a valid CKB address`);
-      return null;
+      throw new Error('Invalid CKB address');
     }
   }
 

@@ -15,12 +15,15 @@ import {
 export class BitcoinBlockResolver {
   private logger = new Logger(BitcoinBlockResolver.name);
 
-  @Query(() => BitcoinBlock, { name: 'btcBlock' })
+  @Query(() => BitcoinBlock, { name: 'btcBlock', nullable: true })
   public async getBlock(
     @Args('hashOrHeight', { type: () => String }) hashOrHeight: string,
     @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
-  ): Promise<BitcoinBaseBlock> {
+  ): Promise<BitcoinBaseBlock | null> {
     const block = await blockLoader.load(hashOrHeight);
+    if (!block) {
+      return null;
+    }
     return BitcoinBlock.from(block);
   }
 
