@@ -11,7 +11,7 @@ export function FailedFallback() {
     <VStack gap={0} textAlign="center">
       <FailedSVG w="200px" h="200px" />
       <Text fontSize="14px" fontWeight="semibold" color="text.third">
-        <Trans>Loading failed, please wait</Trans>
+        <Trans>Load failed, please wait</Trans>
       </Text>
     </VStack>
   )
