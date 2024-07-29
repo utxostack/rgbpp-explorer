@@ -39,7 +39,6 @@ type CkbCell {
 type CkbAddress {
   address: String!
   shannon: Float!
-  rgbppCellsCount: Float!
   transactionsCount: Float!
   transactions(page: Float, pageSize: Float): [CkbTransaction!]!
 }
@@ -91,14 +90,21 @@ type CkbChainInfo {
   fees: CkbFees!
 }
 
+"""Rgbpp Address"""
+type RgbppAddress {
+  address: String!
+  utxosCount: Float!
+  cellsCount: Float!
+}
+
 """Bitcoin Address"""
 type BitcoinAddress {
   address: String!
   satoshi: Float!
   pendingSatoshi: Float!
-  rgbppUtxosCount: Float!
   transactionsCount: Float!
   transactions(afterTxid: String): [BitcoinTransaction!]!
+  rgbpp: RgbppAddress!
 }
 
 """Bitcoin Output Spend Status"""
@@ -257,6 +263,7 @@ type Query {
   btcBlock(hashOrHeight: String!): BitcoinBlock!
   btcTransaction(txid: String!): BitcoinTransaction
   btcAddress(address: String!): BitcoinAddress
+  rgbppAddress(address: String!): RgbppAddress
   rgbppLatestTransactions(page: Int, pageSize: Int): RgbppLatestTransactionList!
   rgbppTransaction(txidOrTxHash: String!): RgbppTransaction
   rgbppCoins(page: Int, pageSize: Int): RgbppCoinList!

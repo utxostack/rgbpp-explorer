@@ -1,5 +1,6 @@
 import { Field, Float, ObjectType } from '@nestjs/graphql';
 import { BitcoinTransaction } from '../transaction/transaction.model';
+import { RgbppAddress } from 'src/modules/rgbpp/address/address.model';
 
 export type BitcoinBaseAddress = Pick<BitcoinAddress, 'address'>;
 
@@ -15,13 +16,13 @@ export class BitcoinAddress {
   pendingSatoshi: number;
 
   @Field(() => Float)
-  rgbppUtxosCount: number;
-
-  @Field(() => Float)
   transactionsCount: number;
 
   @Field(() => [BitcoinTransaction])
   transactions: BitcoinTransaction[];
+
+  @Field(() => RgbppAddress)
+  rgbpp: RgbppAddress;
 
   public static from(address: string): BitcoinBaseAddress {
     return {
