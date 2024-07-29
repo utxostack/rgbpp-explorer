@@ -8,7 +8,7 @@ import {
   BitcoinAddressTransactionsLoader,
   BitcoinAddressTransactionsLoaderType,
 } from './address.dataloader';
-import { RgbppAddress } from 'src/modules/rgbpp/address/address.model';
+import { RgbppAddress, RgbppBaseAddress } from 'src/modules/rgbpp/address/address.model';
 
 @Resolver(() => BitcoinAddress)
 export class BitcoinAddressResolver {
@@ -59,7 +59,7 @@ export class BitcoinAddressResolver {
   }
 
   @ResolveField(() => RgbppAddress)
-  public async rgbpp(@Parent() address: BitcoinBaseAddress) {
+  public async rgbppAddress(@Parent() address: BitcoinBaseAddress): Promise<RgbppBaseAddress> {
     return RgbppAddress.from(address.address);
   }
 }

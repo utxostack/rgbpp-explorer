@@ -22,7 +22,7 @@ export class BitcoinAddress {
   transactions: BitcoinTransaction[];
 
   @Field(() => RgbppAddress)
-  rgbpp: RgbppAddress;
+  rgbppAddress: RgbppAddress;
 
   public static from(address: string): BitcoinBaseAddress {
     return {

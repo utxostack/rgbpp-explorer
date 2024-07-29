@@ -104,7 +104,7 @@ type BitcoinAddress {
   pendingSatoshi: Float!
   transactionsCount: Float!
   transactions(afterTxid: String): [BitcoinTransaction!]!
-  rgbpp: RgbppAddress!
+  rgbppAddress: RgbppAddress!
 }
 
 """Bitcoin Output Spend Status"""
