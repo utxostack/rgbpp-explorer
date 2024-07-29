@@ -1,3 +1,5 @@
+import { RPC } from '@ckb-lumos/rpc';
+
 export interface CellDep {
   dep_type: string;
   out_point: {
@@ -84,4 +86,24 @@ export interface BlockEconomicState {
     secondary: string;
   };
   txs_fee: string;
+}
+
+export interface SearchKey {
+  script: {
+    code_hash: string;
+    hash_type: 'data' | 'type' | 'data1' | 'data2';
+    args: string;
+  };
+  script_type: 'lock' | 'type';
+}
+
+export interface GetTransactionsResult {
+  last_cursor: string;
+  objects: {
+    block_number: string;
+    io_index: string;
+    io_type: string;
+    tx_hash: string;
+    tx_index: string;
+  }[];
 }

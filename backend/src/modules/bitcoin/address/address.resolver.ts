@@ -1,6 +1,5 @@
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
 import { BitcoinBaseTransaction, BitcoinTransaction } from '../transaction/transaction.model';
 import { BitcoinAddress, BitcoinBaseAddress } from './address.model';
 import {
@@ -9,11 +8,10 @@ import {
   BitcoinAddressTransactionsLoader,
   BitcoinAddressTransactionsLoaderType,
 } from './address.dataloader';
+import { RgbppAddress, RgbppBaseAddress } from 'src/modules/rgbpp/address/address.model';
 
 @Resolver(() => BitcoinAddress)
 export class BitcoinAddressResolver {
-  constructor(private ckbExplorerService: CkbExplorerService) {}
-
   @Query(() => BitcoinAddress, { name: 'btcAddress', nullable: true })
   public async getBtcAddress(@Args('address') address: string): Promise<BitcoinBaseAddress> {
     return BitcoinAddress.from(address);
@@ -38,14 +36,6 @@ export class BitcoinAddressResolver {
   }
 
   @ResolveField(() => Float)
-  public async rgbppUtxosCount(@Parent() address: BitcoinBaseAddress): Promise<number> {
-    const cells = await this.ckbExplorerService.getAddressRgbppCells({
-      address: address.address,
-    });
-    return cells.meta.total;
-  }
-
-  @ResolveField(() => Float)
   public async transactionsCount(
     @Parent() address: BitcoinBaseAddress,
     @Loader(BitcoinAddressLoader) addressLoader: BitcoinAddressLoaderType,
@@ -66,5 +56,10 @@ export class BitcoinAddressResolver {
       address: address.address,
       afterTxid: afterTxid,
     });
+  }
+
+  @ResolveField(() => RgbppAddress)
+  public async rgbppAddress(@Parent() address: BitcoinBaseAddress): Promise<RgbppBaseAddress> {
+    return RgbppAddress.from(address.address);
   }
 }

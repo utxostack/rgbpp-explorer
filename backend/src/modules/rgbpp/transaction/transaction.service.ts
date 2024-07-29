@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { RgbppDigest } from 'src/core/ckb-explorer/ckb-explorer.interface';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
@@ -7,13 +7,21 @@ import {
   RgbppBaseTransaction,
   RgbppLatestTransactionList,
 } from './transaction.model';
+import { ConfigService } from '@nestjs/config';
+import { Env } from 'src/env';
+import { CkbRpcWebsocketService } from 'src/core/ckb-rpc/ckb-rpc-websocket.service';
+import { buildRgbppLockArgs, genRgbppLockScript } from '@rgbpp-sdk/ckb/lib/utils/rgbpp';
 
 @Injectable()
 export class RgbppTransactionService {
+  private logger = new Logger(RgbppTransactionService.name);
+
   constructor(
     private ckbExplorerService: CkbExplorerService,
+    private ckbRpcService: CkbRpcWebsocketService,
     private bitcoinApiService: BitcoinApiService,
-  ) {}
+    private configService: ConfigService<Env>,
+  ) { }
 
   public async getLatestTransactions(
     page: number,
@@ -39,9 +47,50 @@ export class RgbppTransactionService {
   }
 
   public async getTransactionByBtcTxid(txid: string): Promise<RgbppBaseTransaction | null> {
-    // TODO: implement this method
-    const response = await this.bitcoinApiService.getTx({ txid });
+    const btcTx = await this.bitcoinApiService.getTx({ txid });
+    const ckbTxs = await Promise.all(
+      btcTx.vout.map(async (_, index) => {
+        const args = buildRgbppLockArgs(index, btcTx.txid);
+        const lock = genRgbppLockScript(args, this.configService.get('NETWORK') === 'mainnet');
+        return this.ckbRpcService.getTransactions(
+          {
+            script: {
+              code_hash: lock.codeHash,
+              hash_type: lock.hashType,
+              args: lock.args,
+            },
+            script_type: 'lock',
+          },
+          'desc',
+          '0x64',
+        );
+      }),
+    );
+    for (const ckbTx of ckbTxs) {
+      if (ckbTx.objects.length > 0) {
+        const [tx] = ckbTx.objects;
+        const response = await this.ckbExplorerService.getTransaction(tx.tx_hash);
+        if (response.data.attributes.is_rgb_transaction) {
+          return RgbppTransaction.fromCkbTransaction(response.data.attributes);
+        }
+      }
+    }
     return null;
+  }
+
+  public async getTransaction(txidOrTxHash: string): Promise<RgbppBaseTransaction | null> {
+    let tx: RgbppBaseTransaction | null = null;
+    try {
+      tx = await this.getTransactionByCkbTxHash(txidOrTxHash);
+    } catch (err) {
+      this.logger.error(err);
+    }
+    try {
+      tx = await this.getTransactionByBtcTxid(txidOrTxHash);
+    } catch (err) {
+      this.logger.error(err);
+    }
+    return tx;
   }
 
   public async getRgbppDigest(txHash: string): Promise<RgbppDigest | null> {
