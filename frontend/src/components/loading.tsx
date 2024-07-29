@@ -13,10 +13,7 @@ export function Loading() {
           pos="absolute"
           top="0"
           left="0"
-          animation="steps-x 500ms steps(21) infinite"
-          // className={css({
-          //   '--steps-offset-x': '1609px',
-          // })}
+          animation="steps-x 800ms steps(21) infinite"
           style={
             {
               '--steps-offset-x': '-1752px',
