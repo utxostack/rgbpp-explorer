@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 
-import { getLocaleFromHeaders } from '@/app/[lang]/appRouterI18n'
+import { getLocaleFromHeaders } from '@/lib/get-locale-from-headers'
 
 export function GET() {
   const locale = getLocaleFromHeaders()

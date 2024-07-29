@@ -39,6 +39,16 @@ export default defineConfig({
   exclude: [],
   theme: {
     extend: {
+      keyframes: {
+        'steps-x': {
+          '0%': {
+            transform: 'translateX(0)',
+          },
+          '100%': {
+            transform: 'translateX(var(--steps-offset-x))',
+          },
+        },
+      },
       recipes: {
         button,
         iconButton,
@@ -79,6 +89,9 @@ export default defineConfig({
             value: '#0FF082',
             a10: {
               value: 'rgba(15,240,130,0.1)',
+            },
+            unspent: {
+              value: '#14E17D',
             },
           },
           border: {

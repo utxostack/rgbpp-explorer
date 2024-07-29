@@ -1,8 +1,11 @@
+'use client'
+
 import { t } from '@lingui/macro'
+import { useQuery } from '@tanstack/react-query'
 import { ReactNode } from 'react'
 import { Box, Grid, HStack, VStack } from 'styled-system/jsx'
 
-import { getI18nFromHeaders } from '@/app/[lang]/appRouterI18n'
+import { explorerGraphql } from '@/apis/explorer-graphql'
 import ArrowIcon from '@/assets/arrow.svg'
 import BchIcon from '@/assets/chains/bch.svg'
 import BsvIcon from '@/assets/chains/bsv.svg'
@@ -11,6 +14,8 @@ import CkbIcon from '@/assets/chains/ckb.svg'
 import UtxoStackIcon from '@/assets/chains/utxo-stack.svg'
 import Link from '@/components/ui/link'
 import { Text } from '@/components/ui/primitives/text'
+import { QueryKey } from '@/constants/query-key'
+import { formatNumber } from '@/lib/string/format-number'
 
 function FieldGroup({ fields }: { fields: Array<{ label: ReactNode; value: ReactNode }> }) {
   return (
@@ -26,11 +31,18 @@ function FieldGroup({ fields }: { fields: Array<{ label: ReactNode; value: React
 }
 
 export function NetworkCards() {
-  const i18n = getI18nFromHeaders()
+  const { data } = useQuery({
+    queryKey: [QueryKey.BlockHeightAndTxns24H],
+    async queryFn() {
+      return explorerGraphql.getBlockHeightAndTxns24H()
+    },
+    refetchInterval: 10000,
+  })
+
   return (
     <Grid w="100%" gridTemplateColumns="repeat(3, 1fr)">
       <Link
-        href="/"
+        href="/explorer/btc"
         display="flex"
         alignItems="start"
         flexDir="column"
@@ -45,25 +57,25 @@ export function NetworkCards() {
         <HStack gap="16px" w="100%">
           <BtcIcon w="48px" />
           <Text fontSize="22px" fontWeight="bold">
-            {t(i18n)`Bitcoin`}
+            {t`Bitcoin`}
           </Text>
           <ArrowIcon ml="auto" w="28px" />
         </HStack>
         <FieldGroup
           fields={[
             {
-              label: t(i18n)`Block Height`,
-              value: (10000000).toLocaleString(),
+              label: t`Block Height`,
+              value: formatNumber(data?.btcChainInfo?.tipBlockHeight),
             },
             {
-              label: t(i18n)`Txns(24H)`,
-              value: (10000000).toLocaleString(),
+              label: t`Txns(24H)`,
+              value: <Text opacity={0.6}>{t`Coming Soon`}</Text>,
             },
           ]}
         />
       </Link>
       <Link
-        href="/"
+        href="/explorer/ckb"
         display="flex"
         flexDir="column"
         justifyContent="space-between"
@@ -78,19 +90,19 @@ export function NetworkCards() {
         <HStack gap="16px" w="100%">
           <CkbIcon w="48px" />
           <Text fontSize="22px" fontWeight="bold">
-            {t(i18n)`CKB`}
+            {t`CKB`}
           </Text>
           <ArrowIcon ml="auto" w="28px" />
         </HStack>
         <FieldGroup
           fields={[
             {
-              label: t(i18n)`Block Height`,
-              value: (10000000).toLocaleString(),
+              label: t`Block Height`,
+              value: formatNumber(data?.ckbChainInfo?.tipBlockNumber),
             },
             {
-              label: t(i18n)`Txns(24H)`,
-              value: (10000000).toLocaleString(),
+              label: t`Txns(24H)`,
+              value: <Text opacity={0.6}>{t`Coming Soon`}</Text>,
             },
           ]}
         />

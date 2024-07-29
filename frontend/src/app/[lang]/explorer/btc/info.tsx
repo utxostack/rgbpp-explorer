@@ -1,14 +1,13 @@
 import { t } from '@lingui/macro'
+import { Grid, HStack, VStack } from 'styled-system/jsx'
 
-import { getI18nFromHeaders } from '@/app/[lang]/appRouterI18n'
 import BtcIcon from '@/assets/chains/btc.svg'
 import SpeedDropIcon from '@/assets/speed/drop.svg'
 import SpeedHighIcon from '@/assets/speed/high.svg'
 import SpeedLowIcon from '@/assets/speed/low.svg'
 import SpeedMediumIcon from '@/assets/speed/medium.svg'
 import { Heading, Text } from '@/components/ui'
-
-import { Grid, HStack, VStack } from '../../../../../styled-system/jsx'
+import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 
 export function Info() {
   const i18n = getI18nFromHeaders()

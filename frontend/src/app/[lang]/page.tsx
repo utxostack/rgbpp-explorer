@@ -1,13 +1,13 @@
 import { t } from '@lingui/macro'
 import { Box, Center, Flex } from 'styled-system/jsx'
 
-import { getI18nFromHeaders } from '@/app/[lang]/appRouterI18n'
 import HomeBgSVG from '@/assets/home-bg.svg'
 import { HomeQuickInfo } from '@/components/home-quick-info'
 import { LastRgbppTxnsTable } from '@/components/last-rgbpp-txns-table'
 import { NetworkCards } from '@/components/network-cards'
 import { SearchBar } from '@/components/search-bar'
 import { Heading } from '@/components/ui'
+import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 
 export default function Home() {
   const i18n = getI18nFromHeaders()

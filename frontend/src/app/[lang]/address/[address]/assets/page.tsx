@@ -1,5 +1,5 @@
-import { Box } from 'styled-system/jsx'
+import { ComingSoon } from '@/components/coming-soon'
 
 export default function Page() {
-  return <Box>Assets</Box>
+  return <ComingSoon />
 }
