@@ -76,7 +76,7 @@ msgstr "Block {0}"
 #: src/components/btc/btc-transaction-overflow.tsx:32
 #: src/components/ckb/ckb-transaction-overflow.tsx:32
 #: src/components/network-cards.tsx:67
-#: src/components/network-cards.tsx:100
+#: src/components/network-cards.tsx:104
 msgid "Block Height"
 msgstr "Block Height"
 
@@ -113,7 +113,7 @@ msgstr "bytes"
 #: src/components/ckb/ckb-transaction-overflow.tsx:59
 #: src/components/footer.tsx:90
 #: src/components/navbar.tsx:46
-#: src/components/network-cards.tsx:93
+#: src/components/network-cards.tsx:97
 msgid "CKB"
 msgstr "CKB"
 
@@ -133,12 +133,16 @@ msgstr "Coin"
 msgid "Coins"
 msgstr "Coins"
 
+#: src/components/network-cards.tsx:134
+msgid "Coming"
+msgstr "Coming"
+
 #: src/components/btc/btc-address-overflow.tsx:61
 #: src/components/ckb/ckb-address-overflow.tsx:36
 #: src/components/ckb/ckb-address-overflow.tsx:40
 #: src/components/ckb/ckb-address-overflow.tsx:58
-#: src/components/network-cards.tsx:72
-#: src/components/network-cards.tsx:105
+#: src/components/network-cards.tsx:74
+#: src/components/network-cards.tsx:111
 msgid "Coming Soon"
 msgstr "Coming Soon"
 
@@ -433,7 +437,7 @@ msgstr "Txns"
 
 #: src/app/[lang]/assets/coins/page.tsx:29
 #: src/components/network-cards.tsx:71
-#: src/components/network-cards.tsx:104
+#: src/components/network-cards.tsx:108
 msgid "Txns(24H)"
 msgstr "Txns(24H)"
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { t } from '@lingui/macro'
+import { Trans } from '@lingui/macro'
 import { useQuery } from '@tanstack/react-query'
 import { ReactNode } from 'react'
 import { Box, Grid, HStack, VStack } from 'styled-system/jsx'
@@ -57,19 +57,23 @@ export function NetworkCards() {
         <HStack gap="16px" w="100%">
           <BtcIcon w="48px" />
           <Text fontSize="22px" fontWeight="bold">
-            {t`Bitcoin`}
+            <Trans>Bitcoin</Trans>
           </Text>
           <ArrowIcon ml="auto" w="28px" />
         </HStack>
         <FieldGroup
           fields={[
             {
-              label: t`Block Height`,
+              label: <Trans>Block Height</Trans>,
               value: formatNumber(data?.btcChainInfo?.tipBlockHeight),
             },
             {
-              label: t`Txns(24H)`,
-              value: <Text opacity={0.6}>{t`Coming Soon`}</Text>,
+              label: <Trans>Txns(24H)</Trans>,
+              value: (
+                <Text opacity={0.6}>
+                  <Trans>Coming Soon</Trans>
+                </Text>
+              ),
             },
           ]}
         />
@@ -90,19 +94,23 @@ export function NetworkCards() {
         <HStack gap="16px" w="100%">
           <CkbIcon w="48px" />
           <Text fontSize="22px" fontWeight="bold">
-            {t`CKB`}
+            <Trans>CKB</Trans>
           </Text>
           <ArrowIcon ml="auto" w="28px" />
         </HStack>
         <FieldGroup
           fields={[
             {
-              label: t`Block Height`,
+              label: <Trans>Block Height</Trans>,
               value: formatNumber(data?.ckbChainInfo?.tipBlockNumber),
             },
             {
-              label: t`Txns(24H)`,
-              value: <Text opacity={0.6}>{t`Coming Soon`}</Text>,
+              label: <Trans>Txns(24H)</Trans>,
+              value: (
+                <Text opacity={0.6}>
+                  <Trans>Coming Soon</Trans>
+                </Text>
+              ),
             },
           ]}
         />
@@ -123,7 +131,7 @@ export function NetworkCards() {
           </HStack>
         </HStack>
         <Box fontWeight="semibold" py="10px" px="40px" rounded="100px" bg="bg.input" mx="auto">
-          Coming
+          <Trans>Coming</Trans>
         </Box>
       </VStack>
     </Grid>
