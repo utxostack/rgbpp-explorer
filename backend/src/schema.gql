@@ -44,6 +44,53 @@ type CkbAddress {
   transactions(page: Float, pageSize: Float): [CkbTransaction!]!
 }
 
+"""CKB Block"""
+type CkbBlock {
+  version: Int!
+  hash: String!
+  number: Int!
+  timestamp: Timestamp!
+  transactionsCount: Int!
+  totalFee: Float!
+  miner: CkbAddress!
+  reward: Float!
+  transactions: [CkbTransaction!]!
+}
+
+"""
+`Date` type as integer. Type represents date and time as number of milliseconds from start of UNIX epoch.
+"""
+scalar Timestamp
+
+"""CKB Transaction"""
+type CkbTransaction {
+  isCellbase: Boolean!
+  blockNumber: Float!
+  hash: String!
+  fee: Float!
+  feeRate: Float!
+  size: Float!
+  inputs: [CkbCell!]!
+  outputs: [CkbCell!]!
+  block: CkbBlock!
+  confirmed: Boolean!
+  confirmations: Float!
+}
+
+"""CKB Fees"""
+type CkbFees {
+  fast: Float!
+  slow: Float!
+  average: Float!
+}
+
+"""CKB ChainInfo"""
+type CkbChainInfo {
+  tipBlockNumber: Float!
+  transactionsCountIn24Hours: Float!
+  fees: CkbFees!
+}
+
 """Bitcoin Address"""
 type BitcoinAddress {
   address: String!
@@ -100,81 +147,6 @@ type BitcoinTransaction {
   feeRate: Float!
   confirmed: Boolean!
   confirmations: Float!
-}
-
-"""
-`Date` type as integer. Type represents date and time as number of milliseconds from start of UNIX epoch.
-"""
-scalar Timestamp
-
-"""Fee Rate Range"""
-type FeeRateRange {
-  min: Float!
-  max: Float!
-}
-
-"""Bitcoin Block"""
-type BitcoinBlock {
-  id: String!
-  height: Float!
-  version: Int!
-  timestamp: Timestamp!
-  size: Float!
-  weight: Float!
-  bits: Float!
-  difficulty: Float!
-  miner: BitcoinAddress!
-  reward: Float!
-  totalFee: Float!
-  feeRateRange: FeeRateRange!
-  transactionsCount: Float!
-  transactions(
-    """For pagination, must be a multiplication of 25"""
-    startIndex: Float
-  ): [BitcoinTransaction!]!
-}
-
-"""CKB Block"""
-type CkbBlock {
-  version: Int!
-  hash: String!
-  number: Int!
-  timestamp: Timestamp!
-  transactionsCount: Int!
-  totalFee: Float!
-  feeRateRange: FeeRateRange!
-  miner: CkbAddress!
-  reward: Float!
-  transactions: [CkbTransaction!]!
-}
-
-"""CKB Transaction"""
-type CkbTransaction {
-  isCellbase: Boolean!
-  blockNumber: Float!
-  hash: String!
-  fee: Float!
-  feeRate: Float!
-  size: Float!
-  inputs: [CkbCell!]!
-  outputs: [CkbCell!]!
-  block: CkbBlock!
-  confirmed: Boolean!
-  confirmations: Float!
-}
-
-"""CKB Fees"""
-type CkbFees {
-  fast: Float!
-  slow: Float!
-  average: Float!
-}
-
-"""CKB ChainInfo"""
-type CkbChainInfo {
-  tipBlockNumber: Float!
-  transactionsCountIn24Hours: Float!
-  fees: CkbFees!
 }
 
 """RGB++ Transaction"""
@@ -247,6 +219,33 @@ type BitcoinChainInfo {
   difficulty: Float!
   transactionsCountIn24Hours: Float!
   fees: BitcoinFees!
+}
+
+"""Fee Rate Range"""
+type FeeRateRange {
+  min: Float!
+  max: Float!
+}
+
+"""Bitcoin Block"""
+type BitcoinBlock {
+  id: String!
+  height: Float!
+  version: Int!
+  timestamp: Timestamp!
+  size: Float!
+  weight: Float!
+  bits: Float!
+  difficulty: Float!
+  miner: BitcoinAddress!
+  reward: Float!
+  totalFee: Float!
+  feeRateRange: FeeRateRange!
+  transactionsCount: Float!
+  transactions(
+    """For pagination, must be a multiplication of 25"""
+    startIndex: Float
+  ): [BitcoinTransaction!]!
 }
 
 type Query {
