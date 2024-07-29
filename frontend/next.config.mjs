@@ -2,14 +2,12 @@
 const nextConfig = {
   reactStrictMode: true,
   experimental: {
-    swcPlugins: [["@lingui/swc-plugin", {}]],
+    swcPlugins: [['@lingui/swc-plugin', {}]],
     esmExternals: true,
     gzipSize: true,
   },
   webpack(config) {
-    const fileLoaderRule = config.module.rules.find((rule) =>
-        rule.test?.test?.('.svg'),
-    )
+    const fileLoaderRule = config.module.rules.find((rule) => rule.test?.test?.('.svg'))
     config.module.rules.push(
       {
         ...fileLoaderRule,
@@ -37,8 +35,8 @@ const nextConfig = {
                 ));
                 
                 ${variables.exports};`
-              }
-            }
+              },
+            },
           },
         ],
       },
@@ -46,6 +44,6 @@ const nextConfig = {
     fileLoaderRule.exclude = /\.svg$/i
     return config
   },
-};
+}
 
-export default nextConfig;
+export default nextConfig

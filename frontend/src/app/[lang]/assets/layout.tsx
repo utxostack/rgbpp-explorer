@@ -1,8 +1,8 @@
 import { t } from '@lingui/macro'
 import type { PropsWithChildren } from 'react'
 
-import { getI18nFromHeaders } from '@/app/[lang]/appRouterI18n'
 import { LinkTabs } from '@/components/link-tabs'
+import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 
 import { VStack } from '../../../../styled-system/jsx'
 

@@ -1,6 +1,5 @@
 import { truncateMiddle } from '@/lib/string/truncate-middle'
-import { CkbAddress } from '@/lib/types/address'
 
-export function formatCkbAddress(ckbAddress: CkbAddress) {
+export function formatCkbAddress(ckbAddress: string) {
   return truncateMiddle(ckbAddress)
 }

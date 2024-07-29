@@ -17,6 +17,26 @@ const StyledLink = styled(NextLink)
 export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link({ children, ...props }, ref) {
   const { i18n } = useLingui()
   const locale = props.locale ?? i18n.locale
+
+  if (typeof props.href === 'string' && (props.href.startsWith('https://') || props.href.startsWith('http://'))) {
+    return (
+      <StyledLink ref={ref} {...props} href={props.href}>
+        {children}
+      </StyledLink>
+    )
+  }
+
+  if (
+    typeof props.href === 'object' &&
+    (props.href.pathname?.startsWith('https://') || props.href.pathname?.startsWith('http://'))
+  ) {
+    return (
+      <StyledLink ref={ref} {...props} href={props.href}>
+        {children}
+      </StyledLink>
+    )
+  }
+
   const href =
     typeof props.href === 'string'
       ? `/${locale}${props.href}`

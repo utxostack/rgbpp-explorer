@@ -1,13 +1,13 @@
 import { t } from '@lingui/macro'
 import { Center, Flex, Grid, HStack, VStack } from 'styled-system/jsx'
 
-import { getI18nFromHeaders } from '@/app/[lang]/appRouterI18n'
 import LogoSVG from '@/assets/logo.svg'
 import DiscordSVG from '@/assets/social-medias/discord.svg'
 import MIcon from '@/assets/social-medias/m.svg'
 import TwitterSVG from '@/assets/social-medias/x.svg'
 import { Heading, Text } from '@/components/ui'
 import Link from '@/components/ui/link'
+import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 
 export function Footer() {
   const i18n = getI18nFromHeaders()

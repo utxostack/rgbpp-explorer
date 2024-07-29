@@ -5,11 +5,12 @@ import { type NextRequest, NextResponse } from 'next/server'
 const { locales } = linguiConfig
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
+  matcher: ['/((?!_next/static|_next/image|api|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
 }
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+  if (pathname.startsWith('/api')) return NextResponse.next()
   const pathnameHasLocale = locales.find((locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`)
   const headers = new Headers(request.headers)
   headers.set('x-url', request.url)
