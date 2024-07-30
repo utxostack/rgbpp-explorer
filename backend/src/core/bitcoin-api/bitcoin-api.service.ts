@@ -234,7 +234,6 @@ export class BitcoinApiService {
     ttl: ONE_MONTH_MS,
   })
   public async getBlockTxids({ hash }: { hash: string }) {
-    console.log('get block txids');
     return this.call('getBlockTxids', { hash });
   }
 
