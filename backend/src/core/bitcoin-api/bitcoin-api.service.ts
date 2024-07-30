@@ -185,7 +185,7 @@ export class BitcoinApiService {
   }
 
   @Cacheable({
-    key: ({ hash }) => `getBlockTxs:${hash}`,
+    key: ({ hash }) => `getTx:${hash}`,
     namespace: 'bitcoinApiService',
     ttl: ONE_MONTH_MS,
   })
@@ -202,7 +202,7 @@ export class BitcoinApiService {
   }
 
   @Cacheable({
-    key: ({ hash }) => `getBlockTxs:${hash}`,
+    key: ({ hash }) => `getBlock:${hash}`,
     namespace: 'bitcoinApiService',
     ttl: ONE_MONTH_MS,
   })
