@@ -57,6 +57,7 @@ export class RgbppStatisticService {
         script_type: 'lock',
       },
       'desc',
+      // rgbppTxs.meta.total * 10 is a rough estimation of the number of cells
       BI.from(rgbppTxs.meta.total * 10).toHexString(),
     );
 
