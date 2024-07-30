@@ -6,15 +6,15 @@ import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import * as BitcoinApi from 'src/core/bitcoin-api/bitcoin-api.schema';
 
 @Injectable()
-export class BitcoinBlockLoader implements NestDataLoader<string, BitcoinApi.Block> {
+export class BitcoinBlockLoader implements NestDataLoader<string, BitcoinApi.Block | null> {
   private logger = new Logger(BitcoinBlockLoader.name);
 
   constructor(private bitcoinApiService: BitcoinApiService) {}
 
   public getBatchFunction() {
-    return (keys: string[]) => {
+    return async (keys: string[]) => {
       this.logger.debug(`Loading bitcoin blocks: ${keys.join(', ')}`);
-      return Promise.all(
+      const results = await Promise.allSettled(
         keys.map(async (key) => {
           let hash = key;
           if (!hash.startsWith('0')) {
@@ -23,10 +23,11 @@ export class BitcoinBlockLoader implements NestDataLoader<string, BitcoinApi.Blo
           return this.bitcoinApiService.getBlock({ hash });
         }),
       );
+      return results.map((result) => (result.status === 'fulfilled' ? result.value : null));
     };
   }
 }
-export type BitcoinBlockLoaderType = DataLoader<string, BitcoinApi.Block>;
+export type BitcoinBlockLoaderType = DataLoader<string, BitcoinApi.Block | null>;
 export type BitcoinBlockLoaderResponse = DataLoaderResponse<BitcoinBlockLoader>;
 
 export interface BitcoinBlockTransactionsLoaderParams {
@@ -36,16 +37,16 @@ export interface BitcoinBlockTransactionsLoaderParams {
 
 @Injectable()
 export class BitcoinBlockTransactionsLoader
-  implements NestDataLoader<BitcoinBlockTransactionsLoaderParams, BitcoinApi.Transaction[]>
+  implements NestDataLoader<BitcoinBlockTransactionsLoaderParams, BitcoinApi.Transaction[] | null>
 {
   private logger = new Logger(BitcoinBlockLoader.name);
 
   constructor(private bitcoinApiService: BitcoinApiService) {}
 
   public getBatchFunction() {
-    return (batchProps: BitcoinBlockTransactionsLoaderParams[]) => {
+    return async (batchProps: BitcoinBlockTransactionsLoaderParams[]) => {
       this.logger.debug(`Loading bitcoin block transactions: ${batchProps}`);
-      return Promise.all(
+      const results = await Promise.allSettled(
         batchProps.map((props) =>
           this.bitcoinApiService.getBlockTxs({
             hash: props.hash,
@@ -53,12 +54,13 @@ export class BitcoinBlockTransactionsLoader
           }),
         ),
       );
+      return results.map((result) => (result.status === 'fulfilled' ? result.value : null));
     };
   }
 }
 export type BitcoinBlockTransactionsLoaderType = DataLoader<
   BitcoinBlockTransactionsLoaderParams,
-  BitcoinApi.Transaction[]
+  BitcoinApi.Transaction[] | null
 >;
 export type BitcoinBlockTransactionsLoaderResponse =
   DataLoaderResponse<BitcoinBlockTransactionsLoader>;

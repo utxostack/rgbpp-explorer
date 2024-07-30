@@ -257,11 +257,11 @@ type BitcoinBlock {
 
 type Query {
   ckbChainInfo: CkbChainInfo!
-  ckbBlock(heightOrHash: String!): CkbBlock!
+  ckbBlock(heightOrHash: String!): CkbBlock
   ckbTransaction(txHash: String!): CkbTransaction
   ckbAddress(address: String!): CkbAddress
   btcChainInfo: BitcoinChainInfo!
-  btcBlock(hashOrHeight: String!): BitcoinBlock!
+  btcBlock(hashOrHeight: String!): BitcoinBlock
   btcTransaction(txid: String!): BitcoinTransaction
   rgbppLatestTransactions(page: Int, pageSize: Int): RgbppLatestTransactionList!
   rgbppTransaction(txidOrTxHash: String!): RgbppTransaction

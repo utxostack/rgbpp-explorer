@@ -6,11 +6,10 @@ import { RgbppTransactionService } from './transaction.service';
 import { RgbppBaseTransaction } from './transaction.model';
 
 @Injectable()
-export class RgbppTransactionLoader
-  implements NestDataLoader<string, RgbppBaseTransaction | null> {
+export class RgbppTransactionLoader implements NestDataLoader<string, RgbppBaseTransaction | null> {
   private logger = new Logger(RgbppTransactionLoader.name);
 
-  constructor(private transactionService: RgbppTransactionService) { }
+  constructor(private transactionService: RgbppTransactionService) {}
 
   public getBatchFunction() {
     return async (ids: string[]) => {

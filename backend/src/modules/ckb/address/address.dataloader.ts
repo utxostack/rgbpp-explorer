@@ -11,25 +11,26 @@ import {
 
 @Injectable()
 export class CkbAddressLoader
-  implements NestDataLoader<GetAddressParams, CkbExplorer.AddressInfo[]>
+  implements NestDataLoader<GetAddressParams, CkbExplorer.AddressInfo[] | null>
 {
   private logger = new Logger(CkbAddressLoader.name);
 
   constructor(private ckbExplorerService: CkbExplorerService) {}
 
   public getBatchFunction() {
-    return (batchParams: GetAddressParams[]) => {
+    return async (batchParams: GetAddressParams[]) => {
       this.logger.debug(`Loading CKB addresses info: ${batchParams}`);
-      return Promise.all(
+      const results = await Promise.allSettled(
         batchParams.map(async (params) => {
           const response = await this.ckbExplorerService.getAddress(params);
           return response.data.map((data) => data.attributes);
         }),
       );
+      return results.map((result) => (result.status === 'fulfilled' ? result.value : null));
     };
   }
 }
-export type CkbAddressLoaderType = DataLoader<GetAddressParams, CkbExplorer.AddressInfo[]>;
+export type CkbAddressLoaderType = DataLoader<GetAddressParams, CkbExplorer.AddressInfo[] | null>;
 export type CkbAddressLoaderResponse = DataLoaderResponse<CkbAddressLoader>;
 
 export interface CkbAddressTransactionLoaderResult {
@@ -39,16 +40,16 @@ export interface CkbAddressTransactionLoaderResult {
 
 @Injectable()
 export class CkbAddressTransactionsLoader
-  implements NestDataLoader<GetAddressTransactionsParams, CkbAddressTransactionLoaderResult>
+  implements NestDataLoader<GetAddressTransactionsParams, CkbAddressTransactionLoaderResult | null>
 {
   private logger = new Logger(CkbAddressTransactionsLoader.name);
 
   constructor(private ckbExplorerService: CkbExplorerService) {}
 
   public getBatchFunction() {
-    return (batchParams: GetAddressParams[]) => {
+    return async (batchParams: GetAddressParams[]) => {
       this.logger.debug(`Loading CKB address transactions: ${batchParams}`);
-      return Promise.all(
+      const results = await Promise.allSettled(
         batchParams.map(async (params) => {
           const response = await this.ckbExplorerService.getAddressTransactions(params);
           return {
@@ -57,11 +58,12 @@ export class CkbAddressTransactionsLoader
           };
         }),
       );
+      return results.map((result) => (result.status === 'fulfilled' ? result.value : null));
     };
   }
 }
 export type CkbAddressTransactionsLoaderType = DataLoader<
   GetAddressTransactionsParams,
-  CkbAddressTransactionLoaderResult
+  CkbAddressTransactionLoaderResult | null
 >;
 export type CkbAddressTransactionsLoaderResponse = DataLoaderResponse<CkbAddressTransactionsLoader>;

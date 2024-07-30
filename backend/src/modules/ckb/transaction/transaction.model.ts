@@ -50,6 +50,10 @@ export class CkbTransaction {
     transactionWithStatus: CkbRpc.TransactionWithStatusResponse,
   ): CkbBaseTransaction {
     const { transaction, tx_status } = transactionWithStatus;
+    if (!transaction || tx_status?.status === 'unknown') {
+      return null;
+    }
+
     const isCellbase = transaction.inputs[0].previous_output.tx_hash.endsWith('0'.repeat(64));
 
     const resultTx = ResultFormatter.toTransaction(transaction as RPCTypes.Transaction);

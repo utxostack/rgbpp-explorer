@@ -7,37 +7,39 @@ import * as CkbExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
 import { CkbBlockService } from './block.service';
 
 @Injectable()
-export class CkbRpcBlockLoader implements NestDataLoader<string, CkbRpc.Block> {
+export class CkbRpcBlockLoader implements NestDataLoader<string, CkbRpc.Block | null> {
   private logger = new Logger(CkbRpcBlockLoader.name);
 
   constructor(private blockService: CkbBlockService) {}
 
   public getBatchFunction() {
-    return (heightOrHashList: string[]) => {
+    return async (heightOrHashList: string[]) => {
       this.logger.debug(`Loading blocks from CkbRpc: ${heightOrHashList.join(', ')}`);
-      return Promise.all(
+      const results = await Promise.allSettled(
         heightOrHashList.map((heightOrHash) => this.blockService.getBlockFromRpc(heightOrHash)),
       );
+      return results.map((result) => (result.status === 'fulfilled' ? result.value : null));
     };
   }
 }
-export type CkbRpcBlockLoaderType = DataLoader<string, CkbRpc.Block>;
+export type CkbRpcBlockLoaderType = DataLoader<string, CkbRpc.Block | null>;
 export type CkbRpcBlockLoaderResponse = DataLoaderResponse<CkbRpcBlockLoader>;
 
 @Injectable()
-export class CkbExplorerBlockLoader implements NestDataLoader<string, CkbExplorer.Block> {
+export class CkbExplorerBlockLoader implements NestDataLoader<string, CkbExplorer.Block | null> {
   private logger = new Logger(CkbRpcBlockLoader.name);
 
   constructor(private blockService: CkbBlockService) {}
 
   public getBatchFunction() {
-    return (heightOrHashList: string[]) => {
+    return async (heightOrHashList: string[]) => {
       this.logger.debug(`Loading blocks from CkbExplorer: ${heightOrHashList.join(', ')}`);
-      return Promise.all(
+      const results = await Promise.allSettled(
         heightOrHashList.map((heightOrHash) =>
           this.blockService.getBlockFromExplorer(heightOrHash),
         ),
       );
+      return results.map((result) => (result.status === 'fulfilled' ? result.value : null));
     };
   }
 }
@@ -46,18 +48,21 @@ export type CkbExplorerBlockLoaderResponse = DataLoaderResponse<CkbExplorerBlock
 
 @Injectable()
 export class CkbBlockEconomicStateLoader
-  implements NestDataLoader<string, CkbRpc.BlockEconomicState>
+  implements NestDataLoader<string, CkbRpc.BlockEconomicState | null>
 {
   private logger = new Logger(CkbBlockEconomicStateLoader.name);
 
   constructor(private blockService: CkbBlockService) {}
 
   public getBatchFunction() {
-    return (hashes: string[]) => {
+    return async (hashes: string[]) => {
       this.logger.debug(`Loading economic state for blocks: ${hashes.join(', ')}`);
-      return Promise.all(hashes.map((key) => this.blockService.getBlockEconomicState(key)));
+      const results = await Promise.allSettled(
+        hashes.map((key) => this.blockService.getBlockEconomicState(key)),
+      );
+      return results.map((result) => (result.status === 'fulfilled' ? result.value : null));
     };
   }
 }
-export type CkbBlockEconomicStateLoaderType = DataLoader<string, CkbRpc.BlockEconomicState>;
+export type CkbBlockEconomicStateLoaderType = DataLoader<string, CkbRpc.BlockEconomicState | null>;
 export type CkbBlockEconomicStateLoaderResponse = DataLoaderResponse<CkbBlockEconomicStateLoader>;

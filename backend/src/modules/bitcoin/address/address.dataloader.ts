@@ -7,21 +7,22 @@ import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import { BitcoinBaseTransaction, BitcoinTransaction } from '../transaction/transaction.model';
 
 @Injectable()
-export class BitcoinAddressLoader implements NestDataLoader<string, Address> {
+export class BitcoinAddressLoader implements NestDataLoader<string, Address | null> {
   private logger = new Logger(BitcoinAddressLoader.name);
 
   constructor(private bitcoinApiService: BitcoinApiService) {}
 
   public getBatchFunction() {
-    return (addresses: string[]) => {
+    return async (addresses: string[]) => {
       this.logger.debug(`Loading bitcoin addresses stats: ${addresses.join(', ')}`);
-      return Promise.all(
+      const results = await Promise.allSettled(
         addresses.map((address) => this.bitcoinApiService.getAddress({ address })),
       );
+      return results.map((result) => (result.status === 'fulfilled' ? result.value : null));
     };
   }
 }
-export type BitcoinAddressLoaderType = DataLoader<string, Address>;
+export type BitcoinAddressLoaderType = DataLoader<string, Address | null>;
 export type BitcoinAddressLoaderResponse = DataLoaderResponse<BitcoinAddressLoader>;
 
 export interface BitcoinAddressTransactionsLoaderParams {
@@ -31,16 +32,17 @@ export interface BitcoinAddressTransactionsLoaderParams {
 
 @Injectable()
 export class BitcoinAddressTransactionsLoader
-  implements NestDataLoader<BitcoinAddressTransactionsLoaderParams, BitcoinBaseTransaction[]>
+  implements
+    NestDataLoader<BitcoinAddressTransactionsLoaderParams, BitcoinBaseTransaction[] | null>
 {
   private logger = new Logger(BitcoinAddressTransactionsLoader.name);
 
   constructor(private bitcoinApiService: BitcoinApiService) {}
 
   public getBatchFunction() {
-    return (batchProps: BitcoinAddressTransactionsLoaderParams[]) => {
+    return async (batchProps: BitcoinAddressTransactionsLoaderParams[]) => {
       this.logger.debug(`Loading bitcoin addresses txs: ${batchProps}`);
-      return Promise.all(
+      const results = await Promise.allSettled(
         batchProps.map(async (props) => {
           const txs = await this.bitcoinApiService.getAddressTxs({
             address: props.address,
@@ -49,12 +51,13 @@ export class BitcoinAddressTransactionsLoader
           return txs.map((tx) => BitcoinTransaction.from(tx));
         }),
       );
+      return results.map((result) => (result.status === 'fulfilled' ? result.value : null));
     };
   }
 }
 export type BitcoinAddressTransactionsLoaderType = DataLoader<
   BitcoinAddressTransactionsLoaderParams,
-  BitcoinBaseTransaction[]
+  BitcoinBaseTransaction[] | null
 >;
 export type BitcoinAddressTransactionsLoaderResponse =
   DataLoaderResponse<BitcoinAddressTransactionsLoader>;

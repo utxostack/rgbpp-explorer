@@ -22,6 +22,9 @@ export class BitcoinTransactionResolver {
     @Loader(BitcoinTransactionLoader) txLoader: BitcoinTransactionLoaderType,
   ): Promise<BitcoinBaseTransaction | null> {
     const transaction = await txLoader.load(txid);
+    if (!transaction) {
+      return null;
+    }
     return BitcoinTransaction.from(transaction);
   }
 
