@@ -54,7 +54,7 @@ export function BtcAddressOverflow({ btcAddress }: { btcAddress: BtcAddress }) {
         >
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <Text color="brand" fontSize="14px">{t(i18n)`Txns`}</Text>
-            <Text color="brand">{formatNumber(btcAddress.transactionCount)}</Text>
+            <Text color="brand">{formatNumber(btcAddress.transactionsCount)}</Text>
           </VStack>
           <VStack gap="15px">
             <Text color="brand" fontSize="14px">{t(i18n)`L1 RGB++ Assets`}</Text>

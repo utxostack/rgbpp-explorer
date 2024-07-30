@@ -1,9 +1,10 @@
 'use client'
 
 import { Trans } from '@lingui/macro'
-import { Box, Center, Flex, HStack, VStack } from 'styled-system/jsx'
+import { Center, Flex, HStack, VStack } from 'styled-system/jsx'
 
 import ArrowIcon from '@/assets/arrow.svg'
+import ArrowDownIcon from '@/assets/arrow-down.svg'
 import BtcIcon from '@/assets/chains/btc.svg'
 import CkbIcon from '@/assets/chains/ckb.svg'
 import LogoSVG from '@/assets/logo.svg'
@@ -25,9 +26,10 @@ export function Navbar() {
         <HStack ml="72px" gap="48px" fontWeight="medium">
           <HoverCard.Root unmountOnExit openDelay={0} closeDelay={200}>
             <HoverCard.Trigger asChild>
-              <Box cursor="default">
+              <Flex align="center" gap="12px" cursor="default">
                 <Trans>Explorer</Trans>
-              </Box>
+                <ArrowDownIcon w="16px" h="16px" />
+              </Flex>
             </HoverCard.Trigger>
 
             <HoverCard.Positioner>

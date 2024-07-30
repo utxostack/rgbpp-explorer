@@ -13,7 +13,7 @@ import { truncateMiddle } from '@/lib/string/truncate-middle'
 export function BtcBlockOverflow({
   block,
 }: {
-  block: Pick<BtcBlock, 'timestamp' | 'size' | 'txCount' | 'feeRateRange' | 'totalFee' | 'miner' | 'height'>
+  block: Pick<BtcBlock, 'timestamp' | 'size' | 'transactionsCount' | 'feeRateRange' | 'totalFee' | 'miner' | 'height'>
 }) {
   const i18n = getI18nFromHeaders()
   return (
@@ -44,7 +44,7 @@ export function BtcBlockOverflow({
           </VStack>
           <VStack gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Transaction`}</Text>
-            <Text>{formatNumber(block.txCount)} </Text>
+            <Text>{formatNumber(block.transactionsCount)} </Text>
           </VStack>
         </Grid>
         <Grid

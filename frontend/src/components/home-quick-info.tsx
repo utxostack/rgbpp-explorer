@@ -1,6 +1,15 @@
+import { t } from '@lingui/macro'
 import { Box, Grid, VStack } from 'styled-system/jsx'
 
-export function HomeQuickInfo() {
+import { explorerGraphql } from '@/apis/explorer-graphql'
+import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
+import { formatNumber } from '@/lib/string/format-number'
+
+export async function HomeQuickInfo() {
+  const i18n = getI18nFromHeaders()
+  const { rgbppStatistic } = await explorerGraphql
+    .getRGBppStatistic()
+    .catch(() => ({ rgbppStatistic: { transactionsCount: undefined, holdersCount: undefined } }))
   return (
     <Grid
       rounded="200px"
@@ -13,18 +22,18 @@ export function HomeQuickInfo() {
     >
       <VStack gap="2px" borderRight="2px solid" borderColor="rgba(255, 255, 255, 0.1)">
         <Box fontSize="36px" lineHeight="100%" fontWeight="bold">
-          1000
+          {formatNumber(rgbppStatistic.transactionsCount)}
         </Box>
         <Box fontSize="sm" lineHeight="20px" color="text.third" fontWeight="semibold">
-          RGB++ Txns
+          {t(i18n)`RGB++ Txns`}
         </Box>
       </VStack>
       <VStack gap="2px">
         <Box fontSize="36px" lineHeight="100%" fontWeight="bold">
-          1000
+          {formatNumber(rgbppStatistic.holdersCount)}
         </Box>
         <Box fontSize="sm" lineHeight="20px" color="text.third" fontWeight="semibold">
-          RGB++ Assets Holders
+          {t(i18n)`RGB++ Assets Holders`}
         </Box>
       </VStack>
     </Grid>

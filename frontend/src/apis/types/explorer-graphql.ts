@@ -13,10 +13,26 @@ export interface XudtInfo {
 
 export interface CkbChainInfo {
   tipBlockNumber: number
+  transactionsCountIn24Hours: number
+  fees: {
+    fast: number
+    slow: number
+    average: number
+  }
 }
 
 export interface BtcChainInfo {
   tipBlockHeight: number
+  tipBlockHash: number
+  difficulty: number
+  transactionsCountIn24Hours: number
+  fees: {
+    fastest: number
+    halfHour: number
+    hour: number
+    economy: number
+    minimum: number
+  }
 }
 
 export interface Pageable {
@@ -61,7 +77,11 @@ export interface CkbCell {
   capacity: number
   lock: CkbScript
   xudtInfo: Pick<XudtInfo, 'amount' | 'decimal' | 'symbol'>
-  spent: boolean
+  status: {
+    consumed: boolean
+    txHash: string
+    index: number
+  }
 }
 
 export interface BtcTransaction {
@@ -84,7 +104,13 @@ export interface BtcAddress {
   address: string
   satoshi: number
   pendingSatoshi: number
-  transactionCount: number
+  transactionsCount: number
+}
+
+export interface RGBppAddress {
+  address: string
+  utxosCount: number
+  cellsCount: number
 }
 
 export interface CkbAddress {
@@ -96,6 +122,12 @@ export interface CkbAddress {
 export enum ScriptpubkeyType {
   OpReturn = 'op_return',
   P2wpkh = 'v0_p2wpkh',
+}
+
+export interface BtcUtxoStatus {
+  spent: boolean
+  txid: string
+  vin: number
 }
 
 export type Vout = (
@@ -112,7 +144,7 @@ export type Vout = (
   scriptpubkeyAsm: string
   scriptpubkeyAddress?: string
   value: number
-  spent: boolean
+  status: BtcUtxoStatus
 }
 
 export interface Prevout {
@@ -122,7 +154,7 @@ export interface Prevout {
   scriptpubkeyAddress: string
   value: number
   address: BtcAddress
-  spent: boolean
+  status: BtcUtxoStatus
 }
 
 export interface Vin {
@@ -162,7 +194,7 @@ export interface BtcBlock {
   height: number
   version: number
   timestamp: number
-  txCount: number
+  transactionsCount: number
   size: number
   weight: number
   bits: number
@@ -184,43 +216,7 @@ export interface Miner {
   transactionCount: number
 }
 
-export module RGBppLatestTransaction {
-  export interface Response {
-    rgbppLatestTransactions: {
-      txs: RGBppTransaction[]
-      total: number
-      pageSize: number
-    }
-  }
-}
-
-export module BlockHeightAndTxns24H {
-  export interface Response {
-    ckbChainInfo: Pick<CkbChainInfo, 'tipBlockNumber'>
-    btcChainInfo: Pick<BtcChainInfo, 'tipBlockHeight'>
-  }
-}
-
-export module RGBppCoinList {
-  export interface Response {
-    rgbppCoinList: {
-      total: number
-      page: number
-      coins: RGBppCoin[]
-    }
-  }
-}
-
-export module RGBppCoin {
-  export interface Response {
-    rgbppCoin: Pick<RGBppCoin, 'name' | 'symbol' | 'icon'>
-  }
-}
-
-export module RGBppCoinTransactionList {
-  export interface Response {
-    rgbppCoin: {
-      transactions: RGBppTransaction[]
-    }
-  }
+export interface RgbppStatistic {
+  transactionsCount: number
+  holdersCount: number
 }

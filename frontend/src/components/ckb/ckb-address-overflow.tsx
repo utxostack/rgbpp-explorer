@@ -29,7 +29,7 @@ export function CkbAddressOverflow({ ckbAddress }: { ckbAddress: CkbAddress }) {
         >
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`CKB Balance`}</Text>
-            <Text>{t(i18n)`${formatNumber(shannonToCKB(ckbAddress.shannon))}} CKB`}</Text>
+            <Text>{t(i18n)`${formatNumber(shannonToCKB(ckbAddress.shannon))} CKB`}</Text>
           </VStack>
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Confirmed`}</Text>
