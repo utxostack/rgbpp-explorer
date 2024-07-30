@@ -39,7 +39,7 @@ export class RgbppStatisticService {
 
   public async setRgbppAssetsHolders(holders: string[]) {
     await this.cacheManager.set(this.holdersCacheKey, holders, TEN_MINUTES_MS);
-  };
+  }
 
   public async collectRgbppAssetsHolders() {
     const network = this.configService.get('NETWORK');
@@ -90,7 +90,12 @@ export class RgbppStatisticService {
     const holdersSet = txs.reduce((set, tx) => {
       if (tx.status === 'fulfilled') {
         const { vout } = tx.value;
-        vout.forEach((output) => {
+        const boundUtxos = utxos.filter((utxo) => utxo.btcTxid === tx.value.txid);
+        boundUtxos.forEach(({ outIndex }) => {
+          const output = vout[outIndex];
+          if (!output) {
+            return;
+          }
           const { scriptpubkey } = output;
           if (scriptpubkey) {
             set.add(scriptpubkey);
