@@ -1,9 +1,8 @@
 import { BI } from '@ckb-lumos/bi';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { NetworkType } from '@rgbpp-sdk/btc';
 import { getRgbppLockScript, remove0x, RGBPPLock } from '@rgbpp-sdk/ckb';
-import { BtcNetworkTypeMap } from 'src/constants';
+import { BtcTestnetTypeMap, NetworkType } from 'src/constants';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
 import { CkbRpcWebsocketService } from 'src/core/ckb-rpc/ckb-rpc-websocket.service';
@@ -44,8 +43,8 @@ export class RgbppStatisticService {
   public async collectRgbppAssetsHolders() {
     const network = this.configService.get('NETWORK');
     const rgbppLock = getRgbppLockScript(
-      network === NetworkType.MAINNET,
-      BtcNetworkTypeMap[network],
+      network === NetworkType.mainnet,
+      BtcTestnetTypeMap[network],
     );
     const rgbppTxs = await this.ckbExplorerService.getRgbppTransactions();
     const cells = await this.ckbRpcService.getCells(
@@ -58,7 +57,7 @@ export class RgbppStatisticService {
         script_type: 'lock',
       },
       'desc',
-      BI.from(rgbppTxs.meta.total).toHexString(),
+      BI.from(rgbppTxs.meta.total * 10).toHexString(),
     );
 
     const utxos = cells.objects
