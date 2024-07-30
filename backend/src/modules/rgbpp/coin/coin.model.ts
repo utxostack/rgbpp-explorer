@@ -8,7 +8,7 @@ export type RgbppBaseCoin = Omit<RgbppCoin, 'transactions'>;
 
 @ObjectType({ description: 'RGB++ Coin' })
 export class RgbppCoin {
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   name: string;
 
   @Field(() => String, { nullable: true })
@@ -23,10 +23,10 @@ export class RgbppCoin {
   @Field(() => String, { nullable: true })
   icon: string;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   typeHash: string;
 
-  @Field(() => CkbScript)
+  @Field(() => CkbScript, { nullable: true })
   typeScript: CkbScript;
 
   @Field(() => Int)

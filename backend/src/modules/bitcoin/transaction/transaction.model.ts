@@ -3,8 +3,12 @@ import * as BitcoinApi from 'src/core/bitcoin-api/bitcoin-api.schema';
 import { BitcoinBaseOutput, BitcoinOutput } from '../output/output.model';
 import { BitcoinInput } from '../input/input.model';
 import { RgbppTransaction } from 'src/modules/rgbpp/transaction/transaction.model';
+import { BitcoinBlock } from '../block/block.model';
 
-export type BitcoinBaseTransaction = Omit<BitcoinTransaction, 'confirmations' | 'rgbppTransaction'>;
+export type BitcoinBaseTransaction = Omit<
+  BitcoinTransaction,
+  'confirmations' | 'block' | 'rgbppTransaction'
+>;
 
 @ObjectType({ description: 'Bitcoin Transaction' })
 export class BitcoinTransaction {
@@ -46,6 +50,9 @@ export class BitcoinTransaction {
 
   @Field(() => Float)
   confirmations: number;
+
+  @Field(() => BitcoinBlock)
+  block: BitcoinBlock;
 
   @Field(() => RgbppTransaction, { nullable: true })
   rgbppTransaction?: RgbppTransaction;

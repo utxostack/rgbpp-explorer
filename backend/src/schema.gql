@@ -138,6 +138,33 @@ type BitcoinInput {
   sequence: Float!
 }
 
+"""Fee Rate Range"""
+type FeeRateRange {
+  min: Float!
+  max: Float!
+}
+
+"""Bitcoin Block"""
+type BitcoinBlock {
+  id: String!
+  height: Float!
+  version: Int!
+  timestamp: Timestamp!
+  size: Float!
+  weight: Float!
+  bits: Float!
+  difficulty: Float!
+  miner: BitcoinAddress!
+  reward: Float!
+  totalFee: Float!
+  feeRateRange: FeeRateRange!
+  transactionsCount: Float!
+  transactions(
+    """For pagination, must be a multiplication of 25"""
+    startIndex: Float
+  ): [BitcoinTransaction!]!
+}
+
 """Bitcoin Transaction"""
 type BitcoinTransaction {
   blockHeight: Float!
@@ -153,6 +180,7 @@ type BitcoinTransaction {
   feeRate: Float!
   confirmed: Boolean!
   confirmations: Float!
+  block: BitcoinBlock!
   rgbppTransaction: RgbppTransaction
 }
 
@@ -182,13 +210,13 @@ type RgbppLatestTransactionList {
 
 """RGB++ Coin"""
 type RgbppCoin {
-  name: String!
+  name: String
   description: String
   symbol: String!
   decimal: Float!
   icon: String
-  typeHash: String!
-  typeScript: CkbScript!
+  typeHash: String
+  typeScript: CkbScript
   holdersCount: Int!
   h24CkbTransactionsCount: Int!
   totalAmount: Float!
@@ -226,33 +254,6 @@ type BitcoinChainInfo {
   difficulty: Float!
   transactionsCountIn24Hours: Float!
   fees: BitcoinFees!
-}
-
-"""Fee Rate Range"""
-type FeeRateRange {
-  min: Float!
-  max: Float!
-}
-
-"""Bitcoin Block"""
-type BitcoinBlock {
-  id: String!
-  height: Float!
-  version: Int!
-  timestamp: Timestamp!
-  size: Float!
-  weight: Float!
-  bits: Float!
-  difficulty: Float!
-  miner: BitcoinAddress!
-  reward: Float!
-  totalFee: Float!
-  feeRateRange: FeeRateRange!
-  transactionsCount: Float!
-  transactions(
-    """For pagination, must be a multiplication of 25"""
-    startIndex: Float
-  ): [BitcoinTransaction!]!
 }
 
 type Query {
