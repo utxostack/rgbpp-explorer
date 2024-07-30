@@ -22,4 +22,5 @@ COPY --from=prod-deps /app/backend/node_modules ./backend/node_modules
 COPY --from=prod-deps /app/backend/package*.json ./backend
 COPY --from=build /app/backend/dist ./backend/dist
 
+EXPOSE 3000
 CMD ["node", "backend/dist/main.js"]
