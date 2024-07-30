@@ -6,6 +6,7 @@ import { Env } from 'src/env';
 import {
   Block,
   BlockEconomicState,
+  GetCellsResult,
   GetTransactionsResult,
   SearchKey,
   TransactionWithStatusResponse,
@@ -65,5 +66,18 @@ export class CkbRpcWebsocketService {
     );
     const transactions = await this.websocket.call('get_transactions', [searchKey, order, limit]);
     return transactions as GetTransactionsResult;
+  }
+
+  public async getCells(
+    searchKey: SearchKey,
+    order: 'asc' | 'desc',
+    limit: string,
+    after?: string,
+  ): Promise<GetCellsResult> {
+    this.logger.debug(
+      `get_cells - searchKey: ${JSON.stringify(searchKey)}, order: ${order}, limit: ${limit}, after: ${after}`,
+    );
+    const cells = await this.websocket.call('get_cells', [searchKey, order, limit, after]);
+    return cells as GetCellsResult;
   }
 }

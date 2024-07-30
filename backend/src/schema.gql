@@ -138,6 +138,33 @@ type BitcoinInput {
   sequence: Float!
 }
 
+"""Fee Rate Range"""
+type FeeRateRange {
+  min: Float!
+  max: Float!
+}
+
+"""Bitcoin Block"""
+type BitcoinBlock {
+  id: String!
+  height: Float!
+  version: Int!
+  timestamp: Timestamp!
+  size: Float!
+  weight: Float!
+  bits: Float!
+  difficulty: Float!
+  miner: BitcoinAddress!
+  reward: Float!
+  totalFee: Float!
+  feeRateRange: FeeRateRange!
+  transactionsCount: Float!
+  transactions(
+    """For pagination, must be a multiplication of 25"""
+    startIndex: Float
+  ): [BitcoinTransaction!]!
+}
+
 """Bitcoin Transaction"""
 type BitcoinTransaction {
   blockHeight: Float!
@@ -147,12 +174,13 @@ type BitcoinTransaction {
   vin: [BitcoinInput!]!
   vout: [BitcoinOutput!]!
   size: Float!
-  locktime: Timestamp!
+  locktime: Float!
   weight: Float!
   fee: Float!
   feeRate: Float!
   confirmed: Boolean!
   confirmations: Float!
+  block: BitcoinBlock!
   rgbppTransaction: RgbppTransaction
 }
 
@@ -182,13 +210,13 @@ type RgbppLatestTransactionList {
 
 """RGB++ Coin"""
 type RgbppCoin {
-  name: String!
+  name: String
   description: String
   symbol: String!
   decimal: Float!
   icon: String
-  typeHash: String!
-  typeScript: CkbScript!
+  typeHash: String
+  typeScript: CkbScript
   holdersCount: Int!
   h24CkbTransactionsCount: Int!
   totalAmount: Float!
@@ -228,31 +256,16 @@ type BitcoinChainInfo {
   fees: BitcoinFees!
 }
 
-"""Fee Rate Range"""
-type FeeRateRange {
-  min: Float!
-  max: Float!
-}
-
-"""Bitcoin Block"""
-type BitcoinBlock {
-  id: String!
-  height: Float!
-  version: Int!
-  timestamp: Timestamp!
-  size: Float!
-  weight: Float!
-  bits: Float!
-  difficulty: Float!
-  miner: BitcoinAddress!
-  reward: Float!
-  totalFee: Float!
-  feeRateRange: FeeRateRange!
-  transactionsCount: Float!
-  transactions(
-    """For pagination, must be a multiplication of 25"""
-    startIndex: Float
-  ): [BitcoinTransaction!]!
+"""Search Result (including address/tx/block)"""
+type SearchResult {
+  query: String!
+  btcBlock: String
+  btcTransaction: String
+  btcAddress: String
+  ckbBlock: String
+  ckbTransaction: String
+  ckbAddress: String
+  rgbppCoin: String
 }
 
 type Query {
@@ -270,4 +283,5 @@ type Query {
   rgbppCoins(page: Int, pageSize: Int): RgbppCoinList!
   rgbppCoin(typeHash: String!): RgbppCoin!
   rgbppStatistic: RgbppStatistic!
+  search(query: String!): SearchResult!
 }

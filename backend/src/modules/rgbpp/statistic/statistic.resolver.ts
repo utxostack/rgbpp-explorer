@@ -1,10 +1,14 @@
 import { Float, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
 import { RgbppBaseStatistic, RgbppStatistic } from './statistic.model';
+import { RgbppStatisticService } from './statistic.service';
 
 @Resolver(() => RgbppStatistic)
 export class RgbppStatisticResolver {
-  constructor(private ckbExplorerService: CkbExplorerService) {}
+  constructor(
+    private ckbExplorerService: CkbExplorerService,
+    private rgbppStatisticService: RgbppStatisticService,
+  ) {}
 
   @Query(() => RgbppStatistic, { name: 'rgbppStatistic' })
   public async getRgbppStatistic(): Promise<RgbppBaseStatistic> {
@@ -19,7 +23,7 @@ export class RgbppStatisticResolver {
 
   @ResolveField(() => Float)
   public async holdersCount(): Promise<number> {
-    // TODO: implement this resolver
-    return 0;
+    const holders = await this.rgbppStatisticService.getRgbppAssetsHolders();
+    return holders.length;
   }
 }
