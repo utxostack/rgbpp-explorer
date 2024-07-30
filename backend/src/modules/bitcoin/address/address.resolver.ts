@@ -1,9 +1,5 @@
-import { ConfigService } from '@nestjs/config';
-import { isValidAddress } from '@rgbpp-sdk/btc';
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { Env } from 'src/env';
-import { BtcNetworkTypeMap } from 'src/constants';
 import { RgbppAddress, RgbppBaseAddress } from 'src/modules/rgbpp/address/address.model';
 import { BitcoinBaseTransaction, BitcoinTransaction } from '../transaction/transaction.model';
 import { BitcoinAddress, BitcoinBaseAddress } from './address.model';
@@ -13,18 +9,14 @@ import {
   BitcoinAddressTransactionsLoader,
   BitcoinAddressTransactionsLoaderType,
 } from './address.dataloader';
+import { ValidateBtcAddressPipe } from 'src/pipes/validate-address.pipe';
 
 @Resolver(() => BitcoinAddress)
 export class BitcoinAddressResolver {
-  constructor(private configService: ConfigService<Env>) {}
-
   @Query(() => BitcoinAddress, { name: 'btcAddress', nullable: true })
-  public async getBtcAddress(@Args('address') address: string): Promise<BitcoinBaseAddress | null> {
-    // TODO: replace with decorator/interceptor?
-    const network = this.configService.get('NETWORK');
-    if (!isValidAddress(address, BtcNetworkTypeMap[network])) {
-      throw new Error('Invalid bitcoin address');
-    }
+  public async getBtcAddress(
+    @Args('address', ValidateBtcAddressPipe) address: string,
+  ): Promise<BitcoinBaseAddress | null> {
     return BitcoinAddress.from(address);
   }
 
