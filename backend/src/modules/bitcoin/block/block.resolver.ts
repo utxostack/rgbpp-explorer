@@ -4,12 +4,8 @@ import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/grap
 import { BitcoinBaseTransaction, BitcoinTransaction } from '../transaction/transaction.model';
 import { BitcoinAddress, BitcoinBaseAddress } from '../address/address.model';
 import { BitcoinBaseBlock, BitcoinBlock, FeeRateRange } from './block.model';
-import {
-  BitcoinBlockLoader,
-  BitcoinBlockLoaderType,
-  BitcoinBlockTransactionsLoader,
-  BitcoinBlockTransactionsLoaderType,
-} from './block.dataloader';
+import { BitcoinBlockLoader, BitcoinBlockLoaderType } from './dataloader/block.loader';
+import { BitcoinBlockTransactionsLoader, BitcoinBlockTransactionsLoaderType } from './dataloader/block-transactions.loader';
 
 @Resolver(() => BitcoinBlock)
 export class BitcoinBlockResolver {

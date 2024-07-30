@@ -12,7 +12,7 @@ import {
   RgbppTransactionLoaderType,
 } from 'src/modules/rgbpp/transaction/transaction.dataloader';
 import { BitcoinBaseBlock, BitcoinBlock } from '../block/block.model';
-import { BitcoinBlockLoader, BitcoinBlockLoaderType } from '../block/block.dataloader';
+import { BitcoinBlockLoader, BitcoinBlockLoaderType } from '../block/dataloader/block.loader';
 
 @Resolver(() => BitcoinTransaction)
 export class BitcoinTransactionResolver {
