@@ -9,6 +9,7 @@ import { redisStore } from 'cache-manager-redis-yet';
 import { Env, envSchema } from './env';
 import { CoreModule } from './core/core.module';
 import { ApiModule } from './modules/api.module';
+import { CacheableModule } from 'nestjs-cacheable';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ApiModule } from './modules/api.module';
       }),
       inject: [ConfigService],
     }),
+    CacheableModule.register(),
     CacheModule.registerAsync<RedisClientOptions>({
       isGlobal: true,
       imports: [ConfigModule],

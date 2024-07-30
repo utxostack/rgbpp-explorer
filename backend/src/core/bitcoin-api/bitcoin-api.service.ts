@@ -8,6 +8,8 @@ import { IBitcoinDataProvider } from './bitcoin-api.interface';
 import { ElectrsService } from './provider/electrs.service';
 import { MempoolService } from './provider/mempool.service';
 import { ChainInfo } from './bitcoin-api.schema';
+import { Cacheable } from 'nestjs-cacheable';
+import { ONE_MONTH_MS, TEN_MINUTES_MS } from 'src/common/date';
 
 type MethodParameters<T, K extends keyof T> = T[K] extends (...args: infer P) => any ? P : never;
 type MethodReturnType<T, K extends keyof T> = T[K] extends (...args: any[]) => infer R ? R : never;
@@ -182,12 +184,13 @@ export class BitcoinApiService {
     return this.call('getAddressTxs', { address, afterTxid });
   }
 
+  @Cacheable({
+    key: ({ hash }) => `getBlockTxs:${hash}`,
+    namespace: 'bitcoinApiService',
+    ttl: ONE_MONTH_MS,
+  })
   public async getTx({ txid }: { txid: string }) {
     return this.call('getTx', { txid });
-  }
-
-  public async getTxHex({ txid }: { txid: string }) {
-    return this.call('getTxHex', { txid });
   }
 
   public async getTxOutSpend({ txid, vout }: { txid: string; vout: number }) {
@@ -198,23 +201,40 @@ export class BitcoinApiService {
     return this.call('getTxOutSpends', { txid });
   }
 
+  @Cacheable({
+    key: ({ hash }) => `getBlockTxs:${hash}`,
+    namespace: 'bitcoinApiService',
+    ttl: ONE_MONTH_MS,
+  })
   public async getBlock({ hash }: { hash: string }) {
     return this.call('getBlock', { hash });
   }
 
+  @Cacheable({
+    key: ({ hash }) => `getBlockTxs:${hash}`,
+    namespace: 'bitcoinApiService',
+    ttl: ONE_MONTH_MS,
+  })
   public async getBlockTxs({ hash, startIndex }: { hash: string; startIndex?: number }) {
     return this.call('getBlockTxs', { hash, startIndex });
   }
 
+  @Cacheable({
+    key: ({ hash }) => `getBlockHeight:${hash}`,
+    namespace: 'bitcoinApiService',
+    ttl: TEN_MINUTES_MS,
+  })
   public async getBlockHeight({ height }: { height: number }) {
     return this.call('getBlockHeight', { height });
   }
 
-  public async getBlockHeader({ hash }: { hash: string }) {
-    return this.call('getBlockHeader', { hash });
-  }
-
+  @Cacheable({
+    key: ({ hash }) => `getBlockTxids:${hash}`,
+    namespace: 'bitcoinApiService',
+    ttl: TEN_MINUTES_MS,
+  })
   public async getBlockTxids({ hash }: { hash: string }) {
+    console.log('get block txids');
     return this.call('getBlockTxids', { hash });
   }
 
