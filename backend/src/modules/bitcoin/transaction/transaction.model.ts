@@ -33,8 +33,8 @@ export class BitcoinTransaction {
   @Field(() => Float)
   size: number;
 
-  @Field(() => Date)
-  locktime: Date;
+  @Field(() => Float)
+  locktime: number;
 
   @Field(() => Float)
   weight: number;
@@ -74,7 +74,7 @@ export class BitcoinTransaction {
         }),
       ),
       size: tx.size,
-      locktime: new Date(tx.locktime),
+      locktime: tx.locktime,
       weight: tx.weight,
       fee: tx.fee,
       feeRate: tx.fee / vSize,

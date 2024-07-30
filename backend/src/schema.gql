@@ -174,7 +174,7 @@ type BitcoinTransaction {
   vin: [BitcoinInput!]!
   vout: [BitcoinOutput!]!
   size: Float!
-  locktime: Timestamp!
+  locktime: Float!
   weight: Float!
   fee: Float!
   feeRate: Float!
