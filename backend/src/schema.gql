@@ -210,13 +210,13 @@ type RgbppLatestTransactionList {
 
 """RGB++ Coin"""
 type RgbppCoin {
-  name: String!
+  name: String
   description: String
   symbol: String!
   decimal: Float!
   icon: String
-  typeHash: String!
-  typeScript: CkbScript!
+  typeHash: String
+  typeScript: CkbScript
   holdersCount: Int!
   h24CkbTransactionsCount: Int!
   totalAmount: Float!
