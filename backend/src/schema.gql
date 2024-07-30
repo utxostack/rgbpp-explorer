@@ -256,6 +256,18 @@ type BitcoinChainInfo {
   fees: BitcoinFees!
 }
 
+"""Search Result (including address/tx/block)"""
+type SearchResult {
+  query: String!
+  btcBlock: String
+  btcTransaction: String
+  btcAddress: String
+  ckbBlock: String
+  ckbTransaction: String
+  ckAddress: String
+  ckbAddress: String
+}
+
 type Query {
   ckbChainInfo: CkbChainInfo!
   ckbBlock(heightOrHash: String!): CkbBlock
@@ -271,4 +283,5 @@ type Query {
   rgbppCoins(page: Int, pageSize: Int): RgbppCoinList!
   rgbppCoin(typeHash: String!): RgbppCoin!
   rgbppStatistic: RgbppStatistic!
+  search(query: String!): SearchResult!
 }

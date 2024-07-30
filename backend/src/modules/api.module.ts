@@ -11,6 +11,7 @@ import { CkbModule } from './ckb/ckb.module';
 import { RgbppModule } from './rgbpp/rgbpp.module';
 import { BitcoinModule } from './bitcoin/bitcoin.module';
 import { FastifyReply, FastifyRequest } from 'fastify';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { FastifyReply, FastifyRequest } from 'fastify';
     CkbModule,
     BitcoinModule,
     RgbppModule,
+    SearchModule,
   ],
   providers: [
     {
