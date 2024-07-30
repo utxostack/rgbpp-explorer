@@ -10,6 +10,7 @@ import { Env, envSchema } from './env';
 import { CoreModule } from './core/core.module';
 import { ApiModule } from './modules/api.module';
 import { CacheableModule } from 'nestjs-cacheable';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { CacheableModule } from 'nestjs-cacheable';
       },
       inject: [ConfigService],
     }),
+    ScheduleModule.forRoot(),
     CoreModule,
     ApiModule,
   ],
