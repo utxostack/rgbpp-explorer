@@ -21,5 +21,5 @@ export class SearchResult {
   ckbTransaction: string;
 
   @Field(() => String, { nullable: true })
-  ckAddress: string;
+  ckbAddress: string;
 }

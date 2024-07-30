@@ -264,7 +264,6 @@ type SearchResult {
   btcAddress: String
   ckbBlock: String
   ckbTransaction: String
-  ckAddress: String
   ckbAddress: String
 }
 
