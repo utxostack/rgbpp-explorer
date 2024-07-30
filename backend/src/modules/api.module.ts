@@ -10,6 +10,7 @@ import { Env } from 'src/env';
 import { CkbModule } from './ckb/ckb.module';
 import { RgbppModule } from './rgbpp/rgbpp.module';
 import { BitcoinModule } from './bitcoin/bitcoin.module';
+import { FastifyReply, FastifyRequest } from 'fastify';
 
 @Module({
   imports: [
@@ -25,7 +26,11 @@ import { BitcoinModule } from './bitcoin/bitcoin.module';
         buildSchemaOptions: {
           dateScalarMode: 'timestamp',
         },
-        context: () => {
+        context: (req: FastifyRequest, res: FastifyReply) => {
+          if (req.method === 'GET') {
+            res.redirect(302, '/graphiql');
+            return;
+          }
           return {
             span: sentryService.instance().startInactiveSpan({
               op: 'gql',

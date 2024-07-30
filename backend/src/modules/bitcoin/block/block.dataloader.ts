@@ -9,7 +9,7 @@ import * as BitcoinApi from 'src/core/bitcoin-api/bitcoin-api.schema';
 export class BitcoinBlockLoader implements NestDataLoader<string, BitcoinApi.Block | null> {
   private logger = new Logger(BitcoinBlockLoader.name);
 
-  constructor(private bitcoinApiService: BitcoinApiService) {}
+  constructor(private bitcoinApiService: BitcoinApiService) { }
 
   public getBatchFunction() {
     return async (keys: string[]) => {
@@ -32,28 +32,33 @@ export type BitcoinBlockLoaderType = DataLoader<string, BitcoinApi.Block | null>
 export type BitcoinBlockLoaderResponse = DataLoaderResponse<BitcoinBlockLoader>;
 
 export interface BitcoinBlockTransactionsLoaderParams {
-  hash: string;
+  hash?: string;
+  height?: number;
   startIndex?: number;
 }
 
 @Injectable()
 export class BitcoinBlockTransactionsLoader
-  implements NestDataLoader<BitcoinBlockTransactionsLoaderParams, BitcoinApi.Transaction[] | null>
-{
+  implements NestDataLoader<BitcoinBlockTransactionsLoaderParams, BitcoinApi.Transaction[] | null> {
   private logger = new Logger(BitcoinBlockLoader.name);
 
-  constructor(private bitcoinApiService: BitcoinApiService) {}
+  constructor(private bitcoinApiService: BitcoinApiService) { }
 
   public getBatchFunction() {
     return async (batchProps: BitcoinBlockTransactionsLoaderParams[]) => {
       this.logger.debug(`Loading bitcoin block transactions: ${batchProps}`);
       const results = await Promise.allSettled(
-        batchProps.map((props) =>
-          this.bitcoinApiService.getBlockTxs({
-            hash: props.hash,
+        batchProps.map(async (props) => {
+          let hash = props.hash;
+          if (props.height && !hash) {
+            hash = await this.bitcoinApiService.getBlockHeight({ height: props.height });
+          }
+          const txs = await this.bitcoinApiService.getBlockTxs({
+            hash,
             startIndex: props.startIndex,
-          }),
-        ),
+          });
+          return txs;
+        }),
       );
       return results.map((result) => (result.status === 'fulfilled' ? result.value : null));
     };
