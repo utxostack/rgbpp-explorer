@@ -68,7 +68,7 @@ function UtxoInput({ vin }: { vin: Vin }) {
       borderBottomColor="border.primary"
     >
       <HStack gap="8px">
-        <SubTractIcon color={vin.prevout?.spent ? 'text.third' : 'success.unspent'} w="16px" h="16px" />
+        <SubTractIcon color={vin.prevout?.status.spent ? 'text.third' : 'success.unspent'} w="16px" h="16px" />
         {vin.prevout ? (
           <Copier onlyIcon value={vin.prevout.address.address}>
             <Link href={`/address/${vin.prevout.address.address}`} color="brand" fontSize="14px">
@@ -100,7 +100,7 @@ function UtxoOutput({ vout }: { vout: Vout }) {
       borderBottomColor="border.primary"
     >
       <HStack gap="8px">
-        <SubTractIcon color={vout.spent ? 'text.third' : 'success.unspent'} w="16px" h="16px" />
+        <SubTractIcon color={vout.status.spent ? 'text.third' : 'success.unspent'} w="16px" h="16px" />
         {vout.scriptpubkeyType === ScriptpubkeyType.OpReturn ? (
           <Trans>OP_RETURN</Trans>
         ) : (

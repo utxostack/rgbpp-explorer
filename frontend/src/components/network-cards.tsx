@@ -69,11 +69,7 @@ export function NetworkCards() {
             },
             {
               label: <Trans>Txns(24H)</Trans>,
-              value: (
-                <Text opacity={0.6}>
-                  <Trans>Coming Soon</Trans>
-                </Text>
-              ),
+              value: formatNumber(data?.btcChainInfo?.transactionsCountIn24Hours),
             },
           ]}
         />

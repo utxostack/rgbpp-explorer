@@ -2,14 +2,21 @@ import { i18n } from '@lingui/core'
 import { t } from '@lingui/macro'
 import { Box, HStack, VStack } from 'styled-system/jsx'
 
-import { CkbTransaction } from '@/apis/types/explorer-graphql'
+import { BtcTransaction, CkbTransaction } from '@/apis/types/explorer-graphql'
+import { BtcUtxos } from '@/components/btc/btc-utxos'
 import { CkbCells } from '@/components/ckb/ckb-cells'
 import { CkbTransactionOverflow } from '@/components/ckb/ckb-transaction-overflow'
 import { Copier } from '@/components/copier'
 import { Heading, Text } from '@/components/ui'
 import { formatNumber } from '@/lib/string/format-number'
 
-export function CKBTransactionPage({ ckbTransaction }: { ckbTransaction: CkbTransaction }) {
+export function CKBTransactionPage({
+  ckbTransaction,
+  btcTransaction,
+}: {
+  ckbTransaction: CkbTransaction
+  btcTransaction?: BtcTransaction
+}) {
   return (
     <VStack w="100%" maxW="content" p="30px" gap="30px">
       <HStack w="100%" gap="24px" p="30px" bg="bg.card" rounded="8px">
@@ -37,6 +44,9 @@ export function CKBTransactionPage({ ckbTransaction }: { ckbTransaction: CkbTran
       </HStack>
       <CkbTransactionOverflow ckbTransaction={ckbTransaction} />
       <CkbCells ckbTransaction={ckbTransaction} />
+      {btcTransaction ? (
+        <BtcUtxos txid={btcTransaction.txid} vin={btcTransaction.vin} vout={btcTransaction.vout} />
+      ) : null}
     </VStack>
   )
 }

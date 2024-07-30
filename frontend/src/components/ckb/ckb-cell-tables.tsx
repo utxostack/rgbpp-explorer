@@ -69,9 +69,9 @@ function Cell({ cell }: { cell: CkbCell }) {
       borderBottomColor="border.primary"
     >
       <HStack gap="8px">
-        <SubTractIcon w="16px" h="16px" color={cell.spent ? 'text.third' : 'success.unspent'} />
+        <SubTractIcon w="16px" h="16px" color={cell.status.consumed ? 'text.third' : 'success.unspent'} />
         <Copier onlyIcon value={address}>
-          <Link href={`/address/${address}`} color="brand" fontSize="14px">
+          <Link href={`/address/${address}`} color="brand" fontSize="14px" cursor="pointer">
             {truncateMiddle(address, 10, 10)}
           </Link>
         </Copier>

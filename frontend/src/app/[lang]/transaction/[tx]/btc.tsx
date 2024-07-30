@@ -1,16 +1,21 @@
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/macro'
-import { Box, Flex, HStack, VStack } from 'styled-system/jsx'
+import { Box, HStack, VStack } from 'styled-system/jsx'
 
-import { BtcTransaction } from '@/apis/types/explorer-graphql'
-import BtcIcon from '@/assets/chains/btc.svg'
+import { BtcTransaction, CkbTransaction } from '@/apis/types/explorer-graphql'
 import { BtcTransactionOverflow } from '@/components/btc/btc-transaction-overflow'
-import { BtcUtxoTables } from '@/components/btc/btc-utxo-tables'
+import { BtcUtxos } from '@/components/btc/btc-utxos'
+import { CkbCells } from '@/components/ckb/ckb-cells'
 import { Copier } from '@/components/copier'
 import { Heading, Text } from '@/components/ui'
-import { ViewMemPool } from '@/components/view-mempool'
 
-export function BTCTransactionPage({ btcTransaction }: { btcTransaction: BtcTransaction }) {
+export function BTCTransactionPage({
+  btcTransaction,
+  ckbTransaction,
+}: {
+  btcTransaction: BtcTransaction
+  ckbTransaction?: CkbTransaction
+}) {
   return (
     <VStack w="100%" maxW="content" p="30px" gap="30px">
       <HStack w="100%" gap="24px" p="30px" bg="bg.card" rounded="8px">
@@ -37,16 +42,8 @@ export function BTCTransactionPage({ btcTransaction }: { btcTransaction: BtcTran
         </Box>
       </HStack>
       <BtcTransactionOverflow btcTransaction={btcTransaction} />
-      <VStack w="100%" gap={0} bg="bg.card" rounded="8px">
-        <Flex w="100%" bg="bg.input" justifyContent="space-between" py="20px" px="30px" roundedTop="8px">
-          <HStack gap="16px">
-            <BtcIcon h="40px" w="40px" />
-            <Text fontSize="16px" fontWeight="semibold">{t(i18n)`BTC Txn`}</Text>
-          </HStack>
-          <ViewMemPool txid={btcTransaction.txid} />
-        </Flex>
-        <BtcUtxoTables vin={btcTransaction.vin} vout={btcTransaction.vout} />
-      </VStack>
+      <BtcUtxos txid={btcTransaction.txid} vin={btcTransaction.vin} vout={btcTransaction.vout} />
+      {ckbTransaction ? <CkbCells ckbTransaction={ckbTransaction} /> : null}
     </VStack>
   )
 }

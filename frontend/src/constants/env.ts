@@ -20,7 +20,7 @@ const sharedEnvSchema = z.object({
 
 export const env = {
   share: sharedEnvSchema.parse({
-    RGBPP_EXPLORER_API_URL: process.env.RGBPP_EXPLORER_API_URL,
+    RGBPP_EXPLORER_API_URL: process.env.NEXT_PUBLIC_RGBPP_EXPLORER_API_URL,
   }),
   internal: (typeof window === 'undefined' ? internalEnvSchema.parse(process.env) : {}) as z.infer<
     typeof internalEnvSchema

@@ -1,6 +1,6 @@
 'use client'
 
-import { t } from '@lingui/macro'
+import { Trans } from '@lingui/macro'
 import { Box, HStack } from 'styled-system/jsx'
 
 import ArrowIcon from '@/assets/arrow-2.svg'
@@ -22,34 +22,46 @@ export function LayerType({ type }: LayerTypeProps) {
             return (
               <>
                 <BtcIcon w="20px" h="20px" />
-                <Box>{t`L1`}</Box>
+                <Box>
+                  <Trans>L1</Trans>
+                </Box>
               </>
             )
           case 'l2':
             return (
               <>
                 <CkbIcon w="20px" h="20px" />
-                <Box>{t`L2`}</Box>
+                <Box>
+                  <Trans>L2</Trans>
+                </Box>
               </>
             )
           case 'l1-l2':
             return (
               <>
                 <BtcIcon w="20px" h="20px" />
-                <Box>{t`L1`}</Box>
+                <Box>
+                  <Trans>L1</Trans>
+                </Box>
                 <ArrowIcon w="12px" />
                 <CkbIcon w="20px" h="20px" />
-                <Box>{t`L2`}</Box>
+                <Box>
+                  <Trans>L2</Trans>
+                </Box>
               </>
             )
           case 'l2-l1':
             return (
               <>
                 <CkbIcon w="20px" h="20px" />
-                <Box>{t`L2`}</Box>
+                <Box>
+                  <Trans>L2</Trans>
+                </Box>
                 <ArrowIcon w="12px" />
                 <BtcIcon w="20px" h="20px" />
-                <Box>{t`L1`}</Box>
+                <Box>
+                  <Trans>L1</Trans>
+                </Box>
               </>
             )
           default:

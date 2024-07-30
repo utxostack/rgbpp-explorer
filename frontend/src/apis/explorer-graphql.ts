@@ -1,17 +1,19 @@
 import { gql, request } from 'graphql-request'
 
 import {
-  BlockHeightAndTxns24H,
   BtcAddress,
   BtcBlock,
+  BtcChainInfo,
   BtcTransaction,
   CkbAddress,
   CkbBlock,
+  CkbChainInfo,
   CkbTransaction,
   Pageable,
+  RGBppAddress,
   RGBppCoin,
-  RGBppCoinTransactionList,
-  RGBppLatestTransaction,
+  RgbppStatistic,
+  RGBppTransaction,
 } from '@/apis/types/explorer-graphql'
 import { env } from '@/constants/env'
 
@@ -21,7 +23,13 @@ class ExplorerGraphql {
   constructor() {}
 
   async getRGBppLatestTransactions() {
-    return request<RGBppLatestTransaction.Response>(
+    return request<{
+      rgbppLatestTransactions: {
+        txs: RGBppTransaction[]
+        total: number
+        pageSize: number
+      }
+    }>(
       this.serverURL,
       gql`
         query RgbppLatestTransactions {
@@ -38,7 +46,11 @@ class ExplorerGraphql {
                 fee
                 size
                 inputs {
-                  spent
+                  status {
+                    consumed
+                    txHash
+                    index
+                  }
                   txHash
                   index
                   capacity
@@ -67,6 +79,11 @@ class ExplorerGraphql {
                     amount
                     decimal
                   }
+                  status {
+                    consumed
+                    txHash
+                    index
+                  }
                 }
               }
               btcTransaction {
@@ -90,7 +107,10 @@ class ExplorerGraphql {
   }
 
   async getBlockHeightAndTxns24H() {
-    return request<BlockHeightAndTxns24H.Response>(
+    return request<{
+      ckbChainInfo: Pick<CkbChainInfo, 'tipBlockNumber'>
+      btcChainInfo: BtcChainInfo
+    }>(
       this.serverURL,
       gql`
         query {
@@ -99,6 +119,7 @@ class ExplorerGraphql {
           }
           btcChainInfo {
             tipBlockHeight
+            transactionsCountIn24Hours
           }
         }
       `,
@@ -136,7 +157,9 @@ class ExplorerGraphql {
   }
 
   async getRGBppCoin(typeHash: string) {
-    return request<RGBppCoin.Response>(
+    return request<{
+      rgbppCoin: RGBppCoin
+    }>(
       this.serverURL,
       gql`
         query RgbppCoin {
@@ -164,7 +187,11 @@ class ExplorerGraphql {
   }
 
   async getRGBppCoinTransactions(typeHash: string, { page = 1, pageSize = 10 }: Pageable = {}) {
-    return request<RGBppCoinTransactionList.Response>(
+    return request<{
+      rgbppCoin: {
+        transactions: RGBppTransaction[]
+      }
+    }>(
       this.serverURL,
       gql`
         query RgbppCoin {
@@ -189,7 +216,11 @@ class ExplorerGraphql {
                   txHash
                   index
                   capacity
-                  spent
+                  status {
+                    consumed
+                    txHash
+                    index
+                  }
                   type {
                     codeHash
                     hashType
@@ -211,7 +242,11 @@ class ExplorerGraphql {
                   txHash
                   index
                   capacity
-                  spent
+                  status {
+                    consumed
+                    txHash
+                    index
+                  }
                   type {
                     codeHash
                     hashType
@@ -255,12 +290,16 @@ class ExplorerGraphql {
                     scriptpubkeyType
                     scriptpubkeyAddress
                     value
-                    spent
+                    status {
+                      spent
+                      txid
+                      vin
+                    }
                     address {
                       address
                       satoshi
                       pendingSatoshi
-                      transactionCount
+                      transactionsCount
                     }
                   }
                 }
@@ -270,12 +309,16 @@ class ExplorerGraphql {
                   scriptpubkeyType
                   scriptpubkeyAddress
                   value
-                  spent
+                  status {
+                    spent
+                    txid
+                    vin
+                  }
                   address {
                     address
                     satoshi
                     pendingSatoshi
-                    transactionCount
+                    transactionsCount
                   }
                 }
               }
@@ -284,6 +327,149 @@ class ExplorerGraphql {
         }
 
       `,
+    )
+  }
+
+  async getTransaction(txidOrTxHash: string) {
+    return request<{ rgbppTransaction: RGBppTransaction }>(
+      this.serverURL,
+      gql`
+      query RgbppTransaction {
+        rgbppTransaction(txidOrTxHash: "${txidOrTxHash}") {
+          ckbTxHash
+          btcTxid
+          leapDirection
+          blockNumber
+          timestamp
+          btcTransaction {
+            blockHeight
+            blockHash
+            txid
+            version
+            size
+            locktime
+            weight
+            fee
+            feeRate
+            confirmed
+            confirmations
+            vin {
+              txid
+              vout
+              scriptsig
+              scriptsigAsm
+              isCoinbase
+              sequence
+              prevout {
+                txid
+                vout
+                scriptpubkey
+                scriptpubkeyAsm
+                scriptpubkeyType
+                scriptpubkeyAddress
+                value
+                address {
+                  address
+                  satoshi
+                  pendingSatoshi
+                  transactionsCount
+                }
+                status {
+                  spent
+                  txid
+                  vin
+                }
+              }
+            }
+            vout {
+              txid
+              vout
+              scriptpubkey
+              scriptpubkeyAsm
+              scriptpubkeyType
+              scriptpubkeyAddress
+              value
+              address {
+                address
+                satoshi
+                pendingSatoshi
+                transactionsCount
+              }
+              status {
+                spent
+                txid
+                vin
+              }
+            }
+          }
+          ckbTransaction {
+            isCellbase
+            blockNumber
+            hash
+            fee
+            feeRate
+            size
+            confirmed
+            confirmations
+            outputs {
+              txHash
+              index
+              capacity
+              type {
+                codeHash
+                hashType
+                args
+              }
+              lock {
+                codeHash
+                hashType
+                args
+              }
+              status {
+                consumed
+                txHash
+                index
+              }
+              xudtInfo {
+                symbol
+                amount
+                decimal
+                typeHash
+              }
+            }
+            inputs {
+              txHash
+              index
+              capacity
+              type {
+                codeHash
+                hashType
+                args
+              }
+              lock {
+                codeHash
+                hashType
+                args
+              }
+              xudtInfo {
+                symbol
+                amount
+                decimal
+                typeHash
+              }
+              status {
+                consumed
+                txHash
+                index
+              }
+            }
+            block {
+              timestamp
+            }
+          }
+        }
+      }
+    `,
     )
   }
 
@@ -301,7 +487,11 @@ class ExplorerGraphql {
             feeRate
             confirmations
             inputs {
-              spent
+              status {
+                consumed
+                txHash
+                index
+              }
               txHash
               index
               capacity
@@ -342,6 +532,11 @@ class ExplorerGraphql {
                 decimal
                 typeHash
               }
+              status {
+                consumed
+                txHash
+                index
+              }
             }
             block {
               timestamp
@@ -380,7 +575,7 @@ class ExplorerGraphql {
                   address
                   satoshi
                   pendingSatoshi
-                  transactionCount
+                  transactionsCount
                 }
               }
             }
@@ -394,7 +589,7 @@ class ExplorerGraphql {
                 address
                 satoshi
                 pendingSatoshi
-                transactionCount
+                transactionsCount
               }
             }
             size
@@ -420,7 +615,7 @@ class ExplorerGraphql {
             height
             version
             timestamp
-            txCount
+            transactionsCount
             size
             weight
             bits
@@ -430,7 +625,7 @@ class ExplorerGraphql {
               address
               satoshi
               pendingSatoshi
-              transactionCount
+              transactionsCount
             }
             feeRateRange {
               min
@@ -468,12 +663,16 @@ class ExplorerGraphql {
                 scriptpubkeyType
                 scriptpubkeyAddress
                 value
-                spent
+                status {
+                  spent
+                  txid
+                  vin
+                }
                 address {
                   address
                   satoshi
                   pendingSatoshi
-                  transactionCount
+                  transactionsCount
                 }
               }
               vin {
@@ -484,7 +683,11 @@ class ExplorerGraphql {
                 isCoinbase
                 sequence
                 prevout {
-                  spent
+                  status {
+                    spent
+                    txid
+                    vin
+                  }
                   scriptpubkey
                   scriptpubkeyAsm
                   scriptpubkeyType
@@ -494,7 +697,7 @@ class ExplorerGraphql {
                     address
                     satoshi
                     pendingSatoshi
-                    transactionCount
+                    transactionsCount
                   }
                 }
               }
@@ -558,9 +761,18 @@ class ExplorerGraphql {
                   decimal
                   typeHash
                 }
+                status {
+                  consumed
+                  txHash
+                  index
+                }
               }
               inputs {
-                spent
+                status {
+                  consumed
+                  txHash
+                  index
+                }
                 txHash
                 index
                 capacity
@@ -598,7 +810,7 @@ class ExplorerGraphql {
             address
             satoshi
             pendingSatoshi
-            transactionCount
+            transactionsCount
           }
         }
       `,
@@ -613,7 +825,7 @@ class ExplorerGraphql {
           ckbAddress(address: "${address}") {
             address
             shannon
-            transactionCount
+            transactionsCount
           }
         }
       `,
@@ -651,12 +863,16 @@ class ExplorerGraphql {
                   scriptpubkeyType
                   scriptpubkeyAddress
                   value
-                  spent
+                  status {
+                    spent
+                    txid
+                    vin
+                  }
                   address {
                     address
                     satoshi
                     pendingSatoshi
-                    transactionCount
+                    transactionsCount
                   }
                 }
               }
@@ -666,12 +882,16 @@ class ExplorerGraphql {
                 scriptpubkeyType
                 scriptpubkeyAddress
                 value
-                spent
+                status {
+                  spent
+                  txid
+                  vin
+                }
                 address {
                   address
                   satoshi
                   pendingSatoshi
-                  transactionCount
+                  transactionsCount
                 }
               }
             }
@@ -696,7 +916,11 @@ class ExplorerGraphql {
               feeRate
               confirmations
               inputs {
-                spent
+                status {
+                  consumed
+                  txHash
+                  index
+                }
                 txHash
                 index
                 capacity
@@ -737,6 +961,11 @@ class ExplorerGraphql {
                   decimal
                   typeHash
                 }
+                status {
+                  consumed
+                  txHash
+                  index
+                }
               }
               block {
                 timestamp
@@ -749,7 +978,108 @@ class ExplorerGraphql {
     )
   }
 
-  async search(keyword: string) {}
+  async search(keyword: string) {
+    return request<{
+      rgbppTransaction: Pick<RGBppTransaction, 'ckbTxHash' | 'btcTxid'>
+      ckbAddress: Pick<CkbAddress, 'address'>
+      btcTransaction: Pick<BtcTransaction, 'txid'>
+      btcAddress: Pick<BtcAddress, 'address'>
+      rgbppAddress: Pick<RGBppAddress, 'address'>
+      rgbppCoin: Pick<RGBppCoin, 'typeHash'>
+      ckbTransaction: Pick<CkbTransaction, 'hash'>
+    }>(
+      this.serverURL,
+      gql`
+      query RgbppTransaction {
+        rgbppTransaction(txidOrTxHash: "${keyword}") {
+          ckbTxHash
+          btcTxid
+        }
+        ckbAddress(address: "${keyword}") {
+          address
+        }
+        btcTransaction(txid: "${keyword}") {
+          txid
+        }
+        btcAddress(address: "${keyword}") {
+          address
+        }
+        rgbppAddress(address: "${keyword}") {
+          address
+        }
+        rgbppCoin(typeHash: "${keyword}") {
+          typeHash
+        }
+        ckbTransaction(txHash: "${keyword}") {
+          hash
+        }
+      }
+
+    `,
+    )
+  }
+
+  getRGBppStatistic() {
+    return request<{ rgbppStatistic: RgbppStatistic }>(
+      this.serverURL,
+      gql`
+        query RgbppStatistic {
+          rgbppStatistic {
+            transactionsCount
+            holdersCount
+          }
+        }
+      `,
+    )
+  }
+
+  getBtcChainInfo() {
+    return request<{ btcChainInfo: BtcChainInfo; rgbppStatistic: Pick<RgbppStatistic, 'holdersCount'> }>(
+      this.serverURL,
+      gql`
+        query BtcChainInfo {
+          btcChainInfo {
+            tipBlockHeight
+            tipBlockHash
+            difficulty
+            transactionsCountIn24Hours
+            fees {
+              fastest
+              halfHour
+              hour
+              economy
+              minimum
+            }
+          }
+          rgbppStatistic {
+            holdersCount
+          }
+        }
+      `,
+    )
+  }
+
+  getCkbChainInfo() {
+    return request<{ ckbChainInfo: CkbChainInfo; rgbppStatistic: Pick<RgbppStatistic, 'holdersCount'> }>(
+      this.serverURL,
+      gql`
+        query CkbChainInfo {
+          ckbChainInfo {
+            tipBlockNumber
+            transactionsCountIn24Hours
+            fees {
+              fast
+              slow
+              average
+            }
+          }
+          rgbppStatistic {
+            holdersCount
+          }
+        }
+      `,
+    )
+  }
 }
 
 export const explorerGraphql = new ExplorerGraphql()
