@@ -22,4 +22,7 @@ export class SearchResult {
 
   @Field(() => String, { nullable: true })
   ckbAddress: string;
+
+  @Field(() => String, { nullable: true })
+  rgbppCoin: string;
 }

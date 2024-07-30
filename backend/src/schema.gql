@@ -265,6 +265,7 @@ type SearchResult {
   ckbBlock: String
   ckbTransaction: String
   ckbAddress: String
+  rgbppCoin: String
 }
 
 type Query {

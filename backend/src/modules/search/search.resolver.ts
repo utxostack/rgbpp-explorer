@@ -18,10 +18,14 @@ import {
   CkbRpcTransactionLoaderType,
 } from '../ckb/transaction/transaction.dataloader';
 import { helpers, config } from '@ckb-lumos/lumos';
+import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
 
 @Resolver(() => SearchResult)
 export class SearchResolver {
-  constructor(private configService: ConfigService) { }
+  constructor(
+    private configService: ConfigService,
+    private ckbExplorerService: CkbExplorerService,
+  ) { }
 
   @Query(() => SearchResult)
   public async search(@Args('query') query: string) {
@@ -91,6 +95,18 @@ export class SearchResolver {
       return query;
     } catch (e) {
       return null;
+    }
+  }
+
+  @ResolveField(() => String, { nullable: true })
+  public async rgbppCoin(
+    @Parent() { query }: SearchResult,
+  ): Promise<string | null> {
+    try {
+      const response = await this.ckbExplorerService.getXUDT(query);
+      return response.data?.attributes?.type_hash;
+    } catch {
+      return null
     }
   }
 }
