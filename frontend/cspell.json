@@ -2,7 +2,7 @@
   "version": "0.1",
   "language": "en",
   "words": ["utxo", "rgbpp", "nervos", "nums", "xudt", "bignumber", "pageable", "locktime"],
-  "ignoreWords": ["lingui", "pandacss", "outdir", "txns", "svgr", "deepmerge", "usehooks", "hstack", "cellbase", "scriptpubkey", "satoshi", "vout", "vin", "scriptsig", "prevout", "nervosnetwork", "bitcoinjs", "wpkh", "shannons"],
+  "ignoreWords": ["lingui", "pandacss", "outdir", "txns", "svgr", "deepmerge", "usehooks", "hstack", "cellbase", "scriptpubkey", "satoshi", "vout", "vin", "scriptsig", "prevout", "nervosnetwork", "bitcoinjs", "wpkh", "shannons", "utxos"],
   "ignorePaths": [
     "pnpm-lock.yaml",
     "package.json",
