@@ -185,7 +185,7 @@ export class BitcoinApiService {
   }
 
   @Cacheable({
-    key: ({ hash }) => `getTx:${hash}`,
+    key: ({ txid }) => `getTx:${txid}`,
     namespace: 'bitcoinApiService',
     ttl: ONE_MONTH_MS,
   })
@@ -211,7 +211,7 @@ export class BitcoinApiService {
   }
 
   @Cacheable({
-    key: ({ hash }) => `getBlockTxs:${hash}`,
+    key: ({ hash, startIndex }) => `getBlockTxs:${hash}:${startIndex}`,
     namespace: 'bitcoinApiService',
     ttl: ONE_MONTH_MS,
   })
@@ -220,7 +220,7 @@ export class BitcoinApiService {
   }
 
   @Cacheable({
-    key: ({ hash }) => `getBlockHeight:${hash}`,
+    key: ({ height }) => `getBlockHeight:${height}`,
     namespace: 'bitcoinApiService',
     ttl: TEN_MINUTES_MS,
   })
@@ -231,7 +231,7 @@ export class BitcoinApiService {
   @Cacheable({
     key: ({ hash }) => `getBlockTxids:${hash}`,
     namespace: 'bitcoinApiService',
-    ttl: TEN_MINUTES_MS,
+    ttl: ONE_MONTH_MS,
   })
   public async getBlockTxids({ hash }: { hash: string }) {
     console.log('get block txids');
