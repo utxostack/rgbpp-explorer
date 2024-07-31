@@ -148,6 +148,12 @@ export interface DisplayOutput {
     type_hash: string;
     published: boolean;
   };
+  omiga_inscription_info: {
+    symbol: string;
+    name: string;
+    decimal: string;
+    amount: string;
+  };
 }
 
 export interface Transaction {
