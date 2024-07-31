@@ -22,8 +22,8 @@ jobs:
           script: |
             cd ${{ secrets.SSH_WORK_DIR }}
             git status
-            git fetch origin main
-            git checkout origin/main
+            git fetch origin
+            git checkout ${{ github.ref }}
             git status
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker compose ps
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker image prune -f
