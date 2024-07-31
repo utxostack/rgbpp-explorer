@@ -53,7 +53,7 @@ export class SearchResolver {
 
   @ResolveField(() => String, { nullable: true })
   public async btcAddress(
-    @ParentField(['query', TryValidateBtcAddressPipe]) address: string | null,
+    @ParentField('query', TryValidateBtcAddressPipe) address: string | null,
   ): Promise<string | null> {
     return address;
   }
@@ -84,7 +84,7 @@ export class SearchResolver {
 
   @ResolveField(() => String, { nullable: true })
   public async ckbAddress(
-    @ParentField(['query', TryValidateCkbAddressPipe]) address: string | null,
+    @ParentField('query', TryValidateCkbAddressPipe) address: string | null,
   ): Promise<string | null> {
     return address;
   }

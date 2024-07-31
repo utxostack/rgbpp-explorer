@@ -1,11 +1,13 @@
 import { config, helpers } from '@ckb-lumos/lumos';
-import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common';
+import { PipeTransform, Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { isValidAddress } from '@rgbpp-sdk/btc';
 import { BtcNetworkTypeMap, NetworkType } from 'src/constants';
 
 @Injectable()
 export class ValidateCkbAddressPipe implements PipeTransform {
+  private logger = new Logger(ValidateCkbAddressPipe.name);
+
   constructor(private configService: ConfigService) { }
 
   public transform(value: string) {
@@ -14,7 +16,8 @@ export class ValidateCkbAddressPipe implements PipeTransform {
       const lumosConfig = network === NetworkType.mainnet ? config.MAINNET : config.TESTNET;
       helpers.parseAddress(value, { config: lumosConfig });
       return value;
-    } catch {
+    } catch (err) {
+      this.logger.error(`Invalid CKB address: ${value}`, err);
       throw new BadRequestException('Invalid CKB address');
     }
   }
@@ -33,12 +36,15 @@ export class TryValidateCkbAddressPipe extends ValidateCkbAddressPipe implements
 
 @Injectable()
 export class ValidateBtcAddressPipe implements PipeTransform {
+  private logger = new Logger(ValidateBtcAddressPipe.name);
+
   constructor(private configService: ConfigService) { }
 
   public transform(value: string) {
     const network = this.configService.get('NETWORK');
     const isValid = isValidAddress(value, BtcNetworkTypeMap[network]);
     if (!isValid) {
+      this.logger.error(`Invalid bitcoin address: ${value}`);
       throw new BadRequestException('Invalid bitcoin address');
     }
     return value;
