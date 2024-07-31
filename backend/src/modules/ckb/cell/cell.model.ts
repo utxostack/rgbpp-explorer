@@ -8,8 +8,8 @@ export class CkbXUDTInfo {
   @Field(() => String)
   symbol: string;
 
-  @Field(() => Float)
-  amount: number;
+  @Field(() => String)
+  amount: string;
 
   @Field(() => Int)
   decimal: number;

@@ -71,7 +71,7 @@ export class RgbppAddressResolver {
           const xudt: CkbXUDTInfo = {
             typeHash: computeScriptHash(typeScript),
             symbol: info.symbol,
-            amount: BI.from(info.amount).toNumber(),
+            amount: info.amount,
             decimal: BI.from(info.decimal).toNumber(),
           };
           return xudt;
@@ -87,9 +87,10 @@ export class RgbppAddressResolver {
       if (!balancesMap.has(key)) {
         balancesMap.set(key, xudt);
       } else {
+        const amount = BI.from(balancesMap.get(key).amount).add(BI.from(xudt.amount)).toHexString();
         balancesMap.set(key, {
           ...balancesMap.get(key),
-          amount: balancesMap.get(key).amount + xudt.amount,
+          amount,
         });
       }
     });
