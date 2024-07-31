@@ -8,16 +8,20 @@ import {
   CkbRpcTransactionLoaderType,
 } from '../transaction/transaction.dataloader';
 import { CkbCell, CkbXUDTInfo, CkbBaseCellStatus, CkbCellStatus, CkbBaseCell } from './cell.model';
+import { CkbCellService } from './cell.service';
 
 @Resolver(() => CkbCell)
 export class CkbCellResolver {
-  @ResolveField(() => CkbXUDTInfo)
+  constructor(private ckbCellService: CkbCellService) { }
+
+  @ResolveField(() => CkbXUDTInfo, { nullable: true })
   public async xudtInfo(
     @Parent() cell: CkbBaseCell,
     @Loader(CkbExplorerTransactionLoader) explorerTxLoader: CkbExplorerTransactionLoaderType,
   ) {
     const tx = await explorerTxLoader.load(cell.txHash);
-    return tx.display_outputs[cell.index].xudt_info;
+    const output = tx.display_outputs[cell.index];
+    return this.ckbCellService.getXUDTInfoFromOutput(cell, output);
   }
 
   @ResolveField(() => CkbCellStatus)
