@@ -22,7 +22,7 @@ export class RgbppAddressProcessor extends WorkerHost {
   async collectRgbppAddressCells(btcAddress: string) {
     this.logger.log(`Collecting RGBPP address cells for ${btcAddress}`);
     const cells = await this.rgbppAddressService.collectRgbppAddressCells(btcAddress);
-    await this.rgbppAddressService.setRgbppAddressCells(cells);
+    await this.rgbppAddressService.setRgbppAddressCells(btcAddress, cells);
     this.logger.log(`Collected ${cells.length} RGBPP address cells for ${btcAddress}`);
   }
 }
