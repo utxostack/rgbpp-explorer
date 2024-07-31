@@ -1,5 +1,4 @@
 import { t } from '@lingui/macro'
-import { redirect } from 'next/navigation'
 import type { PropsWithChildren, ReactNode } from 'react'
 import { HStack, VStack } from 'styled-system/jsx'
 
@@ -21,7 +20,7 @@ export default async function Layout({
   const isBtcAddress = isValidBTCAddress(address)
   const isCkbAddress = isValidCkbAddress(address)
 
-  if (!isBtcAddress && !isCkbAddress) return redirect('/')
+  if (!isBtcAddress && !isCkbAddress) throw new Error(t(i18n)`Invalid address "${address}"`)
 
   let overflow: ReactNode = null
   if (isBtcAddress) {
@@ -36,7 +35,7 @@ export default async function Layout({
     }
   }
 
-  if (!overflow) return redirect('/')
+  if (!overflow) throw new Error(t(i18n)`The address "${address}" not found`)
 
   return (
     <VStack w="100%" maxW="content" p="30px" gap="30px">

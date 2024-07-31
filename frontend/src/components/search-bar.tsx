@@ -57,29 +57,20 @@ function useSearch() {
   return useMutation({
     async mutationFn(keyword: string) {
       const search = await explorerGraphql.search(keyword)
-      if (search.rgbppCoin.typeHash) {
-        return redirect(`/assets/coins/${search.rgbppCoin.typeHash}`)
+      if (search.rgbppCoin) {
+        return redirect(`/assets/coins/${search.rgbppCoin}`)
       }
-      if (search.ckbTransaction.hash) {
-        return redirect(`/transaction/${search.ckbTransaction.hash}`)
+      if (search.ckbTransaction) {
+        return redirect(`/transaction/${search.ckbTransaction}`)
       }
-      if (search.btcTransaction.txid) {
-        return redirect(`/transaction/${search.btcTransaction.txid}`)
+      if (search.btcTransaction) {
+        return redirect(`/transaction/${search.btcTransaction}`)
       }
-      if (search.rgbppTransaction.btcTxid) {
-        return redirect(`/transaction/${search.rgbppTransaction.btcTxid}`)
+      if (search.btcAddress) {
+        return redirect(`/address/${search.btcAddress}`)
       }
-      if (search.rgbppTransaction.ckbTxHash) {
-        return redirect(`/transaction/${search.rgbppTransaction.ckbTxHash}`)
-      }
-      if (search.rgbppAddress.address) {
-        return redirect(`/address/${search.rgbppAddress.address}`)
-      }
-      if (search.btcAddress.address) {
-        return redirect(`/address/${search.btcAddress.address}`)
-      }
-      if (search.ckbAddress.address) {
-        return redirect(`/address/${search.ckbAddress.address}`)
+      if (search.ckbAddress) {
+        return redirect(`/address/${search.ckbAddress}`)
       }
       throw new Error('Not found')
     },

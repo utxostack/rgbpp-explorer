@@ -1,5 +1,4 @@
 import { t } from '@lingui/macro'
-import { redirect } from 'next/navigation'
 import { ReactNode } from 'react'
 import { Box, HStack, VStack } from 'styled-system/jsx'
 
@@ -22,7 +21,7 @@ export default async function Layout({
   const data = await explorerGraphql.getBtcBlock(hashOrHeight)
 
   if (!data?.btcBlock) {
-    return redirect('/')
+    throw new Error(t(i18n)`The block ${hashOrHeight} not found`)
   }
 
   return (

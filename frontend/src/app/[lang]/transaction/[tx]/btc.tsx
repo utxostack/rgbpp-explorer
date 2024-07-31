@@ -2,19 +2,23 @@ import { i18n } from '@lingui/core'
 import { t } from '@lingui/macro'
 import { Box, HStack, VStack } from 'styled-system/jsx'
 
-import { BtcTransaction, CkbTransaction } from '@/apis/types/explorer-graphql'
+import { BtcTransaction, CkbTransaction, LeapDirection } from '@/apis/types/explorer-graphql'
 import { BtcTransactionOverflow } from '@/components/btc/btc-transaction-overflow'
 import { BtcUtxos } from '@/components/btc/btc-utxos'
 import { CkbCells } from '@/components/ckb/ckb-cells'
 import { Copier } from '@/components/copier'
+import { LayerType } from '@/components/layer-type'
 import { Heading, Text } from '@/components/ui'
+import { resolveLayerTypeFromRGBppTransaction } from '@/lib/resolve-layer-type-from-rgbpp-transaction'
 
 export function BTCTransactionPage({
   btcTransaction,
   ckbTransaction,
+  leapDirection,
 }: {
   btcTransaction: BtcTransaction
   ckbTransaction?: CkbTransaction
+  leapDirection?: LeapDirection | null
 }) {
   return (
     <VStack w="100%" maxW="content" p="30px" gap="30px">
@@ -23,6 +27,9 @@ export function BTCTransactionPage({
           {t(i18n)`Transactions`}
         </Heading>
         <Copier value={btcTransaction.txid}>{btcTransaction.txid}</Copier>
+        {leapDirection && ckbTransaction ? (
+          <LayerType type={resolveLayerTypeFromRGBppTransaction({ ckbTransaction, leapDirection, btcTransaction })} />
+        ) : null}
         <Box
           color="brand"
           fontWeight="semibold"

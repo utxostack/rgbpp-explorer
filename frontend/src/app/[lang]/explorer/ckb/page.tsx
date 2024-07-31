@@ -20,7 +20,7 @@ export default async function Page() {
   return (
     <Grid gridTemplateColumns="repeat(2, 1fr)" w="100%" maxW="content" p="30px" gap="30px">
       <Info />
-      <Box bg="bg.card" rounded="8px">
+      <Box bg="bg.card" rounded="8px" whiteSpace="nowrap">
         <Heading fontSize="20px" fontWeight="semibold" p="30px">{t(i18n)`Latest L1 RGB++ transaction`}</Heading>
         <Table.Root>
           <Table.Body>
