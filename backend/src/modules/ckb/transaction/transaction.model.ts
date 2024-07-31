@@ -65,7 +65,7 @@ export class CkbTransaction {
       hash: transaction.hash,
       confirmed: tx_status.status === 'committed',
       blockNumber: toNumber(tx_status.block_number),
-      outputs: transaction.outputs.map((_, index) => CkbCell.from(transaction, index)),
+      outputs: transaction.outputs.map((_, index) => CkbCell.fromTransaction(transaction, index)),
       size: txBytes,
     };
   }

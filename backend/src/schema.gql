@@ -90,11 +90,20 @@ type CkbChainInfo {
   fees: CkbFees!
 }
 
+"""Rgbpp Asset"""
+type RgbppAsset {
+  owner: String!
+  cell: CkbCell!
+  utxo: BitcoinOutput
+}
+
 """Rgbpp Address"""
 type RgbppAddress {
   address: String!
   utxosCount: Float!
   cellsCount: Float!
+  assets: [RgbppAsset!]!
+  balances: [CkbXUDTInfo!]!
 }
 
 """Bitcoin Address"""

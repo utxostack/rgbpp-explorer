@@ -8,8 +8,8 @@ export class CkbXUDTInfo {
   @Field(() => String)
   symbol: string;
 
-  @Field(() => Float)
-  amount: number;
+  @Field(() => String)
+  amount: string;
 
   @Field(() => Int)
   decimal: number;
@@ -57,7 +57,7 @@ export class CkbCell {
   @Field(() => CkbCellStatus)
   status: CkbCellStatus;
 
-  public static from(tx: CkbRpc.Transaction, index: number): CkbBaseCell {
+  public static fromTransaction(tx: CkbRpc.Transaction, index: number): CkbBaseCell {
     const output = tx.outputs[index];
     return {
       txHash: tx.hash,
@@ -65,6 +65,16 @@ export class CkbCell {
       capacity: toNumber(output.capacity),
       type: output.type ? CkbScript.from(output.type) : null,
       lock: CkbScript.from(output.lock),
+    };
+  }
+
+  public static fromCell(cell: CkbRpc.Cell): CkbBaseCell {
+    return {
+      txHash: cell.out_point.tx_hash,
+      index: toNumber(cell.out_point.index),
+      capacity: toNumber(cell.output.capacity),
+      type: cell.output.type ? CkbScript.from(cell.output.type) : null,
+      lock: CkbScript.from(cell.output.lock),
     };
   }
 }
