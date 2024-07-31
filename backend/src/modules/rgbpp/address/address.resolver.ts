@@ -71,7 +71,7 @@ export class RgbppAddressResolver {
           const xudt: CkbXUDTInfo = {
             typeHash: computeScriptHash(typeScript),
             symbol: info.symbol,
-            amount: info.amount,
+            amount: BI.from(info.amount).toHexString(),
             decimal: BI.from(info.decimal).toNumber(),
           };
           return xudt;

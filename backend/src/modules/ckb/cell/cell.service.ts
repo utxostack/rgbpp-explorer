@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import * as CkbExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
 import { CkbBaseCell, CkbXUDTInfo } from './cell.model';
-import { Script } from '@ckb-lumos/lumos';
+import { BI, Script } from '@ckb-lumos/lumos';
 import { computeScriptHash } from '@ckb-lumos/lumos/utils';
 
 @Injectable()
@@ -13,8 +13,8 @@ export class CkbCellService {
     }
     const xudtInfo: CkbXUDTInfo = {
       symbol: info.symbol,
-      amount: parseFloat(info.amount),
-      decimal: parseInt(info.decimal, 10),
+      amount: BI.from(info.amount).toHexString(),
+      decimal: BI.from(info.decimal).toNumber(),
       typeHash: computeScriptHash(cell.type as Script),
     };
     return xudtInfo;
