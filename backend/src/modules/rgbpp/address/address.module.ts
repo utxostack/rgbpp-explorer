@@ -6,6 +6,8 @@ import { BitcoinApiModule } from 'src/core/bitcoin-api/bitcoin-api.module';
 import { CkbRpcModule } from 'src/core/ckb-rpc/ckb-rpc.module';
 import { RgbppModule } from '../rgbpp.module';
 import { CkbTransactionModule } from 'src/modules/ckb/transaction/transaction.module';
+import { BullModule } from '@nestjs/bullmq';
+import { RgbppAddressProcessor } from './address.processor';
 
 @Module({
   imports: [
@@ -14,7 +16,14 @@ import { CkbTransactionModule } from 'src/modules/ckb/transaction/transaction.mo
     CkbRpcModule,
     CkbTransactionModule,
     forwardRef(() => RgbppModule),
+    BullModule.registerQueue({
+      name: 'rgbpp-address',
+      defaultJobOptions: {
+        removeOnComplete: true,
+        removeOnFail: true,
+      },
+    }),
   ],
-  providers: [RgbppAddressResolver, RgbppAddressService],
+  providers: [RgbppAddressResolver, RgbppAddressService, RgbppAddressProcessor],
 })
 export class RgbppAddressModule {}

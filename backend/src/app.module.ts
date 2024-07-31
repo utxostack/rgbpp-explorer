@@ -11,6 +11,7 @@ import { CoreModule } from './core/core.module';
 import { ApiModule } from './modules/api.module';
 import { CacheableModule } from 'nestjs-cacheable';
 import { ScheduleModule } from '@nestjs/schedule';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
   imports: [
@@ -42,11 +43,26 @@ import { ScheduleModule } from '@nestjs/schedule';
       isGlobal: true,
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService<Env>) => {
-        const store = await redisStore({
+        const store = (await redisStore({
           url: configService.get('REDIS_URL'),
-        }) as unknown as CacheStore;
+        })) as unknown as CacheStore;
         return {
           store,
+        };
+      },
+      inject: [ConfigService],
+    }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService<Env>) => {
+        const url = new URL(configService.get('REDIS_URL'));
+        return {
+          connection: {
+            host: url.hostname,
+            port: parseInt(url.port),
+            username: url.username,
+            password: url.password,
+          },
         };
       },
       inject: [ConfigService],

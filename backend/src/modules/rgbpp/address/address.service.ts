@@ -5,6 +5,8 @@ import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { TEN_MINUTES_MS } from 'src/common/date';
 import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
 import * as BitcoinApi from 'src/core/bitcoin-api/bitcoin-api.interface';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class RgbppAddressService {
@@ -14,11 +16,22 @@ export class RgbppAddressService {
     private bitcoinApiService: BitcoinApiService,
     private rgbppService: RgbppService,
     @Inject(CACHE_MANAGER) protected cacheManager: Cache,
+    @InjectQueue('rgbpp-address') private readonly queue: Queue,
   ) {}
 
   public async getRgbppAddressCells(btcAddress: string) {
     const cached = await this.cacheManager.get<CkbRpc.Cell[]>(this.addressCellsCacheKey);
     if (cached) {
+      this.queue.add(
+        'collect-rgbpp-address-cells',
+        { btcAddress },
+        {
+          debounce: {
+            id: btcAddress,
+            ttl: 60 * 1000,
+          },
+        },
+      );
       return cached;
     }
     const cells = await this.collectRgbppAddressCells(btcAddress);
