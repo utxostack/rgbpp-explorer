@@ -7,6 +7,7 @@ import MIcon from '@/assets/social-medias/m.svg'
 import TwitterSVG from '@/assets/social-medias/x.svg'
 import { Heading, Text } from '@/components/ui'
 import Link from '@/components/ui/link'
+import { env } from '@/constants/env'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 
 export function Footer() {
@@ -83,10 +84,10 @@ export function Footer() {
           <VStack w="100%" gap="30px" alignItems="start">
             <Heading fontSize="18px">{t(i18n)`Explorer`}</Heading>
             <VStack w="100%" gap="16px" color="text.third" alignItems="start">
-              <Link href="/" _hover={{ textDecoration: 'underline' }}>
+              <Link href={env.public.MEMPOOL_URL} _hover={{ textDecoration: 'underline' }}>
                 {t(i18n)`Bitcoin`}
               </Link>
-              <Link href="/" _hover={{ textDecoration: 'underline' }}>
+              <Link href={env.public.CKB_EXPLORER_URL} _hover={{ textDecoration: 'underline' }}>
                 {t(i18n)`CKB`}
               </Link>
             </VStack>
@@ -94,13 +95,13 @@ export function Footer() {
           <VStack w="100%" gap="30px" alignItems="start">
             <Heading fontSize="18px">{t(i18n)`RGB++`}</Heading>
             <VStack w="100%" gap="16px" color="text.third" alignItems="start">
-              <Link href="/" _hover={{ textDecoration: 'underline' }}>
+              <Link href={env.public.RGBPP_WHITE_PAPER_URL} _hover={{ textDecoration: 'underline' }}>
                 {t(i18n)`Whitepaper`}
               </Link>
-              <Link href="/" _hover={{ textDecoration: 'underline' }}>
+              <Link href={env.public.RGBPP_SCRIPT_URL} _hover={{ textDecoration: 'underline' }}>
                 {t(i18n)`Script`}
               </Link>
-              <Link href="/" _hover={{ textDecoration: 'underline' }}>
+              <Link href={env.public.RGBPP_SDK_URL} _hover={{ textDecoration: 'underline' }}>
                 {t(i18n)`SDK`}
               </Link>
             </VStack>
@@ -108,10 +109,10 @@ export function Footer() {
           <VStack w="100%" gap="30px" alignItems="start">
             <Heading fontSize="18px">{t(i18n)`More Info`}</Heading>
             <VStack w="100%" gap="16px" color="text.third" alignItems="start">
-              <Link href="/" _hover={{ textDecoration: 'underline' }}>
+              <Link href={env.public.CKB_URL} _hover={{ textDecoration: 'underline' }}>
                 {t(i18n)`Nervos CKB`}
               </Link>
-              <Link href="/" _hover={{ textDecoration: 'underline' }}>
+              <Link href={env.public.UTXO_STACK_URL} _hover={{ textDecoration: 'underline' }}>
                 {t(i18n)`UTXO Stack`}
               </Link>
             </VStack>
