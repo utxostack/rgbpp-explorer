@@ -2,6 +2,8 @@ name: Frontend Spell Check
 
 on:
   push:
+    paths:
+      - frontend/**
 
 jobs:
   spellcheck:

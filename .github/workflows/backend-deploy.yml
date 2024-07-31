@@ -3,6 +3,8 @@ name: Backend Deploy
 on:
   push:
     branches: [develop]
+    paths:
+      - backend/**
   workflow_dispatch:
 
 jobs:
@@ -11,7 +13,7 @@ jobs:
       name: testnet
       url: https://testnet-api.explorer.rgbpp.io/graphql
     runs-on: ubuntu-latest
-  
+
     steps:
       - name: Deploy to testnet
         uses: appleboy/ssh-action@v1.0.3

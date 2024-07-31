@@ -1,6 +1,12 @@
 name: Backend test
 
-on: [pull_request, push]
+on:
+  pull_request:
+    paths:
+      - backend/**
+  push:
+    paths:
+      - backend/**
 
 jobs:
   build:
