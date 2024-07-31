@@ -2,7 +2,7 @@ name: Backend Deploy
 
 on:
   push:
-    branches: [main, deploy-testnet]
+    branches: [develop, deploy-testnet]
   workflow_dispatch:
 
 jobs:
