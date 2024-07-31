@@ -9,7 +9,7 @@ export function HomeTitle() {
     <Heading mt="10%" mb="54px" fontSize="62px" fontWeight="semibold">
       <Trans>
         Explore the
-        <Text as="span" color="#F7931A" mx="4px">
+        <Text as="span" color="#F7931A" mx="12px">
           BTC
         </Text>
         Ecosystem
