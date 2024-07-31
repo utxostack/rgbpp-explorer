@@ -10,10 +10,10 @@ import {
   CkbChainInfo,
   CkbTransaction,
   Pageable,
-  RGBppAddress,
   RGBppCoin,
   RgbppStatistic,
   RGBppTransaction,
+  SearchResult,
 } from '@/apis/types/explorer-graphql'
 import { env } from '@/constants/env'
 
@@ -979,43 +979,22 @@ class ExplorerGraphql {
   }
 
   async search(keyword: string) {
-    return request<{
-      rgbppTransaction: Pick<RGBppTransaction, 'ckbTxHash' | 'btcTxid'>
-      ckbAddress: Pick<CkbAddress, 'address'>
-      btcTransaction: Pick<BtcTransaction, 'txid'>
-      btcAddress: Pick<BtcAddress, 'address'>
-      rgbppAddress: Pick<RGBppAddress, 'address'>
-      rgbppCoin: Pick<RGBppCoin, 'typeHash'>
-      ckbTransaction: Pick<CkbTransaction, 'hash'>
-    }>(
+    return request<SearchResult>(
       this.serverURL,
       gql`
-      query RgbppTransaction {
-        rgbppTransaction(txidOrTxHash: "${keyword}") {
-          ckbTxHash
-          btcTxid
+        query Search {
+          search(query: "${keyword}") {
+            query
+            btcBlock
+            btcTransaction
+            btcAddress
+            ckbBlock
+            ckbTransaction
+            ckbAddress
+            rgbppCoin
+          }
         }
-        ckbAddress(address: "${keyword}") {
-          address
-        }
-        btcTransaction(txid: "${keyword}") {
-          txid
-        }
-        btcAddress(address: "${keyword}") {
-          address
-        }
-        rgbppAddress(address: "${keyword}") {
-          address
-        }
-        rgbppCoin(typeHash: "${keyword}") {
-          typeHash
-        }
-        ckbTransaction(txHash: "${keyword}") {
-          hash
-        }
-      }
-
-    `,
+      `,
     )
   }
 
