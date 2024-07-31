@@ -1,5 +1,7 @@
 import { Address, Block, OutSpend, RecommendedFees, Transaction, UTXO } from './bitcoin-api.schema';
 
+export { Address, Block, OutSpend, RecommendedFees, Transaction, UTXO };
+
 export interface IBitcoinDataProvider {
   getFeesRecommended(): Promise<RecommendedFees>;
   getAddress(props: { address: string }): Promise<Address>;

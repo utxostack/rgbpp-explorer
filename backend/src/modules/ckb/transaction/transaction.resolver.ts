@@ -44,7 +44,7 @@ export class CkbTransactionResolver {
           const input = rpcTx.transaction.inputs[i];
           const previousTx = await rpcTxLoader.load(input.previous_output.tx_hash);
           const index = BI.from(input.previous_output.index).toNumber();
-          return CkbCell.from(previousTx.transaction, index);
+          return CkbCell.fromTransaction(previousTx.transaction, index);
         }),
     );
   }

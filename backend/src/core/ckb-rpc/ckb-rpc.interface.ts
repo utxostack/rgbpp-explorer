@@ -108,16 +108,18 @@ export interface GetTransactionsResult {
   }[];
 }
 
+export interface Cell {
+  block_number: string;
+  out_point: {
+    index: string;
+    tx_hash: string;
+  };
+  output: Output;
+  output_data: string;
+  tx_index: string;
+}
+
 export interface GetCellsResult {
   last_cursor: string;
-  objects: {
-    block_number: string;
-    out_point: {
-      index: string;
-      tx_hash: string;
-    };
-    output: Output;
-    output_data: string;
-    tx_index: string;
-  }[];
+  objects: Cell[];
 }

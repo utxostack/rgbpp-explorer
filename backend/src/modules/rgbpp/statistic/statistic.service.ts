@@ -1,16 +1,9 @@
-import { BI } from '@ckb-lumos/bi';
 import { Inject, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { getRgbppLockScript, remove0x, RGBPPLock } from '@rgbpp-sdk/ckb';
-import { BtcTestnetTypeMap, NetworkType } from 'src/constants';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
-import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
-import { CkbRpcWebsocketService } from 'src/core/ckb-rpc/ckb-rpc-websocket.service';
-import { Env } from 'src/env';
 import * as pLimit from 'p-limit';
-import { bytes } from '@ckb-lumos/lumos/codec';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { TEN_MINUTES_MS } from 'src/common/date';
+import { RgbppService } from '../rgbpp.service';
 
 const limit = pLimit(100);
 
@@ -19,12 +12,10 @@ export class RgbppStatisticService {
   private holdersCacheKey = `RgbppStatisticService:holders`;
 
   constructor(
-    private configService: ConfigService<Env>,
     private bitcoinApiService: BitcoinApiService,
-    private ckbExplorerService: CkbExplorerService,
-    private ckbRpcService: CkbRpcWebsocketService,
+    private rgbppService: RgbppService,
     @Inject(CACHE_MANAGER) protected cacheManager: Cache,
-  ) { }
+  ) {}
 
   public async getRgbppAssetsHolders() {
     const cached = await this.cacheManager.get<string[]>(this.holdersCacheKey);
@@ -41,36 +32,13 @@ export class RgbppStatisticService {
   }
 
   public async collectRgbppAssetsHolders() {
-    const network = this.configService.get('NETWORK');
-    const rgbppLock = getRgbppLockScript(
-      network === NetworkType.mainnet,
-      BtcTestnetTypeMap[network],
-    );
-    const rgbppTxs = await this.ckbExplorerService.getRgbppTransactions();
-    const cells = await this.ckbRpcService.getCells(
-      {
-        script: {
-          code_hash: rgbppLock.codeHash,
-          hash_type: rgbppLock.hashType,
-          args: '0x',
-        },
-        script_type: 'lock',
-      },
-      'desc',
-      // rgbppTxs.meta.total * 10 is a rough estimation of the number of cells
-      BI.from(rgbppTxs.meta.total * 10).toHexString(),
-    );
-
-    const utxos = cells.objects
+    const cells = await this.rgbppService.getAllRgbppLockCells();
+    const utxos = cells
       .map((cell) => {
         const { args } = cell.output.lock;
         try {
-          const unpack = RGBPPLock.unpack(args);
-          const btcTxid = bytes.hexify(bytes.bytify(unpack.btcTxid).reverse());
-          return {
-            outIndex: unpack.outIndex,
-            btcTxid: remove0x(btcTxid),
-          };
+          const data = this.rgbppService.parseRgbppLockArgs(args);
+          return data;
         } catch {
           return null;
         }
