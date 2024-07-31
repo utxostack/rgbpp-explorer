@@ -18,7 +18,7 @@ export function BTCTransactionPage({
 }: {
   btcTransaction: BtcTransaction
   ckbTransaction?: CkbTransaction
-  leapDirection?: LeapDirection
+  leapDirection?: LeapDirection | null
 }) {
   return (
     <VStack w="100%" maxW="content" p="30px" gap="30px">
