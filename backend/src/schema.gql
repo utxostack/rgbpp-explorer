@@ -33,6 +33,15 @@ type CkbCell {
   lock: CkbScript!
   xudtInfo: CkbXUDTInfo
   status: CkbCellStatus!
+  cellType: CellType
+}
+
+"""Cell type (XUDT, SUDT, Dobs, mNFT)"""
+enum CellType {
+  XUDT
+  SUDT
+  DOB
+  MNFT
 }
 
 """CKB Address"""
@@ -280,6 +289,7 @@ type SearchResult {
 type Query {
   ckbChainInfo: CkbChainInfo!
   ckbBlock(heightOrHash: String!): CkbBlock
+  ckbLatestTransactions(types: [CellType!], scriptKey: CkbSearchKeyInput, limit: Float, order: String, after: String): [CkbTransaction!]!
   ckbTransaction(txHash: String!): CkbTransaction
   ckbAddress(address: String!): CkbAddress
   btcChainInfo: BitcoinChainInfo!
@@ -293,6 +303,19 @@ type Query {
   rgbppCoin(typeHash: String!): RgbppCoin!
   rgbppStatistic: RgbppStatistic!
   search(query: String!): SearchResult!
+}
+
+"""Search key for CKB transactions"""
+input CkbSearchKeyInput {
+  script: CkbScriptInput!
+  scriptType: String!
+}
+
+"""CKB Script"""
+input CkbScriptInput {
+  codeHash: String!
+  hashType: String!
+  args: String!
 }
 
 enum TransactionListSortType {

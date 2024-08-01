@@ -4,9 +4,10 @@ import { CkbExplorerModule } from 'src/core/ckb-explorer/ckb-explorer.module';
 import { CkbTransactionResolver } from './transaction.resolver';
 import { CkbTransactionService } from './transaction.service';
 import { CkbExplorerTransactionLoader, CkbRpcTransactionLoader } from './transaction.dataloader';
+import { CkbScriptModule } from '../script/script.module';
 
 @Module({
-  imports: [CkbRpcModule, CkbExplorerModule],
+  imports: [CkbRpcModule, CkbExplorerModule, CkbScriptModule],
   providers: [
     CkbTransactionResolver,
     CkbTransactionService,

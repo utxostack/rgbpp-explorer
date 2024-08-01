@@ -9,10 +9,15 @@ import {
 } from '../transaction/transaction.dataloader';
 import { CkbCell, CkbXUDTInfo, CkbBaseCellStatus, CkbCellStatus, CkbBaseCell } from './cell.model';
 import { CkbCellService } from './cell.service';
+import { CellType } from '../script/script.model';
+import { CkbScriptService } from '../script/script.service';
 
 @Resolver(() => CkbCell)
 export class CkbCellResolver {
-  constructor(private ckbCellService: CkbCellService) { }
+  constructor(
+    private ckbCellService: CkbCellService,
+    private ckbScriptService: CkbScriptService,
+  ) { }
 
   @ResolveField(() => CkbXUDTInfo, { nullable: true })
   public async xudtInfo(
@@ -58,6 +63,16 @@ export class CkbCellResolver {
       return {
         consumed,
       };
+    }
+  }
+
+  @ResolveField(() => CellType, { nullable: true })
+  public cellType(@Parent() cell: CkbBaseCell) {
+    try {
+      const cellType = this.ckbScriptService.getCellTypeByScript(cell.type);
+      return cellType;
+    } catch {
+      return null;
     }
   }
 }

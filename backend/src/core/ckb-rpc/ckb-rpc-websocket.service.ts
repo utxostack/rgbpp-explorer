@@ -60,11 +60,17 @@ export class CkbRpcWebsocketService {
     searchKey: SearchKey,
     order: 'asc' | 'desc',
     limit: string,
+    after?: string,
   ): Promise<GetTransactionsResult> {
     this.logger.debug(
-      `get_transactions - searchKey: ${JSON.stringify(searchKey)}, order: ${order}, limit: ${limit}`,
+      `get_transactions - searchKey: ${JSON.stringify(searchKey)}, order: ${order}, limit: ${limit}, after: ${after}`,
     );
-    const transactions = await this.websocket.call('get_transactions', [searchKey, order, limit]);
+    const transactions = await this.websocket.call('get_transactions', [
+      searchKey,
+      order,
+      limit,
+      after,
+    ]);
     return transactions as GetTransactionsResult;
   }
 
