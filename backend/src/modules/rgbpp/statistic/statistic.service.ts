@@ -64,9 +64,9 @@ export class RgbppStatisticService {
           if (!output) {
             return;
           }
-          const { scriptpubkey } = output;
-          if (scriptpubkey) {
-            set.add(scriptpubkey);
+          const { scriptpubkey_address } = output;
+          if (scriptpubkey_address) {
+            set.add(scriptpubkey_address);
           }
         });
       }
