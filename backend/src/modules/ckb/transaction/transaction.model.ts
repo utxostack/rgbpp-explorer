@@ -48,7 +48,7 @@ export class CkbTransaction {
 
   public static from(
     transactionWithStatus: CkbRpc.TransactionWithStatusResponse,
-  ): CkbBaseTransaction {
+  ): CkbBaseTransaction | null {
     const { transaction, tx_status } = transactionWithStatus;
     if (!transaction || tx_status?.status === 'unknown') {
       return null;

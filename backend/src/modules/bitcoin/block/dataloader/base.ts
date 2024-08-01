@@ -21,7 +21,7 @@ export abstract class BitcoinBaseLoader {
 
   protected async getBlockTxs(
     hashOrHeight: string,
-    startIndex: number,
+    startIndex: number = 0,
   ): Promise<BitcoinApi.Transaction[]> {
     if (hashOrHeight.startsWith('0')) {
       return this.bitcoinApiService.getBlockTxs({ hash: hashOrHeight, startIndex });

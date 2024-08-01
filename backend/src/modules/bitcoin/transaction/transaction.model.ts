@@ -13,10 +13,10 @@ export type BitcoinBaseTransaction = Omit<
 @ObjectType({ description: 'Bitcoin Transaction' })
 export class BitcoinTransaction {
   @Field(() => Float)
-  blockHeight: number;
+  blockHeight: number | null;
 
   @Field(() => String)
-  blockHash: string;
+  blockHash: string | null;
 
   @Field(() => String)
   txid: string;
@@ -24,7 +24,7 @@ export class BitcoinTransaction {
   @Field(() => Int)
   version: number;
 
-  @Field(() => [BitcoinInput])
+  @Field(() => [BitcoinInput], { nullable: true })
   vin: BitcoinInput[];
 
   @Field(() => [BitcoinOutput])
@@ -61,8 +61,8 @@ export class BitcoinTransaction {
     const vSize = Math.ceil(tx.weight / 4);
 
     return {
-      blockHeight: tx.status.block_height,
-      blockHash: tx.status.block_hash,
+      blockHeight: tx.status.block_height ?? null,
+      blockHash: tx.status.block_hash ?? null,
       txid: tx.txid,
       version: tx.version,
       vin: tx.vin.map(BitcoinInput.from),

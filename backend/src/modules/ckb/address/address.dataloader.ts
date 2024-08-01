@@ -12,7 +12,7 @@ import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 
 @Injectable()
 export class CkbAddressLoader
-  implements NestDataLoader<GetAddressParams, CkbExplorer.AddressInfo[] | void>
+  implements NestDataLoader<GetAddressParams, CkbExplorer.AddressInfo[] | null>
 {
   private logger = new Logger(CkbAddressLoader.name);
 
@@ -41,7 +41,7 @@ export class CkbAddressLoader
     };
   }
 }
-export type CkbAddressLoaderType = DataLoader<GetAddressParams, CkbExplorer.AddressInfo[] | void>;
+export type CkbAddressLoaderType = DataLoader<GetAddressParams, CkbExplorer.AddressInfo[] | null>;
 export type CkbAddressLoaderResponse = DataLoaderResponse<CkbAddressLoader>;
 
 export interface CkbAddressTransactionLoaderResult {
@@ -51,7 +51,7 @@ export interface CkbAddressTransactionLoaderResult {
 
 @Injectable()
 export class CkbAddressTransactionsLoader
-  implements NestDataLoader<GetAddressTransactionsParams, CkbAddressTransactionLoaderResult | void>
+  implements NestDataLoader<GetAddressTransactionsParams, CkbAddressTransactionLoaderResult | null>
 {
   private logger = new Logger(CkbAddressTransactionsLoader.name);
 
@@ -85,6 +85,6 @@ export class CkbAddressTransactionsLoader
 }
 export type CkbAddressTransactionsLoaderType = DataLoader<
   GetAddressTransactionsParams,
-  CkbAddressTransactionLoaderResult | void
+  CkbAddressTransactionLoaderResult | null
 >;
 export type CkbAddressTransactionsLoaderResponse = DataLoaderResponse<CkbAddressTransactionsLoader>;

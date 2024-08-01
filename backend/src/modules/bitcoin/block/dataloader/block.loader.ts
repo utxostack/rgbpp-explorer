@@ -11,7 +11,7 @@ import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 @Injectable()
 export class BitcoinBlockLoader
   extends BitcoinBaseLoader
-  implements NestDataLoader<string, BitcoinApi.Block | void>
+  implements NestDataLoader<string, BitcoinApi.Block | null>
 {
   protected logger = new Logger(BitcoinBlockLoader.name);
 
@@ -38,5 +38,5 @@ export class BitcoinBlockLoader
     };
   }
 }
-export type BitcoinBlockLoaderType = DataLoader<string, BitcoinApi.Block | void>;
+export type BitcoinBlockLoaderType = DataLoader<string, BitcoinApi.Block | null>;
 export type BitcoinBlockLoaderResponse = DataLoaderResponse<BitcoinBlockLoader>;

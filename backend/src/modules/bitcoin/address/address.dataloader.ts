@@ -33,7 +33,7 @@ export class BitcoinAddressLoader implements NestDataLoader<string, Address | nu
     };
   }
 }
-export type BitcoinAddressLoaderType = DataLoader<string, Address | void>;
+export type BitcoinAddressLoaderType = DataLoader<string, Address | null>;
 export type BitcoinAddressLoaderResponse = DataLoaderResponse<BitcoinAddressLoader>;
 
 export interface BitcoinAddressTransactionsLoaderParams {
@@ -44,7 +44,7 @@ export interface BitcoinAddressTransactionsLoaderParams {
 @Injectable()
 export class BitcoinAddressTransactionsLoader
   implements
-    NestDataLoader<BitcoinAddressTransactionsLoaderParams, BitcoinBaseTransaction[] | void>
+    NestDataLoader<BitcoinAddressTransactionsLoaderParams, BitcoinBaseTransaction[] | null>
 {
   private logger = new Logger(BitcoinAddressTransactionsLoader.name);
 
@@ -78,7 +78,7 @@ export class BitcoinAddressTransactionsLoader
 }
 export type BitcoinAddressTransactionsLoaderType = DataLoader<
   BitcoinAddressTransactionsLoaderParams,
-  BitcoinBaseTransaction[] | void
+  BitcoinBaseTransaction[] | null
 >;
 export type BitcoinAddressTransactionsLoaderResponse =
   DataLoaderResponse<BitcoinAddressTransactionsLoader>;

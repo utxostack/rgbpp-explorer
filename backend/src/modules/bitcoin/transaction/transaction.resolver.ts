@@ -38,7 +38,7 @@ export class BitcoinTransactionResolver {
 
     // TODO: should this resolver be refactored with a dataloader?
     const info = await this.bitcoinApiService.getBlockchainInfo();
-    return info.blocks - tx.blockHeight + 1;
+    return info.blocks - tx.blockHeight! + 1;
   }
 
   @ResolveField(() => BitcoinBlock, { nullable: true })
@@ -46,6 +46,9 @@ export class BitcoinTransactionResolver {
     @Parent() tx: BitcoinBaseTransaction,
     @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
   ): Promise<BitcoinBaseBlock | null> {
+    if (!tx.blockHash) {
+      return null
+    }
     const block = await blockLoader.load(tx.blockHash);
     if (!block) {
       return null;

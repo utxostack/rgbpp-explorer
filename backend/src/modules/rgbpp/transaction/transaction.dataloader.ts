@@ -7,7 +7,7 @@ import { RgbppBaseTransaction } from './transaction.model';
 import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 
 @Injectable()
-export class RgbppTransactionLoader implements NestDataLoader<string, RgbppBaseTransaction | void> {
+export class RgbppTransactionLoader implements NestDataLoader<string, RgbppBaseTransaction | null> {
   private logger = new Logger(RgbppTransactionLoader.name);
 
   constructor(
@@ -32,5 +32,5 @@ export class RgbppTransactionLoader implements NestDataLoader<string, RgbppBaseT
     };
   }
 }
-export type RgbppTransactionLoaderType = DataLoader<string, RgbppBaseTransaction | void>;
+export type RgbppTransactionLoaderType = DataLoader<string, RgbppBaseTransaction | null>;
 export type RgbppTransactionLoaderResponse = DataLoaderResponse<RgbppTransactionLoader>;

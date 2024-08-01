@@ -15,8 +15,7 @@ export interface BitcoinBlockTxidsLoaderParams {
 @Injectable()
 export class BitcoinBlockTxidsLoader
   extends BitcoinBaseLoader
-  implements NestDataLoader<BitcoinBlockTxidsLoaderParams, string[] | void>
-{
+  implements NestDataLoader<BitcoinBlockTxidsLoaderParams, string[] | null> {
   protected logger = new Logger(BitcoinBlockTxidsLoader.name);
 
   constructor(
@@ -31,7 +30,12 @@ export class BitcoinBlockTxidsLoader
     return async (keys: BitcoinBlockTxidsLoaderParams[]) => {
       this.logger.debug(`Loading bitcoin block transactions`);
       const results = await Promise.allSettled(
-        keys.map(async ({ hash, height }) => this.getBlockTxids(hash || height.toString())),
+        keys.map(async ({ hash, height }) => {
+          if (!hash && !height) {
+            return null;
+          }
+          return this.getBlockTxids(hash || height!.toString());
+        }),
       );
       return results.map((result, index) => {
         if (result.status === 'fulfilled') {
@@ -46,6 +50,6 @@ export class BitcoinBlockTxidsLoader
 }
 export type BitcoinBlockTxidsLoaderType = DataLoader<
   BitcoinBlockTxidsLoaderParams,
-  string[] | void
+  string[] | null
 >;
 export type BitcoinBlockTxidsLoaderResponse = DataLoaderResponse<BitcoinBlockTxidsLoader>;

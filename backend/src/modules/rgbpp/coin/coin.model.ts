@@ -16,7 +16,7 @@ export class RgbppCoin {
   name: string;
 
   @Field(() => String, { nullable: true })
-  description: string;
+  description: string | null;
 
   @Field(() => String)
   symbol: string;
@@ -25,7 +25,7 @@ export class RgbppCoin {
   decimal: number;
 
   @Field(() => String, { nullable: true })
-  icon: string;
+  icon: string | null;
 
   @Field(() => String, { nullable: true })
   typeHash: string;

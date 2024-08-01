@@ -44,11 +44,11 @@ export class BitcoinAddressResolver {
     return addressStats.mempool_stats.funded_txo_sum - addressStats.mempool_stats.spent_txo_sum;
   }
 
-  @ResolveField(() => Float)
+  @ResolveField(() => Float, { nullable: true })
   public async transactionsCount(
     @Parent() address: BitcoinBaseAddress,
     @Loader(BitcoinAddressLoader) addressLoader: BitcoinAddressLoaderType,
-  ): Promise<number> {
+  ): Promise<number | null> {
     // TODO: addressInfo.mempool_stats.tx_count is not included in the response, not sure if it should be included
     const stats = await addressLoader.load(address.address);
     if (!stats) {

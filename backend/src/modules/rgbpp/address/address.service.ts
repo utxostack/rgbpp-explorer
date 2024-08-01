@@ -46,7 +46,7 @@ export class RgbppAddressService {
 
   public async collectRgbppAddressCells(btcAddress: string): Promise<CkbRpc.Cell[]> {
     const addressTxsMap = new Map<string, BitcoinApi.Transaction>();
-    let afterTxid = undefined;
+    let afterTxid: string | undefined = undefined;
     while (true) {
       const txs = await this.bitcoinApiService.getAddressTxs({ address: btcAddress, afterTxid });
       if (txs.length === 0 || afterTxid === txs[txs.length - 1].txid) {
@@ -67,7 +67,7 @@ export class RgbppAddressService {
         if (!tx) {
           return false;
         }
-        const vout = addressTxsMap.get(btcTxid).vout;
+        const vout = addressTxsMap.get(btcTxid)!.vout;
         if (!vout[outIndex]) {
           return false;
         }
