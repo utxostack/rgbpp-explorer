@@ -29,3 +29,7 @@ jobs:
       - name: Run Build
         run: pnpm run build
         working-directory: backend
+
+      - name: Run Test
+        run: pnpm run test
+        working-directory: backend
