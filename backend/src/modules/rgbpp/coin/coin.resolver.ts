@@ -1,21 +1,24 @@
 import { Args, Int, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
-import { XUDTTag } from 'src/core/ckb-explorer/ckb-explorer.interface';
+import { TransactionListSortType, XUDTTag } from 'src/core/ckb-explorer/ckb-explorer.interface';
 import { RgbppTransaction } from '../transaction/transaction.model';
 import { RgbppBaseCoin, RgbppCoin, RgbppCoinList } from './coin.model';
 
 @Resolver(() => RgbppCoin)
 export class RgbppCoinResolver {
-  constructor(private ckbExplorerService: CkbExplorerService) {}
+  constructor(private ckbExplorerService: CkbExplorerService) { }
 
   @Query(() => RgbppCoinList, { name: 'rgbppCoins' })
   public async coins(
     @Args('page', { type: () => Int, nullable: true }) page: number = 1,
     @Args('pageSize', { type: () => Int, nullable: true }) pageSize: number = 10,
+    @Args('sort', { type: () => TransactionListSortType, nullable: true })
+    sort = TransactionListSortType.TransactionsDesc,
   ): Promise<RgbppCoinList> {
     const response = await this.ckbExplorerService.getXUDTList({
       page,
       pageSize,
+      sort,
       tags: [XUDTTag.RgbppCompatible],
     });
     const coins = response.data.map((coin) => RgbppCoin.from(coin.attributes));
