@@ -30,12 +30,15 @@ export class CkbTransactionResolver {
     return CkbTransaction.from(tx);
   }
 
-  @ResolveField(() => [CkbCell])
+  @ResolveField(() => [CkbCell], { nullable: true })
   public async inputs(
     @Parent() tx: CkbBaseTransaction,
     @Loader(CkbRpcTransactionLoader) rpcTxLoader: CkbRpcTransactionLoaderType,
-  ): Promise<CkbBaseCell[]> {
+  ): Promise<(CkbBaseCell | null)[] | null> {
     const rpcTx = await rpcTxLoader.load(tx.hash);
+    if (!rpcTx) {
+      return null;
+    }
     return Promise.all(
       rpcTx.transaction.inputs
         // Filter out cellbase transaction
@@ -43,36 +46,48 @@ export class CkbTransactionResolver {
         .map(async (_, i) => {
           const input = rpcTx.transaction.inputs[i];
           const previousTx = await rpcTxLoader.load(input.previous_output.tx_hash);
+          if (!previousTx) {
+            return null;
+          }
           const index = BI.from(input.previous_output.index).toNumber();
           return CkbCell.fromTransaction(previousTx.transaction, index);
         }),
     );
   }
 
-  @ResolveField(() => CkbBlock)
+  @ResolveField(() => CkbBlock, { nullable: true })
   public async block(
     @Parent() tx: CkbBaseTransaction,
     @Loader(CkbRpcBlockLoader) rpcBlockLoader: CkbRpcBlockLoaderType,
-  ): Promise<CkbBaseBlock> {
+  ): Promise<CkbBaseBlock | null> {
     const block = await rpcBlockLoader.load(tx.blockNumber.toString());
+    if (!block) {
+      return null;
+    }
     return CkbBlock.from(block);
   }
 
-  @ResolveField(() => Float)
+  @ResolveField(() => Float, { nullable: true })
   public async fee(
     @Parent() tx: CkbBaseTransaction,
     @Loader(CkbExplorerTransactionLoader) explorerTxLoader: CkbExplorerTransactionLoaderType,
-  ): Promise<number> {
+  ): Promise<number | null> {
     const explorerTx = await explorerTxLoader.load(tx.hash);
+    if (!explorerTx) {
+      return null;
+    }
     return toNumber(explorerTx.transaction_fee);
   }
 
-  @ResolveField(() => Float)
+  @ResolveField(() => Float, { nullable: true })
   public async feeRate(
     @Parent() tx: CkbBaseTransaction,
     @Loader(CkbExplorerTransactionLoader) explorerTxLoader: CkbExplorerTransactionLoaderType,
-  ): Promise<number> {
+  ): Promise<number | null> {
     const explorerTx = await explorerTxLoader.load(tx.hash);
+    if (!explorerTx) {
+      return null;
+    }
     const fee = BI.from(explorerTx.transaction_fee);
     const size = BI.from(tx.size);
     const ratio = BI.from(1000);

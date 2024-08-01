@@ -29,6 +29,7 @@ export class BitcoinResolver {
     const txidsCollection = await blockTxidsLoader.loadMany(
       blockNumbers.map((blockNumber) => ({ height: blockNumber })),
     );
+    // XXX: what if some of the blocks are not fetched? (due to network issue or else)
     const count = txidsCollection
       .map((txs) => (txs instanceof Array ? txs : []))
       .reduce((acc, txs) => acc + txs?.length ?? 0, 0);

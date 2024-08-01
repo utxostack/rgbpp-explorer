@@ -17,11 +17,14 @@ export class AssetResolver {
   public async utxo(
     @Parent() asset: RgbppBaseAsset,
     @Loader(BitcoinTransactionLoader) txLoader: BitcoinTransactionLoaderType,
-  ): Promise<BitcoinBaseOutput> {
+  ): Promise<BitcoinBaseOutput | null> {
     try {
       const { args } = asset.cell.lock;
       const { btcTxid, outIndex } = this.rgbppService.parseRgbppLockArgs(args);
       const tx = await txLoader.load(btcTxid);
+      if (!tx) {
+        return null;
+      }
       const output = tx.vout[outIndex];
       return BitcoinOutput.from({
         txid: btcTxid,

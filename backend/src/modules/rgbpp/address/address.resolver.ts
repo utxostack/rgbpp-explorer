@@ -51,13 +51,16 @@ export class RgbppAddressResolver {
   public async balances(
     @ParentField('address') address: string,
     @Loader(CkbExplorerTransactionLoader) explorerTxLoader: CkbExplorerTransactionLoaderType,
-  ): Promise<CkbXUDTInfo[]> {
+  ): Promise<(CkbXUDTInfo | null)[]> {
     const cells = await this.rgbppAddressService.getRgbppAddressCells(address);
     const limit = pLimit(10);
     const xudts = await Promise.all(
       cells.map((cell) =>
         limit(async () => {
           const tx = await explorerTxLoader.load(cell.out_point.tx_hash);
+          if (!tx) {
+            return null;
+          }
           const output = tx.display_outputs[BI.from(cell.out_point.index).toNumber()];
           const info = output.xudt_info || output.omiga_inscription_info;
           if (!info) {
