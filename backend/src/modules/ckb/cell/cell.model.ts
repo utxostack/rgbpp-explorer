@@ -46,7 +46,7 @@ export class CkbCell {
   capacity: number;
 
   @Field(() => CkbScript, { nullable: true })
-  type: CkbScript;
+  type: CkbScript | null;
 
   @Field(() => CkbScript)
   lock: CkbScript;

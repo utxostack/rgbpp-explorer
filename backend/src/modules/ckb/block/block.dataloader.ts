@@ -8,7 +8,7 @@ import { CkbBlockService } from './block.service';
 import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 
 @Injectable()
-export class CkbRpcBlockLoader implements NestDataLoader<string, CkbRpc.Block |  void> {
+export class CkbRpcBlockLoader implements NestDataLoader<string, CkbRpc.Block |  null> {
   private logger = new Logger(CkbRpcBlockLoader.name);
 
   constructor(
@@ -33,11 +33,11 @@ export class CkbRpcBlockLoader implements NestDataLoader<string, CkbRpc.Block | 
     };
   }
 }
-export type CkbRpcBlockLoaderType = DataLoader<string, CkbRpc.Block | void>;
+export type CkbRpcBlockLoaderType = DataLoader<string, CkbRpc.Block | null>;
 export type CkbRpcBlockLoaderResponse = DataLoaderResponse<CkbRpcBlockLoader>;
 
 @Injectable()
-export class CkbExplorerBlockLoader implements NestDataLoader<string, CkbExplorer.Block | void> {
+export class CkbExplorerBlockLoader implements NestDataLoader<string, CkbExplorer.Block | null> {
   private logger = new Logger(CkbRpcBlockLoader.name);
 
   constructor(
@@ -64,12 +64,12 @@ export class CkbExplorerBlockLoader implements NestDataLoader<string, CkbExplore
     };
   }
 }
-export type CkbExplorerBlockLoaderType = DataLoader<string, CkbExplorer.Block | void>;
+export type CkbExplorerBlockLoaderType = DataLoader<string, CkbExplorer.Block | null>;
 export type CkbExplorerBlockLoaderResponse = DataLoaderResponse<CkbExplorerBlockLoader>;
 
 @Injectable()
 export class CkbBlockEconomicStateLoader
-  implements NestDataLoader<string, CkbRpc.BlockEconomicState | void>
+  implements NestDataLoader<string, CkbRpc.BlockEconomicState | null>
 {
   private logger = new Logger(CkbBlockEconomicStateLoader.name);
 
@@ -95,5 +95,5 @@ export class CkbBlockEconomicStateLoader
     };
   }
 }
-export type CkbBlockEconomicStateLoaderType = DataLoader<string, CkbRpc.BlockEconomicState | void>;
+export type CkbBlockEconomicStateLoaderType = DataLoader<string, CkbRpc.BlockEconomicState | null>;
 export type CkbBlockEconomicStateLoaderResponse = DataLoaderResponse<CkbBlockEconomicStateLoader>;

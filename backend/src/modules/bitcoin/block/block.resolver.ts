@@ -30,7 +30,7 @@ export class BitcoinBlockResolver {
   ): Promise<BitcoinBaseAddress | null> {
     // XXX: only the "mempool" mode returns the "extra" field
     const detail = await blockLoader.load(block.id);
-    if (!detail) {
+    if (!detail || !detail.extras?.coinbaseAddress) {
       return null;
     }
     return {
@@ -45,7 +45,7 @@ export class BitcoinBlockResolver {
   ): Promise<number | null> {
     // XXX: only the "mempool" mode returns the "extra" field
     const detail = await blockLoader.load(block.id);
-    if (!detail) {
+    if (!detail || !detail.extras?.reward) {
       return null;
     }
     return detail.extras.reward;
@@ -58,7 +58,7 @@ export class BitcoinBlockResolver {
   ): Promise<number | null> {
     // XXX: only the "mempool" mode returns the "extra" field
     const detail = await blockLoader.load(block.id);
-    if (!detail) {
+    if (!detail || !detail.extras?.totalFees) {
       return null;
     }
     return detail.extras.totalFees;
@@ -71,7 +71,7 @@ export class BitcoinBlockResolver {
   ): Promise<FeeRateRange | null> {
     // XXX: only the "mempool" mode returns the "extra" field
     const detail = await blockLoader.load(block.id);
-    if (!detail) {
+    if (!detail || !detail.extras?.feeRange) {
       return null;
     }
     return {

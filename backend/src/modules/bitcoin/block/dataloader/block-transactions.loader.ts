@@ -17,8 +17,7 @@ export interface BitcoinBlockTransactionsLoaderParams {
 @Injectable()
 export class BitcoinBlockTransactionsLoader
   extends BitcoinBaseLoader
-  implements NestDataLoader<BitcoinBlockTransactionsLoaderParams, BitcoinApi.Transaction[] | void>
-{
+  implements NestDataLoader<BitcoinBlockTransactionsLoaderParams, BitcoinApi.Transaction[] | null> {
   protected logger = new Logger(BitcoinBlockTransactionsLoader.name);
 
   constructor(
@@ -33,9 +32,12 @@ export class BitcoinBlockTransactionsLoader
     return async (batchProps: BitcoinBlockTransactionsLoaderParams[]) => {
       this.logger.debug(`Loading bitcoin block transactions`);
       const results = await Promise.allSettled(
-        batchProps.map(async ({ hash, height, startIndex }) =>
-          this.getBlockTxs(hash || height.toString(), startIndex),
-        ),
+        batchProps.map(async ({ hash, height, startIndex }) => {
+          if (!hash && !height) {
+            return null;
+          }
+          return this.getBlockTxs(hash || height!.toString(), startIndex);
+        }),
       );
       return results.map((result, index) => {
         if (result.status === 'fulfilled') {
@@ -50,8 +52,7 @@ export class BitcoinBlockTransactionsLoader
 }
 export type BitcoinBlockTransactionsLoaderType = DataLoader<
   BitcoinBlockTransactionsLoaderParams,
-  BitcoinApi.Transaction[] | void
+  BitcoinApi.Transaction[] | null
 >;
 export type BitcoinBlockTransactionsLoaderResponse =
   DataLoaderResponse<BitcoinBlockTransactionsLoader>;
-

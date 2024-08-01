@@ -18,7 +18,7 @@ export class CkbCellResolver {
   public async xudtInfo(
     @Parent() cell: CkbBaseCell,
     @Loader(CkbExplorerTransactionLoader) explorerTxLoader: CkbExplorerTransactionLoaderType,
-  ): Promise<CkbXUDTInfo> {
+  ): Promise<CkbXUDTInfo | null> {
     const tx = await explorerTxLoader.load(cell.txHash);
     if (!tx || !tx.display_outputs[cell.index]) {
       return null;

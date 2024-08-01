@@ -8,7 +8,7 @@ import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 
 @Injectable()
 export class BitcoinTransactionLoader
-  implements NestDataLoader<string, BitcoinApi.Transaction | void>
+  implements NestDataLoader<string, BitcoinApi.Transaction | null>
 {
   private logger = new Logger(BitcoinTransactionLoader.name);
 
@@ -34,12 +34,12 @@ export class BitcoinTransactionLoader
     };
   }
 }
-export type BitcoinTransactionLoaderType = DataLoader<string, BitcoinApi.Transaction | void>;
+export type BitcoinTransactionLoaderType = DataLoader<string, BitcoinApi.Transaction | null>;
 export type BitcoinTransactionLoaderResponse = DataLoaderResponse<BitcoinTransactionLoader>;
 
 @Injectable()
 export class BitcoinTransactionOutSpendsLoader
-  implements NestDataLoader<string, BitcoinApi.OutSpend[] | void>
+  implements NestDataLoader<string, BitcoinApi.OutSpend[] | null>
 {
   private logger = new Logger(BitcoinTransactionLoader.name);
 
@@ -67,7 +67,7 @@ export class BitcoinTransactionOutSpendsLoader
 }
 export type BitcoinTransactionOutSpendsLoaderType = DataLoader<
   string,
-  BitcoinApi.OutSpend[] | void
+  BitcoinApi.OutSpend[] | null
 >;
 export type BitcoinTransactionOutSpendsLoaderResponse =
   DataLoaderResponse<BitcoinTransactionOutSpendsLoader>;

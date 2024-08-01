@@ -111,7 +111,7 @@ type BitcoinAddress {
   address: String!
   satoshi: Float!
   pendingSatoshi: Float!
-  transactionsCount: Float!
+  transactionsCount: Float
   transactions(afterTxid: String): [BitcoinTransaction!]!
   rgbppAddress: RgbppAddress!
 }
@@ -180,7 +180,7 @@ type BitcoinTransaction {
   blockHash: String!
   txid: String!
   version: Int!
-  vin: [BitcoinInput!]!
+  vin: [BitcoinInput!]
   vout: [BitcoinOutput!]!
   size: Float!
   locktime: Float!

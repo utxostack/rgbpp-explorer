@@ -90,9 +90,9 @@ export class RgbppAddressResolver {
       if (!balancesMap.has(key)) {
         balancesMap.set(key, xudt);
       } else {
-        const amount = BI.from(balancesMap.get(key).amount).add(BI.from(xudt.amount)).toHexString();
+        const amount = BI.from(balancesMap.get(key)!.amount).add(BI.from(xudt.amount)).toHexString();
         balancesMap.set(key, {
-          ...balancesMap.get(key),
+          ...balancesMap.get(key)!,
           amount,
         });
       }

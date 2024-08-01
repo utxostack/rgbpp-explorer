@@ -9,7 +9,7 @@ import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 
 @Injectable()
 export class CkbRpcTransactionLoader
-  implements NestDataLoader<string, CkbRpcInterface.TransactionWithStatusResponse | void>
+  implements NestDataLoader<string, CkbRpcInterface.TransactionWithStatusResponse | null>
 {
   private logger = new Logger(CkbRpcTransactionLoader.name);
 
@@ -37,13 +37,13 @@ export class CkbRpcTransactionLoader
 }
 export type CkbRpcTransactionLoaderType = DataLoader<
   string,
-  CkbRpcInterface.TransactionWithStatusResponse | void
+  CkbRpcInterface.TransactionWithStatusResponse | null
 >;
 export type CkbRpcTransactionLoaderResponse = DataLoaderResponse<CkbRpcTransactionLoader>;
 
 @Injectable()
 export class CkbExplorerTransactionLoader
-  implements NestDataLoader<string, CkbExplorerInterface.DetailTransaction | void>
+  implements NestDataLoader<string, CkbExplorerInterface.DetailTransaction | null>
 {
   private logger = new Logger(CkbExplorerTransactionLoader.name);
 
@@ -71,6 +71,6 @@ export class CkbExplorerTransactionLoader
 }
 export type CkbExplorerTransactionLoaderType = DataLoader<
   string,
-  CkbExplorerInterface.DetailTransaction | void
+  CkbExplorerInterface.DetailTransaction | null
 >;
 export type CkbExplorerTransactionLoaderResponse = DataLoaderResponse<CkbExplorerTransactionLoader>;

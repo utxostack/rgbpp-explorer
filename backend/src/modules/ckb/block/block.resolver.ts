@@ -60,7 +60,7 @@ export class CkbBlockResolver {
   public async reward(
     @Parent() block: CkbBaseBlock,
     @Loader(CkbExplorerBlockLoader) explorerBlockLoader: CkbExplorerBlockLoaderType,
-  ): Promise<number> {
+  ): Promise<number | null> {
     const explorerBlock = await explorerBlockLoader.load(block.hash);
     if (!explorerBlock) {
       return null;
