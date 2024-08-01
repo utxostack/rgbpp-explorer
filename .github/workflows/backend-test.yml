@@ -1,12 +1,12 @@
-name: Frontend Linter
+name: Backend Test
 
 on:
   pull_request:
     paths:
-      - frontend/**
+      - backend/**
   push:
     paths:
-      - frontend/**
+      - backend/**
 
 jobs:
   build:
@@ -26,6 +26,6 @@ jobs:
       - name: Install dependency
         run: pnpm install
 
-      - name: Run Lint
-        run: npm run lint
-        working-directory: frontend
+      - name: Run Build
+        run: pnpm run build
+        working-directory: backend
