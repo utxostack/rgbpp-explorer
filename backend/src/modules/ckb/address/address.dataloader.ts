@@ -8,14 +8,18 @@ import {
   GetAddressParams,
   GetAddressTransactionsParams,
 } from 'src/core/ckb-explorer/ckb-explorer.service';
+import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 
 @Injectable()
 export class CkbAddressLoader
-  implements NestDataLoader<GetAddressParams, CkbExplorer.AddressInfo[] | null>
+  implements NestDataLoader<GetAddressParams, CkbExplorer.AddressInfo[] | void>
 {
   private logger = new Logger(CkbAddressLoader.name);
 
-  constructor(private ckbExplorerService: CkbExplorerService) {}
+  constructor(
+    private ckbExplorerService: CkbExplorerService,
+    @InjectSentry() private sentryService: SentryService,
+  ) {}
 
   public getBatchFunction() {
     return async (batchParams: GetAddressParams[]) => {
@@ -26,11 +30,19 @@ export class CkbAddressLoader
           return response.data.map((data) => data.attributes);
         }),
       );
-      return results.map((result) => (result.status === 'fulfilled' ? result.value : null));
+      return results.map((result, index) => {
+        if (result.status === 'fulfilled') {
+          return result.value;
+        }
+        if (result.reason instanceof Error) {
+          this.logger.error(`Requesting: ${batchParams[index]}, occurred error: ${result.reason}`);
+          this.sentryService.instance().captureException(result.reason);
+        }
+      });
     };
   }
 }
-export type CkbAddressLoaderType = DataLoader<GetAddressParams, CkbExplorer.AddressInfo[] | null>;
+export type CkbAddressLoaderType = DataLoader<GetAddressParams, CkbExplorer.AddressInfo[] | void>;
 export type CkbAddressLoaderResponse = DataLoaderResponse<CkbAddressLoader>;
 
 export interface CkbAddressTransactionLoaderResult {
@@ -40,11 +52,14 @@ export interface CkbAddressTransactionLoaderResult {
 
 @Injectable()
 export class CkbAddressTransactionsLoader
-  implements NestDataLoader<GetAddressTransactionsParams, CkbAddressTransactionLoaderResult | null>
+  implements NestDataLoader<GetAddressTransactionsParams, CkbAddressTransactionLoaderResult | void>
 {
   private logger = new Logger(CkbAddressTransactionsLoader.name);
 
-  constructor(private ckbExplorerService: CkbExplorerService) {}
+  constructor(
+    private ckbExplorerService: CkbExplorerService,
+    @InjectSentry() private sentryService: SentryService,
+  ) {}
 
   public getBatchFunction() {
     return async (batchParams: GetAddressParams[]) => {
@@ -58,12 +73,20 @@ export class CkbAddressTransactionsLoader
           };
         }),
       );
-      return results.map((result) => (result.status === 'fulfilled' ? result.value : null));
+      return results.map((result, index) => {
+        if (result.status === 'fulfilled') {
+          return result.value;
+        }
+        if (result.reason instanceof Error) {
+          this.logger.error(`Requesting: ${batchParams[index]}, occurred error: ${result.reason}`);
+          this.sentryService.instance().captureException(result.reason);
+        }
+      });
     };
   }
 }
 export type CkbAddressTransactionsLoaderType = DataLoader<
   GetAddressTransactionsParams,
-  CkbAddressTransactionLoaderResult | null
+  CkbAddressTransactionLoaderResult | void
 >;
 export type CkbAddressTransactionsLoaderResponse = DataLoaderResponse<CkbAddressTransactionsLoader>;

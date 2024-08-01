@@ -39,7 +39,7 @@ export class SearchResolver {
   ): Promise<string | null> {
     // TODO: check if query is a block hash or block height
     const block = await blockLoader.load(query);
-    return block?.id;
+    return block ? block.id : null;
   }
 
   @ResolveField(() => String, { nullable: true })
@@ -48,7 +48,7 @@ export class SearchResolver {
     @Loader(BitcoinTransactionLoader) txLoader: BitcoinTransactionLoaderType,
   ): Promise<string | null> {
     const transaction = await txLoader.load(query);
-    return transaction?.txid;
+    return transaction ? transaction.txid : null;
   }
 
   @ResolveField(() => String, { nullable: true })
