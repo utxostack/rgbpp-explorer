@@ -12,7 +12,7 @@ type CkbScript {
 """CKB XUDT Info"""
 type CkbXUDTInfo {
   symbol: String!
-  amount: Float!
+  amount: String!
   decimal: Int!
   typeHash: String!
 }
