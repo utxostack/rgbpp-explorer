@@ -222,12 +222,14 @@ export interface RgbppStatistic {
 }
 
 export interface SearchResult {
-  query: string
-  btcBlock: string
-  btcTransaction: string
-  btcAddress: string
-  ckbBlock: string
-  ckbTransaction: string
-  ckbAddress: string
-  rgbppCoin: string
+  search: {
+    query: string
+    btcBlock: string
+    btcTransaction: string
+    btcAddress: string
+    ckbBlock: string
+    ckbTransaction: string
+    ckbAddress: string
+    rgbppCoin: string
+  }
 }

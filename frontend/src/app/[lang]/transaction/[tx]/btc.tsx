@@ -1,4 +1,3 @@
-import { i18n } from '@lingui/core'
 import { t } from '@lingui/macro'
 import { Box, HStack, VStack } from 'styled-system/jsx'
 
@@ -9,6 +8,7 @@ import { CkbCells } from '@/components/ckb/ckb-cells'
 import { Copier } from '@/components/copier'
 import { LayerType } from '@/components/layer-type'
 import { Heading, Text } from '@/components/ui'
+import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { resolveLayerTypeFromRGBppTransaction } from '@/lib/resolve-layer-type-from-rgbpp-transaction'
 
 export function BTCTransactionPage({
@@ -20,6 +20,7 @@ export function BTCTransactionPage({
   ckbTransaction?: CkbTransaction
   leapDirection?: LeapDirection | null
 }) {
+  const i18n = getI18nFromHeaders()
   return (
     <VStack w="100%" maxW="content" p="30px" gap="30px">
       <HStack w="100%" gap="24px" p="30px" bg="bg.card" rounded="8px">

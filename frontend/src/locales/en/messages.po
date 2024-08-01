@@ -54,7 +54,7 @@ msgstr "{secondsDiff}s ago"
 msgid "🔥 Popular RGB++ Assets"
 msgstr "🔥 Popular RGB++ Assets"
 
-#: src/app/[lang]/address/[address]/layout.tsx:45
+#: src/app/[lang]/address/[address]/layout.tsx:44
 msgid "Address"
 msgstr "Address"
 
@@ -63,15 +63,19 @@ msgstr "Address"
 msgid "Amount"
 msgstr "Amount"
 
+#: src/app/not-found.tsx:19
+msgid "Back to Home"
+msgstr "Back to Home"
+
 #: src/app/[lang]/explorer/btc/info.tsx:21
-#: src/components/footer.tsx:87
+#: src/components/footer.tsx:88
 #: src/components/navbar.tsx:43
 #: src/components/network-cards.tsx:60
 msgid "Bitcoin"
 msgstr "Bitcoin"
 
-#: src/app/[lang]/block/btc/[hashOrHeight]/layout.tsx:35
-#: src/app/[lang]/block/ckb/[hashOrHeight]/layout.tsx:35
+#: src/app/[lang]/block/btc/[hashOrHeight]/layout.tsx:34
+#: src/app/[lang]/block/ckb/[hashOrHeight]/layout.tsx:34
 msgid "Block {0}"
 msgstr "Block {0}"
 
@@ -100,7 +104,7 @@ msgstr "BTC"
 msgid "BTC Balance"
 msgstr "BTC Balance"
 
-#: src/components/btc/btc-utxos.tsx:17
+#: src/components/btc/btc-utxos.tsx:18
 msgid "BTC Txn"
 msgstr "BTC Txn"
 
@@ -115,7 +119,7 @@ msgstr "bytes"
 #: src/components/ckb/ckb-block-overflow.tsx:64
 #: src/components/ckb/ckb-cell-tables.tsx:83
 #: src/components/ckb/ckb-transaction-overflow.tsx:59
-#: src/components/footer.tsx:90
+#: src/components/footer.tsx:91
 #: src/components/navbar.tsx:48
 #: src/components/network-cards.tsx:93
 msgid "CKB"
@@ -154,10 +158,10 @@ msgstr "Coming Soon"
 msgid "Coming soon, please stay tuned"
 msgstr "Coming soon, please stay tuned"
 
-#: src/app/[lang]/block/btc/[hashOrHeight]/layout.tsx:54
-#: src/app/[lang]/block/ckb/[hashOrHeight]/layout.tsx:54
-#: src/app/[lang]/transaction/[tx]/btc.tsx:40
-#: src/app/[lang]/transaction/[tx]/ckb.tsx:41
+#: src/app/[lang]/block/btc/[hashOrHeight]/layout.tsx:53
+#: src/app/[lang]/block/ckb/[hashOrHeight]/layout.tsx:53
+#: src/app/[lang]/transaction/[tx]/btc.tsx:48
+#: src/app/[lang]/transaction/[tx]/ckb.tsx:49
 msgid "confirmations"
 msgstr "confirmations"
 
@@ -189,10 +193,14 @@ msgid "Drop"
 msgstr "Drop"
 
 #: src/app/[lang]/page.tsx:21
-msgid "Explore the BTC Ecosystem"
-msgstr "Explore the BTC Ecosystem"
+#~ msgid "Explore the BTC Ecosystem"
+#~ msgstr "Explore the BTC Ecosystem"
 
-#: src/components/footer.tsx:84
+#: src/components/home-title.tsx:10
+msgid "Explore the<0>BTC</0>Ecosystem"
+msgstr "Explore the<0>BTC</0>Ecosystem"
+
+#: src/components/footer.tsx:85
 #: src/components/navbar.tsx:30
 msgid "Explorer"
 msgstr "Explorer"
@@ -233,6 +241,10 @@ msgstr "Holders"
 #: src/components/ckb/ckb-cell-tables.tsx:34
 msgid "Inputs ({0})"
 msgstr "Inputs ({0})"
+
+#: src/app/[lang]/address/[address]/layout.tsx:23
+msgid "Invalid address \"{address}\""
+msgstr "Invalid address \"{address}\""
 
 #: src/components/layer-type.tsx:26
 #: src/components/layer-type.tsx:44
@@ -275,7 +287,7 @@ msgstr "Latest L1 RGB++ transaction"
 #~ msgid "Latest L2 RGB++ transaction"
 #~ msgstr "Latest L2 RGB++ transaction"
 
-#: src/app/[lang]/page.tsx:32
+#: src/app/[lang]/page.tsx:31
 msgid "Latest RGB++ Txns"
 msgstr "Latest RGB++ Txns"
 
@@ -313,11 +325,11 @@ msgstr "Minter"
 msgid "Minter Reward"
 msgstr "Minter Reward"
 
-#: src/components/footer.tsx:109
+#: src/components/footer.tsx:110
 msgid "More Info"
 msgstr "More Info"
 
-#: src/components/footer.tsx:112
+#: src/components/footer.tsx:113
 msgid "Nervos CKB"
 msgstr "Nervos CKB"
 
@@ -343,11 +355,11 @@ msgstr "Outputs ({0})"
 msgid "Overflow"
 msgstr "Overflow"
 
-#: src/components/footer.tsx:95
+#: src/components/footer.tsx:96
 msgid "RGB++"
 msgstr "RGB++"
 
-#: src/app/[lang]/address/[address]/layout.tsx:59
+#: src/app/[lang]/address/[address]/layout.tsx:58
 #: src/components/navbar.tsx:96
 msgid "RGB++ Assets"
 msgstr "RGB++ Assets"
@@ -358,12 +370,12 @@ msgstr "RGB++ Assets"
 msgid "RGB++ Assets Holders"
 msgstr "RGB++ Assets Holders"
 
-#: src/components/footer.tsx:21
+#: src/components/footer.tsx:22
 #: src/components/navbar.tsx:23
 msgid "RGB++ Explorer"
 msgstr "RGB++ Explorer"
 
-#: src/app/[lang]/page.tsx:30
+#: src/app/[lang]/page.tsx:29
 msgid "RGB++ Networks"
 msgstr "RGB++ Networks"
 
@@ -392,16 +404,16 @@ msgstr "sats/kB"
 msgid "sats/VB"
 msgstr "sats/VB"
 
-#: src/components/footer.tsx:101
+#: src/components/footer.tsx:102
 msgid "Script"
 msgstr "Script"
 
-#: src/components/footer.tsx:104
+#: src/components/footer.tsx:105
 msgid "SDK"
 msgstr "SDK"
 
-#: src/components/search-bar.tsx:101
-#: src/components/search-bar.tsx:137
+#: src/components/search-bar.tsx:93
+#: src/components/search-bar.tsx:129
 msgid "Search by Address/Tx Hash/Block Hash"
 msgstr "Search by Address/Tx Hash/Block Hash"
 
@@ -418,6 +430,14 @@ msgstr "shannons/kB"
 msgid "Size"
 msgstr "Size"
 
+#: src/app/error.tsx:30
+msgid "Something wrong，Please reload"
+msgstr "Something wrong，Please reload"
+
+#: src/app/not-found.tsx:15
+msgid "Sorry, the page you visited does not exist"
+msgstr "Sorry, the page you visited does not exist"
+
 #: src/app/[lang]/assets/coins/page.tsx:30
 msgid "Supply"
 msgstr "Supply"
@@ -425,6 +445,20 @@ msgstr "Supply"
 #: src/app/[lang]/layout.tsx:19
 #~ msgid "Test"
 #~ msgstr "Test"
+
+#: src/app/[lang]/address/[address]/layout.tsx:38
+msgid "The address \"{address}\" not found"
+msgstr "The address \"{address}\" not found"
+
+#: src/app/[lang]/block/btc/[hashOrHeight]/layout.tsx:24
+#: src/app/[lang]/block/ckb/[hashOrHeight]/layout.tsx:24
+msgid "The block {hashOrHeight} not found"
+msgstr "The block {hashOrHeight} not found"
+
+#: src/app/[lang]/transaction/[tx]/page.tsx:13
+#: src/app/[lang]/transaction/[tx]/page.tsx:32
+msgid "The transaction \"{tx}\" not found"
+msgstr "The transaction \"{tx}\" not found"
 
 #: src/app/[lang]/assets/coins/[typeHash]/transactions/page.tsx:33
 #: src/components/last-rgbpp-txns-table/index.tsx:61
@@ -441,14 +475,18 @@ msgstr "Total {0} Items"
 msgid "Transaction"
 msgstr "Transaction"
 
-#: src/app/[lang]/address/[address]/layout.tsx:55
+#: src/app/[lang]/address/[address]/layout.tsx:54
 #: src/app/[lang]/assets/coins/[typeHash]/layout.tsx:41
-#: src/app/[lang]/block/btc/[hashOrHeight]/layout.tsx:64
-#: src/app/[lang]/block/ckb/[hashOrHeight]/layout.tsx:64
-#: src/app/[lang]/transaction/[tx]/btc.tsx:23
-#: src/app/[lang]/transaction/[tx]/ckb.tsx:24
+#: src/app/[lang]/block/btc/[hashOrHeight]/layout.tsx:63
+#: src/app/[lang]/block/ckb/[hashOrHeight]/layout.tsx:63
+#: src/app/[lang]/transaction/[tx]/btc.tsx:28
+#: src/app/[lang]/transaction/[tx]/ckb.tsx:29
 msgid "Transactions"
 msgstr "Transactions"
+
+#: src/app/error.tsx:33
+msgid "Try again"
+msgstr "Try again"
 
 #: src/app/[lang]/assets/coins/[typeHash]/transactions/page.tsx:30
 #: src/components/last-rgbpp-txns-table/index.tsx:52
@@ -487,7 +525,7 @@ msgstr "Type"
 msgid "Unconfirmed"
 msgstr "Unconfirmed"
 
-#: src/components/footer.tsx:115
+#: src/components/footer.tsx:116
 msgid "UTXO Stack"
 msgstr "UTXO Stack"
 
@@ -499,6 +537,6 @@ msgstr "View Details in CKB"
 msgid "View Details in Mempool"
 msgstr "View Details in Mempool"
 
-#: src/components/footer.tsx:98
+#: src/components/footer.tsx:99
 msgid "Whitepaper"
 msgstr "Whitepaper"

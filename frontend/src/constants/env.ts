@@ -19,6 +19,9 @@ const publicEnvSchema = z.object({
     .string()
     .default('https://github.com/ckb-cell/RGBPlusPlus-design/blob/main/docs/lockscript-design-prd-en.md'),
   RGBPP_SDK_URL: z.string().default('https://github.com/ckb-cell/rgbpp-sdk'),
+  UTXO_STACK_TWITTER_URL: z.string().default('https://x.com/utxostack'),
+  CKB_CELL_GITHUB_URL: z.string().default('https://github.com/ckb-cell'),
+  UTXO_STACK_MEDIUM_URL: z.string().default('https://medium.com/@utxostack'),
 })
 
 const sharedEnvSchema = z.object({
