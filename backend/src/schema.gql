@@ -289,7 +289,7 @@ type SearchResult {
 type Query {
   ckbChainInfo: CkbChainInfo!
   ckbBlock(heightOrHash: String!): CkbBlock
-  ckbLatestTransactions(types: [CellType!], scriptKey: CkbSearchKeyInput, limit: Float, order: String, after: String): [CkbTransaction!]!
+  ckbTransactions(types: [CellType!], scriptKey: CkbSearchKeyInput, limit: Float, order: String, after: String): [CkbTransaction!]!
   ckbTransaction(txHash: String!): CkbTransaction
   ckbAddress(address: String!): CkbAddress
   btcChainInfo: BitcoinChainInfo!

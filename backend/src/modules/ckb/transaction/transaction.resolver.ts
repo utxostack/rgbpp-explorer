@@ -26,12 +26,13 @@ export class CkbTransactionResolver {
     private ckbTransactionService: CkbTransactionService,
     private ckbScriptService: CkbScriptService,
     @InjectSentry() private sentryService: SentryService,
-  ) { }
+  ) {}
 
-  @Query(() => [CkbTransaction], { name: 'ckbLatestTransactions' })
-  public async getLatestTransactions(
+  @Query(() => [CkbTransaction], { name: 'ckbTransactions' })
+  public async getTransactions(
     @Args('types', { type: () => [CellType], nullable: true }) types: CellType[] | null,
-    @Args('scriptKey', { type: () => CkbSearchKeyInput, nullable: true }) scriptKey: CkbSearchKeyInput | null,
+    @Args('scriptKey', { type: () => CkbSearchKeyInput, nullable: true })
+    scriptKey: CkbSearchKeyInput | null,
     @Args('limit', { type: () => Float, nullable: true }) limit: number = 10,
     @Args('order', { type: () => String, nullable: true }) order: 'asc' | 'desc' = 'desc',
     @Args('after', { type: () => String, nullable: true }) after: string | null,
@@ -74,14 +75,23 @@ export class CkbTransactionResolver {
       return orderedTxs;
     }
 
-    const result = await this.ckbTransactionService.getTransactions(limit, order, scriptKey, after);
-    const txs = await Promise.all(
-      result.objects.map(async (tx) => {
-        const txWithStatus = await this.ckbTransactionService.getTransactionFromRpc(tx.tx_hash);
-        return CkbTransaction.from(txWithStatus);
-      }),
-    );
-    return txs;
+    if (scriptKey) {
+      const result = await this.ckbTransactionService.getTransactions(
+        scriptKey,
+        order,
+        limit,
+        after,
+      );
+      const txs = await Promise.all(
+        result.objects.map(async (tx) => {
+          const txWithStatus = await this.ckbTransactionService.getTransactionFromRpc(tx.tx_hash);
+          return CkbTransaction.from(txWithStatus);
+        }),
+      );
+      return txs;
+    }
+
+    throw new BadRequestException('One of types and scriptKey must be provided');
   }
 
   @Query(() => CkbTransaction, { name: 'ckbTransaction', nullable: true })

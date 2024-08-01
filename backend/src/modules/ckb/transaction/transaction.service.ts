@@ -11,7 +11,7 @@ export class CkbTransactionService {
   constructor(
     private ckbRpcService: CkbRpcWebsocketService,
     private ckbExplorerService: CkbExplorerService,
-  ) { }
+  ) {}
 
   public async getTransactionFromRpc(
     txHash: string,
@@ -29,22 +29,20 @@ export class CkbTransactionService {
   }
 
   public async getTransactions(
-    limit: number,
+    searchKey: CkbSearchKeyInput,
     order: 'asc' | 'desc' = 'desc',
-    searchKey?: CkbSearchKeyInput,
+    limit: number,
     after?: string,
   ): Promise<CkbRpc.GetTransactionsResult> {
     return this.ckbRpcService.getTransactions(
-      searchKey
-        ? {
-          script: {
-            code_hash: searchKey.script.codeHash,
-            hash_type: searchKey.script.hashType,
-            args: searchKey.script.args,
-          },
-          script_type: searchKey.scriptType,
-        }
-        : undefined,
+      {
+        script: {
+          code_hash: searchKey.script.codeHash,
+          hash_type: searchKey.script.hashType,
+          args: searchKey.script.args,
+        },
+        script_type: searchKey.scriptType,
+      },
       order,
       BI.from(limit).toHexString(),
       after,
