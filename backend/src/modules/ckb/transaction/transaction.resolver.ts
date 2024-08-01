@@ -62,8 +62,8 @@ export class CkbTransactionResolver {
           const sort = BI.from(b.block_number).sub(BI.from(a.block_number)).toNumber();
           return order === 'desc' ? sort : -sort;
         })
-        .map((tx) => tx.tx_hash)
-        .slice(0, limit);
+        .slice(0, limit)
+        .map((tx) => tx.tx_hash);
 
       const orderedTxs = await Promise.all(
         orderedTxHashes.map(async (txHash) => {
