@@ -29,7 +29,7 @@ export class SimpleUDTService extends BaseScriptService {
 
   public getScripts(): Script[] {
     const networkType = this.configService.get('NETWORK');
-    return networkType === NetworkType
+    return networkType === NetworkType.mainnet
       ? SimpleUDTService.MainnetScripts
       : SimpleUDTService.TestnetScripts;
   }

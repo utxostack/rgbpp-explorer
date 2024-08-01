@@ -27,6 +27,8 @@ export class MNFTService extends BaseScriptService {
 
   public getScripts(): Script[] {
     const networkType = this.configService.get('NETWORK');
-    return networkType === NetworkType ? MNFTService.MainnetScripts : MNFTService.TestnetScripts;
+    return networkType === NetworkType.mainnet
+      ? MNFTService.MainnetScripts
+      : MNFTService.TestnetScripts;
   }
 }

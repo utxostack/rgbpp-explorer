@@ -35,6 +35,8 @@ export class ExtensibleUDTService extends BaseScriptService {
 
   public getScripts(): Script[] {
     const networkType = this.configService.get('NETWORK');
-    return networkType === NetworkType ? ExtensibleUDTService.MainnetScripts : ExtensibleUDTService.TestnetScripts;
+    return networkType === NetworkType.mainnet
+      ? ExtensibleUDTService.MainnetScripts
+      : ExtensibleUDTService.TestnetScripts;
   }
 }

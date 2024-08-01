@@ -25,7 +25,7 @@ export class DigitalObjectService extends BaseScriptService {
 
   public getScripts(): Script[] {
     const networkType = this.configService.get('NETWORK');
-    return networkType === NetworkType
+    return networkType === NetworkType.mainnet
       ? DigitalObjectService.MainnetScripts
       : DigitalObjectService.TestnetScripts;
   }
