@@ -465,6 +465,7 @@ class ExplorerGraphql {
             }
             block {
               timestamp
+              hash
             }
           }
         }
@@ -721,6 +722,12 @@ class ExplorerGraphql {
             timestamp
             transactionsCount
             totalFee
+            miner {
+              address
+              shannon
+              transactionsCount
+            }
+            reward
           }
         }
       `,

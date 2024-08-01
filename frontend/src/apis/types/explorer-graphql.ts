@@ -187,6 +187,8 @@ export interface CkbBlock {
   timestamp: number
   transactionsCount: number
   totalFee: number
+  miner: CkbAddress
+  reward: number
 }
 
 export interface BtcBlock {
