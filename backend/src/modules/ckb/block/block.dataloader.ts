@@ -26,10 +26,9 @@ export class CkbRpcBlockLoader implements NestDataLoader<string, CkbRpc.Block | 
         if (result.status === 'fulfilled') {
           return result.value;
         }
-        if (result.reason instanceof Error) {
-          this.logger.error(`Requesting: ${heightOrHashList[index]}, occurred error: ${result.reason}`);
-          this.sentryService.instance().captureException(result.reason);
-        }
+        this.logger.error(`Requesting: ${heightOrHashList[index]}, occurred error: ${result.reason}`);
+        this.sentryService.instance().captureException(result.reason);
+        return null;
       });
     };
   }
@@ -58,10 +57,9 @@ export class CkbExplorerBlockLoader implements NestDataLoader<string, CkbExplore
         if (result.status === 'fulfilled') {
           return result.value;
         }
-        if (result.reason instanceof Error) {
-          this.logger.error(`Requesting: ${heightOrHashList[index]}, occurred error: ${result.reason}`);
-          this.sentryService.instance().captureException(result.reason);
-        }
+        this.logger.error(`Requesting: ${heightOrHashList[index]}, occurred error: ${result.reason}`);
+        this.sentryService.instance().captureException(result.reason);
+        return null;
       });
     };
   }
@@ -90,10 +88,9 @@ export class CkbBlockEconomicStateLoader
         if (result.status === 'fulfilled') {
           return result.value;
         }
-        if (result.reason instanceof Error) {
-          this.logger.error(`Requesting: ${hashes[index]}, occurred error: ${result.reason}`);
-          this.sentryService.instance().captureException(result.reason);
-        }
+        this.logger.error(`Requesting: ${hashes[index]}, occurred error: ${result.reason}`);
+        this.sentryService.instance().captureException(result.reason);
+        return null;
       });
     };
   }

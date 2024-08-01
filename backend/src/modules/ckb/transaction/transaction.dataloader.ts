@@ -28,10 +28,9 @@ export class CkbRpcTransactionLoader
         if (result.status === 'fulfilled') {
           return result.value;
         }
-        if (result.reason instanceof Error) {
-          this.logger.error(`Requesting: ${hashes[index]}, occurred error: ${result.reason}`);
-          this.sentryService.instance().captureException(result.reason);
-        }
+        this.logger.error(`Requesting: ${hashes[index]}, occurred error: ${result.reason}`);
+        this.sentryService.instance().captureException(result.reason);
+        return null;
       });
     };
   }
@@ -63,10 +62,9 @@ export class CkbExplorerTransactionLoader
         if (result.status === 'fulfilled') {
           return result.value;
         }
-        if (result.reason instanceof Error) {
-          this.logger.error(`Requesting: ${hashes[index]}, occurred error: ${result.reason}`);
-          this.sentryService.instance().captureException(result.reason);
-        }
+        this.logger.error(`Requesting: ${hashes[index]}, occurred error: ${result.reason}`);
+        this.sentryService.instance().captureException(result.reason);
+        return null;
       });
     };
   }

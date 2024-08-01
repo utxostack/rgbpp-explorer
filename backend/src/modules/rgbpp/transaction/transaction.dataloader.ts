@@ -25,10 +25,9 @@ export class RgbppTransactionLoader implements NestDataLoader<string, RgbppBaseT
         if (result.status === 'fulfilled') {
           return result.value;
         }
-        if (result.reason instanceof Error) {
-          this.logger.error(`Requesting: ${ids[index]}, occurred error: ${result.reason}`);
-          this.sentryService.instance().captureException(result.reason);
-        }
+        this.logger.error(`Requesting: ${ids[index]}, occurred error: ${result.reason}`);
+        this.sentryService.instance().captureException(result.reason);
+        return null;
       });
     };
   }
