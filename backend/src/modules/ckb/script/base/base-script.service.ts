@@ -8,6 +8,7 @@ import { SearchKey } from 'src/core/ckb-rpc/ckb-rpc.interface';
 import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
 import { Env } from 'src/env';
 import { CellType } from '../script.model';
+import { OrderType } from 'src/modules/api.model';
 
 export abstract class BaseScriptService {
   protected logger = new Logger(BaseScriptService.name);
@@ -17,7 +18,7 @@ export abstract class BaseScriptService {
     protected configService: ConfigService<Env>,
     protected ckbRpcService: CkbRpcWebsocketService,
     @InjectSentry() protected sentryService: SentryService,
-  ) { }
+  ) {}
 
   public abstract getScripts(): Script[];
 
@@ -26,7 +27,11 @@ export abstract class BaseScriptService {
     return scripts.some((s) => isScriptEqual(s, { ...script, args: '0x' }));
   }
 
-  public async getTransactions(limit: number = 10, order: 'asc' | 'desc' = 'desc', after?: string) {
+  public async getTransactions(
+    limit: number = 10,
+    order: OrderType = OrderType.Desc,
+    after?: string,
+  ) {
     const scripts = this.getScripts();
     const result = await Promise.allSettled(
       scripts.map(async (script) => {
@@ -61,7 +66,7 @@ export abstract class BaseScriptService {
       .flat()
       .sort((a, b) => {
         const sort = BI.from(b.block_number).sub(BI.from(a.block_number)).toNumber();
-        return order === 'desc' ? sort : -sort;
+        return order === OrderType.Desc ? sort : -sort;
       })
       .slice(0, limit);
   }

@@ -5,6 +5,7 @@ import { CkbRpcWebsocketService } from 'src/core/ckb-rpc/ckb-rpc-websocket.servi
 import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
 import { CkbSearchKeyInput } from './transaction.model';
 import { BI } from '@ckb-lumos/bi';
+import { OrderType } from 'src/modules/api.model';
 
 @Injectable()
 export class CkbTransactionService {
@@ -30,7 +31,7 @@ export class CkbTransactionService {
 
   public async getTransactions(
     searchKey: CkbSearchKeyInput,
-    order: 'asc' | 'desc' = 'desc',
+    order: OrderType = OrderType.Desc,
     limit: number,
     after?: string,
   ): Promise<CkbRpc.GetTransactionsResult> {

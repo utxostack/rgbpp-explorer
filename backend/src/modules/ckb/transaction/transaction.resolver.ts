@@ -17,6 +17,7 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import { CellType } from '../script/script.model';
 import { CkbScriptService } from '../script/script.service';
 import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
+import { OrderType } from 'src/modules/api.model';
 
 @Resolver(() => CkbTransaction)
 export class CkbTransactionResolver {
@@ -34,7 +35,7 @@ export class CkbTransactionResolver {
     @Args('scriptKey', { type: () => CkbSearchKeyInput, nullable: true })
     scriptKey: CkbSearchKeyInput | null,
     @Args('limit', { type: () => Float, nullable: true }) limit: number = 10,
-    @Args('order', { type: () => String, nullable: true }) order: 'asc' | 'desc' = 'desc',
+    @Args('order', { type: () => OrderType, nullable: true }) order: OrderType = OrderType.Desc,
     @Args('after', { type: () => String, nullable: true }) after: string | null,
   ): Promise<CkbBaseTransaction[]> {
     if (types && scriptKey) {
@@ -61,7 +62,7 @@ export class CkbTransactionResolver {
         .flat()
         .sort((a, b) => {
           const sort = BI.from(b.block_number).sub(BI.from(a.block_number)).toNumber();
-          return order === 'desc' ? sort : -sort;
+          return order === OrderType.Desc ? sort : -sort;
         })
         .slice(0, limit)
         .map((tx) => tx.tx_hash);
