@@ -5,7 +5,10 @@ import {
   CkbRpcTransactionLoader,
   CkbRpcTransactionLoaderType,
 } from 'src/modules/ckb/transaction/transaction.dataloader';
-import { BitcoinBaseTransaction, BitcoinTransaction } from 'src/modules/bitcoin/transaction/transaction.model';
+import {
+  BitcoinBaseTransaction,
+  BitcoinTransaction,
+} from 'src/modules/bitcoin/transaction/transaction.model';
 import { RgbppTransactionService } from './transaction.service';
 import {
   BitcoinTransactionLoader,
@@ -22,7 +25,7 @@ import { RgbppTransactionLoader, RgbppTransactionLoaderType } from './transactio
 
 @Resolver(() => RgbppTransaction)
 export class RgbppTransactionResolver {
-  constructor(private transactionService: RgbppTransactionService) {}
+  constructor(private transactionService: RgbppTransactionService) { }
 
   @Query(() => RgbppLatestTransactionList, { name: 'rgbppLatestTransactions' })
   public async getLatestTransactions(

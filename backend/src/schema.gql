@@ -289,8 +289,17 @@ type Query {
   rgbppTransaction(txidOrTxHash: String!): RgbppTransaction
   btcAddress(address: String!): BitcoinAddress
   rgbppAddress(address: String!): RgbppAddress
-  rgbppCoins(page: Int, pageSize: Int): RgbppCoinList!
+  rgbppCoins(page: Int, pageSize: Int, sort: TransactionListSortType): RgbppCoinList!
   rgbppCoin(typeHash: String!): RgbppCoin!
   rgbppStatistic: RgbppStatistic!
   search(query: String!): SearchResult!
+}
+
+enum TransactionListSortType {
+  TransactionsAsc
+  TransactionsDesc
+  AddressCountAsc
+  AddressCountDesc
+  CreatedTimeAsc
+  CreatedTimeDesc
 }
