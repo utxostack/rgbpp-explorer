@@ -27,5 +27,5 @@ jobs:
         run: pnpm install
 
       - name: Run Build
-        run: npm run build
+        run: pnpm run build
         working-directory: backend
