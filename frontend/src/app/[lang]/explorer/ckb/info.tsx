@@ -51,7 +51,7 @@ export async function Info() {
             </HStack>
             <Text>
               {formatNumber(ckbChainInfo.fees.fast)}
-              <Text as="span" color="text.third" fontSize="12px">
+              <Text as="span" color="text.third" fontSize="12px" ml="4px">
                 {t(i18n)`shannons/kB`}
               </Text>
             </Text>
@@ -63,7 +63,7 @@ export async function Info() {
             </HStack>
             <Text>
               {formatNumber(ckbChainInfo.fees.average)}
-              <Text as="span" color="text.third" fontSize="12px">
+              <Text as="span" color="text.third" fontSize="12px" ml="4px">
                 {t(i18n)`shannons/kB`}
               </Text>
             </Text>
@@ -75,7 +75,7 @@ export async function Info() {
             </HStack>
             <Text>
               {formatNumber(ckbChainInfo.fees.slow)}
-              <Text as="span" color="text.third" fontSize="12px">
+              <Text as="span" color="text.third" fontSize="12px" ml="4px">
                 {t(i18n)`shannons/kB`}
               </Text>
             </Text>

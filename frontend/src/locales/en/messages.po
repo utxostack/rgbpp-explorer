@@ -54,7 +54,7 @@ msgstr "{secondsDiff}s ago"
 msgid "🔥 Popular RGB++ Assets"
 msgstr "🔥 Popular RGB++ Assets"
 
-#: src/app/[lang]/address/[address]/layout.tsx:44
+#: src/app/[lang]/address/[address]/layout.tsx:45
 msgid "Address"
 msgstr "Address"
 
@@ -69,7 +69,7 @@ msgstr "Back to Home"
 
 #: src/app/[lang]/explorer/btc/info.tsx:21
 #: src/components/footer.tsx:88
-#: src/components/navbar.tsx:43
+#: src/components/navbar.tsx:54
 #: src/components/network-cards.tsx:60
 msgid "Bitcoin"
 msgstr "Bitcoin"
@@ -120,7 +120,7 @@ msgstr "bytes"
 #: src/components/ckb/ckb-cell-tables.tsx:83
 #: src/components/ckb/ckb-transaction-overflow.tsx:59
 #: src/components/footer.tsx:91
-#: src/components/navbar.tsx:48
+#: src/components/navbar.tsx:59
 #: src/components/network-cards.tsx:93
 msgid "CKB"
 msgstr "CKB"
@@ -201,7 +201,7 @@ msgid "Explore the<0>BTC</0>Ecosystem"
 msgstr "Explore the<0>BTC</0>Ecosystem"
 
 #: src/components/footer.tsx:85
-#: src/components/navbar.tsx:30
+#: src/components/navbar.tsx:41
 msgid "Explorer"
 msgstr "Explorer"
 
@@ -242,7 +242,7 @@ msgstr "Holders"
 msgid "Inputs ({0})"
 msgstr "Inputs ({0})"
 
-#: src/app/[lang]/address/[address]/layout.tsx:23
+#: src/app/[lang]/address/[address]/layout.tsx:24
 msgid "Invalid address \"{address}\""
 msgstr "Invalid address \"{address}\""
 
@@ -359,8 +359,8 @@ msgstr "Overflow"
 msgid "RGB++"
 msgstr "RGB++"
 
-#: src/app/[lang]/address/[address]/layout.tsx:58
-#: src/components/navbar.tsx:96
+#: src/app/[lang]/address/[address]/layout.tsx:59
+#: src/components/navbar.tsx:111
 msgid "RGB++ Assets"
 msgstr "RGB++ Assets"
 
@@ -371,7 +371,7 @@ msgid "RGB++ Assets Holders"
 msgstr "RGB++ Assets Holders"
 
 #: src/components/footer.tsx:22
-#: src/components/navbar.tsx:23
+#: src/components/navbar.tsx:29
 msgid "RGB++ Explorer"
 msgstr "RGB++ Explorer"
 
@@ -430,7 +430,7 @@ msgstr "shannons/kB"
 msgid "Size"
 msgstr "Size"
 
-#: src/app/error.tsx:30
+#: src/app/error.tsx:31
 msgid "Something wrong，Please reload"
 msgstr "Something wrong，Please reload"
 
@@ -446,7 +446,7 @@ msgstr "Supply"
 #~ msgid "Test"
 #~ msgstr "Test"
 
-#: src/app/[lang]/address/[address]/layout.tsx:38
+#: src/app/[lang]/address/[address]/layout.tsx:39
 msgid "The address \"{address}\" not found"
 msgstr "The address \"{address}\" not found"
 
@@ -475,7 +475,7 @@ msgstr "Total {0} Items"
 msgid "Transaction"
 msgstr "Transaction"
 
-#: src/app/[lang]/address/[address]/layout.tsx:54
+#: src/app/[lang]/address/[address]/layout.tsx:55
 #: src/app/[lang]/assets/coins/[typeHash]/layout.tsx:41
 #: src/app/[lang]/block/btc/[hashOrHeight]/layout.tsx:63
 #: src/app/[lang]/block/ckb/[hashOrHeight]/layout.tsx:63
@@ -484,7 +484,7 @@ msgstr "Transaction"
 msgid "Transactions"
 msgstr "Transactions"
 
-#: src/app/error.tsx:33
+#: src/app/error.tsx:34
 msgid "Try again"
 msgstr "Try again"
 

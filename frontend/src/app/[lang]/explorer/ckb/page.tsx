@@ -2,7 +2,7 @@ import { t } from '@lingui/macro'
 import { Box, Grid, styled } from 'styled-system/jsx'
 
 import { explorerGraphql } from '@/apis/explorer-graphql'
-import { Info } from '@/app/[lang]/explorer/btc/info'
+import { Info } from '@/app/[lang]/explorer/ckb/info'
 import BtcIcon from '@/assets/chains/btc.svg'
 import { AgoTimeFormatter } from '@/components/ago-time-formatter'
 import { Heading, Table, Text } from '@/components/ui'

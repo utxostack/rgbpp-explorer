@@ -73,6 +73,12 @@ function useSearch() {
       if (search.ckbAddress) {
         return router.push(`/address/${search.ckbAddress}`)
       }
+      if (search.ckbBlock) {
+        return router.push(`/block/btc/${search.ckbBlock}`)
+      }
+      if (search.btcBlock) {
+        return router.push(`/block/btc/${search.btcBlock}`)
+      }
       throw new Error('Not found')
     },
   })
