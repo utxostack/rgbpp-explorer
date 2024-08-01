@@ -13,9 +13,6 @@ import { Env } from 'src/env';
 
 abstract class BaseValidateAddressPipe implements PipeTransform {
   protected logger = new Logger(this.constructor.name);
-
-  protected constructor(protected configService: ConfigService<Env>) { }
-
   protected abstract validateAddress(value: string): boolean;
   protected abstract getErrorMessage(): string;
 
@@ -31,7 +28,7 @@ abstract class BaseValidateAddressPipe implements PipeTransform {
 @Injectable()
 export class ValidateCkbAddressPipe extends BaseValidateAddressPipe {
   constructor(protected configService: ConfigService<Env>) {
-    super(configService);
+    super();
   }
 
   protected validateAddress(value: string): boolean {
@@ -53,7 +50,7 @@ export class ValidateCkbAddressPipe extends BaseValidateAddressPipe {
 @Injectable()
 export class ValidateBtcAddressPipe extends BaseValidateAddressPipe {
   constructor(protected configService: ConfigService<Env>) {
-    super(configService);
+    super();
   }
 
   protected validateAddress(value: string): boolean {
