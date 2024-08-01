@@ -6,23 +6,17 @@ import { SentryInterceptor, SentryModule } from '@ntegral/nestjs-sentry';
 import { nodeProfilingIntegration } from '@sentry/profiling-node';
 import type { RedisClientOptions } from 'redis';
 import { redisStore } from 'cache-manager-redis-yet';
-import { Env, envSchema } from './env';
+import { Env } from './env';
 import { CoreModule } from './core/core.module';
 import { ApiModule } from './modules/api.module';
 import { CacheableModule } from 'nestjs-cacheable';
 import { ScheduleModule } from '@nestjs/schedule';
 import { BullModule } from '@nestjs/bullmq';
+import configModule from './config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath:
-        process.env.NODE_ENV === 'production'
-          ? ['.env.production.local', '.env.production', '.env']
-          : ['.env.development.local', '.env.development', '.env'],
-      validate: envSchema.parse,
-    }),
+    configModule,
     SentryModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService<Env>) => ({
