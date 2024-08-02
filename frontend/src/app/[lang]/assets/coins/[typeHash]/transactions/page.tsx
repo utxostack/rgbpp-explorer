@@ -24,7 +24,7 @@ export default async function Page({ params: { typeHash } }: { params: { typeHas
 
   return (
     <VStack w="100%" bg="bg.card" maxW="content" rounded="8px" pt="30px">
-      <Table.Root>
+      <Table.Root tableLayout="fixed">
         <Table.Head>
           <Table.Row>
             <Table.Header>{t(i18n)`Tx hash`}</Table.Header>
