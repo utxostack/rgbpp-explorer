@@ -202,15 +202,15 @@ export class CkbExplorerService {
     },
   })
   public async getTransaction(txHash: string): Promise<NonPaginatedResponse<DetailTransaction>> {
-    const key = `CkbExplorerService:getTransaction:${txHash}`;
-    const cached = await this.cacheManager.get(key);
-    if (cached) {
-      return cached as NonPaginatedResponse<DetailTransaction>;
-    }
     const response = await this.request.get(`/v1/transactions/${txHash}`);
     return response.data;
   }
 
+  @Cacheable({
+    namespace: 'CkbExplorerService',
+    key: (txHash: string) => `getRgbppDigest:${txHash}`,
+    ttl: ONE_MONTH_MS,
+  })
   public async getRgbppDigest(txHash: string): Promise<CkbExplorerResponse<RgbppDigest>> {
     const response = await this.request.get(`/v2/ckb_transactions/${txHash}/rgb_digest`);
     return response.data;

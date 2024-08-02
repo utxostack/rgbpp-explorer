@@ -9,7 +9,7 @@ export const fieldPerformanceMiddleware: FieldMiddleware = async (
   const value = await next();
 
   const executionTime = performance.now() - now;
-  if (executionTime > 100) {
+  if (executionTime > 300) {
     const { path } = ctx.info;
     logger.debug(`[${path.typename}.${path.key}]: ${executionTime}ms`);
   }
