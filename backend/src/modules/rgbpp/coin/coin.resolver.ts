@@ -11,7 +11,7 @@ import {
 
 @Resolver(() => RgbppCoin)
 export class RgbppCoinResolver {
-  constructor(private ckbExplorerService: CkbExplorerService) { }
+  constructor(private ckbExplorerService: CkbExplorerService) {}
 
   @Query(() => RgbppCoinList, { name: 'rgbppCoins' })
   public async coins(
@@ -51,6 +51,9 @@ export class RgbppCoinResolver {
     @Args('pageSize', { type: () => Int, nullable: true }) pageSize: number = 10,
     @Loader(CkbExplorerXUDTTransactionsLoader) txsLoader: CkbExplorerXUDTTransactionsLoaderType,
   ): Promise<RgbppBaseTransaction[] | null> {
+    if (!coin.typeHash) {
+      return null;
+    }
     const transactions = await txsLoader.load({
       typeHash: coin.typeHash,
       page,
@@ -67,6 +70,9 @@ export class RgbppCoinResolver {
     @Parent() coin: RgbppBaseCoin,
     @Loader(CkbExplorerXUDTTransactionsLoader) txsLoader: CkbExplorerXUDTTransactionsLoaderType,
   ): Promise<number | null> {
+    if (!coin.typeHash) {
+      return null;
+    }
     const transactions = await txsLoader.load({
       typeHash: coin.typeHash,
       page: 1,

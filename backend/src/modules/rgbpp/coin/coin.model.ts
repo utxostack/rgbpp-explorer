@@ -28,10 +28,10 @@ export class RgbppCoin {
   icon: string | null;
 
   @Field(() => String, { nullable: true })
-  typeHash: string;
+  typeHash: string | null;
 
   @Field(() => CkbScript, { nullable: true })
-  typeScript: CkbScript;
+  typeScript: CkbScript | null;
 
   @Field(() => Int)
   holdersCount: number;
