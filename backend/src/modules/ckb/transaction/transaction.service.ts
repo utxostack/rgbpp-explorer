@@ -3,6 +3,9 @@ import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
 import * as CkbExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
 import { CkbRpcWebsocketService } from 'src/core/ckb-rpc/ckb-rpc-websocket.service';
 import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
+import { CkbSearchKeyInput } from './transaction.model';
+import { BI } from '@ckb-lumos/bi';
+import { OrderType } from 'src/modules/api.model';
 
 @Injectable()
 export class CkbTransactionService {
@@ -24,5 +27,26 @@ export class CkbTransactionService {
 
   public async getTipBlockNumber(): Promise<number> {
     return this.ckbRpcService.getTipBlockNumber();
+  }
+
+  public async getTransactions(
+    searchKey: CkbSearchKeyInput,
+    order: OrderType = OrderType.Desc,
+    limit: number,
+    after?: string,
+  ): Promise<CkbRpc.GetTransactionsResult> {
+    return this.ckbRpcService.getTransactions(
+      {
+        script: {
+          code_hash: searchKey.script.codeHash,
+          hash_type: searchKey.script.hashType,
+          args: searchKey.script.args,
+        },
+        script_type: searchKey.scriptType,
+      },
+      order,
+      BI.from(limit).toHexString(),
+      after,
+    );
   }
 }
