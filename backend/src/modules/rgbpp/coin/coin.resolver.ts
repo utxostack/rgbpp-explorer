@@ -11,7 +11,7 @@ import {
 
 @Resolver(() => RgbppCoin)
 export class RgbppCoinResolver {
-  constructor(private ckbExplorerService: CkbExplorerService) {}
+  constructor(private ckbExplorerService: CkbExplorerService) { }
 
   @Query(() => RgbppCoinList, { name: 'rgbppCoins' })
   public async coins(
@@ -26,7 +26,9 @@ export class RgbppCoinResolver {
       sort,
       tags: [XUDTTag.RgbppCompatible],
     });
-    const coins = response.data.map((coin) => RgbppCoin.from(coin.attributes));
+    const coins = response.data
+      .map((coin) => RgbppCoin.from(coin.attributes))
+      .filter((coin) => coin !== null);
     return {
       coins,
       total: response.meta.total,
@@ -34,10 +36,10 @@ export class RgbppCoinResolver {
     };
   }
 
-  @Query(() => RgbppCoin, { name: 'rgbppCoin' })
+  @Query(() => RgbppCoin, { name: 'rgbppCoin', nullable: true })
   public async coin(
     @Args('typeHash', { type: () => String }) typeHash: string,
-  ): Promise<RgbppBaseCoin> {
+  ): Promise<RgbppBaseCoin | null> {
     const response = await this.ckbExplorerService.getXUDT(typeHash);
     return RgbppCoin.from(response.data.attributes);
   }

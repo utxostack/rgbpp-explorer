@@ -52,7 +52,7 @@ export interface CkbExplorerResponse<T, IsPaginated extends boolean = false> {
   meta: IsPaginated extends true ? PaginationMeta : never;
 }
 
-export type NonPaginatedResponse<T extends {}> = CkbExplorerResponse<
+export type NonPaginatedResponse<T extends object> = CkbExplorerResponse<
   {
     id: string;
     type: string;
@@ -61,7 +61,7 @@ export type NonPaginatedResponse<T extends {}> = CkbExplorerResponse<
   false
 >;
 
-export type PaginatedResponse<T extends {}> = CkbExplorerResponse<
+export type PaginatedResponse<T extends object> = CkbExplorerResponse<
   {
     id: string;
     type: string;

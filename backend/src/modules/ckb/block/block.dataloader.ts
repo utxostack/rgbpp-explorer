@@ -8,7 +8,7 @@ import { CkbBlockService } from './block.service';
 import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 
 @Injectable()
-export class CkbRpcBlockLoader implements NestDataLoader<string, CkbRpc.Block |  null> {
+export class CkbRpcBlockLoader implements NestDataLoader<string, CkbRpc.Block | null> {
   private logger = new Logger(CkbRpcBlockLoader.name);
 
   constructor(
@@ -26,7 +26,9 @@ export class CkbRpcBlockLoader implements NestDataLoader<string, CkbRpc.Block | 
         if (result.status === 'fulfilled') {
           return result.value;
         }
-        this.logger.error(`Requesting: ${heightOrHashList[index]}, occurred error: ${result.reason}`);
+        this.logger.error(
+          `Requesting: ${heightOrHashList[index]}, occurred error: ${result.reason}`,
+        );
         this.sentryService.instance().captureException(result.reason);
         return null;
       });
@@ -57,7 +59,9 @@ export class CkbExplorerBlockLoader implements NestDataLoader<string, CkbExplore
         if (result.status === 'fulfilled') {
           return result.value;
         }
-        this.logger.error(`Requesting: ${heightOrHashList[index]}, occurred error: ${result.reason}`);
+        this.logger.error(
+          `Requesting: ${heightOrHashList[index]}, occurred error: ${result.reason}`,
+        );
         this.sentryService.instance().captureException(result.reason);
         return null;
       });

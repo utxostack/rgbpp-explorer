@@ -6,4 +6,3 @@ export const ParentField = createParamDecorator((param: string, ctx: ExecutionCo
   const value = root[param];
   return value;
 });
-

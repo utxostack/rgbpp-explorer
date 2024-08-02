@@ -1,10 +1,5 @@
 import { config, helpers } from '@ckb-lumos/lumos';
-import {
-  PipeTransform,
-  Injectable,
-  BadRequestException,
-  Logger,
-} from '@nestjs/common';
+import { PipeTransform, Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { isValidAddress } from '@rgbpp-sdk/btc';
 import { BtcNetworkTypeMap, NetworkType } from 'src/constants';
@@ -54,7 +49,7 @@ export class ValidateBtcAddressPipe extends BaseValidateAddressPipe {
 
   protected validateAddress(value: string): boolean {
     const network = this.configService.get('NETWORK', { infer: true });
-    const isValid =  isValidAddress(value, BtcNetworkTypeMap[network ?? NetworkType.testnet]);
+    const isValid = isValidAddress(value, BtcNetworkTypeMap[network ?? NetworkType.testnet]);
     return isValid;
   }
 

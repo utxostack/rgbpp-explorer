@@ -5,7 +5,10 @@ import { BitcoinBaseTransaction, BitcoinTransaction } from '../transaction/trans
 import { BitcoinAddress, BitcoinBaseAddress } from '../address/address.model';
 import { BitcoinBaseBlock, BitcoinBlock, FeeRateRange } from './block.model';
 import { BitcoinBlockLoader, BitcoinBlockLoaderType } from './dataloader/block.loader';
-import { BitcoinBlockTransactionsLoader, BitcoinBlockTransactionsLoaderType } from './dataloader/block-transactions.loader';
+import {
+  BitcoinBlockTransactionsLoader,
+  BitcoinBlockTransactionsLoaderType,
+} from './dataloader/block-transactions.loader';
 
 @Resolver(() => BitcoinBlock)
 export class BitcoinBlockResolver {

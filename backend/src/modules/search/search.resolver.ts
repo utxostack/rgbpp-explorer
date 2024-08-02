@@ -23,7 +23,7 @@ import { ParentField } from 'src/decorators/parent-field.decorator';
 
 @Resolver(() => SearchResult)
 export class SearchResolver {
-  constructor(private ckbExplorerService: CkbExplorerService) { }
+  constructor(private ckbExplorerService: CkbExplorerService) {}
 
   @Query(() => SearchResult)
   public async search(@Args('query') query: string) {

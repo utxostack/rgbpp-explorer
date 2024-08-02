@@ -6,7 +6,10 @@ import { computeScriptHash } from '@ckb-lumos/lumos/utils';
 
 @Injectable()
 export class CkbCellService {
-  public getXUDTInfoFromOutput(cell: CkbBaseCell, output: CkbExplorer.DisplayOutput): CkbXUDTInfo | null {
+  public getXUDTInfoFromOutput(
+    cell: CkbBaseCell,
+    output: CkbExplorer.DisplayOutput,
+  ): CkbXUDTInfo | null {
     const info = output.xudt_info || output.omiga_inscription_info;
     if (!info) {
       return null;

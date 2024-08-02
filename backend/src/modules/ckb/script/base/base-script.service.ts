@@ -18,7 +18,7 @@ export abstract class BaseScriptService {
     protected configService: ConfigService<Env>,
     protected ckbRpcService: CkbRpcWebsocketService,
     @InjectSentry() protected sentryService: SentryService,
-  ) { }
+  ) {}
 
   public static sortTransactionCmp(a: CkbRpc.IndexerCell, b: CkbRpc.IndexerCell, order: OrderType) {
     const blockNumberCmp = BI.from(b.block_number).sub(BI.from(a.block_number)).toNumber();

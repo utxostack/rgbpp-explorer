@@ -54,7 +54,10 @@ export class RgbppCoin {
   @Field(() => Float, { nullable: true })
   transactionsCount: number;
 
-  public static from(xudt: CkbExplorer.XUDT): RgbppBaseCoin {
+  public static from(xudt: CkbExplorer.XUDT): RgbppBaseCoin | null {
+    if (!xudt) {
+      return null;
+    }
     return {
       name: xudt.full_name,
       description: xudt.description,

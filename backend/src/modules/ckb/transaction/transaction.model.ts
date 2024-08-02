@@ -1,5 +1,5 @@
 import { toNumber } from 'lodash';
-import { Field, Float, InputType, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { Field, Float, InputType, ObjectType } from '@nestjs/graphql';
 import { ResultFormatter, RPCTypes } from '@ckb-lumos/lumos/rpc';
 import { blockchain } from '@ckb-lumos/lumos/codec';
 import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
