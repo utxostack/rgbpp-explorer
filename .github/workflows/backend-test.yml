@@ -52,7 +52,6 @@ jobs:
       - name: Run Test
         run: |
           touch .env
-          echo API_ENDPOINT="https://xxx.execute-api.us-west-2.amazonaws.com" >> .env
           echo BITCOIN_PRIMARY_DATA_PROVIDER="${{ matrix.BITCOIN_PRIMARY_DATA_PROVIDER }}" >> .env
           echo BITCOIN_MEMPOOL_SPACE_API_URL="${{ secrets.BITCOIN_MEMPOOL_SPACE_API_URL }}" >> .env
           echo BITCOIN_ELECTRS_API_URL="{{ secrets.BITCOIN_ELECTRS_API_URL }}" >> .env
