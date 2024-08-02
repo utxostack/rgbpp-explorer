@@ -5,6 +5,7 @@ on:
     paths:
       - backend/**
   push:
+    branches: [main, develop]
     paths:
       - backend/**
 
@@ -12,15 +13,33 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           submodules: 'true'
 
-      - uses: actions/setup-node@v2
+      - name: Install PNPM
+        uses: pnpm/action-setup@v3
         with:
-          node-version: '20'
+          version: 8
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '21'
+          cache: 'pnpm'
 
       - uses: pnpm/action-setup@v4
       - name: Install dependency
@@ -31,5 +50,15 @@ jobs:
         working-directory: backend
 
       - name: Run Test
-        run: pnpm run test
+        run: |
+          touch .env
+          echo API_ENDPOINT="https://xxx.execute-api.us-west-2.amazonaws.com" >> .env
+          echo BITCOIN_PRIMARY_DATA_PROVIDER="${{ matrix.BITCOIN_PRIMARY_DATA_PROVIDER }}" >> .env
+          echo BITCOIN_MEMPOOL_SPACE_API_URL="${{ secrets.BITCOIN_MEMPOOL_SPACE_API_URL }}" >> .env
+          echo BITCOIN_ELECTRS_API_URL="{{ secrets.BITCOIN_ELECTRS_API_URL }}" >> .env
+          echo CKB_EXPLORER_API_URL="${{ secrets.CKB_EXPLORER_API_URL }}" >> .env
+          echo CKB_RPC_WEBSOCKET_URL="${{ secrets.CKB_RPC_WEBSOCKET_URL }}" >> .env
+          echo REDIS_URL="redis://localhost:6379" >> .env
+          cat .env
+          pnpm run test
         working-directory: backend
