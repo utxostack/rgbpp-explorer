@@ -67,7 +67,7 @@ export class CkbCell {
       index,
       capacity: toNumber(output.capacity),
       type: output.type ? CkbScript.from(output.type) : null,
-      lock: CkbScript.from(output.lock),
+      lock: CkbScript.from(output.lock)!,
     };
   }
 
@@ -77,7 +77,7 @@ export class CkbCell {
       index: toNumber(cell.out_point.index),
       capacity: toNumber(cell.output.capacity),
       type: cell.output.type ? CkbScript.from(cell.output.type) : null,
-      lock: CkbScript.from(cell.output.lock),
+      lock: CkbScript.from(cell.output.lock)!,
     };
   }
 }
