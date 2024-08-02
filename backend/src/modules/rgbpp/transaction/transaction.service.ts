@@ -21,7 +21,7 @@ export class RgbppTransactionService {
     private ckbRpcService: CkbRpcWebsocketService,
     private bitcoinApiService: BitcoinApiService,
     private configService: ConfigService<Env>,
-  ) { }
+  ) {}
 
   public async getLatestTransactions(
     page: number,

@@ -2,14 +2,17 @@ import { Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import { BitcoinBaseChainInfo, BitcoinChainInfo, BitcoinFees } from './bitcoin.model';
 import { Loader } from '@applifting-io/nestjs-dataloader';
-import { BitcoinBlockTxidsLoader, BitcoinBlockTxidsLoaderType } from './block/dataloader/block-txids.loader';
+import {
+  BitcoinBlockTxidsLoader,
+  BitcoinBlockTxidsLoaderType,
+} from './block/dataloader/block-txids.loader';
 
 // 60 * 24 = 1440 minutes
 const BLOCK_NUMBER_OF_24_HOURS = 144;
 
 @Resolver(() => BitcoinChainInfo)
 export class BitcoinResolver {
-  constructor(private bitcoinApiService: BitcoinApiService) { }
+  constructor(private bitcoinApiService: BitcoinApiService) {}
 
   @Query(() => BitcoinChainInfo, { name: 'btcChainInfo' })
   public async chainInfo(): Promise<BitcoinBaseChainInfo> {

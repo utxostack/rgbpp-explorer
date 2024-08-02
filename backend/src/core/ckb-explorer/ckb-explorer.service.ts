@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { Axios } from 'axios';
 import { Env } from 'src/env';
@@ -22,6 +22,10 @@ import {
   TransactionFeesStatistic,
   TransactionListSortType,
 } from './ckb-explorer.interface';
+import { ONE_HOUR_MS, ONE_MONTH_MS } from 'src/common/date';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import { toNumber } from 'lodash';
+import { Cacheable } from 'src/decorators/cacheable.decorator';
 
 type BasePaginationParams = {
   page?: number;
@@ -62,7 +66,10 @@ export class CkbExplorerService {
   private logger = new Logger(CkbExplorerService.name);
   private request: Axios;
 
-  constructor(private configService: ConfigService<Env>) {
+  constructor(
+    private configService: ConfigService<Env>,
+    @Inject(CACHE_MANAGER) protected cacheManager: Cache,
+  ) {
     this.request = axios.create({
       baseURL: this.configService.get('CKB_EXPLORER_API_URL'),
       headers: {
@@ -118,11 +125,20 @@ export class CkbExplorerService {
     return response.data;
   }
 
+  @Cacheable({
+    key: (heightOrHash: string) => `CkbExplorerService:getBlock:${heightOrHash}`,
+    ttl: ONE_MONTH_MS,
+  })
   public async getBlock(heightOrHash: string): Promise<NonPaginatedResponse<Block>> {
     const response = await this.request.get(`/v1/blocks/${heightOrHash}`);
     return response.data;
   }
 
+  @Cacheable({
+    key: (heightOrHash: string, { page = 1, pageSize = 10 }: BasePaginationParams = {}) =>
+      `CkbExplorerService:getBlockTransactions:${heightOrHash},${page},${pageSize}`,
+    ttl: ONE_MONTH_MS,
+  })
   public async getBlockTransactions(
     blockHash: string,
     { page = 1, pageSize = 10 }: BasePaginationParams = {},
@@ -173,7 +189,21 @@ export class CkbExplorerService {
     return response.data;
   }
 
+  @Cacheable({
+    key: (txHash: string) => `CkbExplorerService:getTransaction:${txHash}`,
+    ttl: ONE_HOUR_MS,
+    shouldCache: async (tx: NonPaginatedResponse<DetailTransaction>) => {
+      // cache tx for 1 month if it's committed and older than 1 hour
+      const { tx_status, block_timestamp } = tx.data.attributes;
+      return tx_status === 'committed' && Date.now() - toNumber(block_timestamp) > ONE_HOUR_MS;
+    },
+  })
   public async getTransaction(txHash: string): Promise<NonPaginatedResponse<DetailTransaction>> {
+    const key = `CkbExplorerService:getTransaction:${txHash}`;
+    const cached = await this.cacheManager.get(key);
+    if (cached) {
+      return cached as NonPaginatedResponse<DetailTransaction>;
+    }
     const response = await this.request.get(`/v1/transactions/${txHash}`);
     return response.data;
   }

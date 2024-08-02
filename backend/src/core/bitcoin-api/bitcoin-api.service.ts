@@ -8,8 +8,8 @@ import { IBitcoinDataProvider } from './bitcoin-api.interface';
 import { ElectrsService } from './provider/electrs.service';
 import { MempoolService } from './provider/mempool.service';
 import { ChainInfo } from './bitcoin-api.schema';
-import { Cacheable } from 'nestjs-cacheable';
 import { ONE_MONTH_MS, TEN_MINUTES_MS } from 'src/common/date';
+import { Cacheable } from 'src/decorators/cacheable.decorator';
 
 type MethodParameters<T, K extends keyof T> = T[K] extends (...args: infer P) => any ? P : never;
 type MethodReturnType<T, K extends keyof T> = T[K] extends (...args: any[]) => infer R ? R : never;

@@ -1,4 +1,3 @@
-import { Script } from '@ckb-lumos/lumos';
 import * as RgbppBtc from '@rgbpp-sdk/btc';
 import { BTCTestnetType } from '@rgbpp-sdk/ckb';
 

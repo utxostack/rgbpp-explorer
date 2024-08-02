@@ -17,7 +17,7 @@ export class RgbppAddressService {
     private rgbppService: RgbppService,
     @Inject(CACHE_MANAGER) protected cacheManager: Cache,
     @InjectQueue('rgbpp-address') private readonly queue: Queue,
-  ) { }
+  ) {}
 
   public async getRgbppAddressCells(btcAddress: string) {
     const key = `${this.addressCellsCacheKey}:${btcAddress}`;
@@ -41,7 +41,11 @@ export class RgbppAddressService {
   }
 
   public async setRgbppAddressCells(btcAddress: string, cells: CkbRpc.Cell[]) {
-    await this.cacheManager.set(`${this.addressCellsCacheKey}:${btcAddress}`, cells, TEN_MINUTES_MS);
+    await this.cacheManager.set(
+      `${this.addressCellsCacheKey}:${btcAddress}`,
+      cells,
+      TEN_MINUTES_MS,
+    );
   }
 
   public async collectRgbppAddressCells(btcAddress: string): Promise<CkbRpc.Cell[]> {

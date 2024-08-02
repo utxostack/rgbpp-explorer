@@ -3,12 +3,12 @@ import { bytes } from '@ckb-lumos/lumos/codec';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { getRgbppLockScript, remove0x, RGBPPLock } from '@rgbpp-sdk/ckb';
-import { Cacheable } from 'nestjs-cacheable';
 import { ONE_MINUTE_MS } from 'src/common/date';
 import { BtcTestnetTypeMap, NetworkType } from 'src/constants';
 import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
 import { CkbRpcWebsocketService } from 'src/core/ckb-rpc/ckb-rpc-websocket.service';
 import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
+import { Cacheable } from 'src/decorators/cacheable.decorator';
 import { Env } from 'src/env';
 
 @Injectable()
