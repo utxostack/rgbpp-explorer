@@ -10,7 +10,7 @@ export const envSchema = z
     // DATABASE_URL: z.string(),
     REDIS_URL: z.string(),
 
-    BITCOIN_PRIMARY_DATA_PROVIDER: z.enum(['mempool', 'electrs']),
+    BITCOIN_PRIMARY_DATA_PROVIDER: z.enum(['mempool', 'electrs']).default('mempool'),
 
     CKB_EXPLORER_API_URL: z.string(),
     CKB_RPC_WEBSOCKET_URL: z.string(),

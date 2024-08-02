@@ -54,7 +54,8 @@ export class ValidateBtcAddressPipe extends BaseValidateAddressPipe {
 
   protected validateAddress(value: string): boolean {
     const network = this.configService.get('NETWORK', { infer: true });
-    return isValidAddress(value, BtcNetworkTypeMap[network ?? NetworkType.testnet]);
+    const isValid =  isValidAddress(value, BtcNetworkTypeMap[network ?? NetworkType.testnet]);
+    return isValid;
   }
 
   protected getErrorMessage(): string {

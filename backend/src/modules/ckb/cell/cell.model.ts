@@ -1,7 +1,7 @@
 import { toNumber } from 'lodash';
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
-import { CkbScript } from '../script/script.model';
+import { CellType, CkbScript } from '../script/script.model';
 
 @ObjectType({ description: 'CKB XUDT Info' })
 export class CkbXUDTInfo {
@@ -32,7 +32,7 @@ export class CkbCellStatus {
   index: number;
 }
 
-export type CkbBaseCell = Omit<CkbCell, 'xudtInfo' | 'status'>;
+export type CkbBaseCell = Omit<CkbCell, 'xudtInfo' | 'status' | 'cellType'>;
 
 @ObjectType({ description: 'CKB Cell' })
 export class CkbCell {
@@ -56,6 +56,9 @@ export class CkbCell {
 
   @Field(() => CkbCellStatus)
   status: CkbCellStatus;
+
+  @Field(() => CellType, { nullable: true })
+  cellType: CellType;
 
   public static fromTransaction(tx: CkbRpc.Transaction, index: number): CkbBaseCell {
     const output = tx.outputs[index];
