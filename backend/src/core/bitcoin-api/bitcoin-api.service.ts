@@ -1,6 +1,6 @@
 import { HttpStatusCode, isAxiosError } from 'axios';
 import { ConfigService } from '@nestjs/config';
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpException, Injectable, Logger } from '@nestjs/common';
 import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 import { NetworkType } from 'src/constants';
 import { Env } from 'src/env';
@@ -122,9 +122,9 @@ export class BitcoinApiService {
         if (calledError.response?.status) {
           error.statusCode = calledError.response.status;
         }
-        throw error;
+        throw new HttpException(error, error.statusCode);
       }
-      throw err;
+      throw new HttpException(calledError, HttpStatusCode.ServiceUnavailable);
     }
   }
 
