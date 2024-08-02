@@ -55,13 +55,13 @@ export class RgbppCoin {
   transactionsCount: number;
 
   public static from(xudt: CkbExplorer.XUDT): RgbppBaseCoin | null {
-    if (!xudt || !xudt.symbol) {
+    if (!xudt) {
       return null;
     }
     return {
       name: xudt.full_name,
       description: xudt.description,
-      symbol: xudt.symbol,
+      symbol: xudt.symbol ?? xudt.type_hash.slice(0, 6),
       decimal: toNumber(xudt.decimal),
       icon: xudt.icon_file,
       typeHash: xudt.type_hash,
