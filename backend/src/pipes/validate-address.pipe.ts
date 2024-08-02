@@ -4,7 +4,6 @@ import {
   Injectable,
   BadRequestException,
   Logger,
-  ArgumentMetadata,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { isValidAddress } from '@rgbpp-sdk/btc';
@@ -16,7 +15,7 @@ abstract class BaseValidateAddressPipe implements PipeTransform {
   protected abstract validateAddress(value: string): boolean;
   protected abstract getErrorMessage(): string;
 
-  transform(value: string) {
+  transform(value: string): string | null {
     if (!this.validateAddress(value)) {
       this.logger.error(`Invalid address: ${value}`);
       throw new BadRequestException(this.getErrorMessage());
@@ -55,7 +54,7 @@ export class ValidateBtcAddressPipe extends BaseValidateAddressPipe {
 
   protected validateAddress(value: string): boolean {
     const network = this.configService.get('NETWORK', { infer: true });
-    return isValidAddress(value, BtcNetworkTypeMap[network]);
+    return isValidAddress(value, BtcNetworkTypeMap[network ?? NetworkType.testnet]);
   }
 
   protected getErrorMessage(): string {
@@ -63,19 +62,22 @@ export class ValidateBtcAddressPipe extends BaseValidateAddressPipe {
   }
 }
 
-function createTryValidatePipe(
-  BasePipe: new (...args: any[]) => PipeTransform,
-): new (...args: any[]) => PipeTransform {
-  return class extends BasePipe {
-    transform(value: string, metadata: ArgumentMetadata) {
-      try {
-        return super.transform(value, metadata);
-      } catch {
-        return null;
-      }
+export class TryValidateCkbAddressPipe extends ValidateCkbAddressPipe {
+  public transform(value: string) {
+    try {
+      return super.transform(value);
+    } catch {
+      return null;
     }
-  };
+  }
 }
 
-export const TryValidateCkbAddressPipe = createTryValidatePipe(ValidateCkbAddressPipe);
-export const TryValidateBtcAddressPipe = createTryValidatePipe(ValidateBtcAddressPipe);
+export class TryValidateBtcAddressPipe extends ValidateBtcAddressPipe {
+  public transform(value: string) {
+    try {
+      return super.transform(value);
+    } catch {
+      return null;
+    }
+  }
+}

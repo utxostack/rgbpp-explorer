@@ -25,40 +25,52 @@ export class CkbAddressResolver {
     };
   }
 
-  @ResolveField(() => Float)
+  @ResolveField(() => Float, { nullable: true })
   public async shannon(
     @Parent() address: CkbBaseAddress,
     @Loader(CkbAddressLoader) addressLoader: CkbAddressLoaderType,
-  ): Promise<number> {
-    const [info] = await addressLoader.load({ address: address.address });
-    return Number(info.balance);
+  ): Promise<number | null> {
+    const addressInfo = await addressLoader.load({ address: address.address });
+    if (!addressInfo) {
+      return null;
+    }
+    return Number(addressInfo[0].balance);
   }
 
-  @ResolveField(() => Float)
+  @ResolveField(() => Float, { nullable: true })
   public async transactionsCount(
     @Parent() address: CkbBaseAddress,
     @Loader(CkbAddressLoader) addressLoader: CkbAddressLoaderType,
-  ): Promise<number> {
-    const [info] = await addressLoader.load({ address: address.address });
-    return Number(info.transactions_count);
+  ): Promise<number | null> {
+    const addressInfo = await addressLoader.load({ address: address.address });
+    if (!addressInfo) {
+      return null;
+    }
+    return Number(addressInfo[0].transactions_count);
   }
 
-  @ResolveField(() => [CkbTransaction])
+  @ResolveField(() => [CkbTransaction], { nullable: true })
   public async transactions(
     @Parent() address: CkbBaseAddress,
     @Loader(CkbAddressTransactionsLoader) addressTxsLoader: CkbAddressTransactionsLoaderType,
     @Loader(CkbRpcTransactionLoader) rpcTxLoader: CkbRpcTransactionLoaderType,
     @Args('page', { nullable: true }) page?: number,
     @Args('pageSize', { nullable: true }) pageSize?: number,
-  ): Promise<CkbBaseTransaction[]> {
+  ): Promise<(CkbBaseTransaction | null)[] | null> {
     const res = await addressTxsLoader.load({
       address: address.address,
       pageSize,
       page,
     });
+    if (!res) {
+      return null;
+    }
     return Promise.all(
       res.txs.map(async (tx) => {
         const rpcTx = await rpcTxLoader.load(tx.transaction_hash);
+        if (!rpcTx) {
+          return null;
+        }
         return CkbTransaction.from(rpcTx);
       }),
     );

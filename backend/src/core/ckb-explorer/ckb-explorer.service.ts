@@ -20,6 +20,7 @@ import {
   XUDTTag,
   Statistics,
   TransactionFeesStatistic,
+  TransactionListSortType,
 } from './ckb-explorer.interface';
 
 type BasePaginationParams = {
@@ -47,6 +48,7 @@ type GetRgbppTransactionsParams = BasePaginationParams & {
 
 type GetXUDTListParams = BasePaginationParams & {
   symbol?: string;
+  sort?: TransactionListSortType;
   tags?: XUDTTag[];
 };
 
@@ -184,6 +186,7 @@ export class CkbExplorerService {
   public async getXUDTList({
     symbol,
     tags,
+    sort,
     page = 1,
     pageSize = 10,
   }: GetXUDTListParams): Promise<PaginatedResponse<XUDT>> {
@@ -195,6 +198,9 @@ export class CkbExplorerService {
     }
     if (tags) {
       params.append('tags', tags.join(','));
+    }
+    if (sort) {
+      params.append('sort', sort);
     }
     const response = await this.request.get(`/v1/xudts?${params.toString()}`);
     return response.data;

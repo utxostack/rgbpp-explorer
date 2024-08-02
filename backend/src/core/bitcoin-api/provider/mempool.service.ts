@@ -110,10 +110,10 @@ export class MempoolService implements IBitcoinDataProvider {
     return response.map((utxo) => UTXO.parse(utxo));
   }
 
-  public async getAddressTxs({ address, afterTxId }: { address: string; afterTxId?: string }) {
+  public async getAddressTxs({ address, afterTxid }: { address: string; afterTxid?: string }) {
     const response = await this.mempool.bitcoin.addresses.getAddressTxs({
       address,
-      after_txid: afterTxId,
+      after_txid: afterTxid,
     });
     return response.map((tx) => Transaction.parse(tx));
   }

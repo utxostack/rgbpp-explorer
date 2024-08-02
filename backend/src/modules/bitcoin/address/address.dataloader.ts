@@ -5,12 +5,16 @@ import { DataLoaderResponse } from 'src/common/type/dataloader';
 import { Address } from 'src/core/bitcoin-api/bitcoin-api.schema';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import { BitcoinBaseTransaction, BitcoinTransaction } from '../transaction/transaction.model';
+import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 
 @Injectable()
 export class BitcoinAddressLoader implements NestDataLoader<string, Address | null> {
   private logger = new Logger(BitcoinAddressLoader.name);
 
-  constructor(private bitcoinApiService: BitcoinApiService) {}
+  constructor(
+    private bitcoinApiService: BitcoinApiService,
+    @InjectSentry() private sentryService: SentryService,
+  ) {}
 
   public getBatchFunction() {
     return async (addresses: string[]) => {
@@ -18,7 +22,14 @@ export class BitcoinAddressLoader implements NestDataLoader<string, Address | nu
       const results = await Promise.allSettled(
         addresses.map((address) => this.bitcoinApiService.getAddress({ address })),
       );
-      return results.map((result) => (result.status === 'fulfilled' ? result.value : null));
+      return results.map((result, index) => {
+        if (result.status === 'fulfilled') {
+          return result.value;
+        }
+        this.logger.error(`Requesting: ${addresses[index]}, occurred error: ${result.reason}`);
+        this.sentryService.instance().captureException(result.reason);
+        return null;
+      });
     };
   }
 }
@@ -37,7 +48,10 @@ export class BitcoinAddressTransactionsLoader
 {
   private logger = new Logger(BitcoinAddressTransactionsLoader.name);
 
-  constructor(private bitcoinApiService: BitcoinApiService) {}
+  constructor(
+    private bitcoinApiService: BitcoinApiService,
+    @InjectSentry() private sentryService: SentryService,
+  ) {}
 
   public getBatchFunction() {
     return async (batchProps: BitcoinAddressTransactionsLoaderParams[]) => {
@@ -51,7 +65,14 @@ export class BitcoinAddressTransactionsLoader
           return txs.map((tx) => BitcoinTransaction.from(tx));
         }),
       );
-      return results.map((result) => (result.status === 'fulfilled' ? result.value : null));
+      return results.map((result, index) => {
+        if (result.status === 'fulfilled') {
+          return result.value;
+        }
+        this.logger.error(`Requesting: ${batchProps[index]}, occurred error: ${result.reason}`);
+        this.sentryService.instance().captureException(result.reason);
+        return null;
+      });
     };
   }
 }

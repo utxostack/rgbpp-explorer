@@ -1,10 +1,14 @@
 import { toNumber } from 'lodash';
-import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
+import { Field, Float, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { CkbScript } from 'src/modules/ckb/script/script.model';
 import * as CkbExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
 import { RgbppTransaction } from '../transaction/transaction.model';
 
 export type RgbppBaseCoin = Omit<RgbppCoin, 'transactions'>;
+
+registerEnumType(CkbExplorer.TransactionListSortType, {
+  name: 'TransactionListSortType',
+});
 
 @ObjectType({ description: 'RGB++ Coin' })
 export class RgbppCoin {
@@ -12,7 +16,7 @@ export class RgbppCoin {
   name: string;
 
   @Field(() => String, { nullable: true })
-  description: string;
+  description: string | null;
 
   @Field(() => String)
   symbol: string;
@@ -21,7 +25,7 @@ export class RgbppCoin {
   decimal: number;
 
   @Field(() => String, { nullable: true })
-  icon: string;
+  icon: string | null;
 
   @Field(() => String, { nullable: true })
   typeHash: string;

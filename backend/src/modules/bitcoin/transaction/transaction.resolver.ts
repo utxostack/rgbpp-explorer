@@ -38,23 +38,30 @@ export class BitcoinTransactionResolver {
 
     // TODO: should this resolver be refactored with a dataloader?
     const info = await this.bitcoinApiService.getBlockchainInfo();
-    return info.blocks - tx.blockHeight + 1;
+    return info.blocks - tx.blockHeight! + 1;
   }
 
-  @ResolveField(() => BitcoinBlock)
+  @ResolveField(() => BitcoinBlock, { nullable: true })
   public async block(
     @Parent() tx: BitcoinBaseTransaction,
     @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
   ): Promise<BitcoinBaseBlock | null> {
+    if (!tx.blockHash) {
+      return null
+    }
     const block = await blockLoader.load(tx.blockHash);
+    if (!block) {
+      return null;
+    }
     return BitcoinBlock.from(block);
   }
 
-  @ResolveField(() => RgbppTransaction)
+  @ResolveField(() => RgbppTransaction, { nullable: true })
   public async rgbppTransaction(
     @Parent() tx: BitcoinBaseTransaction,
     @Loader(RgbppTransactionLoader) txLoader: RgbppTransactionLoaderType,
   ): Promise<RgbppBaseTransaction | null> {
-    return txLoader.load(tx.txid);
+    const result = await txLoader.load(tx.txid);
+    return result || null;
   }
 }

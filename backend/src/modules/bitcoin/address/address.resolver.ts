@@ -24,8 +24,11 @@ export class BitcoinAddressResolver {
   public async satoshi(
     @Parent() address: BitcoinBaseAddress,
     @Loader(BitcoinAddressLoader) addressLoader: BitcoinAddressLoaderType,
-  ): Promise<number> {
+  ): Promise<number | null> {
     const addressStats = await addressLoader.load(address.address);
+    if (!addressStats) {
+      return null;
+    }
     return addressStats.chain_stats.funded_txo_sum - addressStats.chain_stats.spent_txo_sum;
   }
 
@@ -33,32 +36,39 @@ export class BitcoinAddressResolver {
   public async pendingSatoshi(
     @Parent() address: BitcoinBaseAddress,
     @Loader(BitcoinAddressLoader) addressLoader: BitcoinAddressLoaderType,
-  ): Promise<number> {
+  ): Promise<number | null> {
     const addressStats = await addressLoader.load(address.address);
+    if (!addressStats) {
+      return null;
+    }
     return addressStats.mempool_stats.funded_txo_sum - addressStats.mempool_stats.spent_txo_sum;
   }
 
-  @ResolveField(() => Float)
+  @ResolveField(() => Float, { nullable: true })
   public async transactionsCount(
     @Parent() address: BitcoinBaseAddress,
     @Loader(BitcoinAddressLoader) addressLoader: BitcoinAddressLoaderType,
-  ): Promise<number> {
+  ): Promise<number | null> {
     // TODO: addressInfo.mempool_stats.tx_count is not included in the response, not sure if it should be included
     const stats = await addressLoader.load(address.address);
+    if (!stats) {
+      return null;
+    }
     return stats.chain_stats.tx_count;
   }
 
-  @ResolveField(() => [BitcoinTransaction])
+  @ResolveField(() => [BitcoinTransaction], { nullable: true })
   public async transactions(
     @Parent() address: BitcoinBaseAddress,
     @Loader(BitcoinAddressTransactionsLoader)
     addressTxsLoader: BitcoinAddressTransactionsLoaderType,
     @Args('afterTxid', { nullable: true }) afterTxid?: string,
-  ): Promise<BitcoinBaseTransaction[]> {
-    return await addressTxsLoader.load({
+  ): Promise<BitcoinBaseTransaction[] | null> {
+    const list = await addressTxsLoader.load({
       address: address.address,
       afterTxid: afterTxid,
     });
+    return list || null;
   }
 
   @ResolveField(() => RgbppAddress)

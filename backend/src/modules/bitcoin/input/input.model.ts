@@ -11,7 +11,7 @@ export class BitcoinInput {
   vout: number;
 
   @Field(() => BitcoinOutput, { nullable: true })
-  prevout: BitcoinBaseOutput;
+  prevout: BitcoinBaseOutput | null;
 
   @Field(() => String)
   scriptsig: string;
