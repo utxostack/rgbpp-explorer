@@ -242,7 +242,8 @@ type RgbppCoin {
   totalAmount: Float!
   issuer: String!
   deployedAt: Timestamp!
-  transactions(page: Int, pageSize: Int): [RgbppTransaction!]!
+  transactions(page: Int, pageSize: Int): [RgbppTransaction!]
+  transactionsCount: Float
 }
 
 """RGB++ Coin List"""

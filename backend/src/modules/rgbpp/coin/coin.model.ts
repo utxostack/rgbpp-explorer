@@ -4,7 +4,7 @@ import { CkbScript } from 'src/modules/ckb/script/script.model';
 import * as CkbExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
 import { RgbppTransaction } from '../transaction/transaction.model';
 
-export type RgbppBaseCoin = Omit<RgbppCoin, 'transactions'>;
+export type RgbppBaseCoin = Omit<RgbppCoin, 'transactions' | 'transactionsCount'>;
 
 registerEnumType(CkbExplorer.TransactionListSortType, {
   name: 'TransactionListSortType',
@@ -48,8 +48,11 @@ export class RgbppCoin {
   @Field(() => Date)
   deployedAt: Date;
 
-  @Field(() => [RgbppTransaction])
+  @Field(() => [RgbppTransaction], { nullable: true })
   transactions: RgbppTransaction[];
+
+  @Field(() => Float, { nullable: true })
+  transactionsCount: number;
 
   public static from(xudt: CkbExplorer.XUDT): RgbppBaseCoin {
     return {
