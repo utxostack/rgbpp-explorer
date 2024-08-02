@@ -47,7 +47,7 @@ export class CkbTransactionResolver {
       const txs = await Promise.allSettled(
         types.map(async (cellType) => {
           const service = this.ckbScriptService.getServiceByCellType(cellType);
-          const txs = await service.getTransactions(limit, order, after);
+          const txs = await service.getTransactions(limit, order, after || undefined);
           return txs;
         }),
       );
@@ -71,7 +71,7 @@ export class CkbTransactionResolver {
           return CkbTransaction.from(tx);
         }),
       );
-      return orderedTxs;
+      return orderedTxs.filter((tx) => !!tx);
     }
 
     if (scriptKey) {
@@ -79,7 +79,7 @@ export class CkbTransactionResolver {
         scriptKey,
         order,
         limit,
-        after,
+        after || undefined,
       );
       const txs = await Promise.all(
         result.objects.map(async (tx) => {
@@ -87,7 +87,7 @@ export class CkbTransactionResolver {
           return CkbTransaction.from(txWithStatus);
         }),
       );
-      return txs;
+      return txs.filter((tx) => !!tx);
     }
 
     throw new BadRequestException('One of types and scriptKey must be provided');

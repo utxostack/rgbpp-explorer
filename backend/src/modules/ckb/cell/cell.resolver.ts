@@ -68,6 +68,9 @@ export class CkbCellResolver {
 
   @ResolveField(() => CellType, { nullable: true })
   public cellType(@Parent() cell: CkbBaseCell) {
+    if (!cell.type) {
+      return null;
+    }
     try {
       const cellType = this.ckbScriptService.getCellTypeByScript(cell.type);
       return cellType;
