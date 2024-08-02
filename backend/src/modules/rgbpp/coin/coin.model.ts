@@ -55,7 +55,7 @@ export class RgbppCoin {
   transactionsCount: number;
 
   public static from(xudt: CkbExplorer.XUDT): RgbppBaseCoin | null {
-    if (!xudt) {
+    if (!xudt || !xudt.symbol) {
       return null;
     }
     return {
@@ -70,7 +70,7 @@ export class RgbppCoin {
       h24CkbTransactionsCount: toNumber(xudt.h24_ckb_transactions_count),
       totalAmount: toNumber(xudt.total_amount),
       issuer: xudt.issuer_address,
-      deployedAt: new Date(xudt.created_at),
+      deployedAt: new Date(toNumber(xudt.created_at)),
     };
   }
 }
