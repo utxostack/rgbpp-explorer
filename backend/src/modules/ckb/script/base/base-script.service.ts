@@ -18,7 +18,16 @@ export abstract class BaseScriptService {
     protected configService: ConfigService<Env>,
     protected ckbRpcService: CkbRpcWebsocketService,
     @InjectSentry() protected sentryService: SentryService,
-  ) {}
+  ) { }
+
+  public static sortTransactionCmp(a: CkbRpc.IndexerCell, b: CkbRpc.IndexerCell, order: OrderType) {
+    const blockNumberCmp = BI.from(b.block_number).sub(BI.from(a.block_number)).toNumber();
+    if (blockNumberCmp !== 0) {
+      return order === OrderType.Desc ? blockNumberCmp : -blockNumberCmp;
+    }
+    const txIndexCmp = BI.from(b.tx_index).sub(BI.from(a.tx_index)).toNumber();
+    return order === OrderType.Desc ? txIndexCmp : -txIndexCmp;
+  }
 
   public abstract getScripts(): Script[];
 
@@ -64,10 +73,7 @@ export abstract class BaseScriptService {
     return transactions
       .map((tx) => tx.objects)
       .flat()
-      .sort((a, b) => {
-        const sort = BI.from(b.block_number).sub(BI.from(a.block_number)).toNumber();
-        return order === OrderType.Desc ? sort : -sort;
-      })
+      .sort((a, b) => BaseScriptService.sortTransactionCmp(a, b, order))
       .slice(0, limit);
   }
 }

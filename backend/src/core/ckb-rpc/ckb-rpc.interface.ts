@@ -97,15 +97,17 @@ export interface SearchKey {
   script_type: 'lock' | 'type';
 }
 
+export interface IndexerCell {
+  block_number: string;
+  io_index: string;
+  io_type: string;
+  tx_hash: string;
+  tx_index: string;
+}
+
 export interface GetTransactionsResult {
   last_cursor: string;
-  objects: {
-    block_number: string;
-    io_index: string;
-    io_type: string;
-    tx_hash: string;
-    tx_index: string;
-  }[];
+  objects: IndexerCell[];
 }
 
 export interface Cell {

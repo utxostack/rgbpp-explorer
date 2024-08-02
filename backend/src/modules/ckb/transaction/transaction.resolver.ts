@@ -18,6 +18,7 @@ import { CellType } from '../script/script.model';
 import { CkbScriptService } from '../script/script.service';
 import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 import { OrderType } from 'src/modules/api.model';
+import { BaseScriptService } from '../script/base/base-script.service';
 
 @Resolver(() => CkbTransaction)
 export class CkbTransactionResolver {
@@ -60,10 +61,7 @@ export class CkbTransactionResolver {
       const orderedTxHashes = txs
         .map((tx) => (tx.status === 'fulfilled' ? tx.value.map((t) => t) : []))
         .flat()
-        .sort((a, b) => {
-          const sort = BI.from(b.block_number).sub(BI.from(a.block_number)).toNumber();
-          return order === OrderType.Desc ? sort : -sort;
-        })
+        .sort((a, b) => BaseScriptService.sortTransactionCmp(a, b, order))
         .slice(0, limit)
         .map((tx) => tx.tx_hash);
 
