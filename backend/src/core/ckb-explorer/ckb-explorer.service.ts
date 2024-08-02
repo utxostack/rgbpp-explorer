@@ -126,7 +126,8 @@ export class CkbExplorerService {
   }
 
   @Cacheable({
-    key: (heightOrHash: string) => `CkbExplorerService:getBlock:${heightOrHash}`,
+    namespace: 'CkbExplorerService',
+    key: (heightOrHash: string) => `getBlock:${heightOrHash}`,
     ttl: ONE_MONTH_MS,
   })
   public async getBlock(heightOrHash: string): Promise<NonPaginatedResponse<Block>> {
@@ -135,8 +136,9 @@ export class CkbExplorerService {
   }
 
   @Cacheable({
+    namespace: 'CkbExplorerService',
     key: (heightOrHash: string, { page = 1, pageSize = 10 }: BasePaginationParams = {}) =>
-      `CkbExplorerService:getBlockTransactions:${heightOrHash},${page},${pageSize}`,
+      `getBlockTransactions:${heightOrHash},${page},${pageSize}`,
     ttl: ONE_MONTH_MS,
   })
   public async getBlockTransactions(
@@ -190,7 +192,8 @@ export class CkbExplorerService {
   }
 
   @Cacheable({
-    key: (txHash: string) => `CkbExplorerService:getTransaction:${txHash}`,
+    namespace: 'CkbExplorerService',
+    key: (txHash: string) => `getTransaction:${txHash}`,
     ttl: ONE_HOUR_MS,
     shouldCache: async (tx: NonPaginatedResponse<DetailTransaction>) => {
       // cache tx for 1 month if it's committed and older than 1 hour

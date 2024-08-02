@@ -7,8 +7,8 @@ import { Env } from 'src/env';
 import { IBitcoinDataProvider } from './bitcoin-api.interface';
 import { ElectrsService } from './provider/electrs.service';
 import { MempoolService } from './provider/mempool.service';
-import { ChainInfo } from './bitcoin-api.schema';
-import { ONE_MONTH_MS, TEN_MINUTES_MS } from 'src/common/date';
+import { ChainInfo, Transaction } from './bitcoin-api.schema';
+import { ONE_HOUR_MS, ONE_MONTH_MS, TEN_MINUTES_MS } from 'src/common/date';
 import { Cacheable } from 'src/decorators/cacheable.decorator';
 
 type MethodParameters<T, K extends keyof T> = T[K] extends (...args: infer P) => any ? P : never;
@@ -185,9 +185,13 @@ export class BitcoinApiService {
   }
 
   @Cacheable({
-    key: ({ txid }) => `getTx:${txid}`,
     namespace: 'bitcoinApiService',
+    key: ({ txid }) => `getTx:${txid}`,
     ttl: ONE_MONTH_MS,
+    shouldCache: (tx: Transaction) =>
+      tx.status.confirmed &&
+      !!tx.status.block_time &&
+      tx.status.block_time - Date.now() < ONE_HOUR_MS,
   })
   public async getTx({ txid }: { txid: string }) {
     return this.call('getTx', { txid });
@@ -202,8 +206,8 @@ export class BitcoinApiService {
   }
 
   @Cacheable({
-    key: ({ hash }) => `getBlock:${hash}`,
     namespace: 'bitcoinApiService',
+    key: ({ hash }) => `getBlock:${hash}`,
     ttl: ONE_MONTH_MS,
   })
   public async getBlock({ hash }: { hash: string }) {
@@ -211,8 +215,8 @@ export class BitcoinApiService {
   }
 
   @Cacheable({
-    key: ({ hash, startIndex }) => `getBlockTxs:${hash}:${startIndex}`,
     namespace: 'bitcoinApiService',
+    key: ({ hash, startIndex }) => `getBlockTxs:${hash}:${startIndex}`,
     ttl: ONE_MONTH_MS,
   })
   public async getBlockTxs({ hash, startIndex }: { hash: string; startIndex?: number }) {
@@ -220,8 +224,8 @@ export class BitcoinApiService {
   }
 
   @Cacheable({
-    key: ({ height }) => `getBlockHeight:${height}`,
     namespace: 'bitcoinApiService',
+    key: ({ height }) => `getBlockHeight:${height}`,
     ttl: TEN_MINUTES_MS,
   })
   public async getBlockHeight({ height }: { height: number }) {
@@ -229,8 +233,8 @@ export class BitcoinApiService {
   }
 
   @Cacheable({
-    key: ({ hash }) => `getBlockTxids:${hash}`,
     namespace: 'bitcoinApiService',
+    key: ({ hash }) => `getBlockTxids:${hash}`,
     ttl: ONE_MONTH_MS,
   })
   public async getBlockTxids({ hash }: { hash: string }) {
