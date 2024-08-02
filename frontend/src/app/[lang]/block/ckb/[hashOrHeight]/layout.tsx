@@ -1,4 +1,5 @@
 import { t } from '@lingui/macro'
+import { notFound } from 'next/navigation'
 import { ReactNode } from 'react'
 import { Box, HStack, VStack } from 'styled-system/jsx'
 
@@ -9,6 +10,7 @@ import { Copier } from '@/components/copier'
 import { LinkTabs } from '@/components/link-tabs'
 import { Heading, Text } from '@/components/ui'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
+import { formatNumber } from '@/lib/string/format-number'
 
 export default async function Layout({
   params: { hashOrHeight },
@@ -20,9 +22,7 @@ export default async function Layout({
   const i18n = getI18nFromHeaders()
   const data = await explorerGraphql.getCkbBlock(hashOrHeight)
 
-  if (!data?.ckbBlock) {
-    throw new Error(t(i18n)`The block ${hashOrHeight} not found`)
-  }
+  if (!data?.ckbBlock) notFound()
 
   return (
     <VStack w="100%" maxW="content" p="30px" gap="30px">
@@ -48,9 +48,9 @@ export default async function Layout({
           border="1px solid currentColor"
           ml="auto"
         >
-          6930{' '}
-          <Text as="span" fontSize="14px" fontWeight="medium">
-            {t(i18n)`confirmations`}
+          {formatNumber(data.ckbBlock.confirmations)}
+          <Text as="span" fontSize="14px" fontWeight="medium" ml="4px">
+            {t(i18n)`Confirmations`}
           </Text>
         </Box>
       </HStack>

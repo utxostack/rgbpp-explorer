@@ -1,14 +1,20 @@
-import { t, Trans } from '@lingui/macro'
+import { t } from '@lingui/macro'
 import { Grid, HStack, VStack } from 'styled-system/jsx'
 
 import { CkbBlock } from '@/apis/types/explorer-graphql'
 import OverflowSVG from '@/assets/overview.svg'
 import { TimeFormatter } from '@/components/time-formatter'
 import { Heading, Text } from '@/components/ui'
+import { formatCkbAddress } from '@/lib/address/format-ckb-address'
+import { shannonToCKB } from '@/lib/ckb/shannon-to-ckb'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { formatNumber } from '@/lib/string/format-number'
 
-export function CkbBlockOverflow({ block }: { block: Pick<CkbBlock, 'timestamp' | 'transactionsCount'> }) {
+export function CkbBlockOverflow({
+  block,
+}: {
+  block: Pick<CkbBlock, 'timestamp' | 'transactionsCount' | 'miner' | 'reward' | 'size' | 'confirmations'>
+}) {
   const i18n = getI18nFromHeaders()
   return (
     <VStack gap={0} w="100%" bg="bg.card" rounded="8px">
@@ -30,8 +36,8 @@ export function CkbBlockOverflow({ block }: { block: Pick<CkbBlock, 'timestamp' 
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Block size`}</Text>
             <Text color="brand">
-              {'- '}
-              <Text as="span" color="12px">
+              {formatNumber(block.size)}
+              <Text as="span" color="12px" ml="4px">
                 {t(i18n)`bytes`}
               </Text>
             </Text>
@@ -53,15 +59,15 @@ export function CkbBlockOverflow({ block }: { block: Pick<CkbBlock, 'timestamp' 
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Miner`}</Text>
             <Text whiteSpace="nowrap" maxW="250px" truncate color="brand">
-              -
+              {formatCkbAddress(block.miner.address)}
             </Text>
           </VStack>
           <VStack gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Minter Reward`}</Text>
             <Text>
-              -{' '}
-              <Text as="span" fontSize="12px">
-                <Trans>CKB</Trans>
+              {formatNumber(shannonToCKB(block.reward))}
+              <Text as="span" fontSize="12px" ml="4px">
+                {t(i18n)`CKB`}
               </Text>
             </Text>
           </VStack>

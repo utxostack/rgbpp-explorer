@@ -4,6 +4,7 @@ import { CkbTransaction } from '@/apis/types/explorer-graphql'
 import OverflowSVG from '@/assets/overview.svg'
 import { TimeFormatter } from '@/components/time-formatter'
 import { Heading, Text } from '@/components/ui'
+import Link from '@/components/ui/link'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { formatNumber } from '@/lib/string/format-number'
 
@@ -30,7 +31,13 @@ export function CkbTransactionOverflow({ ckbTransaction }: { ckbTransaction: Ckb
         >
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Block Height`}</Text>
-            <Text color="brand">{formatNumber(ckbTransaction.blockNumber)}</Text>
+            <Link
+              href={`/block/ckb/${ckbTransaction.block?.hash || ckbTransaction.blockNumber}`}
+              color="brand"
+              _hover={{ textDecoration: 'underline' }}
+            >
+              {formatNumber(ckbTransaction.blockNumber)}
+            </Link>
           </VStack>
           <VStack gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Size`}</Text>

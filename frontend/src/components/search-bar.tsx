@@ -3,7 +3,7 @@
 import { t, Trans } from '@lingui/macro'
 import { useLingui } from '@lingui/react'
 import { useMutation } from '@tanstack/react-query'
-import { redirect } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { ReactNode, useState } from 'react'
 import { Center, Flex, type FlexProps, styled, VStack } from 'styled-system/jsx'
 import { useDebounceCallback } from 'usehooks-ts'
@@ -54,23 +54,30 @@ function SearchResult({
 }
 
 function useSearch() {
+  const router = useRouter()
   return useMutation({
     async mutationFn(keyword: string) {
-      const search = await explorerGraphql.search(keyword)
+      const { search } = await explorerGraphql.search(keyword)
       if (search.rgbppCoin) {
-        return redirect(`/assets/coins/${search.rgbppCoin}`)
+        return router.push(`/assets/coins/${search.rgbppCoin}`)
       }
       if (search.ckbTransaction) {
-        return redirect(`/transaction/${search.ckbTransaction}`)
+        return router.push(`/transaction/${search.ckbTransaction}`)
       }
       if (search.btcTransaction) {
-        return redirect(`/transaction/${search.btcTransaction}`)
+        return router.push(`/transaction/${search.btcTransaction}`)
       }
       if (search.btcAddress) {
-        return redirect(`/address/${search.btcAddress}`)
+        return router.push(`/address/${search.btcAddress}`)
       }
       if (search.ckbAddress) {
-        return redirect(`/address/${search.ckbAddress}`)
+        return router.push(`/address/${search.ckbAddress}`)
+      }
+      if (search.ckbBlock) {
+        return router.push(`/block/btc/${search.ckbBlock}`)
+      }
+      if (search.btcBlock) {
+        return router.push(`/block/btc/${search.btcBlock}`)
       }
       throw new Error('Not found')
     },

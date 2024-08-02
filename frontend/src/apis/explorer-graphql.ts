@@ -59,6 +59,7 @@ class ExplorerGraphql {
                     hashType
                     args
                   }
+                  cellType
                   xudtInfo {
                     symbol
                     amount
@@ -190,6 +191,7 @@ class ExplorerGraphql {
     return request<{
       rgbppCoin: {
         transactions: RGBppTransaction[]
+        transactionsCount: number
       }
     }>(
       this.serverURL,
@@ -198,6 +200,7 @@ class ExplorerGraphql {
           rgbppCoin(
             typeHash: "${typeHash}"
           ) {
+            transactionsCount
             transactions(page: ${page}, pageSize: ${pageSize}) {
               ckbTxHash
               btcTxid
@@ -325,7 +328,6 @@ class ExplorerGraphql {
             }
           }
         }
-
       `,
     )
   }
@@ -415,6 +417,7 @@ class ExplorerGraphql {
               txHash
               index
               capacity
+              cellType
               type {
                 codeHash
                 hashType
@@ -441,6 +444,7 @@ class ExplorerGraphql {
               txHash
               index
               capacity
+              cellType
               type {
                 codeHash
                 hashType
@@ -465,6 +469,7 @@ class ExplorerGraphql {
             }
             block {
               timestamp
+              hash
             }
           }
         }
@@ -721,6 +726,14 @@ class ExplorerGraphql {
             timestamp
             transactionsCount
             totalFee
+            miner {
+              address
+              shannon
+              transactionsCount
+            }
+            reward
+            size
+            confirmations
           }
         }
       `,

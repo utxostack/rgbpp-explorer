@@ -19,7 +19,7 @@ export function resolveCellDiff(tx?: CkbTransaction) {
     .reduce((acc, input) => acc.plus(input.xudtInfo.amount), BigNumber(0))
   const outputValue = tx?.outputs
     .filter(
-      (output) => output.xudtInfo && output.xudtInfo.symbol === symbol && scriptToAddress(output.lock) !== lockScript,
+      (output) => output.xudtInfo && output.xudtInfo.symbol === symbol && scriptToAddress(output.lock) === lockScript,
     )
     .reduce((acc, output) => acc.plus(output.xudtInfo.amount), BigNumber(0))
   return {
