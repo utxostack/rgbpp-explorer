@@ -59,6 +59,7 @@ class ExplorerGraphql {
                     hashType
                     args
                   }
+                  cellType
                   xudtInfo {
                     symbol
                     amount
@@ -190,6 +191,7 @@ class ExplorerGraphql {
     return request<{
       rgbppCoin: {
         transactions: RGBppTransaction[]
+        transactionsCount: number
       }
     }>(
       this.serverURL,
@@ -198,6 +200,7 @@ class ExplorerGraphql {
           rgbppCoin(
             typeHash: "${typeHash}"
           ) {
+            transactionsCount
             transactions(page: ${page}, pageSize: ${pageSize}) {
               ckbTxHash
               btcTxid
@@ -729,6 +732,8 @@ class ExplorerGraphql {
               transactionsCount
             }
             reward
+            size
+            confirmations
           }
         }
       `,

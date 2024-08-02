@@ -10,6 +10,7 @@ import { Copier } from '@/components/copier'
 import { LinkTabs } from '@/components/link-tabs'
 import { Heading, Text } from '@/components/ui'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
+import { formatNumber } from '@/lib/string/format-number'
 
 export default async function Layout({
   params: { hashOrHeight },
@@ -47,8 +48,8 @@ export default async function Layout({
           border="1px solid currentColor"
           ml="auto"
         >
-          {'- '}
-          <Text as="span" fontSize="14px" fontWeight="medium">
+          {formatNumber(data.ckbBlock.confirmations)}
+          <Text as="span" fontSize="14px" fontWeight="medium" ml="4px">
             {t(i18n)`Confirmations`}
           </Text>
         </Box>

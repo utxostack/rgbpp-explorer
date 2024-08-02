@@ -59,6 +59,14 @@ export interface RGBppCoin {
   issuer: string
   deployedAt: string | number | null
   typeScript: TypeScript
+  transactionsCount: number
+}
+
+export enum CellType {
+  XUDT = 'XUDT',
+  SUDT = 'SUDT',
+  DOB = 'DOB',
+  MNFT = 'mNFT',
 }
 
 export interface RGBppTransaction {
@@ -82,6 +90,7 @@ export interface CkbCell {
     txHash: string
     index: number
   }
+  cellType: CellType
 }
 
 export interface BtcTransaction {
@@ -189,6 +198,8 @@ export interface CkbBlock {
   totalFee: number
   miner: CkbAddress
   reward: number
+  size: number
+  confirmations: number
 }
 
 export interface BtcBlock {

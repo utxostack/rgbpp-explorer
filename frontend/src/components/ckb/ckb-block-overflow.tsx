@@ -13,7 +13,7 @@ import { formatNumber } from '@/lib/string/format-number'
 export function CkbBlockOverflow({
   block,
 }: {
-  block: Pick<CkbBlock, 'timestamp' | 'transactionsCount' | 'miner' | 'reward'>
+  block: Pick<CkbBlock, 'timestamp' | 'transactionsCount' | 'miner' | 'reward' | 'size' | 'confirmations'>
 }) {
   const i18n = getI18nFromHeaders()
   return (
@@ -36,8 +36,8 @@ export function CkbBlockOverflow({
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Block size`}</Text>
             <Text color="brand">
-              {'- '}
-              <Text as="span" color="12px">
+              {formatNumber(block.size)}
+              <Text as="span" color="12px" ml="4px">
                 {t(i18n)`bytes`}
               </Text>
             </Text>
