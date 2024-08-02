@@ -1,4 +1,4 @@
-import { t, Trans } from '@lingui/macro'
+import { t } from '@lingui/macro'
 import { Grid, HStack, VStack } from 'styled-system/jsx'
 
 import { CkbBlock } from '@/apis/types/explorer-graphql'
@@ -67,7 +67,7 @@ export function CkbBlockOverflow({
             <Text>
               {formatNumber(shannonToCKB(block.reward))}
               <Text as="span" fontSize="12px" ml="4px">
-                <Trans>CKB</Trans>
+                {t(i18n)`CKB`}
               </Text>
             </Text>
           </VStack>

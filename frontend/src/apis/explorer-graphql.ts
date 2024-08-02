@@ -325,7 +325,6 @@ class ExplorerGraphql {
             }
           }
         }
-
       `,
     )
   }
@@ -415,6 +414,7 @@ class ExplorerGraphql {
               txHash
               index
               capacity
+              cellType
               type {
                 codeHash
                 hashType
@@ -441,6 +441,7 @@ class ExplorerGraphql {
               txHash
               index
               capacity
+              cellType
               type {
                 codeHash
                 hashType
