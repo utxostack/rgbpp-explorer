@@ -17,9 +17,12 @@ import {
   CkbRpcTransactionLoader,
   CkbRpcTransactionLoaderType,
 } from '../transaction/transaction.dataloader';
+import { CkbRpcWebsocketService } from 'src/core/ckb-rpc/ckb-rpc-websocket.service';
 
 @Resolver(() => CkbBlock)
 export class CkbBlockResolver {
+  constructor(private ckbRpcService: CkbRpcWebsocketService) {}
+
   @Query(() => CkbBlock, { name: 'ckbBlock', nullable: true })
   public async getBlock(
     @Args('heightOrHash', { type: () => String }) heightOrHash: string,
@@ -87,5 +90,30 @@ export class CkbBlockResolver {
         return CkbTransaction.from(transaction);
       }),
     );
+  }
+
+  @ResolveField(() => Float)
+  public async size(
+    @Parent() block: CkbBaseBlock,
+    @Loader(CkbExplorerBlockLoader) explorerBlockLoader: CkbExplorerBlockLoaderType,
+  ): Promise<number | null> {
+    const explorerBlock = await explorerBlockLoader.load(block.hash);
+    if (!explorerBlock) {
+      return null;
+    }
+    return explorerBlock.size;
+  }
+
+  @ResolveField(() => Float)
+  public async confirmations(
+    @Parent() block: CkbBaseBlock,
+    @Loader(CkbExplorerBlockLoader) explorerBlockLoader: CkbExplorerBlockLoaderType,
+  ): Promise<number | null> {
+    const tipBlockNumber = await this.ckbRpcService.getTipBlockNumber();
+    const explorerBlock = await explorerBlockLoader.load(block.hash);
+    if (!explorerBlock) {
+      return null;
+    }
+    return tipBlockNumber - toNumber(explorerBlock.number);
   }
 }

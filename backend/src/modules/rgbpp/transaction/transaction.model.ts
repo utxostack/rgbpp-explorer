@@ -1,4 +1,5 @@
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { toNumber } from 'lodash';
 import * as CkbExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
 import { BitcoinTransaction } from 'src/modules/bitcoin/transaction/transaction.model';
 import { CkbTransaction } from 'src/modules/ckb/transaction/transaction.model';
@@ -59,11 +60,12 @@ export class RgbppTransaction {
   }
 
   public static fromCkbTransaction(tx: CkbExplorer.Transaction) {
+    console.log('tx', tx.create_timestamp);
     return {
       ckbTxHash: tx.transaction_hash,
       btcTxid: tx.rgb_txid,
-      blockNumber: parseInt(tx.block_number),
-      timestamp: new Date(tx.block_timestamp),
+      blockNumber: toNumber(tx.block_number),
+      timestamp: new Date(toNumber(tx.create_timestamp)),
     };
   }
 }
