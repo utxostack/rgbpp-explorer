@@ -63,6 +63,8 @@ type CkbBlock {
   miner: CkbAddress!
   reward: Float!
   transactions: [CkbTransaction!]!
+  size: Float!
+  confirmations: Float!
 }
 
 """
