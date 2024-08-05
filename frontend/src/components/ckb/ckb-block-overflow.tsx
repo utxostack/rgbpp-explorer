@@ -23,7 +23,7 @@ export function CkbBlockOverflow({
         <Heading fontSize="16px" fontWeight="semibold">{t(i18n)`Overflow`}</Heading>
         {block.timestamp ? <TimeFormatter timestamp={block.timestamp} /> : null}
       </HStack>
-      <Grid w="100%" gridTemplateColumns="repeat(2, 1fr)" gap="30px" pt="20px" pb="30px" px="30px">
+      <Grid w="100%" gridTemplateColumns="repeat(2, 1fr)" gap="30px" pt="20px" pb="30px" px="30px" textAlign="center">
         <Grid
           gridTemplateColumns="repeat(2, 1fr)"
           px="20px"

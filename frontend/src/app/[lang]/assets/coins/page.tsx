@@ -5,6 +5,7 @@ import { HStack, styled, VStack } from 'styled-system/jsx'
 import { explorerGraphql } from '@/apis/explorer-graphql'
 import BtcIcon from '@/assets/chains/btc.svg'
 import { PaginationSearchParams } from '@/components/pagination-searchparams'
+import { TextOverflowTooltip } from '@/components/text-overflow-tooltip'
 import { Table, Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { TIME_TEMPLATE } from '@/constants'
@@ -44,7 +45,11 @@ export default async function Page() {
                     color="text.link"
                   >
                     {coin.icon ? <styled.img w="32px" h="32px" src={coin.icon} /> : <BtcIcon w="32px" h="32px" />}
-                    <Text>{coin.symbol}</Text>
+                    <TextOverflowTooltip label={coin.symbol}>
+                      <Text maxW="200px" truncate>
+                        {coin.symbol}
+                      </Text>
+                    </TextOverflowTooltip>
                   </Link>
                 </Table.Cell>
                 <Table.Cell>{formatNumber(coin.holdersCount)}</Table.Cell>

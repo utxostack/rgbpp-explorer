@@ -1,3 +1,5 @@
+import { Flex, VStack } from 'styled-system/jsx'
+
 import { explorerGraphql } from '@/apis/explorer-graphql'
 import { BtcUtxoTables } from '@/components/btc/btc-utxo-tables'
 import { Copier } from '@/components/copier'
@@ -5,8 +7,6 @@ import { FailedFallback } from '@/components/failed-fallback'
 import { TimeFormatter } from '@/components/time-formatter'
 import Link from '@/components/ui/link'
 import { UtxoOrCellFooter } from '@/components/utxo-or-cell-footer'
-
-import { Flex, VStack } from '../../../../../../styled-system/jsx'
 
 export async function BtcTransactionsByAddress({ address }: { address: string }) {
   const { btcAddress } = await explorerGraphql.getBtcTransactionsByAddress(address)

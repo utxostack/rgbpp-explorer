@@ -26,7 +26,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
         maxW="100%"
         textAlign="center"
       >
-        {error.message ?? <Trans>Something wrong，Please reload</Trans>}
+        <Trans>Something wrong. Error code: {error.digest}</Trans>
       </Text>
       <Button size="sm" onClick={reset}>
         <Trans>Try again</Trans>

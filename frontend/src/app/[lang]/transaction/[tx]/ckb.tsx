@@ -46,14 +46,14 @@ export function CKBTransactionPage({
         >
           {formatNumber(ckbTransaction.confirmations)}{' '}
           <Text as="span" fontSize="14px" fontWeight="medium">
-            {t(i18n)`confirmations`}
+            {t(i18n)`Confirmations`}
           </Text>
         </Box>
       </HStack>
       <CkbTransactionOverflow ckbTransaction={ckbTransaction} />
       <CkbCells ckbTransaction={ckbTransaction} />
       {btcTransaction ? (
-        <BtcUtxos txid={btcTransaction.txid} vin={btcTransaction.vin} vout={btcTransaction.vout} />
+        <BtcUtxos txid={btcTransaction.txid} vin={btcTransaction.vin} vout={btcTransaction.vout} isBinding />
       ) : null}
     </VStack>
   )

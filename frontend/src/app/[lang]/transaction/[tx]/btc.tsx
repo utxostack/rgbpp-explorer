@@ -45,13 +45,13 @@ export function BTCTransactionPage({
         >
           {btcTransaction.confirmations}{' '}
           <Text as="span" fontSize="14px" fontWeight="medium">
-            {t(i18n)`confirmations`}
+            {t(i18n)`Confirmations`}
           </Text>
         </Box>
       </HStack>
       <BtcTransactionOverflow btcTransaction={btcTransaction} />
       <BtcUtxos txid={btcTransaction.txid} vin={btcTransaction.vin} vout={btcTransaction.vout} />
-      {ckbTransaction ? <CkbCells ckbTransaction={ckbTransaction} /> : null}
+      {ckbTransaction ? <CkbCells ckbTransaction={ckbTransaction} isBinding /> : null}
     </VStack>
   )
 }
