@@ -1,6 +1,9 @@
 import * as bitcoin from 'bitcoinjs-lib'
+import * as ecc from 'tiny-secp256k1'
 
 import { env } from '@/constants/env'
+
+bitcoin.initEccLib(ecc)
 
 export function isValidBTCAddress(address: string) {
   try {
