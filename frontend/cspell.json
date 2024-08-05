@@ -25,7 +25,9 @@
     "utxos",
     "SUDT",
     "XUDT",
-    "MNFT"
+    "MNFT",
+    "bitcoinerlab",
+    "secp"
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",
