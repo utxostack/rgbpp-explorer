@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { Flex, VStack } from 'styled-system/jsx'
 
 import { CkbCellTables } from '@/components/ckb/ckb-cell-tables'
+import { TimeFormatter } from '@/components/time-formatter'
 import { Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { graphql } from '@/gql'
@@ -13,6 +14,7 @@ import { formatNumber } from '@/lib/string/format-number'
 const query = graphql(`
   query CkbBlockTransactions($hashOrHeight: String!) {
     ckbBlock(heightOrHash: $hashOrHeight) {
+      timestamp
       transactions {
         isCellbase
         blockNumber
@@ -90,9 +92,11 @@ export default async function Page({ params: { hashOrHeight } }: { params: { has
         return (
           <VStack w="100%" gap={0} bg="bg.card" rounded="8px" key={transaction.hash}>
             <Flex w="100%" bg="bg.input" justifyContent="space-between" py="20px" px="30px" roundedTop="8px">
-              <Link href={`/transaction/${transaction.hash}`} fontSize="16px" fontWeight="semibold" color="brand">
+              <Link href={`/transaction/${transaction.hash}`} fontSize="14px" fontWeight="medium" color="brand">
                 {transaction.hash}
               </Link>
+
+              <TimeFormatter timestamp={data.ckbBlock?.timestamp} />
             </Flex>
             <CkbCellTables inputs={transaction.inputs} outputs={transaction.outputs} />
             <Flex h="72px" px="30px" w="100%" alignItems="center" borderTop="1px solid" borderTopColor="border.primary">
