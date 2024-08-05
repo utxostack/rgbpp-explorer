@@ -16,6 +16,135 @@ const query = graphql(`
       leapDirection
       blockNumber
       timestamp
+      btcTransaction {
+        blockHeight
+        blockHash
+        txid
+        version
+        size
+        locktime
+        weight
+        fee
+        feeRate
+        confirmed
+        confirmations
+        vin {
+          txid
+          vout
+          scriptsig
+          scriptsigAsm
+          isCoinbase
+          sequence
+          prevout {
+            txid
+            vout
+            scriptpubkey
+            scriptpubkeyAsm
+            scriptpubkeyType
+            scriptpubkeyAddress
+            value
+            address {
+              address
+              satoshi
+              pendingSatoshi
+              transactionsCount
+            }
+            status {
+              spent
+              txid
+              vin
+            }
+          }
+        }
+        vout {
+          txid
+          vout
+          scriptpubkey
+          scriptpubkeyAsm
+          scriptpubkeyType
+          scriptpubkeyAddress
+          value
+          address {
+            address
+            satoshi
+            pendingSatoshi
+            transactionsCount
+          }
+          status {
+            spent
+            txid
+            vin
+          }
+        }
+      }
+      ckbTransaction {
+        isCellbase
+        blockNumber
+        hash
+        fee
+        feeRate
+        size
+        confirmed
+        confirmations
+        outputs {
+          txHash
+          index
+          capacity
+          cellType
+          type {
+            codeHash
+            hashType
+            args
+          }
+          lock {
+            codeHash
+            hashType
+            args
+          }
+          status {
+            consumed
+            txHash
+            index
+          }
+          xudtInfo {
+            symbol
+            amount
+            decimal
+            typeHash
+          }
+        }
+        inputs {
+          txHash
+          index
+          capacity
+          cellType
+          type {
+            codeHash
+            hashType
+            args
+          }
+          lock {
+            codeHash
+            hashType
+            args
+          }
+          xudtInfo {
+            symbol
+            amount
+            decimal
+            typeHash
+          }
+          status {
+            consumed
+            txHash
+            index
+          }
+        }
+        block {
+          timestamp
+          hash
+        }
+      }
     }
     btcTransaction(txid: $txidOrTxHash) {
       blockHeight
@@ -150,7 +279,9 @@ const query = graphql(`
 `)
 
 export default async function Page({ params: { tx } }: { params: { tx: string } }) {
-  const { rgbppTransaction, btcTransaction, ckbTransaction } = await graphQLClient.request(query, { txidOrTxHash: tx })
+  const { rgbppTransaction, ...result } = await graphQLClient.request(query, { txidOrTxHash: tx })
+  const btcTransaction = rgbppTransaction?.btcTransaction || result.btcTransaction
+  const ckbTransaction = rgbppTransaction?.ckbTransaction || result.ckbTransaction
 
   if (btcTransaction && !tx.startsWith('0x')) {
     return (
