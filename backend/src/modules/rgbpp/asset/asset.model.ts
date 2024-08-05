@@ -16,7 +16,7 @@ export class RgbppAsset {
   cell: CkbCell;
 
   @Field(() => BitcoinOutput, { nullable: true })
-  utxo: BitcoinOutput;
+  utxo: BitcoinOutput | null;
 
   public static from(address: string, cell: CkbRpc.Cell): RgbppBaseAsset {
     return {

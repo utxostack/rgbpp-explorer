@@ -32,10 +32,10 @@ export class RgbppTransaction {
   ckbTxHash: string;
 
   @Field(() => String, { nullable: true })
-  btcTxid: string;
+  btcTxid: string | null;
 
   @Field(() => LeapDirection, { nullable: true })
-  leapDirection: LeapDirection;
+  leapDirection: LeapDirection | null;
 
   @Field(() => Int)
   blockNumber: number;
@@ -44,10 +44,10 @@ export class RgbppTransaction {
   timestamp: Date;
 
   @Field(() => CkbTransaction, { nullable: true })
-  ckbTransaction: CkbTransaction;
+  ckbTransaction: CkbTransaction | null;
 
   @Field(() => BitcoinTransaction, { nullable: true })
-  btcTransaction: BitcoinTransaction;
+  btcTransaction: BitcoinTransaction | null;
 
   public static from(tx: CkbExplorer.RgbppTransaction) {
     return {

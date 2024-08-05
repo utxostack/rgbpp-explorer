@@ -12,10 +12,10 @@ export type BitcoinBaseTransaction = Omit<
 
 @ObjectType({ description: 'Bitcoin Transaction' })
 export class BitcoinTransaction {
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true })
   blockHeight: number | null;
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   blockHash: string | null;
 
   @Field(() => String)
