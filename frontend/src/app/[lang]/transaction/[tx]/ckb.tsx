@@ -1,13 +1,13 @@
 import { t } from '@lingui/macro'
 import { Box, HStack, VStack } from 'styled-system/jsx'
 
-import { BtcTransaction, CkbTransaction, LeapDirection } from '@/apis/types/explorer-graphql'
 import { BtcUtxos } from '@/components/btc/btc-utxos'
 import { CkbCells } from '@/components/ckb/ckb-cells'
-import { CkbTransactionOverflow } from '@/components/ckb/ckb-transaction-overflow'
+import { CkbTransactionOverview } from '@/components/ckb/ckb-transaction-overview'
 import { Copier } from '@/components/copier'
 import { LayerType } from '@/components/layer-type'
 import { Heading, Text } from '@/components/ui'
+import { BitcoinTransaction, CkbTransaction, LeapDirection } from '@/gql/graphql'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { resolveLayerTypeFromRGBppTransaction } from '@/lib/resolve-layer-type-from-rgbpp-transaction'
 import { formatNumber } from '@/lib/string/format-number'
@@ -18,7 +18,7 @@ export function CKBTransactionPage({
   leapDirection,
 }: {
   ckbTransaction: CkbTransaction
-  btcTransaction?: BtcTransaction
+  btcTransaction?: BitcoinTransaction | null
   leapDirection?: LeapDirection | null
 }) {
   const i18n = getI18nFromHeaders()
@@ -50,7 +50,7 @@ export function CKBTransactionPage({
           </Text>
         </Box>
       </HStack>
-      <CkbTransactionOverflow ckbTransaction={ckbTransaction} />
+      <CkbTransactionOverview ckbTransaction={ckbTransaction} />
       <CkbCells ckbTransaction={ckbTransaction} />
       {btcTransaction ? (
         <BtcUtxos txid={btcTransaction.txid} vin={btcTransaction.vin} vout={btcTransaction.vout} isBinding />

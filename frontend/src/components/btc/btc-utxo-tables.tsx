@@ -3,21 +3,23 @@
 import { Trans } from '@lingui/macro'
 import { Box, Flex, Grid, HStack, VStack } from 'styled-system/jsx'
 
-import { ScriptpubkeyType, Vin, Vout } from '@/apis/types/explorer-graphql'
 import SubTractIcon from '@/assets/subtract.svg'
 import { Copier } from '@/components/copier'
 import { Heading, Text } from '@/components/ui'
 import Link from '@/components/ui/link'
+import { BitcoinInput, BitcoinOutput } from '@/gql/graphql'
 import { satsToBtc } from '@/lib/btc/sats-to-btc'
 import { formatNumber } from '@/lib/string/format-number'
 import { truncateMiddle } from '@/lib/string/truncate-middle'
+import { ScriptpubkeyType } from '@/types/graphql'
 
 export interface BtcUtxoTablesProps {
-  vin?: Vin[]
-  vout?: Vout[]
+  vin?: BitcoinInput[]
+  vout?: BitcoinOutput[]
+  currentAddress?: string
 }
 
-export function BtcUtxoTables({ vin = [], vout = [] }: BtcUtxoTablesProps) {
+export function BtcUtxoTables({ vin = [], vout = [], currentAddress }: BtcUtxoTablesProps) {
   return (
     <Grid w="100%" gridTemplateColumns="repeat(2, 1fr)" gap="38px" pt="10px" pb="20px" px="30px">
       <VStack gap={0} w="100%">
@@ -33,7 +35,7 @@ export function BtcUtxoTables({ vin = [], vout = [] }: BtcUtxoTablesProps) {
           <Trans>Inputs ({vin.length})</Trans>
         </Heading>
         {vin.map((input, i) => (
-          <UtxoInput vin={input} key={i} />
+          <UtxoInput vin={input} key={i} currentAddress={currentAddress} />
         ))}
       </VStack>
       <VStack gap={0}>
@@ -49,14 +51,14 @@ export function BtcUtxoTables({ vin = [], vout = [] }: BtcUtxoTablesProps) {
           <Trans>Outputs ({vout.length})</Trans>
         </Heading>
         {vout.map((output, i) => (
-          <UtxoOutput vout={output} key={i} />
+          <UtxoOutput vout={output} key={i} currentAddress={currentAddress} />
         ))}
       </VStack>
     </Grid>
   )
 }
 
-function UtxoInput({ vin }: { vin: Vin }) {
+function UtxoInput({ vin, currentAddress }: { vin: BitcoinInput; currentAddress?: string }) {
   return (
     <Flex
       justifyContent="space-between"
@@ -70,9 +72,15 @@ function UtxoInput({ vin }: { vin: Vin }) {
         <SubTractIcon color={vin.prevout?.status.spent ? 'text.third' : 'success.unspent'} w="16px" h="16px" />
         {vin.prevout ? (
           <Copier onlyIcon value={vin.prevout.address?.address}>
-            <Link href={`/address/${vin.prevout.address?.address}`} color="brand" fontSize="14px">
-              {truncateMiddle(vin.prevout.address?.address, 10, 10)}
-            </Link>
+            {currentAddress === vin.prevout.address?.address ? (
+              <Text as="span" color="text.primary">
+                {truncateMiddle(currentAddress, 10, 10)}
+              </Text>
+            ) : (
+              <Link href={`/address/${vin.prevout.address?.address}`} color="brand" fontSize="14px">
+                {truncateMiddle(vin.prevout.address?.address, 10, 10)}
+              </Link>
+            )}
           </Copier>
         ) : null}
       </HStack>
@@ -88,7 +96,7 @@ function UtxoInput({ vin }: { vin: Vin }) {
   )
 }
 
-function UtxoOutput({ vout }: { vout: Vout }) {
+function UtxoOutput({ vout, currentAddress }: { vout: BitcoinOutput; currentAddress?: string }) {
   return (
     <Flex
       justifyContent="space-between"
@@ -99,14 +107,26 @@ function UtxoOutput({ vout }: { vout: Vout }) {
       borderBottomColor="border.primary"
     >
       <HStack gap="8px">
-        <SubTractIcon color={vout.status.spent ? 'text.third' : 'success.unspent'} w="16px" h="16px" />
+        <SubTractIcon
+          color={
+            vout.status.spent || vout.scriptpubkeyType === ScriptpubkeyType.OpReturn ? 'text.third' : 'success.unspent'
+          }
+          w="16px"
+          h="16px"
+        />
         {vout.scriptpubkeyType === ScriptpubkeyType.OpReturn ? (
           <Trans>OP_RETURN</Trans>
         ) : (
           <Copier onlyIcon value={vout.address?.address}>
-            <Link href={`/address/${vout.address?.address}`} color="brand" fontSize="14px">
-              {truncateMiddle(vout.address?.address, 10, 10)}
-            </Link>
+            {currentAddress === vout.address?.address ? (
+              <Text as="span" color="text.primary">
+                {truncateMiddle(currentAddress, 10, 10)}
+              </Text>
+            ) : (
+              <Link href={`/address/${vout.address?.address}`} color="brand" fontSize="14px">
+                {truncateMiddle(vout.address?.address, 10, 10)}
+              </Link>
+            )}
           </Copier>
         )}
       </HStack>

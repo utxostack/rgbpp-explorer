@@ -5,7 +5,6 @@ import { useQuery } from '@tanstack/react-query'
 import { ReactNode } from 'react'
 import { Box, Grid, HStack, VStack } from 'styled-system/jsx'
 
-import { explorerGraphql } from '@/apis/explorer-graphql'
 import ArrowIcon from '@/assets/arrow.svg'
 import BchIcon from '@/assets/chains/bch.svg'
 import BsvIcon from '@/assets/chains/bsv.svg'
@@ -15,6 +14,8 @@ import UtxoStackIcon from '@/assets/chains/utxo-stack.svg'
 import Link from '@/components/ui/link'
 import { Text } from '@/components/ui/primitives/text'
 import { QueryKey } from '@/constants/query-key'
+import { graphql } from '@/gql'
+import { graphQLClient } from '@/lib/graphql'
 import { formatNumber } from '@/lib/string/format-number'
 
 function FieldGroup({ fields }: { fields: Array<{ label: ReactNode; value: ReactNode }> }) {
@@ -34,7 +35,19 @@ export function NetworkCards() {
   const { data } = useQuery({
     queryKey: [QueryKey.BlockHeightAndTxns24H],
     async queryFn() {
-      return explorerGraphql.getBlockHeightAndTxns24H()
+      return graphQLClient.request(
+        graphql(`
+          query CkbAndBtcChainInfo {
+            ckbChainInfo {
+              tipBlockNumber
+            }
+            btcChainInfo {
+              tipBlockHeight
+              transactionsCountIn24Hours
+            }
+          }
+        `),
+      )
     },
     refetchInterval: 10000,
   })

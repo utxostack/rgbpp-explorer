@@ -1,12 +1,12 @@
 import { t } from '@lingui/macro'
 import { Flex, HStack, VStack } from 'styled-system/jsx'
 
-import { BtcTransaction } from '@/apis/types/explorer-graphql'
 import BtcIcon from '@/assets/chains/btc.svg'
 import { BtcUtxoTables } from '@/components/btc/btc-utxo-tables'
 import { Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { ViewMemPool } from '@/components/view-mempool'
+import { BitcoinInput, BitcoinOutput, BitcoinTransaction } from '@/gql/graphql'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 
 export function BtcUtxos({
@@ -14,7 +14,7 @@ export function BtcUtxos({
   vin,
   vout,
   isBinding,
-}: Pick<BtcTransaction, 'txid' | 'vin' | 'vout'> & {
+}: Pick<BitcoinTransaction, 'txid' | 'vin' | 'vout'> & {
   isBinding?: boolean
 }) {
   const i18n = getI18nFromHeaders()
@@ -43,7 +43,7 @@ export function BtcUtxos({
         </HStack>
         <ViewMemPool txid={txid} />
       </Flex>
-      <BtcUtxoTables vin={vin} vout={vout} />
+      <BtcUtxoTables vin={vin as BitcoinInput[]} vout={vout as BitcoinOutput[]} />
     </VStack>
   )
 }

@@ -1,12 +1,12 @@
 import { t } from '@lingui/macro'
 import { Flex, HStack, VStack } from 'styled-system/jsx'
 
-import { CkbTransaction } from '@/apis/types/explorer-graphql'
 import CkbIcon from '@/assets/chains/ckb.svg'
 import { CkbCellTables } from '@/components/ckb/ckb-cell-tables'
 import { Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { ViewCkbExplorer } from '@/components/view-ckb-explorer'
+import { CkbTransaction } from '@/gql/graphql'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 
 export function CkbCells({

@@ -1,15 +1,92 @@
 import { Flex, VStack } from 'styled-system/jsx'
 
-import { explorerGraphql } from '@/apis/explorer-graphql'
 import { CkbCellTables } from '@/components/ckb/ckb-cell-tables'
 import { Copier } from '@/components/copier'
 import { FailedFallback } from '@/components/failed-fallback'
 import { TimeFormatter } from '@/components/time-formatter'
 import Link from '@/components/ui/link'
 import { UtxoOrCellFooter } from '@/components/utxo-or-cell-footer'
+import { graphql } from '@/gql'
+import { graphQLClient } from '@/lib/graphql'
+
+const query = graphql(`
+  query CkbAddress($address: String!, $page: Float!, $pageSize: Float!) {
+    ckbAddress(address: $address) {
+      transactions(page: $page, pageSize: $pageSize) {
+        isCellbase
+        blockNumber
+        hash
+        fee
+        size
+        feeRate
+        confirmations
+        inputs {
+          status {
+            consumed
+            txHash
+            index
+          }
+          txHash
+          index
+          capacity
+          type {
+            codeHash
+            hashType
+            args
+          }
+          lock {
+            codeHash
+            hashType
+            args
+          }
+          xudtInfo {
+            symbol
+            amount
+            decimal
+            typeHash
+          }
+        }
+        outputs {
+          txHash
+          index
+          capacity
+          type {
+            codeHash
+            hashType
+            args
+          }
+          lock {
+            codeHash
+            hashType
+            args
+          }
+          xudtInfo {
+            symbol
+            amount
+            decimal
+            typeHash
+          }
+          status {
+            consumed
+            txHash
+            index
+          }
+        }
+        block {
+          timestamp
+          number
+        }
+      }
+    }
+  }
+`)
 
 export async function CkbTransactionsByAddress({ address }: { address: string }) {
-  const { ckbAddress } = await explorerGraphql.getCkbTransactionByAddress(address)
+  const { ckbAddress } = await graphQLClient.request(query, {
+    address,
+    page: 1,
+    pageSize: 10,
+  })
 
   if (!ckbAddress) {
     return <FailedFallback />

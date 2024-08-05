@@ -15,7 +15,9 @@
     "cspell": "cspell \"**/*\""
   },
   "dependencies": {
+    "@apollo/client": "^3.11.2",
     "@ark-ui/react": "^3.5.0",
+    "@graphql-typed-document-node/core": "^3.2.0",
     "@lingui/core": "^4.11.2",
     "@lingui/macro": "^4.11.2",
     "@lingui/react": "^4.11.2",
@@ -25,6 +27,7 @@
     "bignumber.js": "^9.1.2",
     "bitcoinjs-lib": "^6.1.6",
     "dayjs": "^1.11.12",
+    "graphql": "^16.9.0",
     "graphql-request": "^7.1.0",
     "lodash-es": "^4.17.21",
     "negotiator": "^0.6.3",
@@ -35,10 +38,14 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@0no-co/graphqlsp": "^1.12.12",
+    "@graphql-codegen/cli": "^5.0.2",
+    "@graphql-codegen/schema-ast": "^4.1.0",
     "@lingui/cli": "^4.11.2",
     "@lingui/conf": "^4.11.2",
     "@lingui/swc-plugin": "^4.0.8",
     "@pandacss/dev": "^0.42.0",
+    "@parcel/watcher": "^2.4.1",
     "@park-ui/panda-preset": "^0.38.1",
     "@svgr/core": "^8.1.0",
     "@svgr/webpack": "^8.1.0",

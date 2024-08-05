@@ -42,3 +42,5 @@ styled-system-studio
 ## Lingui
 src/locales/*/*.ts
 src/locales/*/*.js
+
+src/gql

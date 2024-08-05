@@ -3,11 +3,11 @@
 import { Trans } from '@lingui/macro'
 import { Box, Flex, Grid, HStack, VStack } from 'styled-system/jsx'
 
-import { CkbCell } from '@/apis/types/explorer-graphql'
 import SubTractIcon from '@/assets/subtract.svg'
 import { Copier } from '@/components/copier'
 import { Heading, Text } from '@/components/ui'
 import Link from '@/components/ui/link'
+import { CkbCell } from '@/gql/graphql'
 import { scriptToAddress } from '@/lib/ckb/script-to-address'
 import { shannonToCKB } from '@/lib/ckb/shannon-to-ckb'
 import { formatNumber } from '@/lib/string/format-number'
