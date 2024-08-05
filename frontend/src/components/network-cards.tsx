@@ -123,7 +123,7 @@ export function NetworkCards() {
           </HStack>
           <HStack>
             <UtxoStackIcon w="32px" h="32px" />
-            <Text>Utxo Stack</Text>
+            <Text>UTXO Stack</Text>
           </HStack>
         </HStack>
         <Box fontWeight="semibold" py="10px" px="40px" rounded="100px" bg="bg.input" mx="auto">

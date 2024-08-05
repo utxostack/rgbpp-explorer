@@ -44,19 +44,19 @@ export function LastRgbppTxnsTable() {
   }
 
   return (
-    <Table.Root>
+    <Table.Root tableLayout="fixed">
       <Table.Head>
         <Table.Row>
-          <Table.Header>
+          <Table.Header w="254px">
             <Trans>Tx hash</Trans>
           </Table.Header>
-          <Table.Header>
+          <Table.Header w="160px">
             <Trans>Type</Trans>
           </Table.Header>
-          <Table.Header>
+          <Table.Header w="200px">
             <Trans>Amount</Trans>
           </Table.Header>
-          <Table.Header>
+          <Table.Header w="140px">
             <Trans>Time</Trans>
           </Table.Header>
         </Table.Row>
