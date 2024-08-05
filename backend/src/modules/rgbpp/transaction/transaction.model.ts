@@ -60,7 +60,6 @@ export class RgbppTransaction {
   }
 
   public static fromCkbTransaction(tx: CkbExplorer.Transaction) {
-    console.log('tx', tx.create_timestamp);
     return {
       ckbTxHash: tx.transaction_hash,
       btcTxid: tx.rgb_txid,
