@@ -63,8 +63,8 @@ type CkbBlock {
   miner: CkbAddress!
   reward: Float!
   transactions: [CkbTransaction!]!
-  size: Float!
-  confirmations: Float!
+  size: Float
+  confirmations: Float
 }
 
 """
@@ -187,8 +187,8 @@ type BitcoinBlock {
 
 """Bitcoin Transaction"""
 type BitcoinTransaction {
-  blockHeight: Float!
-  blockHash: String!
+  blockHeight: Float
+  blockHash: String
   txid: String!
   version: Int!
   vin: [BitcoinInput!]
