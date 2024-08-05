@@ -16,8 +16,8 @@ export class CkbCellService {
     }
     const xudtInfo: CkbXUDTInfo = {
       symbol: info.symbol,
-      amount: BI.from(info.amount).toHexString(),
-      decimal: BI.from(info.decimal).toNumber(),
+      amount: BI.from(info.amount || '0').toHexString(),
+      decimal: BI.from(info.decimal || '8').toNumber(),
       typeHash: computeScriptHash(cell.type as Script),
     };
     return xudtInfo;
