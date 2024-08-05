@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CkbExplorerService } from './ckb-explorer.service';
-import { CkbRpcWebsocketService } from '../ckb-rpc/ckb-rpc-websocket.service';
+import { CkbRpcModule } from '../ckb-rpc/ckb-rpc.module';
 
 @Module({
-  imports: [CkbRpcWebsocketService],
+  imports: [forwardRef(() => CkbRpcModule)],
   providers: [CkbExplorerService],
   exports: [CkbExplorerService],
 })
