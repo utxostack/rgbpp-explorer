@@ -1,11 +1,14 @@
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Int, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { CkbTransaction } from 'src/modules/ckb/transaction/transaction.model';
+import { CkbBaseTransaction, CkbTransaction } from 'src/modules/ckb/transaction/transaction.model';
 import {
   CkbRpcTransactionLoader,
   CkbRpcTransactionLoaderType,
 } from 'src/modules/ckb/transaction/transaction.dataloader';
-import { BitcoinTransaction } from 'src/modules/bitcoin/transaction/transaction.model';
+import {
+  BitcoinBaseTransaction,
+  BitcoinTransaction,
+} from 'src/modules/bitcoin/transaction/transaction.model';
 import { RgbppTransactionService } from './transaction.service';
 import {
   BitcoinTransactionLoader,
@@ -37,7 +40,8 @@ export class RgbppTransactionResolver {
     @Args('txidOrTxHash') txidOrTxHash: string,
     @Loader(RgbppTransactionLoader) txLoader: RgbppTransactionLoaderType,
   ): Promise<RgbppBaseTransaction | null> {
-    return await txLoader.load(txidOrTxHash);
+    const tx = await txLoader.load(txidOrTxHash);
+    return tx || null;
   }
 
   @ResolveField(() => LeapDirection, { nullable: true })
@@ -50,7 +54,7 @@ export class RgbppTransactionResolver {
   public async ckbTransaction(
     @Parent() tx: RgbppBaseTransaction,
     @Loader(CkbRpcTransactionLoader) ckbRpcTxLoader: CkbRpcTransactionLoaderType,
-  ) {
+  ): Promise<CkbBaseTransaction | null> {
     const ckbTx = await ckbRpcTxLoader.load(tx.ckbTxHash);
     if (!ckbTx) {
       return null;
@@ -62,7 +66,7 @@ export class RgbppTransactionResolver {
   public async btcTransaction(
     @Parent() tx: RgbppBaseTransaction,
     @Loader(BitcoinTransactionLoader) txLoader: BitcoinTransactionLoaderType,
-  ) {
+  ): Promise<BitcoinBaseTransaction | null> {
     if (!tx.btcTxid) {
       return null;
     }

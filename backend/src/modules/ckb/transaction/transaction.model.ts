@@ -1,15 +1,25 @@
 import { toNumber } from 'lodash';
-import { Field, Float, ObjectType } from '@nestjs/graphql';
+import { Field, Float, InputType, ObjectType } from '@nestjs/graphql';
 import { ResultFormatter, RPCTypes } from '@ckb-lumos/lumos/rpc';
 import { blockchain } from '@ckb-lumos/lumos/codec';
 import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
 import { CkbBaseCell, CkbCell } from '../cell/cell.model';
 import { CkbBlock } from '../block/block.model';
+import { CkbScriptInput } from '../script/script.model';
 
 export type CkbBaseTransaction = Omit<
   CkbTransaction,
   'block' | 'inputs' | 'fee' | 'feeRate' | 'confirmations'
 >;
+
+@InputType({ description: 'Search key for CKB transactions' })
+export class CkbSearchKeyInput {
+  @Field(() => CkbScriptInput)
+  script: CkbScriptInput;
+
+  @Field(() => String)
+  scriptType: 'lock' | 'type';
+}
 
 @ObjectType({ description: 'CKB Transaction' })
 export class CkbTransaction {
@@ -48,7 +58,7 @@ export class CkbTransaction {
 
   public static from(
     transactionWithStatus: CkbRpc.TransactionWithStatusResponse,
-  ): CkbBaseTransaction {
+  ): CkbBaseTransaction | null {
     const { transaction, tx_status } = transactionWithStatus;
     if (!transaction || tx_status?.status === 'unknown') {
       return null;
@@ -65,7 +75,7 @@ export class CkbTransaction {
       hash: transaction.hash,
       confirmed: tx_status.status === 'committed',
       blockNumber: toNumber(tx_status.block_number),
-      outputs: transaction.outputs.map((_, index) => CkbCell.from(transaction, index)),
+      outputs: transaction.outputs.map((_, index) => CkbCell.fromTransaction(transaction, index)),
       size: txBytes,
     };
   }

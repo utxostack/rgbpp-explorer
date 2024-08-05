@@ -6,7 +6,7 @@ import { CkbTransaction } from '../transaction/transaction.model';
 
 export type CkbBaseBlock = Omit<
   CkbBlock,
-  'totalFee' | 'feeRateRange' | 'miner' | 'reward' | 'transactions'
+  'totalFee' | 'feeRateRange' | 'miner' | 'reward' | 'transactions' | 'size' | 'confirmations'
 >;
 
 @ObjectType({ description: 'CKB Block' })
@@ -19,7 +19,6 @@ export class CkbBlock {
 
   @Field(() => Int)
   number: number;
-
   @Field(() => Date)
   timestamp: Date;
 
@@ -37,6 +36,12 @@ export class CkbBlock {
 
   @Field(() => [CkbTransaction])
   transactions: CkbTransaction[];
+
+  @Field(() => Float)
+  size: number | null;
+
+  @Field(() => Float)
+  confirmations: number | null;
 
   public static from(block: CkbRpc.Block): CkbBaseBlock {
     return {

@@ -4,12 +4,12 @@ import { HStack, VStack } from 'styled-system/jsx'
 import { explorerGraphql } from '@/apis/explorer-graphql'
 import LinkOutlineIcon from '@/assets/link-outline.svg'
 import { AgoTimeFormatter } from '@/components/ago-time-formatter'
+import { Amount } from '@/components/last-rgbpp-txns-table/amount'
 import { LayerType } from '@/components/layer-type'
 import { PaginationSearchParams } from '@/components/pagination-searchparams'
 import { Table, Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
-import { resolveCellDiff } from '@/lib/resolve-cell-diff'
 import { resolveLayerTypeFromRGBppTransaction } from '@/lib/resolve-layer-type-from-rgbpp-transaction'
 import { resolveRGBppTxHash } from '@/lib/resolve-rgbpp-tx-hash'
 import { resolveSearchParamsPage } from '@/lib/resolve-searchparams-page'
@@ -24,7 +24,7 @@ export default async function Page({ params: { typeHash } }: { params: { typeHas
 
   return (
     <VStack w="100%" bg="bg.card" maxW="content" rounded="8px" pt="30px">
-      <Table.Root>
+      <Table.Root tableLayout="fixed">
         <Table.Head>
           <Table.Row>
             <Table.Header>{t(i18n)`Tx hash`}</Table.Header>
@@ -36,7 +36,6 @@ export default async function Page({ params: { typeHash } }: { params: { typeHas
         <Table.Body>
           {response.rgbppCoin.transactions.map((tx) => {
             const txHash = resolveRGBppTxHash(tx)
-            const cellDiff = resolveCellDiff(tx.ckbTransaction)
             return (
               <Table.Row key={tx.ckbTxHash}>
                 <Table.Cell>
@@ -49,7 +48,7 @@ export default async function Page({ params: { typeHash } }: { params: { typeHas
                   <LayerType type={resolveLayerTypeFromRGBppTransaction(tx)} />
                 </Table.Cell>
                 <Table.Cell>
-                  <b>{formatNumber(cellDiff.value)}</b> {cellDiff.symbol}
+                  <Amount ckbTransaction={tx.ckbTransaction} />
                 </Table.Cell>
                 <Table.Cell w="165px">
                   <AgoTimeFormatter time={tx.timestamp} tooltip />
@@ -61,8 +60,8 @@ export default async function Page({ params: { typeHash } }: { params: { typeHas
       </Table.Root>
 
       <HStack ml="auto" gap="16px" mt="auto" p="30px">
-        <Text fontSize="14px">{t(i18n)`Total ${100} Items`}</Text>
-        <PaginationSearchParams count={100} pageSize={pageSize} />
+        <Text fontSize="14px">{t(i18n)`Total ${formatNumber(response.rgbppCoin.transactionsCount)} Items`}</Text>
+        <PaginationSearchParams count={response.rgbppCoin.transactionsCount} pageSize={pageSize} />
       </HStack>
     </VStack>
   )

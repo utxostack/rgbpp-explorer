@@ -12,6 +12,7 @@ import { RgbppModule } from './rgbpp/rgbpp.module';
 import { BitcoinModule } from './bitcoin/bitcoin.module';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { SearchModule } from './search/search.module';
+import { fieldPerformanceMiddleware } from 'src/middlewares/field-performance.middleware';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { SearchModule } from './search/search.module';
         autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
         buildSchemaOptions: {
           dateScalarMode: 'timestamp',
+          fieldMiddleware: [fieldPerformanceMiddleware],
         },
         context: (req: FastifyRequest, res: FastifyReply) => {
           if (req.method === 'GET') {
@@ -53,4 +55,4 @@ import { SearchModule } from './search/search.module';
     },
   ],
 })
-export class ApiModule { }
+export class ApiModule {}

@@ -1,5 +1,3 @@
-import { RPC } from '@ckb-lumos/rpc';
-
 export interface CellDep {
   dep_type: string;
   out_point: {
@@ -97,27 +95,31 @@ export interface SearchKey {
   script_type: 'lock' | 'type';
 }
 
+export interface IndexerCell {
+  block_number: string;
+  io_index: string;
+  io_type: string;
+  tx_hash: string;
+  tx_index: string;
+}
+
 export interface GetTransactionsResult {
   last_cursor: string;
-  objects: {
-    block_number: string;
-    io_index: string;
-    io_type: string;
+  objects: IndexerCell[];
+}
+
+export interface Cell {
+  block_number: string;
+  out_point: {
+    index: string;
     tx_hash: string;
-    tx_index: string;
-  }[];
+  };
+  output: Output;
+  output_data: string;
+  tx_index: string;
 }
 
 export interface GetCellsResult {
   last_cursor: string;
-  objects: {
-    block_number: string;
-    out_point: {
-      index: string;
-      tx_hash: string;
-    };
-    output: Output;
-    output_data: string;
-    tx_index: string;
-  }[];
+  objects: Cell[];
 }

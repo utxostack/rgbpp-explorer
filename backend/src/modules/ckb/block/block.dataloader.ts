@@ -5,12 +5,16 @@ import { DataLoaderResponse } from 'src/common/type/dataloader';
 import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
 import * as CkbExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
 import { CkbBlockService } from './block.service';
+import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 
 @Injectable()
 export class CkbRpcBlockLoader implements NestDataLoader<string, CkbRpc.Block | null> {
   private logger = new Logger(CkbRpcBlockLoader.name);
 
-  constructor(private blockService: CkbBlockService) {}
+  constructor(
+    private blockService: CkbBlockService,
+    @InjectSentry() private sentryService: SentryService,
+  ) {}
 
   public getBatchFunction() {
     return async (heightOrHashList: string[]) => {
@@ -18,7 +22,16 @@ export class CkbRpcBlockLoader implements NestDataLoader<string, CkbRpc.Block | 
       const results = await Promise.allSettled(
         heightOrHashList.map((heightOrHash) => this.blockService.getBlockFromRpc(heightOrHash)),
       );
-      return results.map((result) => (result.status === 'fulfilled' ? result.value : null));
+      return results.map((result, index) => {
+        if (result.status === 'fulfilled') {
+          return result.value;
+        }
+        this.logger.error(
+          `Requesting: ${heightOrHashList[index]}, occurred error: ${result.reason}`,
+        );
+        this.sentryService.instance().captureException(result.reason);
+        return null;
+      });
     };
   }
 }
@@ -29,7 +42,10 @@ export type CkbRpcBlockLoaderResponse = DataLoaderResponse<CkbRpcBlockLoader>;
 export class CkbExplorerBlockLoader implements NestDataLoader<string, CkbExplorer.Block | null> {
   private logger = new Logger(CkbRpcBlockLoader.name);
 
-  constructor(private blockService: CkbBlockService) {}
+  constructor(
+    private blockService: CkbBlockService,
+    @InjectSentry() private sentryService: SentryService,
+  ) {}
 
   public getBatchFunction() {
     return async (heightOrHashList: string[]) => {
@@ -39,11 +55,20 @@ export class CkbExplorerBlockLoader implements NestDataLoader<string, CkbExplore
           this.blockService.getBlockFromExplorer(heightOrHash),
         ),
       );
-      return results.map((result) => (result.status === 'fulfilled' ? result.value : null));
+      return results.map((result, index) => {
+        if (result.status === 'fulfilled') {
+          return result.value;
+        }
+        this.logger.error(
+          `Requesting: ${heightOrHashList[index]}, occurred error: ${result.reason}`,
+        );
+        this.sentryService.instance().captureException(result.reason);
+        return null;
+      });
     };
   }
 }
-export type CkbExplorerBlockLoaderType = DataLoader<string, CkbExplorer.Block>;
+export type CkbExplorerBlockLoaderType = DataLoader<string, CkbExplorer.Block | null>;
 export type CkbExplorerBlockLoaderResponse = DataLoaderResponse<CkbExplorerBlockLoader>;
 
 @Injectable()
@@ -52,7 +77,10 @@ export class CkbBlockEconomicStateLoader
 {
   private logger = new Logger(CkbBlockEconomicStateLoader.name);
 
-  constructor(private blockService: CkbBlockService) {}
+  constructor(
+    private blockService: CkbBlockService,
+    @InjectSentry() private sentryService: SentryService,
+  ) {}
 
   public getBatchFunction() {
     return async (hashes: string[]) => {
@@ -60,7 +88,14 @@ export class CkbBlockEconomicStateLoader
       const results = await Promise.allSettled(
         hashes.map((key) => this.blockService.getBlockEconomicState(key)),
       );
-      return results.map((result) => (result.status === 'fulfilled' ? result.value : null));
+      return results.map((result, index) => {
+        if (result.status === 'fulfilled') {
+          return result.value;
+        }
+        this.logger.error(`Requesting: ${hashes[index]}, occurred error: ${result.reason}`);
+        this.sentryService.instance().captureException(result.reason);
+        return null;
+      });
     };
   }
 }

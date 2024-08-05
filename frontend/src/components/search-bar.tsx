@@ -3,7 +3,7 @@
 import { t, Trans } from '@lingui/macro'
 import { useLingui } from '@lingui/react'
 import { useMutation } from '@tanstack/react-query'
-import { redirect } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { ReactNode, useState } from 'react'
 import { Center, Flex, type FlexProps, styled, VStack } from 'styled-system/jsx'
 import { useDebounceCallback } from 'usehooks-ts'
@@ -54,32 +54,30 @@ function SearchResult({
 }
 
 function useSearch() {
+  const router = useRouter()
   return useMutation({
     async mutationFn(keyword: string) {
-      const search = await explorerGraphql.search(keyword)
-      if (search.rgbppCoin.typeHash) {
-        return redirect(`/assets/coins/${search.rgbppCoin.typeHash}`)
+      const { search } = await explorerGraphql.search(keyword)
+      if (search.rgbppCoin) {
+        return router.push(`/assets/coins/${search.rgbppCoin}`)
       }
-      if (search.ckbTransaction.hash) {
-        return redirect(`/transaction/${search.ckbTransaction.hash}`)
+      if (search.ckbTransaction) {
+        return router.push(`/transaction/${search.ckbTransaction}`)
       }
-      if (search.btcTransaction.txid) {
-        return redirect(`/transaction/${search.btcTransaction.txid}`)
+      if (search.btcTransaction) {
+        return router.push(`/transaction/${search.btcTransaction}`)
       }
-      if (search.rgbppTransaction.btcTxid) {
-        return redirect(`/transaction/${search.rgbppTransaction.btcTxid}`)
+      if (search.btcAddress) {
+        return router.push(`/address/${search.btcAddress}`)
       }
-      if (search.rgbppTransaction.ckbTxHash) {
-        return redirect(`/transaction/${search.rgbppTransaction.ckbTxHash}`)
+      if (search.ckbAddress) {
+        return router.push(`/address/${search.ckbAddress}`)
       }
-      if (search.rgbppAddress.address) {
-        return redirect(`/address/${search.rgbppAddress.address}`)
+      if (search.ckbBlock) {
+        return router.push(`/block/btc/${search.ckbBlock}`)
       }
-      if (search.btcAddress.address) {
-        return redirect(`/address/${search.btcAddress.address}`)
-      }
-      if (search.ckbAddress.address) {
-        return redirect(`/address/${search.ckbAddress.address}`)
+      if (search.btcBlock) {
+        return router.push(`/block/btc/${search.btcBlock}`)
       }
       throw new Error('Not found')
     },
@@ -98,7 +96,7 @@ export function SearchBar(props: FlexProps) {
       <Flex w="100%" maxW="812px" h="64px" p="6px" bg="rgba(255, 255, 255, 0.9)" rounded="100px" {...props}>
         <styled.input
           flex={1}
-          placeholder={t(i18n)`Search by Address/Tx Hash/Block Hash`}
+          placeholder={t(i18n)`Search by Address/Tx Hash/Block Hash/AssetID`}
           pl="20px"
           color="bg.primary"
           fontWeight="medium"
@@ -134,11 +132,11 @@ export function SearchBarInNav(props: FlexProps) {
       <Flex bg="bg.input" h="44px" rounded="100px" w="500px" {...props}>
         <styled.input
           flex={1}
-          placeholder={t(i18n)`Search by Address/Tx Hash/Block Hash`}
+          placeholder={t(i18n)`Search by Address/Tx Hash/Block Hash/AssetID`}
+          fontSize="14px"
           pl="20px"
           color="text.primary"
           fontWeight="medium"
-          fontSize="md"
           _placeholder={{
             color: 'text.third',
           }}

@@ -1,4 +1,3 @@
-import { i18n } from '@lingui/core'
 import { t } from '@lingui/macro'
 import { Flex, VStack } from 'styled-system/jsx'
 
@@ -7,9 +6,11 @@ import { BtcUtxoTables } from '@/components/btc/btc-utxo-tables'
 import { TimeFormatter } from '@/components/time-formatter'
 import { Text } from '@/components/ui'
 import Link from '@/components/ui/link'
+import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { formatNumber } from '@/lib/string/format-number'
 
 export default async function Page({ params: { hashOrHeight } }: { params: { hashOrHeight: string } }) {
+  const i18n = getI18nFromHeaders()
   const data = await explorerGraphql.getBtcBlockTransaction(hashOrHeight)
 
   return (

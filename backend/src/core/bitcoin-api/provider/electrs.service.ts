@@ -8,6 +8,7 @@ import {
   Transaction,
   UTXO,
 } from '../bitcoin-api.schema';
+import { HttpException } from '@nestjs/common';
 
 export class ElectrsService implements IBitcoinDataProvider {
   private request: AxiosInstance;
@@ -19,7 +20,7 @@ export class ElectrsService implements IBitcoinDataProvider {
   }
 
   public async getFeesRecommended(): Promise<RecommendedFees> {
-    throw new Error('Electrs: Recommended fees not available');
+    throw new HttpException('Electrs: Recommended fees not available', 500);
   }
 
   public async getAddress({ address }: { address: string }) {

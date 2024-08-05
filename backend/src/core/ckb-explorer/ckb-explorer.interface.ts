@@ -21,6 +21,15 @@ export enum AddressTransactionSortType {
   TimeDesc = 'time.desc',
 }
 
+export enum TransactionListSortType {
+  TransactionsAsc = 'transactions.asc',
+  TransactionsDesc = 'transactions.desc',
+  AddressCountAsc = 'address_count.asc',
+  AddressCountDesc = 'address_count.desc',
+  CreatedTimeAsc = 'created_time.asc',
+  CreatedTimeDesc = 'created_time.desc',
+}
+
 // https://github.com/nervosnetwork/ckb-explorer/blob/f2b9823e1a1ece1b74901ca3090565d62b251dcd/app/workers/bitcoin_transaction_detect_worker.rb#L123C4-L137C8
 export enum LeapDirection {
   In = 'in',
@@ -43,7 +52,7 @@ export interface CkbExplorerResponse<T, IsPaginated extends boolean = false> {
   meta: IsPaginated extends true ? PaginationMeta : never;
 }
 
-export type NonPaginatedResponse<T extends {}> = CkbExplorerResponse<
+export type NonPaginatedResponse<T extends object> = CkbExplorerResponse<
   {
     id: string;
     type: string;
@@ -52,7 +61,7 @@ export type NonPaginatedResponse<T extends {}> = CkbExplorerResponse<
   false
 >;
 
-export type PaginatedResponse<T extends {}> = CkbExplorerResponse<
+export type PaginatedResponse<T extends object> = CkbExplorerResponse<
   {
     id: string;
     type: string;
@@ -147,6 +156,12 @@ export interface DisplayOutput {
     decimal: string;
     type_hash: string;
     published: boolean;
+  };
+  omiga_inscription_info: {
+    symbol: string;
+    name: string;
+    decimal: string;
+    amount: string;
   };
 }
 

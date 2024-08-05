@@ -17,9 +17,12 @@ import {
   CkbRpcTransactionLoader,
   CkbRpcTransactionLoaderType,
 } from '../transaction/transaction.dataloader';
+import { CkbRpcWebsocketService } from 'src/core/ckb-rpc/ckb-rpc-websocket.service';
 
 @Resolver(() => CkbBlock)
 export class CkbBlockResolver {
+  constructor(private ckbRpcService: CkbRpcWebsocketService) {}
+
   @Query(() => CkbBlock, { name: 'ckbBlock', nullable: true })
   public async getBlock(
     @Args('heightOrHash', { type: () => String }) heightOrHash: string,
@@ -32,45 +35,85 @@ export class CkbBlockResolver {
     return CkbBlock.from(block);
   }
 
-  @ResolveField(() => Float)
+  @ResolveField(() => Float, { nullable: true })
   public async totalFee(
     @Parent() block: CkbBaseBlock,
     @Loader(CkbBlockEconomicStateLoader) blockEconomicLoader: CkbBlockEconomicStateLoaderType,
-  ): Promise<number> {
+  ): Promise<number | null> {
     const blockEconomicState = await blockEconomicLoader.load(block.hash);
+    if (!blockEconomicState) {
+      return null;
+    }
     return BI.from(blockEconomicState.txs_fee).toNumber();
   }
 
-  @ResolveField(() => CkbAddress)
+  @ResolveField(() => CkbAddress, { nullable: true })
   public async miner(
     @Parent() block: CkbBaseBlock,
     @Loader(CkbExplorerBlockLoader) explorerBlockLoader: CkbExplorerBlockLoaderType,
-  ): Promise<CkbBaseAddress> {
+  ): Promise<CkbBaseAddress | null> {
     const explorerBlock = await explorerBlockLoader.load(block.hash);
+    if (!explorerBlock) {
+      return null;
+    }
     return CkbAddress.from(explorerBlock.miner_hash);
   }
 
-  @ResolveField(() => Float)
+  @ResolveField(() => Float, { nullable: true })
   public async reward(
     @Parent() block: CkbBaseBlock,
     @Loader(CkbExplorerBlockLoader) explorerBlockLoader: CkbExplorerBlockLoaderType,
-  ): Promise<number> {
+  ): Promise<number | null> {
     const explorerBlock = await explorerBlockLoader.load(block.hash);
+    if (!explorerBlock) {
+      return null;
+    }
     return toNumber(explorerBlock.miner_reward);
   }
 
-  @ResolveField(() => [String])
+  @ResolveField(() => [String], { nullable: true })
   public async transactions(
     @Parent() { hash }: CkbBaseBlock,
     @Loader(CkbRpcBlockLoader) rpcBlockLoader: CkbRpcBlockLoaderType,
     @Loader(CkbRpcTransactionLoader) rpcTxLoader: CkbRpcTransactionLoaderType,
-  ): Promise<CkbBaseTransaction[]> {
+  ): Promise<(CkbBaseTransaction | null)[] | null> {
     const block = await rpcBlockLoader.load(hash);
+    if (!block) {
+      return null;
+    }
     return Promise.all(
       block.transactions.map(async (tx) => {
         const transaction = await rpcTxLoader.load(tx.hash);
+        if (!transaction) {
+          return null;
+        }
         return CkbTransaction.from(transaction);
       }),
     );
+  }
+
+  @ResolveField(() => Float)
+  public async size(
+    @Parent() block: CkbBaseBlock,
+    @Loader(CkbExplorerBlockLoader) explorerBlockLoader: CkbExplorerBlockLoaderType,
+  ): Promise<number | null> {
+    const explorerBlock = await explorerBlockLoader.load(block.hash);
+    if (!explorerBlock) {
+      return null;
+    }
+    return explorerBlock.size;
+  }
+
+  @ResolveField(() => Float)
+  public async confirmations(
+    @Parent() block: CkbBaseBlock,
+    @Loader(CkbExplorerBlockLoader) explorerBlockLoader: CkbExplorerBlockLoaderType,
+  ): Promise<number | null> {
+    const tipBlockNumber = await this.ckbRpcService.getTipBlockNumber();
+    const explorerBlock = await explorerBlockLoader.load(block.hash);
+    if (!explorerBlock) {
+      return null;
+    }
+    return tipBlockNumber - toNumber(explorerBlock.number);
   }
 }

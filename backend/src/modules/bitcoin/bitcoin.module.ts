@@ -18,4 +18,4 @@ import { BitcoinOutputModule } from './output/output.module';
   ],
   providers: [BitcoinResolver],
 })
-export class BitcoinModule { }
+export class BitcoinModule {}

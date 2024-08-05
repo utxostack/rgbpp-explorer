@@ -2,7 +2,9 @@ name: Backend Deploy
 
 on:
   push:
-    branches: [main, deploy-testnet]
+    branches: [develop]
+    paths:
+      - backend/**
   workflow_dispatch:
 
 jobs:
@@ -11,7 +13,7 @@ jobs:
       name: testnet
       url: https://testnet-api.explorer.rgbpp.io/graphql
     runs-on: ubuntu-latest
-  
+
     steps:
       - name: Deploy to testnet
         uses: appleboy/ssh-action@v1.0.3
@@ -22,8 +24,8 @@ jobs:
           script: |
             cd ${{ secrets.SSH_WORK_DIR }}
             git status
-            git fetch origin main
-            git checkout origin/main
+            git fetch origin
+            git checkout ${{ github.sha }}
             git status
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker compose ps
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker image prune -f

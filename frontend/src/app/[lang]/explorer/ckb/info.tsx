@@ -51,7 +51,7 @@ export async function Info() {
             </HStack>
             <Text>
               {formatNumber(ckbChainInfo.fees.fast)}
-              <Text as="span" color="text.third" fontSize="12px">
+              <Text as="span" color="text.third" fontSize="12px" ml="4px">
                 {t(i18n)`shannons/kB`}
               </Text>
             </Text>
@@ -63,19 +63,19 @@ export async function Info() {
             </HStack>
             <Text>
               {formatNumber(ckbChainInfo.fees.average)}
-              <Text as="span" color="text.third" fontSize="12px">
+              <Text as="span" color="text.third" fontSize="12px" ml="4px">
                 {t(i18n)`shannons/kB`}
               </Text>
             </Text>
           </VStack>
-          <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
+          <VStack gap="15px">
             <HStack bg="success.a10" px="10px" rounded="4px" color="success" gap="4px" lineHeight="24px">
               <SpeedLowIcon w="20px" h="20px" />
               <Text fontSize="14px" fontWeight="semibold">{t(i18n)`Low`}</Text>
             </HStack>
             <Text>
               {formatNumber(ckbChainInfo.fees.slow)}
-              <Text as="span" color="text.third" fontSize="12px">
+              <Text as="span" color="text.third" fontSize="12px" ml="4px">
                 {t(i18n)`shannons/kB`}
               </Text>
             </Text>

@@ -6,6 +6,7 @@ import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import * as BitcoinApi from 'src/core/bitcoin-api/bitcoin-api.schema';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { BitcoinBaseLoader } from './base';
+import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 
 export interface BitcoinBlockTransactionsLoaderParams {
   hash?: string;
@@ -23,6 +24,7 @@ export class BitcoinBlockTransactionsLoader
   constructor(
     public bitcoinApiService: BitcoinApiService,
     @Inject(CACHE_MANAGER) public cacheManager: Cache,
+    @InjectSentry() private sentryService: SentryService,
   ) {
     super();
   }
@@ -31,11 +33,21 @@ export class BitcoinBlockTransactionsLoader
     return async (batchProps: BitcoinBlockTransactionsLoaderParams[]) => {
       this.logger.debug(`Loading bitcoin block transactions`);
       const results = await Promise.allSettled(
-        batchProps.map(async ({ hash, height, startIndex }) =>
-          this.getBlockTxs(hash || height.toString(), startIndex),
-        ),
+        batchProps.map(async ({ hash, height, startIndex }) => {
+          if (!hash && !height) {
+            return null;
+          }
+          return this.getBlockTxs(hash || height!.toString(), startIndex);
+        }),
       );
-      return results.map((result) => (result.status === 'fulfilled' ? result.value : null));
+      return results.map((result, index) => {
+        if (result.status === 'fulfilled') {
+          return result.value;
+        }
+        this.logger.error(`Requesting: ${batchProps[index]}, occurred error: ${result.reason}`);
+        this.sentryService.instance().captureException(result.reason);
+        return null;
+      });
     };
   }
 }
@@ -45,4 +57,3 @@ export type BitcoinBlockTransactionsLoaderType = DataLoader<
 >;
 export type BitcoinBlockTransactionsLoaderResponse =
   DataLoaderResponse<BitcoinBlockTransactionsLoader>;
-

@@ -2,11 +2,10 @@
 
 import { Trans } from '@lingui/macro'
 import { isNumber } from 'lodash-es'
+import { Box, Flex, HStack } from 'styled-system/jsx'
 
 import { Text } from '@/components/ui'
 import { formatNumber } from '@/lib/string/format-number'
-
-import { Box, Flex, HStack } from '../../styled-system/jsx'
 
 export function UtxoOrCellFooter({
   fee,

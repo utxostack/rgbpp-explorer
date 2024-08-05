@@ -8,6 +8,7 @@ import {
   GetAddressParams,
   GetAddressTransactionsParams,
 } from 'src/core/ckb-explorer/ckb-explorer.service';
+import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 
 @Injectable()
 export class CkbAddressLoader
@@ -15,7 +16,10 @@ export class CkbAddressLoader
 {
   private logger = new Logger(CkbAddressLoader.name);
 
-  constructor(private ckbExplorerService: CkbExplorerService) {}
+  constructor(
+    private ckbExplorerService: CkbExplorerService,
+    @InjectSentry() private sentryService: SentryService,
+  ) {}
 
   public getBatchFunction() {
     return async (batchParams: GetAddressParams[]) => {
@@ -26,7 +30,14 @@ export class CkbAddressLoader
           return response.data.map((data) => data.attributes);
         }),
       );
-      return results.map((result) => (result.status === 'fulfilled' ? result.value : null));
+      return results.map((result, index) => {
+        if (result.status === 'fulfilled') {
+          return result.value;
+        }
+        this.logger.error(`Requesting: ${batchParams[index]}, occurred error: ${result.reason}`);
+        this.sentryService.instance().captureException(result.reason);
+        return null;
+      });
     };
   }
 }
@@ -44,7 +55,10 @@ export class CkbAddressTransactionsLoader
 {
   private logger = new Logger(CkbAddressTransactionsLoader.name);
 
-  constructor(private ckbExplorerService: CkbExplorerService) {}
+  constructor(
+    private ckbExplorerService: CkbExplorerService,
+    @InjectSentry() private sentryService: SentryService,
+  ) {}
 
   public getBatchFunction() {
     return async (batchParams: GetAddressParams[]) => {
@@ -58,7 +72,14 @@ export class CkbAddressTransactionsLoader
           };
         }),
       );
-      return results.map((result) => (result.status === 'fulfilled' ? result.value : null));
+      return results.map((result, index) => {
+        if (result.status === 'fulfilled') {
+          return result.value;
+        }
+        this.logger.error(`Requesting: ${batchParams[index]}, occurred error: ${result.reason}`);
+        this.sentryService.instance().captureException(result.reason);
+        return null;
+      });
     };
   }
 }

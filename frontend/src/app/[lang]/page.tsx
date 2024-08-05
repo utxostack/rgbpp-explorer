@@ -3,6 +3,7 @@ import { Box, Center, Flex } from 'styled-system/jsx'
 
 import HomeBgSVG from '@/assets/home-bg.svg'
 import { HomeQuickInfo } from '@/components/home-quick-info'
+import { HomeTitle } from '@/components/home-title'
 import { LastRgbppTxnsTable } from '@/components/last-rgbpp-txns-table'
 import { NetworkCards } from '@/components/network-cards'
 import { SearchBar } from '@/components/search-bar'
@@ -17,9 +18,7 @@ export default function Home() {
         <HomeBgSVG w="100%" pos="absolute" top="50px" left="0" />
         <Flex w="100%" direction="column" pos="relative" aspectRatio={1440 / 1063}>
           <Flex w="100%" direction="column" textAlign="center" align="center" justify="start">
-            <Heading mt="10%" mb="54px" fontSize="62px" fontWeight="semibold">
-              {t(i18n)`Explore the BTC Ecosystem`}
-            </Heading>
+            <HomeTitle />
             <HomeQuickInfo />
             <SearchBar mt="60px" />
           </Flex>

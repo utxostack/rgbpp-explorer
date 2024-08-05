@@ -1,4 +1,6 @@
 import { Field, Float, ObjectType } from '@nestjs/graphql';
+import { RgbppAsset } from '../asset/asset.model';
+import { CkbXUDTInfo } from 'src/modules/ckb/cell/cell.model';
 
 export type RgbppBaseAddress = Pick<RgbppAddress, 'address'>;
 
@@ -12,6 +14,12 @@ export class RgbppAddress {
 
   @Field(() => Float)
   cellsCount: number;
+
+  @Field(() => [RgbppAsset])
+  assets: RgbppAsset[];
+
+  @Field(() => [CkbXUDTInfo])
+  balances: CkbXUDTInfo[];
 
   public static from(address: string): RgbppBaseAddress {
     return {

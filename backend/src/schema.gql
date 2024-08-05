@@ -12,7 +12,7 @@ type CkbScript {
 """CKB XUDT Info"""
 type CkbXUDTInfo {
   symbol: String!
-  amount: Float!
+  amount: String!
   decimal: Int!
   typeHash: String!
 }
@@ -33,6 +33,15 @@ type CkbCell {
   lock: CkbScript!
   xudtInfo: CkbXUDTInfo
   status: CkbCellStatus!
+  cellType: CellType
+}
+
+"""Cell type (XUDT, SUDT, Dobs, mNFT)"""
+enum CellType {
+  XUDT
+  SUDT
+  DOB
+  MNFT
 }
 
 """CKB Address"""
@@ -54,6 +63,8 @@ type CkbBlock {
   miner: CkbAddress!
   reward: Float!
   transactions: [CkbTransaction!]!
+  size: Float!
+  confirmations: Float!
 }
 
 """
@@ -90,11 +101,20 @@ type CkbChainInfo {
   fees: CkbFees!
 }
 
+"""Rgbpp Asset"""
+type RgbppAsset {
+  owner: String!
+  cell: CkbCell!
+  utxo: BitcoinOutput
+}
+
 """Rgbpp Address"""
 type RgbppAddress {
   address: String!
   utxosCount: Float!
   cellsCount: Float!
+  assets: [RgbppAsset!]!
+  balances: [CkbXUDTInfo!]!
 }
 
 """Bitcoin Address"""
@@ -102,7 +122,7 @@ type BitcoinAddress {
   address: String!
   satoshi: Float!
   pendingSatoshi: Float!
-  transactionsCount: Float!
+  transactionsCount: Float
   transactions(afterTxid: String): [BitcoinTransaction!]!
   rgbppAddress: RgbppAddress!
 }
@@ -171,7 +191,7 @@ type BitcoinTransaction {
   blockHash: String!
   txid: String!
   version: Int!
-  vin: [BitcoinInput!]!
+  vin: [BitcoinInput!]
   vout: [BitcoinOutput!]!
   size: Float!
   locktime: Float!
@@ -222,7 +242,8 @@ type RgbppCoin {
   totalAmount: Float!
   issuer: String!
   deployedAt: Timestamp!
-  transactions(page: Int, pageSize: Int): [RgbppTransaction!]!
+  transactions(page: Int, pageSize: Int): [RgbppTransaction!]
+  transactionsCount: Float
 }
 
 """RGB++ Coin List"""
@@ -271,6 +292,7 @@ type SearchResult {
 type Query {
   ckbChainInfo: CkbChainInfo!
   ckbBlock(heightOrHash: String!): CkbBlock
+  ckbTransactions(types: [CellType!], scriptKey: CkbSearchKeyInput, limit: Float, order: OrderType, after: String): [CkbTransaction!]!
   ckbTransaction(txHash: String!): CkbTransaction
   ckbAddress(address: String!): CkbAddress
   btcChainInfo: BitcoinChainInfo!
@@ -280,8 +302,35 @@ type Query {
   rgbppTransaction(txidOrTxHash: String!): RgbppTransaction
   btcAddress(address: String!): BitcoinAddress
   rgbppAddress(address: String!): RgbppAddress
-  rgbppCoins(page: Int, pageSize: Int): RgbppCoinList!
-  rgbppCoin(typeHash: String!): RgbppCoin!
+  rgbppCoins(page: Int, pageSize: Int, sort: TransactionListSortType): RgbppCoinList!
+  rgbppCoin(typeHash: String!): RgbppCoin
   rgbppStatistic: RgbppStatistic!
   search(query: String!): SearchResult!
+}
+
+"""Search key for CKB transactions"""
+input CkbSearchKeyInput {
+  script: CkbScriptInput!
+  scriptType: String!
+}
+
+"""CKB Script"""
+input CkbScriptInput {
+  codeHash: String!
+  hashType: String!
+  args: String!
+}
+
+enum OrderType {
+  Desc
+  Asc
+}
+
+enum TransactionListSortType {
+  TransactionsAsc
+  TransactionsDesc
+  AddressCountAsc
+  AddressCountDesc
+  CreatedTimeAsc
+  CreatedTimeDesc
 }

@@ -11,6 +11,9 @@ import {
   SearchKey,
   TransactionWithStatusResponse,
 } from './ckb-rpc.interface';
+import { Cacheable } from 'src/decorators/cacheable.decorator';
+import { ONE_MONTH_MS } from 'src/common/date';
+import { CKB_MIN_SAFE_CONFIRMATIONS } from 'src/constants';
 
 @Injectable()
 export class CkbRpcWebsocketService {
@@ -19,17 +22,45 @@ export class CkbRpcWebsocketService {
 
   constructor(private configService: ConfigService<Env>) {
     this.websocket = new RpcWebsocketsClient(this.configService.get('CKB_RPC_WEBSOCKET_URL'));
-    this.websocket.on('error', (error) => {
-      this.logger.error(error.message);
+
+    this.websocket.on('open', () => {
+      this.websocket.on('error', (error) => {
+        this.logger.error(error.message);
+      });
     });
   }
 
+  private async isSafeConfirmations(blockNumber: string): Promise<boolean> {
+    const tipBlockNumber = await this.getTipBlockNumber();
+    return BI.from(blockNumber).gt(BI.from(tipBlockNumber).add(CKB_MIN_SAFE_CONFIRMATIONS));
+  }
+
+  @Cacheable({
+    namespace: 'CkbRpcWebsocketService',
+    key: (txHash: string) => `getTransaction:${txHash}`,
+    ttl: ONE_MONTH_MS,
+    shouldCache: async (tx: TransactionWithStatusResponse, that: CkbRpcWebsocketService) => {
+      if (tx.tx_status.status !== 'committed' || !tx.tx_status.block_number) {
+        return false;
+      }
+      return that.isSafeConfirmations(tx.tx_status.block_number);
+    },
+  })
   public async getTransaction(txHash: string): Promise<TransactionWithStatusResponse> {
     this.logger.debug(`get_transaction - txHash: ${txHash}`);
     const tx = await this.websocket.call('get_transaction', [txHash]);
     return tx as TransactionWithStatusResponse;
   }
 
+  @Cacheable({
+    namespace: 'CkbRpcWebsocketService',
+    key: (blockHash: string) => `getBlock:${blockHash}`,
+    ttl: ONE_MONTH_MS,
+    shouldCache: async (block: Block, that: CkbRpcWebsocketService) => {
+      const { number } = block.header;
+      return that.isSafeConfirmations(number);
+    },
+  })
   public async getBlock(blockHash: string): Promise<Block> {
     this.logger.debug(`get_block - blockHash: ${blockHash}`);
     const block = await this.websocket.call('get_block', [blockHash]);
@@ -44,12 +75,23 @@ export class CkbRpcWebsocketService {
     return block as Block;
   }
 
+  @Cacheable({
+    namespace: 'CkbRpcWebsocketService',
+    key: (blockHash: string) => `getBlockEconomicState:${blockHash}`,
+    ttl: ONE_MONTH_MS,
+  })
   public async getBlockEconomicState(blockHash: string): Promise<BlockEconomicState> {
     this.logger.debug(`get_block_economic_state - blockHash: ${blockHash}`);
     const blockEconomicState = await this.websocket.call('get_block_economic_state', [blockHash]);
     return blockEconomicState as BlockEconomicState;
   }
 
+  @Cacheable({
+    namespace: 'CkbRpcWebsocketService',
+    key: 'getTipBlockNumber',
+    // just cache for 1 second to avoid too many requests
+    ttl: 1000,
+  })
   public async getTipBlockNumber(): Promise<number> {
     this.logger.debug('get_tip_block_number');
     const tipBlockNumber = await this.websocket.call('get_tip_block_number', []);
@@ -60,11 +102,17 @@ export class CkbRpcWebsocketService {
     searchKey: SearchKey,
     order: 'asc' | 'desc',
     limit: string,
+    after?: string,
   ): Promise<GetTransactionsResult> {
     this.logger.debug(
-      `get_transactions - searchKey: ${JSON.stringify(searchKey)}, order: ${order}, limit: ${limit}`,
+      `get_transactions - searchKey: ${JSON.stringify(searchKey)}, order: ${order}, limit: ${limit}, after: ${after}`,
     );
-    const transactions = await this.websocket.call('get_transactions', [searchKey, order, limit]);
+    const transactions = await this.websocket.call('get_transactions', [
+      searchKey,
+      order,
+      limit,
+      after,
+    ]);
     return transactions as GetTransactionsResult;
   }
 

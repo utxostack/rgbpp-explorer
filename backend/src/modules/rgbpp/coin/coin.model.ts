@@ -1,10 +1,14 @@
 import { toNumber } from 'lodash';
-import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
+import { Field, Float, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { CkbScript } from 'src/modules/ckb/script/script.model';
 import * as CkbExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
 import { RgbppTransaction } from '../transaction/transaction.model';
 
-export type RgbppBaseCoin = Omit<RgbppCoin, 'transactions'>;
+export type RgbppBaseCoin = Omit<RgbppCoin, 'transactions' | 'transactionsCount'>;
+
+registerEnumType(CkbExplorer.TransactionListSortType, {
+  name: 'TransactionListSortType',
+});
 
 @ObjectType({ description: 'RGB++ Coin' })
 export class RgbppCoin {
@@ -12,7 +16,7 @@ export class RgbppCoin {
   name: string;
 
   @Field(() => String, { nullable: true })
-  description: string;
+  description: string | null;
 
   @Field(() => String)
   symbol: string;
@@ -21,13 +25,13 @@ export class RgbppCoin {
   decimal: number;
 
   @Field(() => String, { nullable: true })
-  icon: string;
+  icon: string | null;
 
   @Field(() => String, { nullable: true })
-  typeHash: string;
+  typeHash: string | null;
 
   @Field(() => CkbScript, { nullable: true })
-  typeScript: CkbScript;
+  typeScript: CkbScript | null;
 
   @Field(() => Int)
   holdersCount: number;
@@ -44,14 +48,20 @@ export class RgbppCoin {
   @Field(() => Date)
   deployedAt: Date;
 
-  @Field(() => [RgbppTransaction])
+  @Field(() => [RgbppTransaction], { nullable: true })
   transactions: RgbppTransaction[];
 
-  public static from(xudt: CkbExplorer.XUDT): RgbppBaseCoin {
+  @Field(() => Float, { nullable: true })
+  transactionsCount: number;
+
+  public static from(xudt: CkbExplorer.XUDT): RgbppBaseCoin | null {
+    if (!xudt) {
+      return null;
+    }
     return {
       name: xudt.full_name,
       description: xudt.description,
-      symbol: xudt.symbol,
+      symbol: xudt.symbol ?? xudt.type_hash.slice(0, 6),
       decimal: toNumber(xudt.decimal),
       icon: xudt.icon_file,
       typeHash: xudt.type_hash,
@@ -60,7 +70,7 @@ export class RgbppCoin {
       h24CkbTransactionsCount: toNumber(xudt.h24_ckb_transactions_count),
       totalAmount: toNumber(xudt.total_amount),
       issuer: xudt.issuer_address,
-      deployedAt: new Date(xudt.created_at),
+      deployedAt: new Date(toNumber(xudt.created_at)),
     };
   }
 }

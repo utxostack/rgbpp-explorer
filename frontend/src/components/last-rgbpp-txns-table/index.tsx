@@ -8,15 +8,14 @@ import { explorerGraphql } from '@/apis/explorer-graphql'
 import LinkOutlineIcon from '@/assets/link-outline.svg'
 import { AgoTimeFormatter } from '@/components/ago-time-formatter'
 import { FailedFallback } from '@/components/failed-fallback'
+import { Amount } from '@/components/last-rgbpp-txns-table/amount'
 import { LayerType } from '@/components/layer-type'
 import { Loading } from '@/components/loading'
 import Link from '@/components/ui/link'
 import { Table } from '@/components/ui/primitives'
 import { QueryKey } from '@/constants/query-key'
-import { resolveCellDiff } from '@/lib/resolve-cell-diff'
 import { resolveLayerTypeFromRGBppTransaction } from '@/lib/resolve-layer-type-from-rgbpp-transaction'
 import { resolveRGBppTxHash } from '@/lib/resolve-rgbpp-tx-hash'
-import { formatNumber } from '@/lib/string/format-number'
 import { truncateMiddle } from '@/lib/string/truncate-middle'
 
 export function LastRgbppTxnsTable() {
@@ -45,19 +44,19 @@ export function LastRgbppTxnsTable() {
   }
 
   return (
-    <Table.Root>
+    <Table.Root tableLayout="fixed">
       <Table.Head>
         <Table.Row>
-          <Table.Header>
+          <Table.Header w="254px">
             <Trans>Tx hash</Trans>
           </Table.Header>
-          <Table.Header>
+          <Table.Header w="160px">
             <Trans>Type</Trans>
           </Table.Header>
-          <Table.Header>
+          <Table.Header w="200px">
             <Trans>Amount</Trans>
           </Table.Header>
-          <Table.Header>
+          <Table.Header w="140px">
             <Trans>Time</Trans>
           </Table.Header>
         </Table.Row>
@@ -65,7 +64,6 @@ export function LastRgbppTxnsTable() {
       <Table.Body>
         {data?.rgbppLatestTransactions.txs.map((tx) => {
           const txHash = resolveRGBppTxHash(tx)
-          const cellDiff = resolveCellDiff(tx.ckbTransaction)
           return (
             <Table.Row key={tx.ckbTxHash}>
               <Table.Cell>
@@ -78,7 +76,7 @@ export function LastRgbppTxnsTable() {
                 <LayerType type={resolveLayerTypeFromRGBppTransaction(tx)} />
               </Table.Cell>
               <Table.Cell>
-                <b>{formatNumber(cellDiff.value)}</b> {cellDiff.symbol}
+                <Amount ckbTransaction={tx.ckbTransaction} />
               </Table.Cell>
               <Table.Cell w="165px">
                 <AgoTimeFormatter time={tx.timestamp} tooltip />

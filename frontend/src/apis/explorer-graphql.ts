@@ -10,10 +10,10 @@ import {
   CkbChainInfo,
   CkbTransaction,
   Pageable,
-  RGBppAddress,
   RGBppCoin,
   RgbppStatistic,
   RGBppTransaction,
+  SearchResult,
 } from '@/apis/types/explorer-graphql'
 import { env } from '@/constants/env'
 
@@ -59,6 +59,7 @@ class ExplorerGraphql {
                     hashType
                     args
                   }
+                  cellType
                   xudtInfo {
                     symbol
                     amount
@@ -190,6 +191,7 @@ class ExplorerGraphql {
     return request<{
       rgbppCoin: {
         transactions: RGBppTransaction[]
+        transactionsCount: number
       }
     }>(
       this.serverURL,
@@ -198,6 +200,7 @@ class ExplorerGraphql {
           rgbppCoin(
             typeHash: "${typeHash}"
           ) {
+            transactionsCount
             transactions(page: ${page}, pageSize: ${pageSize}) {
               ckbTxHash
               btcTxid
@@ -325,7 +328,6 @@ class ExplorerGraphql {
             }
           }
         }
-
       `,
     )
   }
@@ -415,6 +417,7 @@ class ExplorerGraphql {
               txHash
               index
               capacity
+              cellType
               type {
                 codeHash
                 hashType
@@ -441,6 +444,7 @@ class ExplorerGraphql {
               txHash
               index
               capacity
+              cellType
               type {
                 codeHash
                 hashType
@@ -465,6 +469,7 @@ class ExplorerGraphql {
             }
             block {
               timestamp
+              hash
             }
           }
         }
@@ -721,6 +726,14 @@ class ExplorerGraphql {
             timestamp
             transactionsCount
             totalFee
+            miner {
+              address
+              shannon
+              transactionsCount
+            }
+            reward
+            size
+            confirmations
           }
         }
       `,
@@ -979,43 +992,22 @@ class ExplorerGraphql {
   }
 
   async search(keyword: string) {
-    return request<{
-      rgbppTransaction: Pick<RGBppTransaction, 'ckbTxHash' | 'btcTxid'>
-      ckbAddress: Pick<CkbAddress, 'address'>
-      btcTransaction: Pick<BtcTransaction, 'txid'>
-      btcAddress: Pick<BtcAddress, 'address'>
-      rgbppAddress: Pick<RGBppAddress, 'address'>
-      rgbppCoin: Pick<RGBppCoin, 'typeHash'>
-      ckbTransaction: Pick<CkbTransaction, 'hash'>
-    }>(
+    return request<SearchResult>(
       this.serverURL,
       gql`
-      query RgbppTransaction {
-        rgbppTransaction(txidOrTxHash: "${keyword}") {
-          ckbTxHash
-          btcTxid
+        query Search {
+          search(query: "${keyword}") {
+            query
+            btcBlock
+            btcTransaction
+            btcAddress
+            ckbBlock
+            ckbTransaction
+            ckbAddress
+            rgbppCoin
+          }
         }
-        ckbAddress(address: "${keyword}") {
-          address
-        }
-        btcTransaction(txid: "${keyword}") {
-          txid
-        }
-        btcAddress(address: "${keyword}") {
-          address
-        }
-        rgbppAddress(address: "${keyword}") {
-          address
-        }
-        rgbppCoin(typeHash: "${keyword}") {
-          typeHash
-        }
-        ckbTransaction(txHash: "${keyword}") {
-          hash
-        }
-      }
-
-    `,
+      `,
     )
   }
 

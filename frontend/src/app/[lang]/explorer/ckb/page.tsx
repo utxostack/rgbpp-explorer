@@ -2,15 +2,16 @@ import { t } from '@lingui/macro'
 import { Box, Grid, styled } from 'styled-system/jsx'
 
 import { explorerGraphql } from '@/apis/explorer-graphql'
-import { Info } from '@/app/[lang]/explorer/btc/info'
+import { Info } from '@/app/[lang]/explorer/ckb/info'
 import BtcIcon from '@/assets/chains/btc.svg'
 import { AgoTimeFormatter } from '@/components/ago-time-formatter'
+import { Amount } from '@/components/last-rgbpp-txns-table/amount'
 import { Heading, Table, Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
-import { resolveCellDiff } from '@/lib/resolve-cell-diff'
-import { formatNumber } from '@/lib/string/format-number'
 import { truncateMiddle } from '@/lib/string/truncate-middle'
+
+export const revalidate = 5
 
 export default async function Page() {
   const i18n = getI18nFromHeaders()
@@ -20,12 +21,11 @@ export default async function Page() {
   return (
     <Grid gridTemplateColumns="repeat(2, 1fr)" w="100%" maxW="content" p="30px" gap="30px">
       <Info />
-      <Box bg="bg.card" rounded="8px">
-        <Heading fontSize="20px" fontWeight="semibold" p="30px">{t(i18n)`Latest L1 RGB++ transaction`}</Heading>
+      <Box bg="bg.card" rounded="8px" whiteSpace="nowrap" pb="12px">
+        <Heading fontSize="20px" fontWeight="semibold" p="30px">{t(i18n)`Latest L2 RGB++ transaction`}</Heading>
         <Table.Root>
           <Table.Body>
             {rgbppLatestTransactions.txs.map((tx) => {
-              const cellDiff = resolveCellDiff(tx.ckbTransaction)
               return (
                 <Table.Row key={tx.btcTxid} lineHeight="36px">
                   <Table.Cell>
@@ -43,7 +43,7 @@ export default async function Page() {
                     <AgoTimeFormatter time={tx.timestamp} tooltip />
                   </Table.Cell>
                   <Table.Cell>
-                    <b>{formatNumber(cellDiff.value)}</b> {cellDiff.symbol}
+                    <Amount ckbTransaction={tx.ckbTransaction} />
                   </Table.Cell>
                 </Table.Row>
               )
@@ -51,7 +51,7 @@ export default async function Page() {
           </Table.Body>
         </Table.Root>
       </Box>
-      <Box bg="bg.card" rounded="8px">
+      <Box bg="bg.card" rounded="8px" pb="12px">
         <Heading fontSize="20px" fontWeight="semibold" p="30px">{t(i18n)`🔥 Popular RGB++ Assets`}</Heading>
         <Table.Root>
           <Table.Body>

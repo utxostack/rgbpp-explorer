@@ -9,23 +9,21 @@ import {
   BitcoinTransactionLoader,
   BitcoinTransactionLoaderType,
 } from '../bitcoin/transaction/transaction.dataloader';
-import { ConfigService } from '@nestjs/config';
-import { isValidAddress } from '@rgbpp-sdk/btc';
-import { BtcNetworkTypeMap, NetworkType } from 'src/constants';
 import { CkbRpcBlockLoader, CkbRpcBlockLoaderType } from '../ckb/block/block.dataloader';
 import {
   CkbRpcTransactionLoader,
   CkbRpcTransactionLoaderType,
 } from '../ckb/transaction/transaction.dataloader';
-import { helpers, config } from '@ckb-lumos/lumos';
 import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
+import {
+  TryValidateBtcAddressPipe,
+  TryValidateCkbAddressPipe,
+} from 'src/pipes/validate-address.pipe';
+import { ParentField } from 'src/decorators/parent-field.decorator';
 
 @Resolver(() => SearchResult)
 export class SearchResolver {
-  constructor(
-    private configService: ConfigService,
-    private ckbExplorerService: CkbExplorerService,
-  ) { }
+  constructor(private ckbExplorerService: CkbExplorerService) {}
 
   @Query(() => SearchResult)
   public async search(@Args('query') query: string) {
@@ -41,7 +39,7 @@ export class SearchResolver {
   ): Promise<string | null> {
     // TODO: check if query is a block hash or block height
     const block = await blockLoader.load(query);
-    return block?.id;
+    return block ? block.id : null;
   }
 
   @ResolveField(() => String, { nullable: true })
@@ -50,16 +48,14 @@ export class SearchResolver {
     @Loader(BitcoinTransactionLoader) txLoader: BitcoinTransactionLoaderType,
   ): Promise<string | null> {
     const transaction = await txLoader.load(query);
-    return transaction?.txid;
+    return transaction ? transaction.txid : null;
   }
 
   @ResolveField(() => String, { nullable: true })
-  public async btcAddress(@Parent() { query }: SearchResult): Promise<string | null> {
-    const network = this.configService.get('NETWORK');
-    if (!isValidAddress(query, BtcNetworkTypeMap[network])) {
-      return null;
-    }
-    return query;
+  public async btcAddress(
+    @ParentField('query', TryValidateBtcAddressPipe) address: string | null,
+  ): Promise<string | null> {
+    return address;
   }
 
   @ResolveField(() => String, { nullable: true })
@@ -87,26 +83,19 @@ export class SearchResolver {
   }
 
   @ResolveField(() => String, { nullable: true })
-  public async ckbAddress(@Parent() { query }: SearchResult): Promise<string | null> {
-    try {
-      const network = this.configService.get('NETWORK');
-      const lumosConfig = network === NetworkType.mainnet ? config.MAINNET : config.TESTNET;
-      helpers.parseAddress(query, { config: lumosConfig });
-      return query;
-    } catch (e) {
-      return null;
-    }
+  public async ckbAddress(
+    @ParentField('query', TryValidateCkbAddressPipe) address: string | null,
+  ): Promise<string | null> {
+    return address;
   }
 
   @ResolveField(() => String, { nullable: true })
-  public async rgbppCoin(
-    @Parent() { query }: SearchResult,
-  ): Promise<string | null> {
+  public async rgbppCoin(@Parent() { query }: SearchResult): Promise<string | null> {
     try {
       const response = await this.ckbExplorerService.getXUDT(query);
       return response.data?.attributes?.type_hash;
     } catch {
-      return null
+      return null;
     }
   }
 }

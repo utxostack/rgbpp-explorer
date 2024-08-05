@@ -1,6 +1,8 @@
 'use client'
 
 import { Trans } from '@lingui/macro'
+import { useLingui } from '@lingui/react'
+import { usePathname } from 'next/navigation'
 import { Center, Flex, HStack, VStack } from 'styled-system/jsx'
 
 import ArrowIcon from '@/assets/arrow.svg'
@@ -9,24 +11,34 @@ import BtcIcon from '@/assets/chains/btc.svg'
 import CkbIcon from '@/assets/chains/ckb.svg'
 import LogoSVG from '@/assets/logo.svg'
 import { IfPathname } from '@/components/if-pathname'
+import { NetworkSwitcher } from '@/components/network-switcher'
 import { SearchBarInNav } from '@/components/search-bar'
 import { HoverCard, Text } from '@/components/ui'
 import { Link } from '@/components/ui/link'
 
 export function Navbar() {
+  const pathname = usePathname()
+  const {
+    i18n: { locale },
+  } = useLingui()
   return (
     <Center bg="bg.card" w="100%" px="30px" pos="sticky" top="0" zIndex="50">
-      <Flex maxW="1280px" w="100%" h="80px" alignItems="center">
-        <Link display="flex" href="/" gap="8px" alignItems="center">
-          <LogoSVG w="40px" h="40px" />
-          <Text fontWeight="semibold" size="xl">
-            <Trans>RGB++ Explorer</Trans>
-          </Text>
-        </Link>
-        <HStack ml="72px" gap="48px" fontWeight="medium">
+      <Flex maxW="1280px" w="100%" h="80px" alignItems="center" justifyContent="space-between">
+        <HStack gap="48px" fontWeight="medium">
+          <Link display="flex" href="/" gap="8px" alignItems="center" pr="32px">
+            <LogoSVG w="40px" h="40px" />
+            <Text fontWeight="semibold" size="xl">
+              <Trans>RGB++ Explorer</Trans>
+            </Text>
+          </Link>
           <HoverCard.Root unmountOnExit openDelay={0} closeDelay={200}>
             <HoverCard.Trigger asChild>
-              <Flex align="center" gap="12px" cursor="default">
+              <Flex
+                align="center"
+                gap="12px"
+                cursor="default"
+                color={pathname.startsWith(`/${locale}/explorer`) ? 'brand' : 'text.primary'}
+              >
                 <Trans>Explorer</Trans>
                 <ArrowDownIcon w="16px" h="16px" />
               </Flex>
@@ -92,13 +104,20 @@ export function Navbar() {
             </HoverCard.Positioner>
           </HoverCard.Root>
 
-          <Link href="/assets" _hover={{ textDecoration: 'underline' }}>
+          <Link
+            href="/assets"
+            _hover={{ textDecoration: 'underline' }}
+            color={pathname.startsWith(`/${locale}/assets`) ? 'brand' : 'text.primary'}
+          >
             <Trans>RGB++ Assets</Trans>
           </Link>
         </HStack>
-        <IfPathname isNotOneOf={['/']} exact>
-          <SearchBarInNav ml="auto" />
-        </IfPathname>
+        <HStack gap="20px">
+          <IfPathname isNotOneOf={['/']} exact>
+            <SearchBarInNav ml="auto" />
+          </IfPathname>
+          <NetworkSwitcher />
+        </HStack>
       </Flex>
     </Center>
   )

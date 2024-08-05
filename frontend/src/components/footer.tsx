@@ -2,11 +2,12 @@ import { t } from '@lingui/macro'
 import { Center, Flex, Grid, HStack, VStack } from 'styled-system/jsx'
 
 import LogoSVG from '@/assets/logo.svg'
-import DiscordSVG from '@/assets/social-medias/discord.svg'
-import MIcon from '@/assets/social-medias/m.svg'
+import GithubSVG from '@/assets/social-medias/github.svg'
+import MediumIcon from '@/assets/social-medias/medium.svg'
 import TwitterSVG from '@/assets/social-medias/x.svg'
 import { Heading, Text } from '@/components/ui'
 import Link from '@/components/ui/link'
+import { env } from '@/constants/env'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 
 export function Footer() {
@@ -29,7 +30,7 @@ export function Footer() {
               display="flex"
               justifyContent="center"
               alignItems="center"
-              href="/"
+              href={env.public.UTXO_STACK_TWITTER_URL}
               target="_blank"
               transition="200ms"
               _hover={{
@@ -48,7 +49,7 @@ export function Footer() {
               display="flex"
               justifyContent="center"
               alignItems="center"
-              href="/"
+              href={env.public.CKB_CELL_GITHUB_URL}
               target="_blank"
               transition="200ms"
               _hover={{
@@ -56,7 +57,7 @@ export function Footer() {
                 borderColor: 'brand',
               }}
             >
-              <DiscordSVG w="32px" h="32px" />
+              <GithubSVG w="32px" h="32px" />
             </Link>
             <Link
               rounded="100%"
@@ -67,7 +68,7 @@ export function Footer() {
               display="flex"
               justifyContent="center"
               alignItems="center"
-              href="/"
+              href={env.public.UTXO_STACK_MEDIUM_URL}
               target="_blank"
               transition="200ms"
               _hover={{
@@ -75,7 +76,7 @@ export function Footer() {
                 borderColor: 'brand',
               }}
             >
-              <MIcon w="32px" h="32px" />
+              <MediumIcon w="32px" h="32px" />
             </Link>
           </HStack>
         </Grid>
@@ -83,10 +84,10 @@ export function Footer() {
           <VStack w="100%" gap="30px" alignItems="start">
             <Heading fontSize="18px">{t(i18n)`Explorer`}</Heading>
             <VStack w="100%" gap="16px" color="text.third" alignItems="start">
-              <Link href="/" _hover={{ textDecoration: 'underline' }}>
+              <Link href={env.public.MEMPOOL_URL} _hover={{ textDecoration: 'underline' }}>
                 {t(i18n)`Bitcoin`}
               </Link>
-              <Link href="/" _hover={{ textDecoration: 'underline' }}>
+              <Link href={env.public.CKB_EXPLORER_URL} _hover={{ textDecoration: 'underline' }}>
                 {t(i18n)`CKB`}
               </Link>
             </VStack>
@@ -94,13 +95,13 @@ export function Footer() {
           <VStack w="100%" gap="30px" alignItems="start">
             <Heading fontSize="18px">{t(i18n)`RGB++`}</Heading>
             <VStack w="100%" gap="16px" color="text.third" alignItems="start">
-              <Link href="/" _hover={{ textDecoration: 'underline' }}>
+              <Link href={env.public.RGBPP_WHITE_PAPER_URL} _hover={{ textDecoration: 'underline' }}>
                 {t(i18n)`Whitepaper`}
               </Link>
-              <Link href="/" _hover={{ textDecoration: 'underline' }}>
+              <Link href={env.public.RGBPP_SCRIPT_URL} _hover={{ textDecoration: 'underline' }}>
                 {t(i18n)`Script`}
               </Link>
-              <Link href="/" _hover={{ textDecoration: 'underline' }}>
+              <Link href={env.public.RGBPP_SDK_URL} _hover={{ textDecoration: 'underline' }}>
                 {t(i18n)`SDK`}
               </Link>
             </VStack>
@@ -108,10 +109,10 @@ export function Footer() {
           <VStack w="100%" gap="30px" alignItems="start">
             <Heading fontSize="18px">{t(i18n)`More Info`}</Heading>
             <VStack w="100%" gap="16px" color="text.third" alignItems="start">
-              <Link href="/" _hover={{ textDecoration: 'underline' }}>
+              <Link href={env.public.CKB_URL} _hover={{ textDecoration: 'underline' }}>
                 {t(i18n)`Nervos CKB`}
               </Link>
-              <Link href="/" _hover={{ textDecoration: 'underline' }}>
+              <Link href={env.public.UTXO_STACK_URL} _hover={{ textDecoration: 'underline' }}>
                 {t(i18n)`UTXO Stack`}
               </Link>
             </VStack>

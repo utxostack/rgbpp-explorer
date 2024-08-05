@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { Axios } from 'axios';
 import { Env } from 'src/env';
@@ -20,7 +20,15 @@ import {
   XUDTTag,
   Statistics,
   TransactionFeesStatistic,
+  TransactionListSortType,
 } from './ckb-explorer.interface';
+import { ONE_HOUR_MS, ONE_MONTH_MS } from 'src/common/date';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import { toNumber } from 'lodash';
+import { Cacheable } from 'src/decorators/cacheable.decorator';
+import { CkbRpcWebsocketService } from '../ckb-rpc/ckb-rpc-websocket.service';
+import { BI } from '@ckb-lumos/bi';
+import { CKB_MIN_SAFE_CONFIRMATIONS } from 'src/constants';
 
 type BasePaginationParams = {
   page?: number;
@@ -47,6 +55,7 @@ type GetRgbppTransactionsParams = BasePaginationParams & {
 
 type GetXUDTListParams = BasePaginationParams & {
   symbol?: string;
+  sort?: TransactionListSortType;
   tags?: XUDTTag[];
 };
 
@@ -60,7 +69,11 @@ export class CkbExplorerService {
   private logger = new Logger(CkbExplorerService.name);
   private request: Axios;
 
-  constructor(private configService: ConfigService<Env>) {
+  constructor(
+    private configService: ConfigService<Env>,
+    private ckbRpcService: CkbRpcWebsocketService,
+    @Inject(CACHE_MANAGER) protected cacheManager: Cache,
+  ) {
     this.request = axios.create({
       baseURL: this.configService.get('CKB_EXPLORER_API_URL'),
       headers: {
@@ -72,6 +85,11 @@ export class CkbExplorerService {
       this.logger.debug(`${request.method?.toUpperCase()} ${request.url}`);
       return request;
     });
+  }
+
+  private async isSafeConfirmations(blockNumber: string): Promise<boolean> {
+    const tipBlockNumber = await this.ckbRpcService.getTipBlockNumber();
+    return BI.from(blockNumber).gt(BI.from(tipBlockNumber).add(CKB_MIN_SAFE_CONFIRMATIONS));
   }
 
   // https://github.com/nervosnetwork/ckb-explorer-frontend/blob/b9dd537f836e8c827f1d4741e07c84484170d671/src/pages/Address/AddressPage.tsx#L50-L54
@@ -116,11 +134,26 @@ export class CkbExplorerService {
     return response.data;
   }
 
+  @Cacheable({
+    namespace: 'CkbExplorerService',
+    key: (heightOrHash: string) => `getBlock:${heightOrHash}`,
+    ttl: ONE_MONTH_MS,
+    shouldCache: async (block: NonPaginatedResponse<Block>, that: CkbExplorerService) => {
+      const { number } = block.data.attributes;
+      return that.isSafeConfirmations(number);
+    },
+  })
   public async getBlock(heightOrHash: string): Promise<NonPaginatedResponse<Block>> {
     const response = await this.request.get(`/v1/blocks/${heightOrHash}`);
     return response.data;
   }
 
+  @Cacheable({
+    namespace: 'CkbExplorerService',
+    key: (heightOrHash: string, { page = 1, pageSize = 10 }: BasePaginationParams = {}) =>
+      `getBlockTransactions:${heightOrHash},${page},${pageSize}`,
+    ttl: ONE_MONTH_MS,
+  })
   public async getBlockTransactions(
     blockHash: string,
     { page = 1, pageSize = 10 }: BasePaginationParams = {},
@@ -171,11 +204,26 @@ export class CkbExplorerService {
     return response.data;
   }
 
+  @Cacheable({
+    namespace: 'CkbExplorerService',
+    key: (txHash: string) => `getTransaction:${txHash}`,
+    ttl: ONE_MONTH_MS,
+    shouldCache: async (tx: NonPaginatedResponse<DetailTransaction>, that: CkbExplorerService) => {
+      const { tx_status, block_number } = tx.data.attributes;
+      const isSafeConfirmations = await that.isSafeConfirmations(block_number);
+      return tx_status === 'committed' && isSafeConfirmations;
+    },
+  })
   public async getTransaction(txHash: string): Promise<NonPaginatedResponse<DetailTransaction>> {
     const response = await this.request.get(`/v1/transactions/${txHash}`);
     return response.data;
   }
 
+  @Cacheable({
+    namespace: 'CkbExplorerService',
+    key: (txHash: string) => `getRgbppDigest:${txHash}`,
+    ttl: ONE_MONTH_MS,
+  })
   public async getRgbppDigest(txHash: string): Promise<CkbExplorerResponse<RgbppDigest>> {
     const response = await this.request.get(`/v2/ckb_transactions/${txHash}/rgb_digest`);
     return response.data;
@@ -184,6 +232,7 @@ export class CkbExplorerService {
   public async getXUDTList({
     symbol,
     tags,
+    sort,
     page = 1,
     pageSize = 10,
   }: GetXUDTListParams): Promise<PaginatedResponse<XUDT>> {
@@ -195,6 +244,9 @@ export class CkbExplorerService {
     }
     if (tags) {
       params.append('tags', tags.join(','));
+    }
+    if (sort) {
+      params.append('sort', sort);
     }
     const response = await this.request.get(`/v1/xudts?${params.toString()}`);
     return response.data;

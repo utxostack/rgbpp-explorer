@@ -13,10 +13,10 @@ export class BitcoinOutputStatus {
   spent: boolean;
 
   @Field(() => String, { nullable: true })
-  txid: string;
+  txid: string | null;
 
   @Field(() => Float, { nullable: true })
-  vin: number;
+  vin: number | null;
 
   public static from(outSpend: BitcoinApi.OutSpend): BitcoinOutputStatus {
     return {
@@ -47,13 +47,13 @@ export class BitcoinOutput {
   scriptpubkeyType: string;
 
   @Field(() => String, { nullable: true })
-  scriptpubkeyAddress: string;
+  scriptpubkeyAddress: string | null;
 
   @Field(() => Float)
   value: number;
 
   @Field(() => BitcoinAddress, { nullable: true })
-  address: BitcoinBaseAddress;
+  address: BitcoinBaseAddress | null;
 
   @Field(() => BitcoinOutputStatus)
   status: BitcoinOutputStatus;
@@ -65,7 +65,7 @@ export class BitcoinOutput {
       scriptpubkey: output.scriptpubkey,
       scriptpubkeyAsm: output.scriptpubkey_asm,
       scriptpubkeyType: output.scriptpubkey_type,
-      scriptpubkeyAddress: output.scriptpubkey_address,
+      scriptpubkeyAddress: output.scriptpubkey_address ?? null,
       value: output.value,
       address: output.scriptpubkey_address
         ? BitcoinAddress.from(output.scriptpubkey_address)

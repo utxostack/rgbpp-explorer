@@ -5,7 +5,10 @@ import { BitcoinBaseTransaction, BitcoinTransaction } from '../transaction/trans
 import { BitcoinAddress, BitcoinBaseAddress } from '../address/address.model';
 import { BitcoinBaseBlock, BitcoinBlock, FeeRateRange } from './block.model';
 import { BitcoinBlockLoader, BitcoinBlockLoaderType } from './dataloader/block.loader';
-import { BitcoinBlockTransactionsLoader, BitcoinBlockTransactionsLoaderType } from './dataloader/block-transactions.loader';
+import {
+  BitcoinBlockTransactionsLoader,
+  BitcoinBlockTransactionsLoaderType,
+} from './dataloader/block-transactions.loader';
 
 @Resolver(() => BitcoinBlock)
 export class BitcoinBlockResolver {
@@ -23,75 +26,64 @@ export class BitcoinBlockResolver {
     return BitcoinBlock.from(block);
   }
 
-  @ResolveField(() => BitcoinAddress)
+  @ResolveField(() => BitcoinAddress, { nullable: true })
   public async miner(
     @Parent() block: BitcoinBaseBlock,
     @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
-  ): Promise<BitcoinBaseAddress> {
+  ): Promise<BitcoinBaseAddress | null> {
     // XXX: only the "mempool" mode returns the "extra" field
     const detail = await blockLoader.load(block.id);
-    if (detail.extras) {
-      return {
-        address: detail.extras.coinbaseAddress,
-      };
-    } else {
-      this.logger.error('"miner" cannot be resolved in "electrs" mode');
+    if (!detail || !detail.extras?.coinbaseAddress) {
       return null;
     }
+    return {
+      address: detail.extras.coinbaseAddress,
+    };
   }
 
-  @ResolveField(() => Float)
+  @ResolveField(() => Float, { nullable: true })
   public async reward(
     @Parent() block: BitcoinBaseBlock,
     @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
-  ): Promise<number> {
+  ): Promise<number | null> {
     // XXX: only the "mempool" mode returns the "extra" field
     const detail = await blockLoader.load(block.id);
-    if (detail.extras) {
-      return detail.extras.reward;
-    } else {
-      this.logger.error('"reward" cannot be resolved in "electrs" mode');
-      return 0;
+    if (!detail || !detail.extras?.reward) {
+      return null;
     }
+    return detail.extras.reward;
   }
 
-  @ResolveField(() => Float)
+  @ResolveField(() => Float, { nullable: true })
   public async totalFee(
     @Parent() block: BitcoinBaseBlock,
     @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
-  ): Promise<number> {
+  ): Promise<number | null> {
     // XXX: only the "mempool" mode returns the "extra" field
     const detail = await blockLoader.load(block.id);
-    if (detail.extras) {
-      return detail.extras.totalFees;
-    } else {
-      this.logger.error('"totalFee" cannot be resolved in "electrs" mode');
-      return 0;
+    if (!detail || !detail.extras?.totalFees) {
+      return null;
     }
+    return detail.extras.totalFees;
   }
 
-  @ResolveField(() => FeeRateRange)
+  @ResolveField(() => FeeRateRange, { nullable: true })
   public async feeRateRange(
     @Parent() block: BitcoinBaseBlock,
     @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
-  ): Promise<FeeRateRange> {
+  ): Promise<FeeRateRange | null> {
     // XXX: only the "mempool" mode returns the "extra" field
     const detail = await blockLoader.load(block.id);
-    if (detail.extras) {
-      return {
-        min: detail.extras.feeRange[0],
-        max: detail.extras.feeRange[detail.extras.feeRange.length - 1],
-      };
-    } else {
-      this.logger.error('"feeRateRange" cannot be resolved in "electrs" mode');
-      return {
-        min: 0,
-        max: 0,
-      };
+    if (!detail || !detail.extras?.feeRange) {
+      return null;
     }
+    return {
+      min: detail.extras.feeRange[0],
+      max: detail.extras.feeRange[detail.extras.feeRange.length - 1],
+    };
   }
 
-  @ResolveField(() => [BitcoinTransaction])
+  @ResolveField(() => [BitcoinTransaction], { nullable: true })
   public async transactions(
     @Parent() block: BitcoinBaseBlock,
     @Loader(BitcoinBlockTransactionsLoader) blockTxsLoader: BitcoinBlockTransactionsLoaderType,
@@ -100,11 +92,14 @@ export class BitcoinBlockResolver {
       description: 'For pagination, must be a multiplication of 25',
     })
     startIndex?: number,
-  ): Promise<BitcoinBaseTransaction[]> {
+  ): Promise<BitcoinBaseTransaction[] | null> {
     const txs = await blockTxsLoader.load({
       hash: block.id,
       startIndex,
     });
+    if (!txs) {
+      return null;
+    }
     return txs.map((tx) => BitcoinTransaction.from(tx));
   }
 }

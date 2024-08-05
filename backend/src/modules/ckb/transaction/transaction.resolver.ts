@@ -6,17 +6,92 @@ import { CkbRpcBlockLoader, CkbRpcBlockLoaderType } from '../block/block.dataloa
 import { CkbBaseBlock, CkbBlock } from '../block/block.model';
 import { CkbBaseCell, CkbCell } from '../cell/cell.model';
 import { CkbTransactionService } from './transaction.service';
-import { CkbTransaction, CkbBaseTransaction } from './transaction.model';
+import { CkbTransaction, CkbBaseTransaction, CkbSearchKeyInput } from './transaction.model';
 import {
   CkbRpcTransactionLoader,
   CkbRpcTransactionLoaderType,
   CkbExplorerTransactionLoader,
   CkbExplorerTransactionLoaderType,
 } from './transaction.dataloader';
+import { BadRequestException, Logger } from '@nestjs/common';
+import { CellType } from '../script/script.model';
+import { CkbScriptService } from '../script/script.service';
+import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
+import { OrderType } from 'src/modules/api.model';
+import { BaseScriptService } from '../script/base/base-script.service';
 
 @Resolver(() => CkbTransaction)
 export class CkbTransactionResolver {
-  constructor(private ckbTransactionService: CkbTransactionService) {}
+  private logger = new Logger(CkbTransactionResolver.name);
+
+  constructor(
+    private ckbTransactionService: CkbTransactionService,
+    private ckbScriptService: CkbScriptService,
+    @InjectSentry() private sentryService: SentryService,
+  ) {}
+
+  @Query(() => [CkbTransaction], { name: 'ckbTransactions' })
+  public async getTransactions(
+    @Args('types', { type: () => [CellType], nullable: true }) types: CellType[] | null,
+    @Args('scriptKey', { type: () => CkbSearchKeyInput, nullable: true })
+    scriptKey: CkbSearchKeyInput | null,
+    @Args('limit', { type: () => Float, nullable: true }) limit: number = 10,
+    @Args('order', { type: () => OrderType, nullable: true }) order: OrderType = OrderType.Desc,
+    @Args('after', { type: () => String, nullable: true }) after: string | null,
+  ): Promise<CkbBaseTransaction[]> {
+    if (types && scriptKey) {
+      throw new BadRequestException('Only one of types and scriptKey can be provided');
+    }
+
+    if (types) {
+      const txs = await Promise.allSettled(
+        types.map(async (cellType) => {
+          const service = this.ckbScriptService.getServiceByCellType(cellType);
+          const txs = await service.getTransactions(limit, order, after || undefined);
+          return txs;
+        }),
+      );
+      txs.forEach((tx) => {
+        if (tx.status === 'rejected') {
+          this.logger.error(tx.reason);
+          this.sentryService.instance().captureException(tx.reason);
+        }
+      });
+
+      const orderedTxHashes = txs
+        .map((tx) => (tx.status === 'fulfilled' ? tx.value.map((t) => t) : []))
+        .flat()
+        .sort((a, b) => BaseScriptService.sortTransactionCmp(a, b, order))
+        .slice(0, limit)
+        .map((tx) => tx.tx_hash);
+
+      const orderedTxs = await Promise.all(
+        orderedTxHashes.map(async (txHash) => {
+          const tx = await this.ckbTransactionService.getTransactionFromRpc(txHash);
+          return CkbTransaction.from(tx);
+        }),
+      );
+      return orderedTxs.filter((tx) => !!tx);
+    }
+
+    if (scriptKey) {
+      const result = await this.ckbTransactionService.getTransactions(
+        scriptKey,
+        order,
+        limit,
+        after || undefined,
+      );
+      const txs = await Promise.all(
+        result.objects.map(async (tx) => {
+          const txWithStatus = await this.ckbTransactionService.getTransactionFromRpc(tx.tx_hash);
+          return CkbTransaction.from(txWithStatus);
+        }),
+      );
+      return txs.filter((tx) => !!tx);
+    }
+
+    throw new BadRequestException('One of types and scriptKey must be provided');
+  }
 
   @Query(() => CkbTransaction, { name: 'ckbTransaction', nullable: true })
   public async getTransaction(
@@ -30,12 +105,15 @@ export class CkbTransactionResolver {
     return CkbTransaction.from(tx);
   }
 
-  @ResolveField(() => [CkbCell])
+  @ResolveField(() => [CkbCell], { nullable: true })
   public async inputs(
     @Parent() tx: CkbBaseTransaction,
     @Loader(CkbRpcTransactionLoader) rpcTxLoader: CkbRpcTransactionLoaderType,
-  ): Promise<CkbBaseCell[]> {
+  ): Promise<(CkbBaseCell | null)[] | null> {
     const rpcTx = await rpcTxLoader.load(tx.hash);
+    if (!rpcTx) {
+      return null;
+    }
     return Promise.all(
       rpcTx.transaction.inputs
         // Filter out cellbase transaction
@@ -43,36 +121,48 @@ export class CkbTransactionResolver {
         .map(async (_, i) => {
           const input = rpcTx.transaction.inputs[i];
           const previousTx = await rpcTxLoader.load(input.previous_output.tx_hash);
+          if (!previousTx) {
+            return null;
+          }
           const index = BI.from(input.previous_output.index).toNumber();
-          return CkbCell.from(previousTx.transaction, index);
+          return CkbCell.fromTransaction(previousTx.transaction, index);
         }),
     );
   }
 
-  @ResolveField(() => CkbBlock)
+  @ResolveField(() => CkbBlock, { nullable: true })
   public async block(
     @Parent() tx: CkbBaseTransaction,
     @Loader(CkbRpcBlockLoader) rpcBlockLoader: CkbRpcBlockLoaderType,
-  ): Promise<CkbBaseBlock> {
+  ): Promise<CkbBaseBlock | null> {
     const block = await rpcBlockLoader.load(tx.blockNumber.toString());
+    if (!block) {
+      return null;
+    }
     return CkbBlock.from(block);
   }
 
-  @ResolveField(() => Float)
+  @ResolveField(() => Float, { nullable: true })
   public async fee(
     @Parent() tx: CkbBaseTransaction,
     @Loader(CkbExplorerTransactionLoader) explorerTxLoader: CkbExplorerTransactionLoaderType,
-  ): Promise<number> {
+  ): Promise<number | null> {
     const explorerTx = await explorerTxLoader.load(tx.hash);
+    if (!explorerTx) {
+      return null;
+    }
     return toNumber(explorerTx.transaction_fee);
   }
 
-  @ResolveField(() => Float)
+  @ResolveField(() => Float, { nullable: true })
   public async feeRate(
     @Parent() tx: CkbBaseTransaction,
     @Loader(CkbExplorerTransactionLoader) explorerTxLoader: CkbExplorerTransactionLoaderType,
-  ): Promise<number> {
+  ): Promise<number | null> {
     const explorerTx = await explorerTxLoader.load(tx.hash);
+    if (!explorerTx) {
+      return null;
+    }
     const fee = BI.from(explorerTx.transaction_fee);
     const size = BI.from(tx.size);
     const ratio = BI.from(1000);

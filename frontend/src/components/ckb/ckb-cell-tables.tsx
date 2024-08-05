@@ -76,13 +76,21 @@ function Cell({ cell }: { cell: CkbCell }) {
           </Link>
         </Copier>
       </HStack>
-      <VStack gap={0}>
+      <VStack gap={0} alignItems="flex-end">
         <Box>
           {formatNumber(shannonToCKB(cell.capacity))}{' '}
           <Text as="span" fontSize="12px" color="text.third">
             <Trans>CKB</Trans>
           </Text>
         </Box>
+        {cell.xudtInfo ? (
+          <Box>
+            {formatNumber(cell.xudtInfo.amount, cell.xudtInfo.decimal)}{' '}
+            <Text as="span" fontSize="12px" color="text.third">
+              {cell.xudtInfo.symbol}
+            </Text>
+          </Box>
+        ) : null}
       </VStack>
     </Flex>
   )

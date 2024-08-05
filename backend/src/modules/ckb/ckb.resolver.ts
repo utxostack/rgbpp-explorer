@@ -9,7 +9,7 @@ export class CkbResolver {
   constructor(
     private ckbRpcService: CkbRpcWebsocketService,
     private ckbExplorerService: CkbExplorerService,
-  ) { }
+  ) {}
 
   @Query(() => CkbChainInfo, { name: 'ckbChainInfo' })
   public async chainInfo(): Promise<CkbBaseChainInfo> {
