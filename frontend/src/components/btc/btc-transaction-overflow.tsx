@@ -1,4 +1,5 @@
 import { t } from '@lingui/macro'
+import { Grid, HStack, VStack } from 'styled-system/jsx'
 
 import { BtcTransaction } from '@/apis/types/explorer-graphql'
 import OverflowSVG from '@/assets/overview.svg'
@@ -7,8 +8,6 @@ import { Heading, Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { formatNumber } from '@/lib/string/format-number'
-
-import { Grid, HStack, VStack } from 'styled-system/jsx'
 
 export function BtcTransactionOverflow({ btcTransaction }: { btcTransaction: BtcTransaction }) {
   const i18n = getI18nFromHeaders()

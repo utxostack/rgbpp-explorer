@@ -1,4 +1,5 @@
 import { t } from '@lingui/macro'
+import { Grid, HStack, VStack } from 'styled-system/jsx'
 
 import { CkbAddress } from '@/apis/types/explorer-graphql'
 import OverflowSVG from '@/assets/overview.svg'
@@ -6,8 +7,6 @@ import { Heading, Text } from '@/components/ui'
 import { shannonToCKB } from '@/lib/ckb/shannon-to-ckb'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { formatNumber } from '@/lib/string/format-number'
-
-import { Grid, HStack, VStack } from 'styled-system/jsx'
 
 export function CkbAddressOverflow({ ckbAddress }: { ckbAddress: CkbAddress }) {
   const i18n = getI18nFromHeaders()

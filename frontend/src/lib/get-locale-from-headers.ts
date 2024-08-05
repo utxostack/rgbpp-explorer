@@ -1,6 +1,5 @@
-import { headers } from 'next/headers'
-
 import linguiConfig from 'lingui.config.mjs'
+import { headers } from 'next/headers'
 
 export function getLocaleFromHeaders() {
   const headersList = headers()

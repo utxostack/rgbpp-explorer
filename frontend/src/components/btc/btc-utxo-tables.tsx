@@ -1,6 +1,7 @@
 'use client'
 
 import { Trans } from '@lingui/macro'
+import { Box, Flex, Grid, HStack, VStack } from 'styled-system/jsx'
 
 import { ScriptpubkeyType, Vin, Vout } from '@/apis/types/explorer-graphql'
 import SubTractIcon from '@/assets/subtract.svg'
@@ -10,8 +11,6 @@ import Link from '@/components/ui/link'
 import { satsToBtc } from '@/lib/btc/sats-to-btc'
 import { formatNumber } from '@/lib/string/format-number'
 import { truncateMiddle } from '@/lib/string/truncate-middle'
-
-import { Box, Flex, Grid, HStack, VStack } from 'styled-system/jsx'
 
 export interface BtcUtxoTablesProps {
   vin?: Vin[]

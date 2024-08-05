@@ -1,4 +1,5 @@
 import { t } from '@lingui/macro'
+import { Flex, HStack, VStack } from 'styled-system/jsx'
 
 import { CkbTransaction } from '@/apis/types/explorer-graphql'
 import CkbIcon from '@/assets/chains/ckb.svg'
@@ -7,8 +8,6 @@ import { Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { ViewCkbExplorer } from '@/components/view-ckb-explorer'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
-
-import { Flex, HStack, VStack } from 'styled-system/jsx'
 
 export function CkbCells({
   ckbTransaction,
