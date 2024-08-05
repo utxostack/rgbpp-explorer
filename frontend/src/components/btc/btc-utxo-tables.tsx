@@ -11,7 +11,7 @@ import { satsToBtc } from '@/lib/btc/sats-to-btc'
 import { formatNumber } from '@/lib/string/format-number'
 import { truncateMiddle } from '@/lib/string/truncate-middle'
 
-import { Box, Flex, Grid, HStack, VStack } from '../../../styled-system/jsx'
+import { Box, Flex, Grid, HStack, VStack } from 'styled-system/jsx'
 
 export interface BtcUtxoTablesProps {
   vin?: Vin[]

@@ -4,8 +4,10 @@ import { Grid, HStack, VStack } from 'styled-system/jsx'
 
 import { BtcBlock } from '@/apis/types/explorer-graphql'
 import OverflowSVG from '@/assets/overview.svg'
+import { TextOverflowTooltip } from '@/components/text-overflow-tooltip'
 import { TimeFormatter } from '@/components/time-formatter'
-import { Heading, Text } from '@/components/ui'
+import { Heading, Text, Tooltip } from '@/components/ui'
+import Link from '@/components/ui/link'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { formatNumber } from '@/lib/string/format-number'
 import { truncateMiddle } from '@/lib/string/truncate-middle'
@@ -23,7 +25,7 @@ export function BtcBlockOverflow({
         <Heading fontSize="16px" fontWeight="semibold">{t(i18n)`Overflow`}</Heading>
         {block.timestamp ? <TimeFormatter timestamp={block.timestamp} /> : null}
       </HStack>
-      <Grid w="100%" gridTemplateColumns="repeat(2, 1fr)" gap="30px" pt="20px" pb="30px" px="30px">
+      <Grid w="100%" gridTemplateColumns="repeat(2, 1fr)" gap="30px" pt="20px" pb="30px" px="30px" textAlign="center">
         <Grid
           gridTemplateColumns="repeat(2, 1fr)"
           px="20px"
@@ -58,20 +60,55 @@ export function BtcBlockOverflow({
         >
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Fee rate span`}</Text>
-            <Text whiteSpace="nowrap" maxW="250px" truncate>
-              {formatNumber(block.feeRateRange.min)}
-              <Text as="span" color="12px">
-                {t(i18n)`sats/VB`}
+            <TextOverflowTooltip
+              label={
+                <Text whiteSpace="nowrap">
+                  {formatNumber(block.feeRateRange.min)}
+                  <Text as="span" color="12px">
+                    {t(i18n)`sats/VB`}
+                  </Text>
+                  ~ {formatNumber(BigNumber(block.feeRateRange.max))}{' '}
+                  <Text as="span" color="12px">
+                    {t(i18n)`sats/VB`}
+                  </Text>
+                </Text>
+              }
+            >
+              <Text whiteSpace="nowrap" maxW="250px" truncate>
+                {formatNumber(block.feeRateRange.min)}
+                <Text as="span" color="12px">
+                  {t(i18n)`sats/VB`}
+                </Text>
+                ~ {formatNumber(BigNumber(block.feeRateRange.max))}{' '}
+                <Text as="span" color="12px">
+                  {t(i18n)`sats/VB`}
+                </Text>
               </Text>
-              ~ {formatNumber(BigNumber(block.feeRateRange.max))}{' '}
-              <Text as="span" color="12px">
-                {t(i18n)`sats/VB`}
-              </Text>
-            </Text>
+            </TextOverflowTooltip>
           </VStack>
           <VStack gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Minter`}</Text>
-            <Text color="brand">{truncateMiddle(block.miner.address, 5, 5)}</Text>
+            <Tooltip.Root openDelay={0} closeDelay={0}>
+              <Tooltip.Trigger>
+                <Link
+                  href={`/address/${block.miner.address}`}
+                  color="brand"
+                  _hover={{
+                    textDecoration: 'underline',
+                  }}
+                >
+                  {truncateMiddle(block.miner.address, 5, 5)}
+                </Link>
+              </Tooltip.Trigger>
+              <Tooltip.Positioner>
+                <Tooltip.Arrow>
+                  <Tooltip.ArrowTip />
+                </Tooltip.Arrow>
+                <Tooltip.Content whiteSpace="nowrap" maxW="unset">
+                  {block.miner.address}
+                </Tooltip.Content>
+              </Tooltip.Positioner>
+            </Tooltip.Root>
           </VStack>
         </Grid>
       </Grid>

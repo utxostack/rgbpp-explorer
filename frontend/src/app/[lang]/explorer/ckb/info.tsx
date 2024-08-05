@@ -68,7 +68,7 @@ export async function Info() {
               </Text>
             </Text>
           </VStack>
-          <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
+          <VStack gap="15px">
             <HStack bg="success.a10" px="10px" rounded="4px" color="success" gap="4px" lineHeight="24px">
               <SpeedLowIcon w="20px" h="20px" />
               <Text fontSize="14px" fontWeight="semibold">{t(i18n)`Low`}</Text>

@@ -5,7 +5,7 @@ import { Trans } from '@lingui/macro'
 import ComingSoonSVG from '@/assets/coming-soon.svg'
 import { Text } from '@/components/ui'
 
-import { VStack } from '../../styled-system/jsx'
+import { VStack } from 'styled-system/jsx'
 
 export function ComingSoon() {
   return (

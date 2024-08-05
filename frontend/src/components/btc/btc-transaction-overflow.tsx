@@ -8,7 +8,7 @@ import Link from '@/components/ui/link'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { formatNumber } from '@/lib/string/format-number'
 
-import { Grid, HStack, VStack } from '../../../styled-system/jsx'
+import { Grid, HStack, VStack } from 'styled-system/jsx'
 
 export function BtcTransactionOverflow({ btcTransaction }: { btcTransaction: BtcTransaction }) {
   const i18n = getI18nFromHeaders()
@@ -19,7 +19,7 @@ export function BtcTransactionOverflow({ btcTransaction }: { btcTransaction: Btc
         <Heading fontSize="16px" fontWeight="semibold">{t(i18n)`Overflow`}</Heading>
         {btcTransaction.locktime ? <TimeFormatter timestamp={btcTransaction.locktime} /> : null}
       </HStack>
-      <Grid w="100%" gridTemplateColumns="repeat(2, 1fr)" gap="30px" pt="20px" pb="30px" px="30px">
+      <Grid w="100%" gridTemplateColumns="repeat(2, 1fr)" gap="30px" pt="20px" pb="30px" px="30px" textAlign="center">
         <Grid
           gridTemplateColumns="repeat(2, 1fr)"
           px="20px"

@@ -4,7 +4,7 @@ import { AgoTimeFormatter } from '@/components/ago-time-formatter'
 import { Text } from '@/components/ui'
 import { TIME_TEMPLATE } from '@/constants'
 
-import { HStack } from '../../styled-system/jsx'
+import { HStack } from 'styled-system/jsx'
 
 export function TimeFormatter({ timestamp }: { timestamp: number }) {
   return (

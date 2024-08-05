@@ -4,7 +4,7 @@ import type { PropsWithChildren } from 'react'
 import { LinkTabs } from '@/components/link-tabs'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 
-import { VStack } from '../../../../styled-system/jsx'
+import { VStack } from 'styled-system/jsx'
 
 export default function Layout({ children }: PropsWithChildren) {
   const i18n = getI18nFromHeaders()

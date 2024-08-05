@@ -41,13 +41,7 @@
     "no-constructor-return": "error",
     "no-plusplus": "error",
     "no-regex-spaces": "error",
-    "no-restricted-globals": [
-      "error",
-      "event",
-      "name",
-      "length",
-      "closed"
-    ],
+    "no-restricted-globals": ["error", "event", "name", "length", "closed"],
     "no-script-url": "error",
     "no-self-assign": "error",
     "no-self-compare": "error",
@@ -76,9 +70,7 @@
       "always",
       {
         "line": {
-          "markers": [
-            "/"
-          ]
+          "markers": ["/"]
         }
       }
     ],
@@ -109,16 +101,10 @@
       "warn",
       {
         "namedComponents": "function-declaration",
-        "unnamedComponents": [
-          "function-expression",
-          "arrow-function"
-        ]
+        "unnamedComponents": ["function-expression", "arrow-function"]
       }
     ],
-    "react/jsx-boolean-value": [
-      "error",
-      "never"
-    ],
+    "react/jsx-boolean-value": ["error", "never"],
     "react/self-closing-comp": [
       "error",
       {

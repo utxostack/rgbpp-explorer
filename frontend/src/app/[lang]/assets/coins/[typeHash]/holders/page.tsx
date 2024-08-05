@@ -4,7 +4,7 @@ import ComingSoonSVG from '@/assets/coming-soon.svg'
 import { Text } from '@/components/ui'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 
-import { VStack } from '../../../../../../../styled-system/jsx'
+import { VStack } from 'styled-system/jsx'
 
 export default function Page() {
   const i18n = getI18nFromHeaders()

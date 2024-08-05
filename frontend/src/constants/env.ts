@@ -22,6 +22,8 @@ const publicEnvSchema = z.object({
   UTXO_STACK_TWITTER_URL: z.string().default('https://x.com/utxostack'),
   CKB_CELL_GITHUB_URL: z.string().default('https://github.com/ckb-cell'),
   UTXO_STACK_MEDIUM_URL: z.string().default('https://medium.com/@utxostack'),
+  RGBPP_EXPLORER_TESTNET_URL: z.string().default('https://testnet.explorer.utxostack.network'),
+  RGBPP_EXPLORER_MAINNET_URL: z.string().default('https://explorer.utxostack.network'),
 })
 
 const sharedEnvSchema = z.object({

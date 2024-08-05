@@ -48,9 +48,9 @@ export default async function Layout({
           border="1px solid currentColor"
           ml="auto"
         >
-          6930{' '}
+          {'- '}
           <Text as="span" fontSize="14px" fontWeight="medium">
-            {t(i18n)`confirmations`}
+            {t(i18n)`Confirmations`}
           </Text>
         </Box>
       </HStack>

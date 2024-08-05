@@ -96,7 +96,7 @@ export function SearchBar(props: FlexProps) {
       <Flex w="100%" maxW="812px" h="64px" p="6px" bg="rgba(255, 255, 255, 0.9)" rounded="100px" {...props}>
         <styled.input
           flex={1}
-          placeholder={t(i18n)`Search by Address/Tx Hash/Block Hash`}
+          placeholder={t(i18n)`Search by Address/Tx Hash/Block Hash/AssetID`}
           pl="20px"
           color="bg.primary"
           fontWeight="medium"
@@ -132,11 +132,11 @@ export function SearchBarInNav(props: FlexProps) {
       <Flex bg="bg.input" h="44px" rounded="100px" w="500px" {...props}>
         <styled.input
           flex={1}
-          placeholder={t(i18n)`Search by Address/Tx Hash/Block Hash`}
+          placeholder={t(i18n)`Search by Address/Tx Hash/Block Hash/AssetID`}
+          fontSize="14px"
           pl="20px"
           color="text.primary"
           fontWeight="medium"
-          fontSize="md"
           _placeholder={{
             color: 'text.third',
           }}

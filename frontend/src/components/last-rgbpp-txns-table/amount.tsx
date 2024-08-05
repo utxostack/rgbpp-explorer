@@ -11,14 +11,24 @@ export function Amount({ ckbTransaction }: { ckbTransaction?: CkbTransaction }) 
 
   if (!ckbTransaction) return <Trans>-</Trans>
 
-  const dobInput =
-    ckbTransaction?.inputs.find((input) => input.cellType === CellType.DOB || input.cellType === CellType.MNFT) ||
-    ckbTransaction?.outputs.find((input) => input.cellType === CellType.DOB || input.cellType === CellType.MNFT)
-
-  if (dobInput) {
+  const dobInputCount = ckbTransaction?.inputs.filter(
+    (input) => input.cellType === CellType.DOB || input.cellType === CellType.MNFT,
+  )
+  if (dobInputCount?.length) {
     return (
       <Trans>
-        <b>1</b> DOB
+        <b>{dobInputCount.length}</b> DOB
+      </Trans>
+    )
+  }
+
+  const dobOutputCount = ckbTransaction?.outputs.filter(
+    (output) => output.cellType === CellType.DOB || output.cellType === CellType.MNFT,
+  )
+  if (dobOutputCount?.length) {
+    return (
+      <Trans>
+        <b>{dobOutputCount.length}</b> DOB
       </Trans>
     )
   }
