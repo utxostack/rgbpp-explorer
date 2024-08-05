@@ -106,8 +106,8 @@ msgstr "Block {0}"
 msgid "Block Height"
 msgstr "Block Height"
 
-#: src/components/btc/btc-block-overview.tsx:42
-#: src/components/ckb/ckb-block-overview.tsx:37
+#: src/components/btc/btc-block-overview.tsx:43
+#: src/components/ckb/ckb-block-overview.tsx:38
 msgid "Block size"
 msgstr "Block size"
 
@@ -127,16 +127,16 @@ msgstr "BTC Balance"
 msgid "BTC Txn"
 msgstr "BTC Txn"
 
-#: src/components/btc/btc-block-overview.tsx:46
+#: src/components/btc/btc-block-overview.tsx:47
 #: src/components/btc/btc-transaction-overview.tsx:46
-#: src/components/ckb/ckb-block-overview.tsx:41
+#: src/components/ckb/ckb-block-overview.tsx:42
 #: src/components/ckb/ckb-transaction-overview.tsx:46
 msgid "bytes"
 msgstr "bytes"
 
 #: src/app/[lang]/explorer/ckb/info.tsx:39
 #: src/components/ckb/ckb-address-overview.tsx:34
-#: src/components/ckb/ckb-block-overview.tsx:70
+#: src/components/ckb/ckb-block-overview.tsx:71
 #: src/components/ckb/ckb-cell-tables.tsx:83
 #: src/components/ckb/ckb-transaction-overview.tsx:65
 #: src/components/footer.tsx:91
@@ -245,7 +245,7 @@ msgstr "Fee"
 msgid "Fee rate"
 msgstr "Fee rate"
 
-#: src/components/btc/btc-block-overview.tsx:65
+#: src/components/btc/btc-block-overview.tsx:66
 msgid "Fee rate span"
 msgstr "Fee rate span"
 
@@ -346,12 +346,12 @@ msgstr "Mainnet"
 msgid "Medium"
 msgstr "Medium"
 
-#: src/components/btc/btc-block-overview.tsx:93
-#: src/components/ckb/ckb-block-overview.tsx:60
+#: src/components/btc/btc-block-overview.tsx:94
+#: src/components/ckb/ckb-block-overview.tsx:61
 msgid "Miner"
 msgstr "Miner"
 
-#: src/components/ckb/ckb-block-overview.tsx:66
+#: src/components/ckb/ckb-block-overview.tsx:67
 msgid "Miner Reward"
 msgstr "Miner Reward"
 
@@ -398,10 +398,10 @@ msgstr "Outputs ({0})"
 #~ msgstr "Overflow"
 
 #: src/components/btc/btc-address-overview.tsx:19
-#: src/components/btc/btc-block-overview.tsx:28
+#: src/components/btc/btc-block-overview.tsx:29
 #: src/components/btc/btc-transaction-overview.tsx:18
 #: src/components/ckb/ckb-address-overview.tsx:19
-#: src/components/ckb/ckb-block-overview.tsx:23
+#: src/components/ckb/ckb-block-overview.tsx:24
 #: src/components/ckb/ckb-transaction-overview.tsx:18
 msgid "Overview"
 msgstr "Overview"
@@ -462,10 +462,10 @@ msgstr "sats/kB"
 msgid "sats/vB"
 msgstr "sats/vB"
 
-#: src/components/btc/btc-block-overview.tsx:71
-#: src/components/btc/btc-block-overview.tsx:75
-#: src/components/btc/btc-block-overview.tsx:83
-#: src/components/btc/btc-block-overview.tsx:87
+#: src/components/btc/btc-block-overview.tsx:72
+#: src/components/btc/btc-block-overview.tsx:76
+#: src/components/btc/btc-block-overview.tsx:84
+#: src/components/btc/btc-block-overview.tsx:88
 msgid "sats/VB"
 msgstr "sats/VB"
 
@@ -546,8 +546,8 @@ msgstr "Time"
 msgid "Total {0} Items"
 msgstr "Total {0} Items"
 
-#: src/components/btc/btc-block-overview.tsx:51
-#: src/components/ckb/ckb-block-overview.tsx:46
+#: src/components/btc/btc-block-overview.tsx:52
+#: src/components/ckb/ckb-block-overview.tsx:47
 msgid "Transaction"
 msgstr "Transaction"
 

@@ -54,7 +54,7 @@ export function CkbAddressOverview({ ckbAddress }: { ckbAddress: CkbAddressBaseQ
         >
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Txns`}</Text>
-            <Text color="brand">{formatNumber(ckbAddress.transactionsCount ?? undefined)}</Text>
+            <Text>{formatNumber(ckbAddress.transactionsCount ?? undefined)}</Text>
           </VStack>
           <VStack gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`L2 RGB++ Assets`}</Text>

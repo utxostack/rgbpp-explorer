@@ -15,6 +15,7 @@ export function CkbBlockOverview({
 }: {
   block: Pick<CkbBlock, 'timestamp' | 'transactionsCount' | 'miner' | 'reward' | 'size' | 'confirmations'>
 }) {
+  if (!block) return null
   const i18n = getI18nFromHeaders()
   return (
     <VStack gap={0} w="100%" bg="bg.card" rounded="8px">
@@ -36,7 +37,7 @@ export function CkbBlockOverview({
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Block size`}</Text>
             <Text color="brand">
-              {formatNumber(block.size)}
+              {formatNumber(block.size ?? undefined)}
               <Text as="span" color="12px" ml="4px">
                 {t(i18n)`bytes`}
               </Text>

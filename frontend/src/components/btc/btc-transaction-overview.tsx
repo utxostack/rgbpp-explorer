@@ -35,7 +35,7 @@ export function BtcTransactionOverview({ btcTransaction }: { btcTransaction: Bit
               color="brand"
               _hover={{ textDecoration: 'underline' }}
             >
-              {formatNumber(btcTransaction.blockHeight)}
+              {formatNumber(btcTransaction?.blockHeight ?? undefined)}
             </Link>
           </VStack>
           <VStack gap="15px">

@@ -20,6 +20,7 @@ export function BtcBlockOverview({
     'timestamp' | 'size' | 'transactionsCount' | 'feeRateRange' | 'totalFee' | 'miner' | 'height'
   >
 }) {
+  if (!block) return null
   const i18n = getI18nFromHeaders()
   return (
     <VStack gap={0} w="100%" bg="bg.card" rounded="8px">

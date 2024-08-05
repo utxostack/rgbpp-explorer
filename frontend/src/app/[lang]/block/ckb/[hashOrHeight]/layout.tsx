@@ -71,7 +71,7 @@ export default async function Layout({
           border="1px solid currentColor"
           ml="auto"
         >
-          {formatNumber(data.ckbBlock.confirmations)}
+          {formatNumber(data.ckbBlock?.confirmations ?? undefined)}
           <Text as="span" fontSize="14px" fontWeight="medium" ml="4px">
             {t(i18n)`Confirmations`}
           </Text>
