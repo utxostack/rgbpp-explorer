@@ -124,9 +124,9 @@ export const OutSpend = z.discriminatedUnion('spent', [
     vin: z.number(),
     status: z.object({
       confirmed: z.boolean(),
-      block_height: z.number(),
-      block_hash: z.string(),
-      block_time: z.number(),
+      block_height: z.number().optional(),
+      block_hash: z.string().optional(),
+      block_time: z.number().optional(),
     }),
   }),
 ]);
