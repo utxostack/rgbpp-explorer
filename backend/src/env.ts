@@ -7,6 +7,17 @@ export const envSchema = z
     NETWORK: z.enum([NetworkType.mainnet, NetworkType.testnet]).default(NetworkType.testnet),
     ENABLED_GRAPHQL_PLAYGROUND: z.boolean().default(true),
 
+    /**
+     * CORS origin whitelist (split by comma)
+     */
+    CORS_WHITELIST: z
+      .string()
+      .default('')
+      .transform((value) => {
+        const origin = value.split(',');
+        return origin.map((host) => host.trim());
+      }),
+
     // DATABASE_URL: z.string(),
     REDIS_URL: z.string(),
 
