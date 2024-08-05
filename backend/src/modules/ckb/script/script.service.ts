@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ExtensibleUDTService } from './xudt.service';
 import { SimpleUDTService } from './sudt.service';
 import { DigitalObjectService } from './dob.service';
@@ -36,7 +36,7 @@ export class CkbScriptService {
       case CellType.MNFT:
         return this.mNFTService;
       default:
-        throw new Error(`Unsupported cell type: ${cellType}`);
+        throw new BadRequestException(`Unsupported cell type: ${cellType}`);
     }
   }
 
@@ -46,6 +46,6 @@ export class CkbScriptService {
         return service.type;
       }
     }
-    throw new Error(`Unsupported script: ${JSON.stringify(script)}`);
+    throw new BadRequestException(`Unsupported script: ${JSON.stringify(script)}`);
   }
 }

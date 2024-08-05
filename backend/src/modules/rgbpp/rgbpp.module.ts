@@ -17,6 +17,6 @@ import { RgbppService } from './rgbpp.service';
     RgbppStatisticModule,
   ],
   providers: [RgbppService],
-  exports: [RgbppService]
+  exports: [RgbppService],
 })
 export class RgbppModule {}

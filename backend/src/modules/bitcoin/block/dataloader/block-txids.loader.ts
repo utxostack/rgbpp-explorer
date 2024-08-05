@@ -15,7 +15,8 @@ export interface BitcoinBlockTxidsLoaderParams {
 @Injectable()
 export class BitcoinBlockTxidsLoader
   extends BitcoinBaseLoader
-  implements NestDataLoader<BitcoinBlockTxidsLoaderParams, string[] | null> {
+  implements NestDataLoader<BitcoinBlockTxidsLoaderParams, string[] | null>
+{
   protected logger = new Logger(BitcoinBlockTxidsLoader.name);
 
   constructor(

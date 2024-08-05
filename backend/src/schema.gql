@@ -303,7 +303,7 @@ type Query {
   btcAddress(address: String!): BitcoinAddress
   rgbppAddress(address: String!): RgbppAddress
   rgbppCoins(page: Int, pageSize: Int, sort: TransactionListSortType): RgbppCoinList!
-  rgbppCoin(typeHash: String!): RgbppCoin!
+  rgbppCoin(typeHash: String!): RgbppCoin
   rgbppStatistic: RgbppStatistic!
   search(query: String!): SearchResult!
 }

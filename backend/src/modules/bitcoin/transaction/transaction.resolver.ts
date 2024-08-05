@@ -16,7 +16,7 @@ import { BitcoinBlockLoader, BitcoinBlockLoaderType } from '../block/dataloader/
 
 @Resolver(() => BitcoinTransaction)
 export class BitcoinTransactionResolver {
-  constructor(private bitcoinApiService: BitcoinApiService) { }
+  constructor(private bitcoinApiService: BitcoinApiService) {}
 
   @Query(() => BitcoinTransaction, { name: 'btcTransaction', nullable: true })
   public async getTransaction(
@@ -47,7 +47,7 @@ export class BitcoinTransactionResolver {
     @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
   ): Promise<BitcoinBaseBlock | null> {
     if (!tx.blockHash) {
-      return null
+      return null;
     }
     const block = await blockLoader.load(tx.blockHash);
     if (!block) {

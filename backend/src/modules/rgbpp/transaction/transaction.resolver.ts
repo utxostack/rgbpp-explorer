@@ -25,7 +25,7 @@ import { RgbppTransactionLoader, RgbppTransactionLoaderType } from './transactio
 
 @Resolver(() => RgbppTransaction)
 export class RgbppTransactionResolver {
-  constructor(private transactionService: RgbppTransactionService) { }
+  constructor(private transactionService: RgbppTransactionService) {}
 
   @Query(() => RgbppLatestTransactionList, { name: 'rgbppLatestTransactions' })
   public async getLatestTransactions(

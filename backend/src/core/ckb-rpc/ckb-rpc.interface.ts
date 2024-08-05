@@ -1,5 +1,3 @@
-import { RPC } from '@ckb-lumos/rpc';
-
 export interface CellDep {
   dep_type: string;
   out_point: {

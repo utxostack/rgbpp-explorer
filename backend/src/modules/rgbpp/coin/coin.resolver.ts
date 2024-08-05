@@ -26,7 +26,9 @@ export class RgbppCoinResolver {
       sort,
       tags: [XUDTTag.RgbppCompatible],
     });
-    const coins = response.data.map((coin) => RgbppCoin.from(coin.attributes));
+    const coins = response.data
+      .map((coin) => RgbppCoin.from(coin.attributes))
+      .filter((coin) => coin !== null);
     return {
       coins,
       total: response.meta.total,
@@ -34,10 +36,10 @@ export class RgbppCoinResolver {
     };
   }
 
-  @Query(() => RgbppCoin, { name: 'rgbppCoin' })
+  @Query(() => RgbppCoin, { name: 'rgbppCoin', nullable: true })
   public async coin(
     @Args('typeHash', { type: () => String }) typeHash: string,
-  ): Promise<RgbppBaseCoin> {
+  ): Promise<RgbppBaseCoin | null> {
     const response = await this.ckbExplorerService.getXUDT(typeHash);
     return RgbppCoin.from(response.data.attributes);
   }
@@ -49,6 +51,9 @@ export class RgbppCoinResolver {
     @Args('pageSize', { type: () => Int, nullable: true }) pageSize: number = 10,
     @Loader(CkbExplorerXUDTTransactionsLoader) txsLoader: CkbExplorerXUDTTransactionsLoaderType,
   ): Promise<RgbppBaseTransaction[] | null> {
+    if (!coin.typeHash) {
+      return null;
+    }
     const transactions = await txsLoader.load({
       typeHash: coin.typeHash,
       page,
@@ -65,6 +70,9 @@ export class RgbppCoinResolver {
     @Parent() coin: RgbppBaseCoin,
     @Loader(CkbExplorerXUDTTransactionsLoader) txsLoader: CkbExplorerXUDTTransactionsLoaderType,
   ): Promise<number | null> {
+    if (!coin.typeHash) {
+      return null;
+    }
     const transactions = await txsLoader.load({
       typeHash: coin.typeHash,
       page: 1,

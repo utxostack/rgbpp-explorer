@@ -19,4 +19,4 @@ import { CkbRpcModule } from 'src/core/ckb-rpc/ckb-rpc.module';
   ],
   exports: [CkbScriptService],
 })
-export class CkbScriptModule { }
+export class CkbScriptModule {}

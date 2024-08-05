@@ -17,7 +17,7 @@ export class CkbCellResolver {
   constructor(
     private ckbCellService: CkbCellService,
     private ckbScriptService: CkbScriptService,
-  ) { }
+  ) {}
 
   @ResolveField(() => CkbXUDTInfo, { nullable: true })
   public async xudtInfo(

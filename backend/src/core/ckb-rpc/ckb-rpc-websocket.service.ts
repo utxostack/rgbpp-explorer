@@ -11,6 +11,8 @@ import {
   SearchKey,
   TransactionWithStatusResponse,
 } from './ckb-rpc.interface';
+import { Cacheable } from 'src/decorators/cacheable.decorator';
+import { ONE_MONTH_MS } from 'src/common/date';
 
 @Injectable()
 export class CkbRpcWebsocketService {
@@ -19,11 +21,26 @@ export class CkbRpcWebsocketService {
 
   constructor(private configService: ConfigService<Env>) {
     this.websocket = new RpcWebsocketsClient(this.configService.get('CKB_RPC_WEBSOCKET_URL'));
-    this.websocket.on('error', (error) => {
-      this.logger.error(error.message);
+
+    this.websocket.on('open', () => {
+      this.websocket.on('error', (error) => {
+        this.logger.error(error.message);
+      });
     });
   }
 
+  @Cacheable({
+    namespace: 'CkbRpcWebsocketService',
+    key: (txHash: string) => `getTransaction:${txHash}`,
+    ttl: ONE_MONTH_MS,
+    shouldCache: async (tx: TransactionWithStatusResponse, that: CkbRpcWebsocketService) => {
+      if (tx.tx_status.status !== 'committed') {
+        return false;
+      }
+      const block = await that.getTipBlockNumber();
+      return BI.from(tx.tx_status.block_number).lt(BI.from(block));
+    },
+  })
   public async getTransaction(txHash: string): Promise<TransactionWithStatusResponse> {
     this.logger.debug(`get_transaction - txHash: ${txHash}`);
     const tx = await this.websocket.call('get_transaction', [txHash]);
@@ -50,6 +67,12 @@ export class CkbRpcWebsocketService {
     return blockEconomicState as BlockEconomicState;
   }
 
+  @Cacheable({
+    namespace: 'CkbRpcWebsocketService',
+    key: 'getTipBlockNumber',
+    // just cache for 1 second to avoid too many requests
+    ttl: 1000,
+  })
   public async getTipBlockNumber(): Promise<number> {
     this.logger.debug('get_tip_block_number');
     const tipBlockNumber = await this.websocket.call('get_tip_block_number', []);

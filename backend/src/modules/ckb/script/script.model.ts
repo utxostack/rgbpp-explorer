@@ -37,7 +37,10 @@ export class CkbScript {
   @Field(() => String)
   args: string;
 
-  public static from(script: CkbRpc.Script): CkbScript {
+  public static from(script: CkbRpc.Script): CkbScript | null {
+    if (!script) {
+      return null;
+    }
     return {
       codeHash: script.code_hash,
       hashType: script.hash_type as HashType,

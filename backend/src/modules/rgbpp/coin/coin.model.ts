@@ -28,10 +28,10 @@ export class RgbppCoin {
   icon: string | null;
 
   @Field(() => String, { nullable: true })
-  typeHash: string;
+  typeHash: string | null;
 
   @Field(() => CkbScript, { nullable: true })
-  typeScript: CkbScript;
+  typeScript: CkbScript | null;
 
   @Field(() => Int)
   holdersCount: number;
@@ -54,11 +54,14 @@ export class RgbppCoin {
   @Field(() => Float, { nullable: true })
   transactionsCount: number;
 
-  public static from(xudt: CkbExplorer.XUDT): RgbppBaseCoin {
+  public static from(xudt: CkbExplorer.XUDT): RgbppBaseCoin | null {
+    if (!xudt) {
+      return null;
+    }
     return {
       name: xudt.full_name,
       description: xudt.description,
-      symbol: xudt.symbol,
+      symbol: xudt.symbol ?? xudt.type_hash.slice(0, 6),
       decimal: toNumber(xudt.decimal),
       icon: xudt.icon_file,
       typeHash: xudt.type_hash,
@@ -67,7 +70,7 @@ export class RgbppCoin {
       h24CkbTransactionsCount: toNumber(xudt.h24_ckb_transactions_count),
       totalAmount: toNumber(xudt.total_amount),
       issuer: xudt.issuer_address,
-      deployedAt: new Date(xudt.created_at),
+      deployedAt: new Date(toNumber(xudt.created_at)),
     };
   }
 }

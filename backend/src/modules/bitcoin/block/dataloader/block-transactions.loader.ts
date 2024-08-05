@@ -17,7 +17,8 @@ export interface BitcoinBlockTransactionsLoaderParams {
 @Injectable()
 export class BitcoinBlockTransactionsLoader
   extends BitcoinBaseLoader
-  implements NestDataLoader<BitcoinBlockTransactionsLoaderParams, BitcoinApi.Transaction[] | null> {
+  implements NestDataLoader<BitcoinBlockTransactionsLoaderParams, BitcoinApi.Transaction[] | null>
+{
   protected logger = new Logger(BitcoinBlockTransactionsLoader.name);
 
   constructor(

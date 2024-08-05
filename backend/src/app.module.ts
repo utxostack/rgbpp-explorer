@@ -22,8 +22,8 @@ import configModule from './config';
       useFactory: async (configService: ConfigService<Env>) => ({
         dsn: configService.get('SENTRY_DSN'),
         environment: configService.get('NODE_ENV'),
-        tracesSampleRate: 0.1,
-        profilesSampleRate: 0.1,
+        tracesSampleRate: 0.5,
+        profilesSampleRate: 0.5,
         integrations: [nodeProfilingIntegration()],
         logLevels:
           configService.get('NODE_ENV') === 'production'
