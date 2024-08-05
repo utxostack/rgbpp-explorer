@@ -2,7 +2,7 @@ import { t } from '@lingui/macro'
 import { Box, Center, Flex } from 'styled-system/jsx'
 
 import HomeBgSVG from '@/assets/home-bg.svg'
-import { HomeQuickInfo } from '@/components/home-quick-info'
+// import { HomeQuickInfo } from '@/components/home-quick-info'
 import { HomeTitle } from '@/components/home-title'
 import { LastRgbppTxnsTable } from '@/components/last-rgbpp-txns-table'
 import { NetworkCards } from '@/components/network-cards'
@@ -19,7 +19,7 @@ export default function Home() {
         <Flex w="100%" direction="column" pos="relative" aspectRatio={1440 / 1063}>
           <Flex w="100%" direction="column" textAlign="center" align="center" justify="start">
             <HomeTitle />
-            <HomeQuickInfo />
+            {/* <HomeQuickInfo />*/}
             <SearchBar mt="60px" />
           </Flex>
         </Flex>
