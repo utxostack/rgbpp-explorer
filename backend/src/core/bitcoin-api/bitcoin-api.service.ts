@@ -191,7 +191,7 @@ export class BitcoinApiService {
     shouldCache: (tx: Transaction) =>
       tx.status.confirmed &&
       !!tx.status.block_time &&
-      tx.status.block_time - Date.now() < ONE_HOUR_MS,
+      Date.now() - tx.status.block_time > ONE_HOUR_MS,
   })
   public async getTx({ txid }: { txid: string }) {
     return this.call('getTx', { txid });

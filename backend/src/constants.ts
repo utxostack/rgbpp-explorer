@@ -17,3 +17,5 @@ export const BtcTestnetTypeMap: Record<NetworkType.testnet | NetworkType.signet,
   [NetworkType.testnet]: 'Testnet3',
   [NetworkType.signet]: 'Signet',
 };
+
+export const CKB_MIN_SAFE_CONFIRMATIONS = 24;
