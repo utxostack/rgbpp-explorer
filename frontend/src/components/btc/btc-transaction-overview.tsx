@@ -60,8 +60,8 @@ export function BtcTransactionOverview({ btcTransaction }: { btcTransaction: Bit
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Fee`}</Text>
             <Text>
-              {formatNumber(btcTransaction.fee)}{' '}
-              <Text as="span" color="12px">
+              {formatNumber(btcTransaction.fee)}
+              <Text as="span" color="12px" ml="4px">
                 {t(i18n)`sats`}
               </Text>
             </Text>
@@ -69,8 +69,8 @@ export function BtcTransactionOverview({ btcTransaction }: { btcTransaction: Bit
           <VStack gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Fee rate`}</Text>
             <Text>
-              {btcTransaction.feeRate}{' '}
-              <Text as="span" color="12px">
+              {formatNumber(btcTransaction.feeRate)}
+              <Text as="span" color="12px" ml="4px">
                 {t(i18n)`sat/VB`}
               </Text>
             </Text>

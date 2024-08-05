@@ -24,6 +24,7 @@ const query = graphql(`
         locktime
         weight
         fee
+        feeRate
         confirmed
         vout {
           scriptpubkey
@@ -92,13 +93,28 @@ export default async function Page({ params: { hashOrHeight } }: { params: { has
               {transaction.locktime ? <TimeFormatter timestamp={transaction.locktime} /> : null}
             </Flex>
             <BtcUtxoTables vin={transaction.vin as BitcoinInput[]} vout={transaction.vout as BitcoinOutput[]} />
-            <Flex h="72px" px="30px" w="100%" alignItems="center" borderTop="1px solid" borderTopColor="border.primary">
+            <Flex
+              h="72px"
+              gap="32px"
+              px="30px"
+              w="100%"
+              alignItems="center"
+              borderTop="1px solid"
+              borderTopColor="border.primary"
+            >
               <Text as="span" fontSize="14px" color="text.third">
-                {t(i18n)`Txn fee: `}{' '}
-                <Text as="span" color="text.primary" fontWeight="semibold">
+                {t(i18n)`Txn fee: `}
+                <Text as="span" color="text.primary" fontWeight="semibold" ml="4px">
                   {formatNumber(transaction.fee)}{' '}
                 </Text>
                 {t(i18n)`sats`}
+              </Text>
+              <Text as="span" fontSize="14px" color="text.third">
+                {t(i18n)`Fee rate: `}
+                <Text as="span" color="text.primary" fontWeight="semibold" ml="4px">
+                  {formatNumber(transaction.feeRate)}{' '}
+                </Text>
+                {t(i18n)`sats/vB`}
               </Text>
             </Flex>
           </VStack>

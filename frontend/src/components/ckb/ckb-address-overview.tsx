@@ -35,11 +35,11 @@ export function CkbAddressOverview({ ckbAddress }: { ckbAddress: CkbAddressBaseQ
             </Text>
           </VStack>
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`Confirmed`}</Text>
+            <Text color="text.third" fontSize="14px">{t(i18n)`Available`}</Text>
             <Text color="text.third">{t(i18n)`Coming Soon`}</Text>
           </VStack>
           <VStack gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`Unconfirmed`}</Text>
+            <Text color="text.third" fontSize="14px">{t(i18n)`Occupied`}</Text>
             <Text color="text.third">{t(i18n)`Coming Soon`}</Text>
           </VStack>
         </Grid>
