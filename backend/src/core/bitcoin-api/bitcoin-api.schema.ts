@@ -114,19 +114,22 @@ export const Transaction = z.object({
 });
 export type Transaction = z.infer<typeof Transaction>;
 
-export const OutSpend = z.object({
-  spent: z.boolean(),
-  txid: z.string().optional(),
-  vin: z.number().optional(),
-  status: z
-    .object({
+export const OutSpend = z.discriminatedUnion('spent', [
+  z.object({
+    spent: z.literal(false),
+  }),
+  z.object({
+    spent: z.literal(true),
+    txid: z.string(),
+    vin: z.number(),
+    status: z.object({
       confirmed: z.boolean(),
-      block_height: z.number(),
-      block_hash: z.string(),
-      block_time: z.number(),
-    })
-    .optional(),
-});
+      block_height: z.number().optional(),
+      block_hash: z.string().optional(),
+      block_time: z.number().optional(),
+    }),
+  }),
+]);
 export type OutSpend = z.infer<typeof OutSpend>;
 
 export const RecommendedFees = z.object({
