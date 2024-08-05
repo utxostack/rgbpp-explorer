@@ -39,6 +39,8 @@
     "public/**",
     "src/locales/**",
     "styled-system",
-    "src/assets/**"
+    "src/assets/**",
+    "codegen.ts",
+    "src/gql/**"
   ]
 }

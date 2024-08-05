@@ -77,6 +77,10 @@ msgstr "Address"
 msgid "Amount"
 msgstr "Amount"
 
+#: src/components/ckb/ckb-address-overview.tsx:38
+msgid "Available"
+msgstr "Available"
+
 #: src/app/not-found.tsx:19
 msgid "Back to Home"
 msgstr "Back to Home"
@@ -189,7 +193,6 @@ msgid "Confirmations"
 msgstr "Confirmations"
 
 #: src/components/btc/btc-address-overview.tsx:38
-#: src/components/ckb/ckb-address-overview.tsx:38
 msgid "Confirmed"
 msgstr "Confirmed"
 
@@ -245,6 +248,10 @@ msgstr "Fee rate"
 #: src/components/btc/btc-block-overview.tsx:65
 msgid "Fee rate span"
 msgstr "Fee rate span"
+
+#: src/app/[lang]/block/btc/[hashOrHeight]/transactions/page.tsx:113
+msgid "Fee rate:"
+msgstr "Fee rate:"
 
 #: src/components/utxo-or-cell-footer.tsx:43
 msgid "Fee rate:<0>{0}</0>sats/vB"
@@ -364,6 +371,10 @@ msgstr "More Info"
 msgid "Nervos CKB"
 msgstr "Nervos CKB"
 
+#: src/components/ckb/ckb-address-overview.tsx:42
+msgid "Occupied"
+msgstr "Occupied"
+
 #: src/components/search-bar.tsx:47
 msgid "Oops! Your search did not match any record."
 msgstr "Oops! Your search did not match any record."
@@ -435,7 +446,7 @@ msgstr "RGB++ Txns"
 msgid "sat/VB"
 msgstr "sat/VB"
 
-#: src/app/[lang]/block/btc/[hashOrHeight]/transactions/page.tsx:101
+#: src/app/[lang]/block/btc/[hashOrHeight]/transactions/page.tsx:110
 #: src/components/btc/btc-transaction-overview.tsx:65
 msgid "sats"
 msgstr "sats"
@@ -446,6 +457,10 @@ msgstr "sats"
 #: src/app/[lang]/explorer/btc/info.tsx:113
 msgid "sats/kB"
 msgstr "sats/kB"
+
+#: src/app/[lang]/block/btc/[hashOrHeight]/transactions/page.tsx:117
+msgid "sats/vB"
+msgstr "sats/vB"
 
 #: src/components/btc/btc-block-overview.tsx:71
 #: src/components/btc/btc-block-overview.tsx:75
@@ -472,7 +487,7 @@ msgstr "SDK"
 msgid "Search by Address/Tx Hash/Block Hash/AssetID"
 msgstr "Search by Address/Tx Hash/Block Hash/AssetID"
 
-#: src/app/[lang]/block/ckb/[hashOrHeight]/transactions/page.tsx:104
+#: src/app/[lang]/block/ckb/[hashOrHeight]/transactions/page.tsx:108
 #: src/app/[lang]/explorer/ckb/info.tsx:73
 #: src/app/[lang]/explorer/ckb/info.tsx:85
 #: src/app/[lang]/explorer/ckb/info.tsx:97
@@ -518,8 +533,8 @@ msgid "The block {hashOrHeight} not found"
 msgstr "The block {hashOrHeight} not found"
 
 #: src/app/[lang]/transaction/[tx]/page.tsx:198
-msgid "The transaction \"{tx}\" not found"
-msgstr "The transaction \"{tx}\" not found"
+#~ msgid "The transaction \"{tx}\" not found"
+#~ msgstr "The transaction \"{tx}\" not found"
 
 #: src/app/[lang]/assets/coins/[typeHash]/transactions/page.tsx:170
 #: src/components/last-rgbpp-txns-table/index.tsx:139
@@ -554,8 +569,8 @@ msgstr "Try again"
 msgid "Tx hash"
 msgstr "Tx hash"
 
-#: src/app/[lang]/block/btc/[hashOrHeight]/transactions/page.tsx:97
-#: src/app/[lang]/block/ckb/[hashOrHeight]/transactions/page.tsx:100
+#: src/app/[lang]/block/btc/[hashOrHeight]/transactions/page.tsx:106
+#: src/app/[lang]/block/ckb/[hashOrHeight]/transactions/page.tsx:104
 msgid "Txn fee:"
 msgstr "Txn fee:"
 
@@ -582,7 +597,6 @@ msgid "Type"
 msgstr "Type"
 
 #: src/components/btc/btc-address-overview.tsx:47
-#: src/components/ckb/ckb-address-overview.tsx:42
 msgid "Unconfirmed"
 msgstr "Unconfirmed"
 
