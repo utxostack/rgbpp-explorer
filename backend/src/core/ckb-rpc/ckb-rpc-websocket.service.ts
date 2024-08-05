@@ -13,6 +13,7 @@ import {
 } from './ckb-rpc.interface';
 import { Cacheable } from 'src/decorators/cacheable.decorator';
 import { ONE_MONTH_MS } from 'src/common/date';
+import { CKB_MIN_SAFE_CONFIRMATIONS } from 'src/constants';
 
 @Injectable()
 export class CkbRpcWebsocketService {
@@ -29,16 +30,20 @@ export class CkbRpcWebsocketService {
     });
   }
 
+  private async isSafeConfirmations(blockNumber: string): Promise<boolean> {
+    const tipBlockNumber = await this.getTipBlockNumber();
+    return BI.from(blockNumber).gt(BI.from(tipBlockNumber).add(CKB_MIN_SAFE_CONFIRMATIONS));
+  }
+
   @Cacheable({
     namespace: 'CkbRpcWebsocketService',
     key: (txHash: string) => `getTransaction:${txHash}`,
     ttl: ONE_MONTH_MS,
     shouldCache: async (tx: TransactionWithStatusResponse, that: CkbRpcWebsocketService) => {
-      if (tx.tx_status.status !== 'committed') {
+      if (tx.tx_status.status !== 'committed' || !tx.tx_status.block_number) {
         return false;
       }
-      const block = await that.getTipBlockNumber();
-      return BI.from(tx.tx_status.block_number).lt(BI.from(block));
+      return that.isSafeConfirmations(tx.tx_status.block_number);
     },
   })
   public async getTransaction(txHash: string): Promise<TransactionWithStatusResponse> {
@@ -47,6 +52,15 @@ export class CkbRpcWebsocketService {
     return tx as TransactionWithStatusResponse;
   }
 
+  @Cacheable({
+    namespace: 'CkbRpcWebsocketService',
+    key: (blockHash: string) => `getBlock:${blockHash}`,
+    ttl: ONE_MONTH_MS,
+    shouldCache: async (block: Block, that: CkbRpcWebsocketService) => {
+      const { number } = block.header;
+      return that.isSafeConfirmations(number);
+    },
+  })
   public async getBlock(blockHash: string): Promise<Block> {
     this.logger.debug(`get_block - blockHash: ${blockHash}`);
     const block = await this.websocket.call('get_block', [blockHash]);
@@ -61,6 +75,11 @@ export class CkbRpcWebsocketService {
     return block as Block;
   }
 
+  @Cacheable({
+    namespace: 'CkbRpcWebsocketService',
+    key: (blockHash: string) => `getBlockEconomicState:${blockHash}`,
+    ttl: ONE_MONTH_MS,
+  })
   public async getBlockEconomicState(blockHash: string): Promise<BlockEconomicState> {
     this.logger.debug(`get_block_economic_state - blockHash: ${blockHash}`);
     const blockEconomicState = await this.websocket.call('get_block_economic_state', [blockHash]);
