@@ -13,7 +13,7 @@ registerEnumType(CkbExplorer.TransactionListSortType, {
 @ObjectType({ description: 'RGB++ Coin' })
 export class RgbppCoin {
   @Field(() => String, { nullable: true })
-  name: string;
+  name: string | null;
 
   @Field(() => String, { nullable: true })
   description: string | null;
@@ -49,10 +49,10 @@ export class RgbppCoin {
   deployedAt: Date;
 
   @Field(() => [RgbppTransaction], { nullable: true })
-  transactions: RgbppTransaction[];
+  transactions: RgbppTransaction[] | null;
 
   @Field(() => Float, { nullable: true })
-  transactionsCount: number;
+  transactionsCount: number | null;
 
   public static from(xudt: CkbExplorer.XUDT): RgbppBaseCoin | null {
     if (!xudt) {

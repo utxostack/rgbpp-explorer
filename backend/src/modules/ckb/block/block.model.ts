@@ -37,10 +37,10 @@ export class CkbBlock {
   @Field(() => [CkbTransaction])
   transactions: CkbTransaction[];
 
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true })
   size: number | null;
 
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true })
   confirmations: number | null;
 
   public static from(block: CkbRpc.Block): CkbBaseBlock {

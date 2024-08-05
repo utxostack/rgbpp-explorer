@@ -6,23 +6,23 @@ export class SearchResult {
   query: string;
 
   @Field(() => String, { nullable: true })
-  btcBlock: string;
+  btcBlock: string | null;
 
   @Field(() => String, { nullable: true })
-  btcTransaction: string;
+  btcTransaction: string | null;
 
   @Field(() => String, { nullable: true })
-  btcAddress: string;
+  btcAddress: string | null;
 
   @Field(() => String, { nullable: true })
-  ckbBlock: string;
+  ckbBlock: string | null;
 
   @Field(() => String, { nullable: true })
-  ckbTransaction: string;
+  ckbTransaction: string | null;
 
   @Field(() => String, { nullable: true })
-  ckbAddress: string;
+  ckbAddress: string | null;
 
   @Field(() => String, { nullable: true })
-  rgbppCoin: string;
+  rgbppCoin: string | null;
 }

@@ -26,10 +26,10 @@ export class CkbCellStatus {
   consumed: boolean;
 
   @Field(() => String, { nullable: true })
-  txHash: string;
+  txHash: string | null;
 
   @Field(() => Float, { nullable: true })
-  index: number;
+  index: number | null;
 }
 
 export type CkbBaseCell = Omit<CkbCell, 'xudtInfo' | 'status' | 'cellType'>;
@@ -52,13 +52,13 @@ export class CkbCell {
   lock: CkbScript;
 
   @Field(() => CkbXUDTInfo, { nullable: true })
-  xudtInfo: CkbXUDTInfo;
+  xudtInfo: CkbXUDTInfo | null;
 
   @Field(() => CkbCellStatus)
   status: CkbCellStatus;
 
   @Field(() => CellType, { nullable: true })
-  cellType: CellType;
+  cellType: CellType | null;
 
   public static fromTransaction(tx: CkbRpc.Transaction, index: number): CkbBaseCell {
     const output = tx.outputs[index];
