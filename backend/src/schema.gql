@@ -44,12 +44,20 @@ enum CellType {
   MNFT
 }
 
+"""CKB Address Balance"""
+type CkbAddressBalance {
+  total: String!
+  available: String!
+  occupied: String!
+}
+
 """CKB Address"""
 type CkbAddress {
   address: String!
   shannon: Float!
   transactionsCount: Float!
   transactions(page: Float, pageSize: Float): [CkbTransaction!]!
+  balance: CkbAddressBalance!
 }
 
 """CKB Block"""

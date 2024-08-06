@@ -261,7 +261,7 @@ export interface AddressInfo {
   bitcoin_address_hash?: string;
   lockHash: string;
   balance: string;
-  balanceOccupied: string;
+  balance_occupied: string;
   transactions_count: string;
   lock_script: Script;
   pending_reward_blocks_count: string;
