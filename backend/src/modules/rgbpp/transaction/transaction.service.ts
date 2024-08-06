@@ -96,7 +96,6 @@ export class RgbppTransactionService {
     } catch (err) {
       this.logger.error(err);
     }
-    console.log(tx);
     return tx;
   }
 
