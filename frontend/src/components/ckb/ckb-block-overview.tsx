@@ -2,12 +2,12 @@ import { t } from '@lingui/macro'
 import { Grid, HStack, VStack } from 'styled-system/jsx'
 
 import OverflowSVG from '@/assets/overview.svg'
+import { OverflowAmount } from '@/components/overflow-amount'
 import { TimeFormatter } from '@/components/time-formatter'
 import { Heading, Text, Tooltip } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { CkbBlock } from '@/gql/graphql'
 import { formatCkbAddress } from '@/lib/address/format-ckb-address'
-import { shannonToCKB } from '@/lib/ckb/shannon-to-ckb'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { formatNumber } from '@/lib/string/format-number'
 
@@ -38,10 +38,7 @@ export function CkbBlockOverview({
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Block size`}</Text>
             <Text>
-              {formatNumber(block.size ?? undefined)}
-              <Text as="span" color="12px" ml="8px">
-                {t(i18n)`bytes`}
-              </Text>
+              <OverflowAmount amount={formatNumber(block.size ?? undefined)} symbol={t(i18n)`bytes`} />
             </Text>
           </VStack>
           <VStack gap="15px">
@@ -85,10 +82,7 @@ export function CkbBlockOverview({
           <VStack gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Miner Reward`}</Text>
             <Text>
-              {formatNumber(shannonToCKB(block.reward))}
-              <Text as="span" fontSize="12px" ml="4px">
-                {t(i18n)`CKB`}
-              </Text>
+              <OverflowAmount amount={formatNumber(block.reward)} symbol={t(i18n)`CKB`} />
             </Text>
           </VStack>
         </Grid>

@@ -10,6 +10,7 @@ import { Heading, Text } from '@/components/ui'
 import { BitcoinTransaction, CkbTransaction, LeapDirection } from '@/gql/graphql'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { resolveLayerTypeFromRGBppTransaction } from '@/lib/resolve-layer-type-from-rgbpp-transaction'
+import { formatNumber } from '@/lib/string/format-number'
 
 export function BTCTransactionPage({
   btcTransaction,
@@ -43,8 +44,8 @@ export function BTCTransactionPage({
           border="1px solid currentColor"
           ml="auto"
         >
-          {btcTransaction.confirmations}{' '}
-          <Text as="span" fontSize="14px" fontWeight="medium">
+          {formatNumber(btcTransaction.confirmations)}
+          <Text as="span" fontSize="14px" fontWeight="medium" ml="4px">
             {t(i18n)`Confirmations`}
           </Text>
         </Box>

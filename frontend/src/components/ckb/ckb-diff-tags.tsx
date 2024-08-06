@@ -39,7 +39,7 @@ export const CkbDiffTags = memo(function CkbDiffTags({
       .reduce((acc, x) => acc.plus(x.xudtInfo?.amount || 0), BigNumber(0))
     const diff = BigNumber(xudtBalanceWithoutThisAddress).minus(BigNumber(balance))
     return !diff.isZero() ? (
-      <Flex align="center" bg="brand" py="8px" px="16px" rounded="4px">
+      <Flex align="center" py="8px" px="16px" rounded="4px" bg={diff.isGreaterThan(0) ? 'success' : 'danger'}>
         <Trans>
           {formatNumber(diff, xudt?.decimal)} {xudt?.symbol}
         </Trans>
@@ -60,7 +60,7 @@ export const CkbDiffTags = memo(function CkbDiffTags({
   return (
     <>
       {!ckbDiff.isZero() ? (
-        <Flex align="center" bg="brand" py="8px" px="16px" rounded="4px">
+        <Flex align="center" py="8px" px="16px" rounded="4px" bg={ckbDiff.isGreaterThan(0) ? 'success' : 'danger'}>
           <Trans>{formatNumber(ckbDiff)} CKB</Trans>
           <MoneyIcon w="16px" h="16px" ml="6px" />
         </Flex>

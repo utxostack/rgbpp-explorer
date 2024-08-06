@@ -59,7 +59,7 @@ export default async function Layout({
     }
   }
 
-  if (!overflow) throw new Error(t(i18n)`The address "${address}" not found`)
+  if (!overflow) notFound()
 
   return (
     <VStack w="100%" maxW="content" p="30px" gap="30px">
