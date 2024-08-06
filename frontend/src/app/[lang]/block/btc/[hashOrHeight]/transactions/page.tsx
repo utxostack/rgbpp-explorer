@@ -8,6 +8,7 @@ import { Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { graphql } from '@/gql'
 import { BitcoinInput, BitcoinOutput } from '@/gql/graphql'
+import { resolveBtcTime } from '@/lib/btc/resolve-btc-time'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { graphQLClient } from '@/lib/graphql'
 import { formatNumber } from '@/lib/string/format-number'
@@ -15,6 +16,7 @@ import { formatNumber } from '@/lib/string/format-number'
 const query = graphql(`
   query BtcBlockTransaction($hashOrHeight: String!) {
     btcBlock(hashOrHeight: $hashOrHeight) {
+      timestamp
       transactions {
         blockHeight
         blockHash
@@ -90,7 +92,7 @@ export default async function Page({ params: { hashOrHeight } }: { params: { has
               <Link href={`/transaction/${transaction.txid}`} fontSize="14px" fontWeight="medium" color="brand">
                 {transaction.txid}
               </Link>
-              {transaction.locktime ? <TimeFormatter timestamp={transaction.locktime} /> : null}
+              {data.btcBlock?.timestamp ? <TimeFormatter timestamp={resolveBtcTime(data.btcBlock.timestamp)} /> : null}
             </Flex>
             <BtcUtxoTables vin={transaction.vin as BitcoinInput[]} vout={transaction.vout as BitcoinOutput[]} />
             <Flex

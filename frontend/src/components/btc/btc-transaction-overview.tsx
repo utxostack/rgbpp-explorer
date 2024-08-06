@@ -6,6 +6,7 @@ import { TimeFormatter } from '@/components/time-formatter'
 import { Heading, Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { BitcoinTransaction } from '@/gql/graphql'
+import { resolveBtcTime } from '@/lib/btc/resolve-btc-time'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { formatNumber } from '@/lib/string/format-number'
 
@@ -16,7 +17,9 @@ export function BtcTransactionOverview({ btcTransaction }: { btcTransaction: Bit
       <HStack w="100%" px="30px" py="16px" gap="12px" borderBottom="1px solid" borderBottomColor="border.primary">
         <OverviewSVG w="24px" />
         <Heading fontSize="16px" fontWeight="semibold">{t(i18n)`Overview`}</Heading>
-        {btcTransaction.block.timestamp ? <TimeFormatter timestamp={btcTransaction.block.timestamp} /> : null}
+        {btcTransaction.block.timestamp ? (
+          <TimeFormatter timestamp={resolveBtcTime(btcTransaction.block.timestamp)} />
+        ) : null}
       </HStack>
       <Grid w="100%" gridTemplateColumns="repeat(2, 1fr)" gap="30px" pt="20px" pb="30px" px="30px" textAlign="center">
         <Grid

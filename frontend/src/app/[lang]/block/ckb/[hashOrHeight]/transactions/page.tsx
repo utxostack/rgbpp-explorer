@@ -92,18 +92,42 @@ export default async function Page({ params: { hashOrHeight } }: { params: { has
         return (
           <VStack w="100%" gap={0} bg="bg.card" rounded="8px" key={transaction.hash}>
             <Flex w="100%" bg="bg.input" justifyContent="space-between" py="20px" px="30px" roundedTop="8px">
-              <Link href={`/transaction/${transaction.hash}`} fontSize="14px" fontWeight="medium" color="brand">
+              <Link
+                href={`/transaction/${transaction.hash}`}
+                fontSize="14px"
+                fontWeight="medium"
+                color="brand"
+                _hover={{ textDecoration: 'underline' }}
+              >
                 {transaction.hash}
               </Link>
-
               <TimeFormatter timestamp={data.ckbBlock?.timestamp} />
             </Flex>
-            <CkbCellTables inputs={transaction.inputs} outputs={transaction.outputs} />
-            <Flex h="72px" px="30px" w="100%" alignItems="center" borderTop="1px solid" borderTopColor="border.primary">
+            <CkbCellTables
+              inputs={transaction.inputs}
+              outputs={transaction.outputs}
+              isCellbase={transaction.isCellbase}
+            />
+            <Flex
+              gap="32px"
+              h="72px"
+              px="30px"
+              w="100%"
+              alignItems="center"
+              borderTop="1px solid"
+              borderTopColor="border.primary"
+            >
               <Text as="span" fontSize="14px" color="text.third">
-                {t(i18n)`Txn fee: `}{' '}
-                <Text as="span" color="text.primary" fontWeight="semibold">
-                  {formatNumber(transaction.fee)}{' '}
+                {t(i18n)`Txn fee: `}
+                <Text as="span" color="text.primary" fontWeight="semibold" mx="4px">
+                  {formatNumber(transaction.fee)}
+                </Text>
+                {t(i18n)`shannons`}
+              </Text>
+              <Text as="span" fontSize="14px" color="text.third">
+                {t(i18n)`Fee rate: `}
+                <Text as="span" color="text.primary" fontWeight="semibold" mx="4px">
+                  {formatNumber(transaction.feeRate)}
                 </Text>
                 {t(i18n)`shannons/kB`}
               </Text>

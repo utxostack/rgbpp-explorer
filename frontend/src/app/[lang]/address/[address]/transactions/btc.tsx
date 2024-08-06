@@ -8,6 +8,7 @@ import Link from '@/components/ui/link'
 import { UtxoOrCellFooter } from '@/components/utxo-or-cell-footer'
 import { graphql } from '@/gql'
 import { BitcoinInput, BitcoinOutput } from '@/gql/graphql'
+import { resolveBtcTime } from '@/lib/btc/resolve-btc-time'
 import { graphQLClient } from '@/lib/graphql'
 
 const query = graphql(`
@@ -94,7 +95,7 @@ export async function BtcTransactionsByAddress({ address }: { address: string })
               {tx.txid}
             </Link>
           </Copier>
-          <TimeFormatter timestamp={tx.locktime} />
+          {tx.locktime > 500000000 ? <TimeFormatter timestamp={resolveBtcTime(tx.locktime)} /> : null}
         </Flex>
         <BtcUtxoTables vin={tx.vin as BitcoinInput[]} vout={tx.vout as BitcoinOutput[]} currentAddress={address} />
         <UtxoOrCellFooter fee={tx.fee} confirmations={tx.confirmations} feeRate={tx.feeRate} />

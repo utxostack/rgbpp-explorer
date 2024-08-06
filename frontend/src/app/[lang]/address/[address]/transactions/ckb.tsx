@@ -103,7 +103,7 @@ export async function CkbTransactionsByAddress({ address }: { address: string })
           </Copier>
           {tx.block ? <TimeFormatter timestamp={tx.block.timestamp} /> : null}
         </Flex>
-        <CkbCellTables inputs={tx.inputs} outputs={tx.outputs} />
+        <CkbCellTables inputs={tx.inputs} outputs={tx.outputs} isCellbase={tx.isCellbase} />
         <UtxoOrCellFooter fee={tx.fee} confirmations={tx.confirmations} feeRate={tx.feeRate} />
       </VStack>
     )
