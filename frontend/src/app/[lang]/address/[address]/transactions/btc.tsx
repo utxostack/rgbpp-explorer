@@ -84,6 +84,8 @@ export async function BtcTransactionsByAddress({ address }: { address: string })
     afterTxid,
   })
 
+  const nextCursor = last(btcAddress?.transactions)?.txid
+
   if (!btcAddress) {
     return <FailedFallback />
   }
@@ -100,16 +102,18 @@ export async function BtcTransactionsByAddress({ address }: { address: string })
               <Button>Back to first page</Button>
             </Link>
           ) : null}
-          <Link
-            href={{
-              pathname: `/address/${address}/transactions`,
-              query: {
-                afterTxid: last(btcAddress.transactions)?.txid,
-              },
-            }}
-          >
-            <Button>Next</Button>
-          </Link>
+          {nextCursor ? (
+            <Link
+              href={{
+                pathname: `/address/${address}/transactions`,
+                query: {
+                  afterTxid: nextCursor,
+                },
+              }}
+            >
+              <Button>Next</Button>
+            </Link>
+          ) : null}
         </HStack>
       </Center>
     </>
