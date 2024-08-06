@@ -1,3 +1,4 @@
+import { t } from '@lingui/macro'
 import { Flex, VStack } from 'styled-system/jsx'
 
 import { CkbCellTables } from '@/components/ckb/ckb-cell-tables'
@@ -7,6 +8,7 @@ import { TimeFormatter } from '@/components/time-formatter'
 import Link from '@/components/ui/link'
 import { UtxoOrCellFooter } from '@/components/utxo-or-cell-footer'
 import { graphql } from '@/gql'
+import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { graphQLClient } from '@/lib/graphql'
 
 const query = graphql(`
@@ -21,6 +23,7 @@ const query = graphql(`
         feeRate
         confirmations
         inputs {
+          cellType
           status {
             consumed
             txHash
@@ -48,6 +51,7 @@ const query = graphql(`
         }
         outputs {
           txHash
+          cellType
           index
           capacity
           type {
@@ -82,6 +86,7 @@ const query = graphql(`
 `)
 
 export async function CkbTransactionsByAddress({ address }: { address: string }) {
+  const i18n = getI18nFromHeaders()
   const { ckbAddress } = await graphQLClient.request(query, {
     address,
     page: 1,
@@ -104,7 +109,14 @@ export async function CkbTransactionsByAddress({ address }: { address: string })
           {tx.block ? <TimeFormatter timestamp={tx.block.timestamp} /> : null}
         </Flex>
         <CkbCellTables inputs={tx.inputs} outputs={tx.outputs} isCellbase={tx.isCellbase} />
-        <UtxoOrCellFooter fee={tx.fee} confirmations={tx.confirmations} feeRate={tx.feeRate} />
+        <UtxoOrCellFooter
+          fee={tx.fee}
+          confirmations={tx.confirmations}
+          feeRate={tx.feeRate}
+          ckbCell={tx}
+          feeUnit={t(i18n)`shannons`}
+          address={address}
+        />
       </VStack>
     )
   })
