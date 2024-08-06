@@ -65,7 +65,7 @@ export function BtcBlockOverview({
             <Text color="text.third" fontSize="14px">{t(i18n)`Fee rate span`}</Text>
             <TextOverflowTooltip
               label={
-                <Text whiteSpace="nowrap" maxW="250px" truncate>
+                <Text whiteSpace="nowrap">
                   {t(
                     i18n,
                   )`${formatNumber(block.feeRateRange.min)} sats/VB ~ ${formatNumber(BigNumber(block.feeRateRange.max))} sats/VB`}
