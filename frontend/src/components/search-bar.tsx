@@ -8,11 +8,12 @@ import { ReactNode, useState } from 'react'
 import { Center, Flex, type FlexProps, styled, VStack } from 'styled-system/jsx'
 import { useDebounceCallback } from 'usehooks-ts'
 
-import { explorerGraphql } from '@/apis/explorer-graphql'
 import SearchIcon from '@/assets/search.svg'
 import SearchFailedSVG from '@/assets/search-failed.svg'
 import { Loading } from '@/components/loading'
 import { HoverCard, Text } from '@/components/ui'
+import { graphql } from '@/gql'
+import { graphQLClient } from '@/lib/graphql'
 
 function SearchResult({
   children,
@@ -57,7 +58,25 @@ function useSearch() {
   const router = useRouter()
   return useMutation({
     async mutationFn(keyword: string) {
-      const { search } = await explorerGraphql.search(keyword)
+      const { search } = await graphQLClient.request(
+        graphql(`
+          query Search($keyword: String!) {
+            search(query: $keyword) {
+              query
+              btcBlock
+              btcTransaction
+              btcAddress
+              ckbBlock
+              ckbTransaction
+              ckbAddress
+              rgbppCoin
+            }
+          }
+        `),
+        {
+          keyword,
+        },
+      )
       if (search.rgbppCoin) {
         return router.push(`/assets/coins/${search.rgbppCoin}`)
       }

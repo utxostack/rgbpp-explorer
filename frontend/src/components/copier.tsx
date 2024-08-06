@@ -10,11 +10,11 @@ import { HoverCard, Text } from '@/components/ui'
 import { delay } from '@/lib/delay'
 
 export interface CopierProps extends BoxProps {
-  value: string
+  value?: string
   onlyIcon?: boolean
 }
 
-export function Copier({ value, children, onlyIcon = false, ...props }: CopierProps) {
+export function Copier({ value = '', children, onlyIcon = false, ...props }: CopierProps) {
   const [, copyFn] = useCopyToClipboard()
   const {
     mutateAsync: onCopy,

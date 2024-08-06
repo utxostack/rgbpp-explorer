@@ -2,40 +2,51 @@
 
 import { Trans } from '@lingui/macro'
 
-import { CellType, CkbTransaction } from '@/apis/types/explorer-graphql'
+import { Text } from '@/components/ui'
+import { CellType, CkbTransaction } from '@/gql/graphql'
 import { resolveCellDiff } from '@/lib/resolve-cell-diff'
 import { formatNumber } from '@/lib/string/format-number'
 
-export function Amount({ ckbTransaction }: { ckbTransaction?: CkbTransaction }) {
-  const cellDiff = resolveCellDiff(ckbTransaction)
-
+export function Amount({ ckbTransaction }: { ckbTransaction?: Pick<CkbTransaction, 'inputs' | 'outputs'> | null }) {
   if (!ckbTransaction) return <Trans>-</Trans>
 
   const dobInputCount = ckbTransaction?.inputs.filter(
-    (input) => input.cellType === CellType.DOB || input.cellType === CellType.MNFT,
+    (input) => input.cellType === CellType.Dob || input.cellType === CellType.Mnft,
   )
+
   if (dobInputCount?.length) {
     return (
       <Trans>
-        <b>{dobInputCount.length}</b> DOB
+        <b>{dobInputCount.length}</b>
+        <Text as="span" color="text.third" fontSize="14px" fontWeight="medium" ml="4px">
+          DOB
+        </Text>
       </Trans>
     )
   }
 
   const dobOutputCount = ckbTransaction?.outputs.filter(
-    (output) => output.cellType === CellType.DOB || output.cellType === CellType.MNFT,
+    (output) => output.cellType === CellType.Dob || output.cellType === CellType.Mnft,
   )
   if (dobOutputCount?.length) {
     return (
       <Trans>
-        <b>{dobOutputCount.length}</b> DOB
+        <b>{dobOutputCount.length}</b>
+        <Text as="span" color="text.third" fontSize="14px" fontWeight="medium" ml="4px">
+          DOB
+        </Text>
       </Trans>
     )
   }
 
+  const cellDiff = resolveCellDiff(ckbTransaction)
+
   return (
     <>
-      <b>{formatNumber(cellDiff.value)}</b> {cellDiff.symbol}
+      <b>{formatNumber(cellDiff.value)}</b>
+      <Text as="span" color="text.third" fontSize="14px" fontWeight="medium" ml="4px">
+        {cellDiff.symbol}
+      </Text>
     </>
   )
 }

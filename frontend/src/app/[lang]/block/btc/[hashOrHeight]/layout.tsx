@@ -2,13 +2,42 @@ import { t } from '@lingui/macro'
 import { ReactNode } from 'react'
 import { Box, HStack, VStack } from 'styled-system/jsx'
 
-import { explorerGraphql } from '@/apis/explorer-graphql'
 import BlockIcon from '@/assets/block.svg'
-import { BtcBlockOverflow } from '@/components/btc/btc-block-overflow'
+import { BtcBlockOverview } from '@/components/btc/btc-block-overview'
 import { Copier } from '@/components/copier'
 import { LinkTabs } from '@/components/link-tabs'
 import { Heading, Text } from '@/components/ui'
+import { graphql } from '@/gql'
+import { BitcoinBlock } from '@/gql/graphql'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
+import { graphQLClient } from '@/lib/graphql'
+
+const query = graphql(`
+  query BtcBlock($hashOrHeight: String!) {
+    btcBlock(hashOrHeight: $hashOrHeight) {
+      id
+      height
+      version
+      timestamp
+      transactionsCount
+      size
+      weight
+      bits
+      difficulty
+      totalFee
+      miner {
+        address
+        satoshi
+        pendingSatoshi
+        transactionsCount
+      }
+      feeRateRange {
+        min
+        max
+      }
+    }
+  }
+`)
 
 export default async function Layout({
   params: { hashOrHeight },
@@ -18,7 +47,7 @@ export default async function Layout({
   children: ReactNode
 }) {
   const i18n = getI18nFromHeaders()
-  const data = await explorerGraphql.getBtcBlock(hashOrHeight)
+  const data = await graphQLClient.request(query, { hashOrHeight })
 
   if (!data?.btcBlock) {
     throw new Error(t(i18n)`The block ${hashOrHeight} not found`)
@@ -54,7 +83,7 @@ export default async function Layout({
           </Text>
         </Box>
       </HStack>
-      <BtcBlockOverflow block={data.btcBlock} />
+      <BtcBlockOverview block={data.btcBlock as BitcoinBlock} />
       <LinkTabs
         w="100%"
         links={[

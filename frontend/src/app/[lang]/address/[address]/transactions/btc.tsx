@@ -1,15 +1,89 @@
+import { t } from '@lingui/macro'
 import { Flex, VStack } from 'styled-system/jsx'
 
-import { explorerGraphql } from '@/apis/explorer-graphql'
 import { BtcUtxoTables } from '@/components/btc/btc-utxo-tables'
 import { Copier } from '@/components/copier'
 import { FailedFallback } from '@/components/failed-fallback'
 import { TimeFormatter } from '@/components/time-formatter'
 import Link from '@/components/ui/link'
 import { UtxoOrCellFooter } from '@/components/utxo-or-cell-footer'
+import { graphql } from '@/gql'
+import { BitcoinInput, BitcoinOutput } from '@/gql/graphql'
+import { resolveBtcTime } from '@/lib/btc/resolve-btc-time'
+import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
+import { graphQLClient } from '@/lib/graphql'
+
+const query = graphql(`
+  query BtcTransactionByAddress($address: String!) {
+    btcAddress(address: $address) {
+      transactions {
+        blockHeight
+        blockHash
+        txid
+        version
+        size
+        locktime
+        weight
+        fee
+        feeRate
+        confirmed
+        confirmations
+        vin {
+          txid
+          vout
+          scriptsig
+          scriptsigAsm
+          isCoinbase
+          sequence
+          prevout {
+            scriptpubkey
+            scriptpubkeyAsm
+            scriptpubkeyType
+            scriptpubkeyAddress
+            value
+            status {
+              spent
+              txid
+              vin
+            }
+            address {
+              address
+              satoshi
+              pendingSatoshi
+              transactionsCount
+            }
+          }
+        }
+        vout {
+          scriptpubkey
+          scriptpubkeyAsm
+          scriptpubkeyType
+          scriptpubkeyAddress
+          value
+          status {
+            spent
+            txid
+            vin
+          }
+          address {
+            address
+            satoshi
+            pendingSatoshi
+            transactionsCount
+          }
+        }
+      }
+    }
+  }
+`)
 
 export async function BtcTransactionsByAddress({ address }: { address: string }) {
-  const { btcAddress } = await explorerGraphql.getBtcTransactionsByAddress(address)
+  const i18n = getI18nFromHeaders()
+  const { btcAddress } = await graphQLClient.request(query, {
+    address,
+    page: 1,
+    pageSize: 10,
+  })
 
   if (!btcAddress) {
     return <FailedFallback />
@@ -24,10 +98,17 @@ export async function BtcTransactionsByAddress({ address }: { address: string })
               {tx.txid}
             </Link>
           </Copier>
-          <TimeFormatter timestamp={tx.locktime} />
+          {tx.locktime > 500000000 ? <TimeFormatter timestamp={resolveBtcTime(tx.locktime)} /> : null}
         </Flex>
-        <BtcUtxoTables vin={tx.vin} vout={tx.vout} />
-        <UtxoOrCellFooter fee={tx.fee} confirmations={tx.confirmations} feeRate={tx.feeRate} />
+        <BtcUtxoTables vin={tx.vin as BitcoinInput[]} vout={tx.vout as BitcoinOutput[]} currentAddress={address} />
+        <UtxoOrCellFooter
+          fee={tx.fee}
+          confirmations={tx.confirmations}
+          feeRate={tx.feeRate}
+          feeUnit={t(i18n)`sats`}
+          address={address}
+          btcUtxo={{ vin: tx.vin as BitcoinInput[], vout: tx.vout as BitcoinOutput[] }}
+        />
       </VStack>
     )
   })

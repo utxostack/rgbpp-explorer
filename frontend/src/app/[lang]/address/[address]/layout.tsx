@@ -3,15 +3,38 @@ import { notFound } from 'next/navigation'
 import type { PropsWithChildren, ReactNode } from 'react'
 import { HStack, VStack } from 'styled-system/jsx'
 
-import { explorerGraphql } from '@/apis/explorer-graphql'
-import { BtcAddressOverflow } from '@/components/btc/btc-address-overflow'
-import { CkbAddressOverflow } from '@/components/ckb/ckb-address-overflow'
+import { BtcAddressOverview } from '@/components/btc/btc-address-overview'
+import { BtcAddressType } from '@/components/btc/btc-address-type'
+import { CkbAddressOverview } from '@/components/ckb/ckb-address-overview'
 import { Copier } from '@/components/copier'
 import { LinkTabs } from '@/components/link-tabs'
-import { Heading } from '@/components/ui'
+import { Heading, Text } from '@/components/ui'
+import { graphql } from '@/gql'
 import { isValidBTCAddress } from '@/lib/btc/is-valid-btc-address'
 import { isValidCkbAddress } from '@/lib/ckb/is-valid-ckb-address'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
+import { graphQLClient } from '@/lib/graphql'
+
+const btcAddressQuery = graphql(`
+  query BtcAddressBase($address: String!) {
+    btcAddress(address: $address) {
+      address
+      satoshi
+      pendingSatoshi
+      transactionsCount
+    }
+  }
+`)
+
+const ckbAddressQuery = graphql(`
+  query CkbAddressBase($address: String!) {
+    ckbAddress(address: $address) {
+      address
+      shannon
+      transactionsCount
+    }
+  }
+`)
 
 export default async function Layout({
   children,
@@ -25,14 +48,14 @@ export default async function Layout({
 
   let overflow: ReactNode = null
   if (isBtcAddress) {
-    const data = await explorerGraphql.getBtcAddress(address).catch(() => null)
+    const data = await graphQLClient.request(btcAddressQuery, { address })
     if (data?.btcAddress) {
-      overflow = <BtcAddressOverflow btcAddress={data?.btcAddress} />
+      overflow = <BtcAddressOverview btcAddress={data?.btcAddress} />
     }
   } else if (isCkbAddress) {
-    const data = await explorerGraphql.getCkbAddress(address).catch(() => null)
+    const data = await graphQLClient.request(ckbAddressQuery, { address })
     if (data?.ckbAddress) {
-      overflow = <CkbAddressOverflow ckbAddress={data?.ckbAddress} />
+      overflow = <CkbAddressOverview ckbAddress={data?.ckbAddress} />
     }
   }
 
@@ -44,7 +67,14 @@ export default async function Layout({
         <Heading fontSize="20px" fontWeight="semibold">
           {t(i18n)`Address`}
         </Heading>
-        <Copier value={address}>{address}</Copier>
+        <Copier value={address}>
+          <HStack maxW="calc(1160px - 100px - 24px)" truncate>
+            <Text as="span" wordBreak="break-all" whiteSpace="wrap" textAlign="left">
+              {address}
+            </Text>
+            <BtcAddressType address={address} />
+          </HStack>
+        </Copier>
       </HStack>
       {overflow}
       <LinkTabs

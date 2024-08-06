@@ -1,19 +1,41 @@
 import { t } from '@lingui/macro'
 import { Grid, HStack, VStack } from 'styled-system/jsx'
 
-import { explorerGraphql } from '@/apis/explorer-graphql'
 import BtcIcon from '@/assets/chains/btc.svg'
 import SpeedDropIcon from '@/assets/speed/drop.svg'
 import SpeedHighIcon from '@/assets/speed/high.svg'
 import SpeedLowIcon from '@/assets/speed/low.svg'
 import SpeedMediumIcon from '@/assets/speed/medium.svg'
 import { Heading, Text } from '@/components/ui'
+import { graphql } from '@/gql'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
+import { graphQLClient } from '@/lib/graphql'
 import { formatNumber } from '@/lib/string/format-number'
 
 export async function Info() {
   const i18n = getI18nFromHeaders()
-  const { btcChainInfo, rgbppStatistic } = await explorerGraphql.getBtcChainInfo()
+  const { btcChainInfo, rgbppStatistic } = await graphQLClient.request(
+    graphql(`
+      query BtcChainInfo {
+        btcChainInfo {
+          tipBlockHeight
+          tipBlockHash
+          difficulty
+          transactionsCountIn24Hours
+          fees {
+            fastest
+            halfHour
+            hour
+            economy
+            minimum
+          }
+        }
+        rgbppStatistic {
+          holdersCount
+        }
+      }
+    `),
+  )
   return (
     <VStack gridColumn="1/3" gap="20px" bg="bg.card" p="30px" alignItems="start" rounded="8px">
       <HStack gap="16px">
