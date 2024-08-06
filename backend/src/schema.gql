@@ -183,6 +183,7 @@ type BitcoinBlock {
     """For pagination, must be a multiplication of 25"""
     startIndex: Float
   ): [BitcoinTransaction!]!
+  confirmations: Float
 }
 
 """Bitcoin Transaction"""
