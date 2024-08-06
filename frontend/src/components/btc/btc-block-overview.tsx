@@ -10,7 +10,6 @@ import { Heading, Text, Tooltip } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { BitcoinBlock } from '@/gql/graphql'
 import { resolveBtcTime } from '@/lib/btc/resolve-btc-time'
-import { satsToBtc } from '@/lib/btc/sats-to-btc'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { formatNumber } from '@/lib/string/format-number'
 import { truncateMiddle } from '@/lib/string/truncate-middle'
@@ -45,7 +44,7 @@ export function BtcBlockOverview({
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Block size`}</Text>
             <Text>
-              <OverflowAmount amount={formatNumber(satsToBtc(block.size))} symbol={t(i18n)`bytes`} />
+              <OverflowAmount amount={formatNumber(block.size)} symbol={t(i18n)`bytes`} />
             </Text>
           </VStack>
           <VStack gap="15px">

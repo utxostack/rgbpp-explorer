@@ -174,7 +174,7 @@ export default async function Page({ params: { typeHash } }: { params: { typeHas
           {response.rgbppCoin.transactions?.map((tx) => {
             const txHash = resolveRGBppTxHash(tx as RgbppTransaction)
             return (
-              <Table.Row key={tx.ckbTxHash}>
+              <Table.Row key={tx.ckbTxHash} tableLayout="fixed">
                 <Table.Cell>
                   <Link href={`/transaction/${txHash}`} display="flex" alignItems="center" gap={3} color="text.link">
                     <LinkOutlineIcon w="36px" h="36px" />

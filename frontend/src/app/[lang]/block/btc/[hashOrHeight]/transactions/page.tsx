@@ -29,6 +29,7 @@ const query = graphql(`
         fee
         feeRate
         confirmed
+        transactionTime
         vout {
           scriptpubkey
           scriptpubkeyAsm
@@ -93,7 +94,9 @@ export default async function Page({ params: { hashOrHeight } }: { params: { has
               <Link href={`/transaction/${transaction.txid}`} fontSize="14px" fontWeight="medium" color="brand">
                 {transaction.txid}
               </Link>
-              {data.btcBlock?.timestamp ? <TimeFormatter timestamp={resolveBtcTime(data.btcBlock.timestamp)} /> : null}
+              {transaction.transactionTime ? (
+                <TimeFormatter timestamp={resolveBtcTime(transaction.transactionTime)} />
+              ) : null}
             </Flex>
             <BtcUtxoTables vin={transaction.vin as BitcoinInput[]} vout={transaction.vout as BitcoinOutput[]} />
             <Flex

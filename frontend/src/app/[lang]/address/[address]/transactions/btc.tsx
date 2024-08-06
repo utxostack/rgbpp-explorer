@@ -28,6 +28,7 @@ const query = graphql(`
         feeRate
         confirmed
         confirmations
+        transactionTime
         vin {
           txid
           vout
@@ -98,7 +99,7 @@ export async function BtcTransactionsByAddress({ address }: { address: string })
               {tx.txid}
             </Link>
           </Copier>
-          {tx.locktime > 500000000 ? <TimeFormatter timestamp={resolveBtcTime(tx.locktime)} /> : null}
+          {tx.transactionTime ? <TimeFormatter timestamp={resolveBtcTime(tx.transactionTime)} /> : null}
         </Flex>
         <BtcUtxoTables vin={tx.vin as BitcoinInput[]} vout={tx.vout as BitcoinOutput[]} currentAddress={address} />
         <UtxoOrCellFooter

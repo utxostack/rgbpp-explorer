@@ -12,6 +12,7 @@ import { graphql } from '@/gql'
 import { BitcoinBlock } from '@/gql/graphql'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { graphQLClient } from '@/lib/graphql'
+import { formatNumber } from '@/lib/string/format-number'
 
 const query = graphql(`
   query BtcBlock($hashOrHeight: String!) {
@@ -21,6 +22,7 @@ const query = graphql(`
       version
       timestamp
       transactionsCount
+      confirmations
       size
       weight
       bits
@@ -76,8 +78,8 @@ export default async function Layout({
           border="1px solid currentColor"
           ml="auto"
         >
-          {'- '}
-          <Text as="span" fontSize="14px" fontWeight="medium">
+          {formatNumber(data.btcBlock?.confirmations ?? undefined)}
+          <Text as="span" fontSize="14px" fontWeight="medium" ml="4px">
             {t(i18n)`Confirmations`}
           </Text>
         </Box>
