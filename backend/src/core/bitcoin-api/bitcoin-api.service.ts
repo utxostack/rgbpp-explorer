@@ -205,6 +205,11 @@ export class BitcoinApiService {
     return this.call('getTxOutSpends', { txid });
   }
 
+  public async getTransactionTimes({ txids }: { txids: string[] }) {
+    console.log('txids', txids);
+    return this.call('getTransactionTimes', { txids });
+  }
+
   @Cacheable({
     namespace: 'bitcoinApiService',
     key: ({ hash }) => `getBlock:${hash}`,

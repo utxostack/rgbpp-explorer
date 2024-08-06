@@ -108,6 +108,6 @@ export class BitcoinBlockResolver {
     @Parent() block: BitcoinBaseBlock,
   ): Promise<number | null> {
     const info = await this.bitcoinApiService.getBlockchainInfo();
-    return block.height - info.blocks;
+    return info.blocks - block.height;
   }
 }

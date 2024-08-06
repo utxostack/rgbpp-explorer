@@ -190,6 +190,7 @@ type BitcoinBlock {
 type BitcoinTransaction {
   blockHeight: Float
   blockHash: String
+  blockTime: Timestamp
   txid: String!
   version: Int!
   vin: [BitcoinInput!]
@@ -201,6 +202,7 @@ type BitcoinTransaction {
   feeRate: Float!
   confirmed: Boolean!
   confirmations: Float!
+  transactionTime: Timestamp!
   block: BitcoinBlock!
   rgbppTransaction: RgbppTransaction
 }

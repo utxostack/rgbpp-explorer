@@ -62,6 +62,11 @@ export class ElectrsService implements IBitcoinDataProvider {
     return response.data.map((outSpend) => OutSpend.parse(outSpend));
   }
 
+  public async getTransactionTimes({ txids }: { txids: string[] }) {
+    const response = await this.request.post<number[]>('/v1/transaction-times', { txId: txids });
+    return response.data as number[];
+  }
+
   public async getBlock({ hash }: { hash: string }) {
     const response = await this.request.get<Block>(`/block/${hash}`);
     return Block.parse(response.data);

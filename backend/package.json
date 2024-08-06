@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@applifting-io/nestjs-dataloader": "^1.1.5",
-    "@cell-studio/mempool.js": "^2.4.0",
+    "@cell-studio/mempool.js": "^2.5.3",
     "@ckb-lumos/bi": "^0.23.0",
     "@ckb-lumos/lumos": "^0.23.0",
     "@ckb-lumos/rpc": "^0.23.0",
