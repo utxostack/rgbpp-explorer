@@ -11,6 +11,7 @@ export function resolveLayerTypeFromRGBppTransaction(
     case LeapDirection.Within:
       return 'l1'
     default:
+      if (tx.btcTransaction) return 'l2-l1'
       return 'l2'
   }
 }
