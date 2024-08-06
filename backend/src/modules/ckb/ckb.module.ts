@@ -7,6 +7,7 @@ import { CkbTransactionModule } from './transaction/transaction.module';
 import { CkbScriptModule } from './script/script.module';
 import { CkbResolver } from './ckb.resolver';
 import { CkbAddressModule } from './address/address.module';
+import { CkbService } from './ckb.service';
 
 @Module({
   imports: [
@@ -18,6 +19,6 @@ import { CkbAddressModule } from './address/address.module';
     CkbCellModule,
     CkbScriptModule,
   ],
-  providers: [CkbResolver],
+  providers: [CkbResolver, CkbService],
 })
 export class CkbModule {}
