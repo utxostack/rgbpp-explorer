@@ -2,6 +2,7 @@ import { t } from '@lingui/macro'
 import { Grid, HStack, VStack } from 'styled-system/jsx'
 
 import OverviewSVG from '@/assets/overview.svg'
+import { OverflowAmount } from '@/components/overflow-amount'
 import { TimeFormatter } from '@/components/time-formatter'
 import { Heading, Text } from '@/components/ui'
 import Link from '@/components/ui/link'
@@ -44,10 +45,7 @@ export function BtcTransactionOverview({ btcTransaction }: { btcTransaction: Bit
           <VStack gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Size`}</Text>
             <Text>
-              {formatNumber(btcTransaction.size)}{' '}
-              <Text as="span" color="12px">
-                {t(i18n)`bytes`}
-              </Text>
+              <OverflowAmount amount={formatNumber(btcTransaction.size)} symbol={t(i18n)`bytes`} />
             </Text>
           </VStack>
         </Grid>
@@ -63,19 +61,13 @@ export function BtcTransactionOverview({ btcTransaction }: { btcTransaction: Bit
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Fee`}</Text>
             <Text>
-              {formatNumber(btcTransaction.fee)}
-              <Text as="span" color="12px" ml="4px">
-                {t(i18n)`sats`}
-              </Text>
+              <OverflowAmount amount={formatNumber(btcTransaction.fee)} symbol={t(i18n)`sats`} />
             </Text>
           </VStack>
           <VStack gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Fee rate`}</Text>
             <Text>
-              {formatNumber(btcTransaction.feeRate)}
-              <Text as="span" color="12px" ml="4px">
-                {t(i18n)`sat/VB`}
-              </Text>
+              <OverflowAmount amount={formatNumber(btcTransaction.feeRate)} symbol={t(i18n)`sat/VB`} />
             </Text>
           </VStack>
         </Grid>

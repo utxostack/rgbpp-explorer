@@ -3,12 +3,14 @@ import BigNumber from 'bignumber.js'
 import { Grid, HStack, VStack } from 'styled-system/jsx'
 
 import OverviewSVG from '@/assets/overview.svg'
+import { OverflowAmount } from '@/components/overflow-amount'
 import { TextOverflowTooltip } from '@/components/text-overflow-tooltip'
 import { TimeFormatter } from '@/components/time-formatter'
 import { Heading, Text, Tooltip } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { BitcoinBlock } from '@/gql/graphql'
 import { resolveBtcTime } from '@/lib/btc/resolve-btc-time'
+import { satsToBtc } from '@/lib/btc/sats-to-btc'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { formatNumber } from '@/lib/string/format-number'
 import { truncateMiddle } from '@/lib/string/truncate-middle'
@@ -43,10 +45,7 @@ export function BtcBlockOverview({
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Block size`}</Text>
             <Text>
-              {formatNumber(block.size)}
-              <Text as="span" color="12px" ml="8px">
-                {t(i18n)`bytes`}
-              </Text>
+              <OverflowAmount amount={formatNumber(satsToBtc(block.size))} symbol={t(i18n)`bytes`} />
             </Text>
           </VStack>
           <VStack gap="15px">
@@ -67,26 +66,21 @@ export function BtcBlockOverview({
             <Text color="text.third" fontSize="14px">{t(i18n)`Fee rate span`}</Text>
             <TextOverflowTooltip
               label={
-                <Text whiteSpace="nowrap">
-                  {formatNumber(block.feeRateRange.min)}
-                  <Text as="span" color="12px" ml="4px">
-                    {t(i18n)`sats/VB`}
-                  </Text>
-                  ~ {formatNumber(BigNumber(block.feeRateRange.max))}{' '}
-                  <Text as="span" color="12px">
-                    {t(i18n)`sats/VB`}
-                  </Text>
+                <Text whiteSpace="nowrap" maxW="250px" truncate>
+                  {t(
+                    i18n,
+                  )`${formatNumber(block.feeRateRange.min)} sats/VB ~ ${formatNumber(BigNumber(block.feeRateRange.max))} sats/VB`}
                 </Text>
               }
               contentProps={{ maxW: 'unset' }}
             >
               <Text whiteSpace="nowrap" maxW="250px" truncate>
                 {formatNumber(block.feeRateRange.min)}
-                <Text as="span" color="12px" ml="4px">
+                <Text as="span" fontSize="14px" ml="4px">
                   {t(i18n)`sats/VB`}
                 </Text>
                 ~ {formatNumber(BigNumber(block.feeRateRange.max))}{' '}
-                <Text as="span" color="12px">
+                <Text as="span" fontSize="14px">
                   {t(i18n)`sats/VB`}
                 </Text>
               </Text>
