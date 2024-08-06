@@ -17,9 +17,10 @@ export interface CellTablesProps {
   inputs?: CkbCell[]
   outputs?: CkbCell[]
   isCellbase?: boolean
+  address?: string
 }
 
-export function CkbCellTables({ inputs = [], outputs = [], isCellbase }: CellTablesProps) {
+export function CkbCellTables({ inputs = [], outputs = [], isCellbase, address }: CellTablesProps) {
   return (
     <Grid w="100%" gridTemplateColumns="repeat(2, 1fr)" gap="38px" pt="10px" pb="20px" px="30px">
       <VStack gap={0} w="100%">
@@ -52,7 +53,7 @@ export function CkbCellTables({ inputs = [], outputs = [], isCellbase }: CellTab
           </Flex>
         ) : null}
         {inputs.map((input, i) => (
-          <Cell cell={input} key={i} />
+          <Cell cell={input} key={i} address={address} />
         ))}
       </VStack>
       <VStack gap={0}>
@@ -68,14 +69,14 @@ export function CkbCellTables({ inputs = [], outputs = [], isCellbase }: CellTab
           <Trans>Outputs ({outputs.length})</Trans>
         </Heading>
         {outputs.map((output, i) => (
-          <Cell cell={output} key={i} />
+          <Cell cell={output} key={i} address={address} />
         ))}
       </VStack>
     </Grid>
   )
 }
 
-function Cell({ cell }: { cell: CkbCell }) {
+function Cell({ cell, address: currentAddress }: { cell: CkbCell; address?: string }) {
   const address = scriptToAddress(cell.lock)
   return (
     <Flex
@@ -89,15 +90,21 @@ function Cell({ cell }: { cell: CkbCell }) {
       <HStack gap="8px">
         <SubTractIcon w="16px" h="16px" color={cell.status.consumed ? 'text.third' : 'success.unspent'} />
         <Copier onlyIcon value={address}>
-          <Link
-            href={`/address/${address}`}
-            color="brand"
-            fontSize="14px"
-            cursor="pointer"
-            _hover={{ textDecoration: 'underline' }}
-          >
-            {truncateMiddle(address, 10, 10)}
-          </Link>
+          {currentAddress !== address ? (
+            <Link
+              href={`/address/${address}`}
+              color="brand"
+              fontSize="14px"
+              cursor="pointer"
+              _hover={{ textDecoration: 'underline' }}
+            >
+              {truncateMiddle(address, 10, 10)}
+            </Link>
+          ) : (
+            <Text fontSize="14px" color="text.primary">
+              {truncateMiddle(address, 10, 10)}
+            </Text>
+          )}
         </Copier>
       </HStack>
       <VStack gap={0} alignItems="flex-end">

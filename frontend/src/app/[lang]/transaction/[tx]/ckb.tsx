@@ -29,7 +29,7 @@ export function CKBTransactionPage({
           {t(i18n)`Transactions`}
         </Heading>
         <Copier value={ckbTransaction.hash}>{ckbTransaction.hash}</Copier>
-        {leapDirection && btcTransaction ? (
+        {btcTransaction ? (
           <LayerType type={resolveLayerTypeFromRGBppTransaction({ ckbTransaction, leapDirection, btcTransaction })} />
         ) : null}
         <Box

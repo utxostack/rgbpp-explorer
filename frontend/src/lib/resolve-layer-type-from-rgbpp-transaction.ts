@@ -11,6 +11,6 @@ export function resolveLayerTypeFromRGBppTransaction(
     case LeapDirection.Within:
       return 'l1'
     default:
-      return
+      return 'l2'
   }
 }
