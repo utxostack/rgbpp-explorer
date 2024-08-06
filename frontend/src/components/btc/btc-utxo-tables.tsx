@@ -1,6 +1,7 @@
 'use client'
 
 import { Trans } from '@lingui/macro'
+import { useMemo } from 'react'
 import { Box, Flex, Grid, HStack, VStack } from 'styled-system/jsx'
 
 import SubTractIcon from '@/assets/subtract.svg'
@@ -59,6 +60,29 @@ export function BtcUtxoTables({ vin = [], vout = [], currentAddress }: BtcUtxoTa
 }
 
 function UtxoInput({ vin, currentAddress }: { vin: BitcoinInput; currentAddress?: string }) {
+  const text = useMemo(() => {
+    if (vin.isCoinbase)
+      return (
+        <Text fontSize="14px" fontWeight="semibold">
+          <Trans>Coinbase</Trans>
+        </Text>
+      )
+    if (!vin.prevout) return null
+    return (
+      <Copier onlyIcon value={vin.prevout.address?.address}>
+        {currentAddress === vin.prevout.address?.address ? (
+          <Text as="span" color="text.primary">
+            {truncateMiddle(currentAddress, 10, 10)}
+          </Text>
+        ) : (
+          <Link href={`/address/${vin.prevout.address?.address}`} color="brand" fontSize="14px">
+            {truncateMiddle(vin.prevout.address?.address, 10, 10)}
+          </Link>
+        )}
+      </Copier>
+    )
+  }, [vin, currentAddress])
+
   return (
     <Flex
       justifyContent="space-between"
@@ -70,19 +94,7 @@ function UtxoInput({ vin, currentAddress }: { vin: BitcoinInput; currentAddress?
     >
       <HStack gap="8px">
         <SubTractIcon color={vin.prevout?.status.spent ? 'text.third' : 'success.unspent'} w="16px" h="16px" />
-        {vin.prevout ? (
-          <Copier onlyIcon value={vin.prevout.address?.address}>
-            {currentAddress === vin.prevout.address?.address ? (
-              <Text as="span" color="text.primary">
-                {truncateMiddle(currentAddress, 10, 10)}
-              </Text>
-            ) : (
-              <Link href={`/address/${vin.prevout.address?.address}`} color="brand" fontSize="14px">
-                {truncateMiddle(vin.prevout.address?.address, 10, 10)}
-              </Link>
-            )}
-          </Copier>
-        ) : null}
+        {text}
       </HStack>
       <VStack gap={0}>
         <Box>
