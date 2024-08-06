@@ -264,10 +264,12 @@ type RgbppCoinList {
   pageSize: Int!
 }
 
-"""RGB++ Coin"""
+"""RGB++ Statistic"""
 type RgbppStatistic {
   transactionsCount: Float!
   holdersCount: Float!
+  latest24HoursL1TransactionsCount: Float!
+  latest24HoursL2TransactionsCount: Float!
 }
 
 """Bitcoin Fees"""
