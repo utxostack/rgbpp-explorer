@@ -22,7 +22,9 @@ const query = graphql(`
         txid
         version
         size
-        locktime
+        block {
+          timestamp
+        }
         weight
         fee
         feeRate
@@ -152,7 +154,9 @@ const query = graphql(`
       txid
       version
       size
-      locktime
+      block {
+        timestamp
+      }
       weight
       fee
       feeRate

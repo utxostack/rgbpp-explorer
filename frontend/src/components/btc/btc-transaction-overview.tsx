@@ -16,7 +16,7 @@ export function BtcTransactionOverview({ btcTransaction }: { btcTransaction: Bit
       <HStack w="100%" px="30px" py="16px" gap="12px" borderBottom="1px solid" borderBottomColor="border.primary">
         <OverviewSVG w="24px" />
         <Heading fontSize="16px" fontWeight="semibold">{t(i18n)`Overview`}</Heading>
-        {btcTransaction.locktime ? <TimeFormatter timestamp={btcTransaction.locktime} /> : null}
+        {btcTransaction.block.timestamp ? <TimeFormatter timestamp={btcTransaction.block.timestamp} /> : null}
       </HStack>
       <Grid w="100%" gridTemplateColumns="repeat(2, 1fr)" gap="30px" pt="20px" pb="30px" px="30px" textAlign="center">
         <Grid
