@@ -22,7 +22,7 @@ import {
   TransactionFeesStatistic,
   TransactionListSortType,
 } from './ckb-explorer.interface';
-import { ONE_HOUR_MS, ONE_MONTH_MS } from 'src/common/date';
+import { ONE_HOUR_MS, ONE_MONTH_MS, TEN_MINUTES_MS } from 'src/common/date';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { toNumber } from 'lodash';
 import { Cacheable } from 'src/decorators/cacheable.decorator';
@@ -276,14 +276,19 @@ export class CkbExplorerService {
     return response.data;
   }
 
+  @Cacheable({
+    namespace: 'CkbExplorerService',
+    key: 'getStatistics',
+    // Same as the ckb explorer frontend
+    // https://github.com/nervosnetwork/ckb-explorer-frontend/blob/develop/src/constants/common.ts#L3
+    ttl: 4000,
+  })
   public async getStatistics(): Promise<NonPaginatedResponse<Statistics>> {
     const response = await this.request.get('/v1/statistics');
     return response.data;
   }
 
-  public async getTransactionFeesStatistic(): Promise<
-    NonPaginatedResponse<TransactionFeesStatistic>
-  > {
+  public async getTransactionFeesStatistic(): Promise<TransactionFeesStatistic> {
     const response = await this.request.get('/v2/statistics/transaction_fees');
     return response.data;
   }

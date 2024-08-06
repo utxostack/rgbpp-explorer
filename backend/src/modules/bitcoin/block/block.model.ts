@@ -5,7 +5,7 @@ import { BitcoinAddress } from '../address/address.model';
 
 export type BitcoinBaseBlock = Omit<
   BitcoinBlock,
-  'miner' | 'reward' | 'totalFee' | 'feeRateRange' | 'transactions'
+  'miner' | 'reward' | 'totalFee' | 'feeRateRange' | 'transactions' | 'confirmations'
 >;
 
 @ObjectType({ description: 'Fee Rate Range' })
@@ -60,6 +60,9 @@ export class BitcoinBlock {
 
   @Field(() => [BitcoinTransaction])
   transactions: BitcoinTransaction[];
+
+  @Field(() => Float, { nullable: true })
+  confirmations: number | null;
 
   public static from(block: BitcoinApi.Block): BitcoinBaseBlock {
     return {

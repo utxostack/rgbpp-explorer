@@ -35,10 +35,17 @@ export class BitcoinTransactionResolver {
     if (!tx.confirmed) {
       return 0;
     }
-
-    // TODO: should this resolver be refactored with a dataloader?
     const info = await this.bitcoinApiService.getBlockchainInfo();
     return info.blocks - tx.blockHeight! + 1;
+  }
+
+  @ResolveField(() => Date)
+  public async transactionTime(@Parent() tx: BitcoinBaseTransaction): Promise<Date> {
+    const [txTime] = await this.bitcoinApiService.getTransactionTimes({ txids: [tx.txid] });
+    if (txTime === 0) {
+      return tx.blockTime!;
+    }
+    return new Date(txTime * 1000);
   }
 
   @ResolveField(() => BitcoinBlock, { nullable: true })

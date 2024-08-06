@@ -1,7 +1,7 @@
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { CkbBaseTransaction, CkbTransaction } from '../transaction/transaction.model';
-import { CkbAddress, CkbBaseAddress } from './address.model';
+import { CkbAddress, CkbAddressBalance, CkbBaseAddress } from './address.model';
 import {
   CkbAddressLoader,
   CkbAddressLoaderType,
@@ -13,6 +13,7 @@ import {
   CkbRpcTransactionLoaderType,
 } from '../transaction/transaction.dataloader';
 import { ValidateCkbAddressPipe } from 'src/pipes/validate-address.pipe';
+import { BI } from '@ckb-lumos/bi';
 
 @Resolver(() => CkbAddress)
 export class CkbAddressResolver {
@@ -74,5 +75,25 @@ export class CkbAddressResolver {
         return CkbTransaction.from(rpcTx);
       }),
     );
+  }
+
+  @ResolveField(() => CkbAddressBalance, { nullable: true })
+  public async balance(
+    @Parent() address: CkbBaseAddress,
+    @Loader(CkbAddressLoader) addressLoader: CkbAddressLoaderType,
+  ): Promise<CkbAddressBalance | null> {
+    const addressInfo = await addressLoader.load({ address: address.address });
+    if (!addressInfo) {
+      return null;
+    }
+    const { balance, balance_occupied } = addressInfo[0];
+    const total = BI.from(balance).toHexString();
+    const occupied = BI.from(balance_occupied).toHexString();
+    const available = BI.from(balance).sub(balance_occupied).toHexString();
+    return {
+      total,
+      available,
+      occupied,
+    };
   }
 }
