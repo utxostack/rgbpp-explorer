@@ -79,7 +79,8 @@ export function BtcBlockOverview({
                 <Text as="span" fontSize="14px" ml="4px">
                   {t(i18n)`sats/VB`}
                 </Text>
-                ~ {formatNumber(BigNumber(block.feeRateRange.max))}{' '}
+                {' ~ '}
+                {formatNumber(BigNumber(block.feeRateRange.max))}{' '}
                 <Text as="span" fontSize="14px">
                   {t(i18n)`sats/VB`}
                 </Text>
