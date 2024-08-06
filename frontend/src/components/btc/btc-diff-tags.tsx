@@ -24,7 +24,7 @@ export function BtcDiffTags({
   const diff = satsToBtc(BigNumber(outputBalance).minus(BigNumber(inputBalance)))
 
   return !diff.isZero() ? (
-    <Flex align="center" bg="brand" py="8px" px="16px" rounded="4px">
+    <Flex align="center" py="8px" px="16px" rounded="4px" bg={diff.isGreaterThan(0) ? 'success' : 'danger'}>
       <Trans>{formatNumber(diff)} BTC</Trans>
       <MoneyIcon w="16px" h="16px" ml="6px" />
     </Flex>
