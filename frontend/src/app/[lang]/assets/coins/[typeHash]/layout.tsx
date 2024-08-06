@@ -32,7 +32,7 @@ export default async function AssetDetail({
     <>
       <HStack gap="16px" w="100%" maxW="content" py="20px" px="30px" bg="bg.card" rounded="8px">
         {response.rgbppCoin.icon ? (
-          <styled.img w="56px" h="56px" src={response.rgbppCoin.icon} />
+          <styled.img w="56px" h="56px" src={response.rgbppCoin.icon} rounded="100%" />
         ) : (
           <BtcIcon w="56px" h="56px" />
         )}

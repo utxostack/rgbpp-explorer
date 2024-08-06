@@ -173,7 +173,11 @@ export default async function Page() {
                       gap={3}
                       color="text.link"
                     >
-                      {coin.icon ? <styled.img w="36px" h="36px" src={coin.icon} /> : <BtcIcon w="36px" h="36px" />}
+                      {coin.icon ? (
+                        <styled.img w="36px" h="36px" src={coin.icon} rounded="100%" />
+                      ) : (
+                        <BtcIcon w="36px" h="36px" />
+                      )}
                       <Text>{coin.symbol}</Text>
                     </Link>
                   </Table.Cell>

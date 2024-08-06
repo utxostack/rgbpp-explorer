@@ -66,7 +66,11 @@ export default async function Page() {
                     color="text.link"
                     cursor="pointer"
                   >
-                    {coin.icon ? <styled.img w="32px" h="32px" src={coin.icon} /> : <BtcIcon w="32px" h="32px" />}
+                    {coin.icon ? (
+                      <styled.img w="32px" h="32px" src={coin.icon} rounded="100%" />
+                    ) : (
+                      <BtcIcon w="32px" h="32px" />
+                    )}
                     <TextOverflowTooltip label={coin.symbol}>
                       <Text maxW="200px" truncate cursor="pointer">
                         {coin.symbol}
