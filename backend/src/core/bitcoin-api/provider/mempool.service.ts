@@ -139,16 +139,8 @@ export class MempoolService implements IBitcoinDataProvider {
   }
 
   public async getTransactionTimes({ txids }: { txids: string[] }) {
-    try {
-      if (txids.length === 1) {
-        txids.push('1e158327e52acae35de94962e60e53fc70f6b175b0cfc3e2058bed4b895203b4')
-      }
-      const response = await this.mempool.bitcoin.transactions.getTransactionTimes({ txId: txids });
-      return response;
-    } catch (e) {
-      console.error(e);
-    }
-    return [0];
+    const response = await this.mempool.bitcoin.transactions.getTransactionTimes({ txId: txids });
+    return response;
   }
 
   public async getBlock({ hash }: { hash: string }) {
