@@ -42,9 +42,9 @@ export function BtcBlockOverview({
         >
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Block size`}</Text>
-            <Text color="brand">
+            <Text>
               {formatNumber(block.size)}
-              <Text as="span" color="12px">
+              <Text as="span" color="12px" ml="8px">
                 {t(i18n)`bytes`}
               </Text>
             </Text>
@@ -69,7 +69,7 @@ export function BtcBlockOverview({
               label={
                 <Text whiteSpace="nowrap">
                   {formatNumber(block.feeRateRange.min)}
-                  <Text as="span" color="12px">
+                  <Text as="span" color="12px" ml="4px">
                     {t(i18n)`sats/VB`}
                   </Text>
                   ~ {formatNumber(BigNumber(block.feeRateRange.max))}{' '}
@@ -78,10 +78,11 @@ export function BtcBlockOverview({
                   </Text>
                 </Text>
               }
+              contentProps={{ maxW: 'unset' }}
             >
               <Text whiteSpace="nowrap" maxW="250px" truncate>
                 {formatNumber(block.feeRateRange.min)}
-                <Text as="span" color="12px">
+                <Text as="span" color="12px" ml="4px">
                   {t(i18n)`sats/VB`}
                 </Text>
                 ~ {formatNumber(BigNumber(block.feeRateRange.max))}{' '}

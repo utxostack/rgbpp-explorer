@@ -37,9 +37,9 @@ export function CkbBlockOverview({
         >
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Block size`}</Text>
-            <Text color="brand">
+            <Text>
               {formatNumber(block.size ?? undefined)}
-              <Text as="span" color="12px" ml="4px">
+              <Text as="span" color="12px" ml="8px">
                 {t(i18n)`bytes`}
               </Text>
             </Text>
