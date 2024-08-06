@@ -15,7 +15,6 @@ import { formatNumber } from '@/lib/string/format-number'
 export const CkbDiffTags = memo(function CkbDiffTags({
   inputs = [],
   outputs = [],
-  fee = 0,
   address,
 }: {
   inputs?: CkbCell[]
@@ -28,7 +27,7 @@ export const CkbDiffTags = memo(function CkbDiffTags({
   const outputBalanceWithoutThisAddress = sum(
     outputs.filter((x) => scriptToAddress(x.lock) === address).map((x) => x.capacity),
   )
-  const ckbDiff = shannonToCKB(BigNumber(outputBalanceWithoutThisAddress).minus(BigNumber(inputBalance).plus(fee)))
+  const ckbDiff = shannonToCKB(BigNumber(outputBalanceWithoutThisAddress).minus(BigNumber(inputBalance)))
 
   // xudt
   const allXudt = compact(inputs.map((x) => x.xudtInfo))

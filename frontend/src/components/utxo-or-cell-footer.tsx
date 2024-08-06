@@ -5,9 +5,10 @@ import { isNumber } from 'lodash-es'
 import { ReactNode } from 'react'
 import { Box, Flex, HStack } from 'styled-system/jsx'
 
+import { BtcDiffTags } from '@/components/btc/btc-diff-tags'
 import { CkbDiffTags } from '@/components/ckb/ckb-diff-tags'
 import { Text } from '@/components/ui'
-import { CkbTransaction } from '@/gql/graphql'
+import { BitcoinInput, BitcoinOutput, CkbTransaction } from '@/gql/graphql'
 import { formatNumber } from '@/lib/string/format-number'
 
 export function UtxoOrCellFooter({
@@ -15,6 +16,7 @@ export function UtxoOrCellFooter({
   feeRate,
   confirmations,
   ckbCell,
+  btcUtxo,
   feeUnit,
   address,
 }: {
@@ -23,6 +25,10 @@ export function UtxoOrCellFooter({
   feeRate?: number
   confirmations?: number
   ckbCell?: Pick<CkbTransaction, 'inputs' | 'outputs'>
+  btcUtxo?: {
+    vin?: BitcoinInput[]
+    vout?: BitcoinOutput[]
+  }
   feeUnit?: ReactNode
 }) {
   return (
@@ -61,6 +67,7 @@ export function UtxoOrCellFooter({
       </HStack>
       <HStack gap="16px">
         {ckbCell ? <CkbDiffTags {...ckbCell} address={address} /> : null}
+        {btcUtxo ? <BtcDiffTags {...btcUtxo} address={address} /> : null}
         {isNumber(confirmations) ? (
           <Box bg="brand" py="8px" px="16px" rounded="4px">
             <Trans>{formatNumber(confirmations)} confirmed</Trans>

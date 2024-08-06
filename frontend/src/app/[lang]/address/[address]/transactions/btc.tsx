@@ -107,6 +107,7 @@ export async function BtcTransactionsByAddress({ address }: { address: string })
           feeRate={tx.feeRate}
           feeUnit={t(i18n)`sats`}
           address={address}
+          btcUtxo={{ vin: tx.vin as BitcoinInput[], vout: tx.vout as BitcoinOutput[] }}
         />
       </VStack>
     )
