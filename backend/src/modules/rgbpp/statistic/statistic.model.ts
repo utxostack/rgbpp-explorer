@@ -1,4 +1,4 @@
 import { ObjectType } from '@nestjs/graphql';
 
-@ObjectType({ description: 'RGB++ Coin' })
+@ObjectType({ description: 'RGB++ Statistic' })
 export class RgbppStatistic {}
