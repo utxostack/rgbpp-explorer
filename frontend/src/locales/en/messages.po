@@ -17,17 +17,33 @@ msgstr ""
 msgid "-"
 msgstr "-"
 
-#: src/components/btc/btc-address-overview.tsx:31
-#~ msgid "{0} BTC"
-#~ msgstr "{0} BTC"
+#: src/components/ckb/ckb-diff-tags.tsx:43
+#: src/components/ckb/ckb-outputs-sum.tsx:30
+msgid "{0} {1}"
+msgstr "{0} {1}"
 
-#: src/components/ckb/ckb-address-overview.tsx:31
-#~ msgid "{0} CKB"
-#~ msgstr "{0} CKB"
+#: src/components/btc/btc-diff-tags.tsx:28
+#: src/components/btc/btc-outputs-sum.tsx:19
+msgid "{0} BTC"
+msgstr "{0} BTC"
 
-#: src/components/utxo-or-cell-footer.tsx:56
+#: src/components/ckb/ckb-diff-tags.tsx:64
+#: src/components/ckb/ckb-outputs-sum.tsx:46
+msgid "{0} CKB"
+msgstr "{0} CKB"
+
+#: src/components/utxo-or-cell-footer.tsx:73
 msgid "{0} confirmed"
 msgstr "{0} confirmed"
+
+#: src/components/ckb/ckb-diff-tags.tsx:71
+#: src/components/ckb/ckb-outputs-sum.tsx:53
+msgid "{0} DOB"
+msgstr "{0} DOB"
+
+#: src/components/btc/btc-block-overview.tsx:70
+msgid "{0} sats/VB ~ {1} sats/VB"
+msgstr "{0} sats/VB ~ {1} sats/VB"
 
 #: src/components/ckb/ckb-address-overview.tsx:32
 #~ msgid "{0}} CKB"
@@ -68,7 +84,7 @@ msgstr "<0>{0}</0><1>DOB</1>"
 msgid "🔥 Popular RGB++ Assets"
 msgstr "🔥 Popular RGB++ Assets"
 
-#: src/app/[lang]/address/[address]/layout.tsx:67
+#: src/app/[lang]/address/[address]/layout.tsx:68
 msgid "Address"
 msgstr "Address"
 
@@ -99,23 +115,23 @@ msgstr "Block {0}"
 
 #: src/app/[lang]/explorer/btc/info.tsx:56
 #: src/app/[lang]/explorer/ckb/info.tsx:52
-#: src/components/btc/btc-transaction-overview.tsx:32
-#: src/components/ckb/ckb-transaction-overview.tsx:32
+#: src/components/btc/btc-transaction-overview.tsx:36
+#: src/components/ckb/ckb-transaction-overview.tsx:34
 #: src/components/network-cards.tsx:80
 #: src/components/network-cards.tsx:113
 msgid "Block Height"
 msgstr "Block Height"
 
-#: src/components/btc/btc-block-overview.tsx:43
-#: src/components/ckb/ckb-block-overview.tsx:38
+#: src/components/btc/btc-block-overview.tsx:46
+#: src/components/ckb/ckb-block-overview.tsx:39
 msgid "Block size"
 msgstr "Block size"
 
 #: src/components/btc/btc-address-overview.tsx:34
 #: src/components/btc/btc-address-overview.tsx:42
 #: src/components/btc/btc-address-overview.tsx:49
-#: src/components/btc/btc-utxo-tables.tsx:91
-#: src/components/btc/btc-utxo-tables.tsx:137
+#: src/components/btc/btc-utxo-tables.tsx:107
+#: src/components/btc/btc-utxo-tables.tsx:153
 msgid "BTC"
 msgstr "BTC"
 
@@ -127,18 +143,18 @@ msgstr "BTC Balance"
 msgid "BTC Txn"
 msgstr "BTC Txn"
 
-#: src/components/btc/btc-block-overview.tsx:47
-#: src/components/btc/btc-transaction-overview.tsx:46
-#: src/components/ckb/ckb-block-overview.tsx:42
+#: src/components/btc/btc-block-overview.tsx:48
+#: src/components/btc/btc-transaction-overview.tsx:48
+#: src/components/ckb/ckb-block-overview.tsx:41
 #: src/components/ckb/ckb-transaction-overview.tsx:46
 msgid "bytes"
 msgstr "bytes"
 
 #: src/app/[lang]/explorer/ckb/info.tsx:39
 #: src/components/ckb/ckb-address-overview.tsx:34
-#: src/components/ckb/ckb-block-overview.tsx:71
-#: src/components/ckb/ckb-cell-tables.tsx:83
-#: src/components/ckb/ckb-transaction-overview.tsx:65
+#: src/components/ckb/ckb-block-overview.tsx:85
+#: src/components/ckb/ckb-cell-tables.tsx:114
+#: src/components/ckb/ckb-transaction-overview.tsx:62
 #: src/components/footer.tsx:91
 #: src/components/navbar.tsx:60
 #: src/components/network-cards.tsx:106
@@ -156,6 +172,11 @@ msgstr "CKB Txn"
 #: src/app/[lang]/assets/coins/page.tsx:49
 msgid "Coin"
 msgstr "Coin"
+
+#: src/components/btc/btc-utxo-tables.tsx:67
+#: src/components/ckb/ckb-cell-tables.tsx:50
+msgid "Coinbase"
+msgstr "Coinbase"
 
 #: src/app/[lang]/assets/layout.tsx:16
 msgid "Coins"
@@ -210,6 +231,10 @@ msgstr "Copy"
 msgid "Deploy Time"
 msgstr "Deploy Time"
 
+#: src/components/ckb/ckb-cell-tables.tsx:129
+msgid "DOB"
+msgstr "DOB"
+
 #: src/app/[lang]/assets/layout.tsx:20
 msgid "DOBs"
 msgstr "DOBs"
@@ -235,13 +260,13 @@ msgstr "Explorer"
 msgid "Fast"
 msgstr "Fast"
 
-#: src/components/btc/btc-transaction-overview.tsx:61
-#: src/components/ckb/ckb-transaction-overview.tsx:61
+#: src/components/btc/btc-transaction-overview.tsx:62
+#: src/components/ckb/ckb-transaction-overview.tsx:60
 msgid "Fee"
 msgstr "Fee"
 
-#: src/components/btc/btc-transaction-overview.tsx:70
-#: src/components/ckb/ckb-transaction-overview.tsx:70
+#: src/components/btc/btc-transaction-overview.tsx:68
+#: src/components/ckb/ckb-transaction-overview.tsx:66
 msgid "Fee rate"
 msgstr "Fee rate"
 
@@ -249,13 +274,18 @@ msgstr "Fee rate"
 msgid "Fee rate span"
 msgstr "Fee rate span"
 
-#: src/app/[lang]/block/btc/[hashOrHeight]/transactions/page.tsx:113
+#: src/app/[lang]/block/btc/[hashOrHeight]/transactions/page.tsx:116
+#: src/app/[lang]/block/ckb/[hashOrHeight]/transactions/page.tsx:130
 msgid "Fee rate:"
 msgstr "Fee rate:"
 
+#: src/components/utxo-or-cell-footer.tsx:58
+msgid "Fee rate:<0>{0}</0>{feeUnit}"
+msgstr "Fee rate:<0>{0}</0>{feeUnit}"
+
 #: src/components/utxo-or-cell-footer.tsx:43
-msgid "Fee rate:<0>{0}</0>sats/vB"
-msgstr "Fee rate:<0>{0}</0>sats/vB"
+#~ msgid "Fee rate:<0>{0}</0>sats/vB"
+#~ msgstr "Fee rate:<0>{0}</0>sats/vB"
 
 #: src/app/[lang]/explorer/btc/info.tsx:72
 msgid "High"
@@ -267,8 +297,8 @@ msgstr "High"
 msgid "Holders"
 msgstr "Holders"
 
-#: src/components/btc/btc-utxo-tables.tsx:35
-#: src/components/ckb/ckb-cell-tables.tsx:34
+#: src/components/btc/btc-utxo-tables.tsx:36
+#: src/components/ckb/ckb-cell-tables.tsx:36
 msgid "Inputs ({0})"
 msgstr "Inputs ({0})"
 
@@ -346,12 +376,12 @@ msgstr "Mainnet"
 msgid "Medium"
 msgstr "Medium"
 
-#: src/components/btc/btc-block-overview.tsx:94
-#: src/components/ckb/ckb-block-overview.tsx:61
+#: src/components/btc/btc-block-overview.tsx:91
+#: src/components/ckb/ckb-block-overview.tsx:59
 msgid "Miner"
 msgstr "Miner"
 
-#: src/components/ckb/ckb-block-overview.tsx:67
+#: src/components/ckb/ckb-block-overview.tsx:83
 msgid "Miner Reward"
 msgstr "Miner Reward"
 
@@ -379,12 +409,12 @@ msgstr "Occupied"
 msgid "Oops! Your search did not match any record."
 msgstr "Oops! Your search did not match any record."
 
-#: src/components/btc/btc-utxo-tables.tsx:118
+#: src/components/btc/btc-utxo-tables.tsx:134
 msgid "OP_RETURN"
 msgstr "OP_RETURN"
 
-#: src/components/btc/btc-utxo-tables.tsx:51
-#: src/components/ckb/ckb-cell-tables.tsx:50
+#: src/components/btc/btc-utxo-tables.tsx:52
+#: src/components/ckb/ckb-cell-tables.tsx:69
 msgid "Outputs ({0})"
 msgstr "Outputs ({0})"
 
@@ -398,11 +428,11 @@ msgstr "Outputs ({0})"
 #~ msgstr "Overflow"
 
 #: src/components/btc/btc-address-overview.tsx:19
-#: src/components/btc/btc-block-overview.tsx:29
-#: src/components/btc/btc-transaction-overview.tsx:18
+#: src/components/btc/btc-block-overview.tsx:32
+#: src/components/btc/btc-transaction-overview.tsx:20
 #: src/components/ckb/ckb-address-overview.tsx:19
-#: src/components/ckb/ckb-block-overview.tsx:24
-#: src/components/ckb/ckb-transaction-overview.tsx:18
+#: src/components/ckb/ckb-block-overview.tsx:25
+#: src/components/ckb/ckb-transaction-overview.tsx:20
 msgid "Overview"
 msgstr "Overview"
 
@@ -410,7 +440,7 @@ msgstr "Overview"
 msgid "RGB++"
 msgstr "RGB++"
 
-#: src/app/[lang]/address/[address]/layout.tsx:81
+#: src/app/[lang]/address/[address]/layout.tsx:89
 #: src/components/navbar.tsx:112
 msgid "RGB++ Assets"
 msgstr "RGB++ Assets"
@@ -442,12 +472,13 @@ msgstr "RGB++ Networks"
 msgid "RGB++ Txns"
 msgstr "RGB++ Txns"
 
-#: src/components/btc/btc-transaction-overview.tsx:74
+#: src/components/btc/btc-transaction-overview.tsx:70
 msgid "sat/VB"
 msgstr "sat/VB"
 
-#: src/app/[lang]/block/btc/[hashOrHeight]/transactions/page.tsx:110
-#: src/components/btc/btc-transaction-overview.tsx:65
+#: src/app/[lang]/address/[address]/transactions/btc.tsx:108
+#: src/app/[lang]/block/btc/[hashOrHeight]/transactions/page.tsx:113
+#: src/components/btc/btc-transaction-overview.tsx:64
 msgid "sats"
 msgstr "sats"
 
@@ -458,14 +489,12 @@ msgstr "sats"
 msgid "sats/kB"
 msgstr "sats/kB"
 
-#: src/app/[lang]/block/btc/[hashOrHeight]/transactions/page.tsx:117
+#: src/app/[lang]/block/btc/[hashOrHeight]/transactions/page.tsx:120
 msgid "sats/vB"
 msgstr "sats/vB"
 
-#: src/components/btc/btc-block-overview.tsx:72
-#: src/components/btc/btc-block-overview.tsx:76
-#: src/components/btc/btc-block-overview.tsx:84
-#: src/components/btc/btc-block-overview.tsx:88
+#: src/components/btc/btc-block-overview.tsx:80
+#: src/components/btc/btc-block-overview.tsx:85
 msgid "sats/VB"
 msgstr "sats/VB"
 
@@ -487,16 +516,21 @@ msgstr "SDK"
 msgid "Search by Address/Tx Hash/Block Hash/AssetID"
 msgstr "Search by Address/Tx Hash/Block Hash/AssetID"
 
-#: src/app/[lang]/block/ckb/[hashOrHeight]/transactions/page.tsx:108
+#: src/app/[lang]/address/[address]/transactions/ckb.tsx:117
+#: src/app/[lang]/block/ckb/[hashOrHeight]/transactions/page.tsx:127
+msgid "shannons"
+msgstr "shannons"
+
+#: src/app/[lang]/block/ckb/[hashOrHeight]/transactions/page.tsx:134
 #: src/app/[lang]/explorer/ckb/info.tsx:73
 #: src/app/[lang]/explorer/ckb/info.tsx:85
 #: src/app/[lang]/explorer/ckb/info.tsx:97
-#: src/components/ckb/ckb-transaction-overview.tsx:74
+#: src/components/ckb/ckb-transaction-overview.tsx:68
 msgid "shannons/kB"
 msgstr "shannons/kB"
 
-#: src/components/btc/btc-transaction-overview.tsx:42
-#: src/components/ckb/ckb-transaction-overview.tsx:42
+#: src/components/btc/btc-transaction-overview.tsx:46
+#: src/components/ckb/ckb-transaction-overview.tsx:44
 msgid "Size"
 msgstr "Size"
 
@@ -524,7 +558,7 @@ msgstr "Supply"
 msgid "Testnet"
 msgstr "Testnet"
 
-#: src/app/[lang]/address/[address]/layout.tsx:61
+#: src/app/[lang]/address/[address]/layout.tsx:62
 msgid "The address \"{address}\" not found"
 msgstr "The address \"{address}\" not found"
 
@@ -547,11 +581,11 @@ msgid "Total {0} Items"
 msgstr "Total {0} Items"
 
 #: src/components/btc/btc-block-overview.tsx:52
-#: src/components/ckb/ckb-block-overview.tsx:47
+#: src/components/ckb/ckb-block-overview.tsx:45
 msgid "Transaction"
 msgstr "Transaction"
 
-#: src/app/[lang]/address/[address]/layout.tsx:77
+#: src/app/[lang]/address/[address]/layout.tsx:85
 #: src/app/[lang]/assets/coins/[typeHash]/layout.tsx:62
 #: src/app/[lang]/block/btc/[hashOrHeight]/layout.tsx:92
 #: src/app/[lang]/block/ckb/[hashOrHeight]/layout.tsx:86
@@ -569,14 +603,18 @@ msgstr "Try again"
 msgid "Tx hash"
 msgstr "Tx hash"
 
-#: src/app/[lang]/block/btc/[hashOrHeight]/transactions/page.tsx:106
-#: src/app/[lang]/block/ckb/[hashOrHeight]/transactions/page.tsx:104
+#: src/app/[lang]/block/btc/[hashOrHeight]/transactions/page.tsx:109
+#: src/app/[lang]/block/ckb/[hashOrHeight]/transactions/page.tsx:123
 msgid "Txn fee:"
 msgstr "Txn fee:"
 
+#: src/components/utxo-or-cell-footer.tsx:47
+msgid "Txn fee:<0>{0} </0>{feeUnit}"
+msgstr "Txn fee:<0>{0} </0>{feeUnit}"
+
 #: src/components/utxo-or-cell-footer.tsx:32
-msgid "Txn fee:<0>{0} </0>sats"
-msgstr "Txn fee:<0>{0} </0>sats"
+#~ msgid "Txn fee:<0>{0} </0>sats"
+#~ msgstr "Txn fee:<0>{0} </0>sats"
 
 #: src/components/btc/btc-address-overview.tsx:63
 #: src/components/ckb/ckb-address-overview.tsx:56
