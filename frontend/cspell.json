@@ -27,7 +27,8 @@
     "XUDT",
     "MNFT",
     "bitcoinerlab",
-    "secp"
+    "secp",
+    "bech"
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",
