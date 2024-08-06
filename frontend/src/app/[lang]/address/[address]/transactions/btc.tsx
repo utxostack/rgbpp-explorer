@@ -1,12 +1,15 @@
+import { t } from '@lingui/macro'
 import { last } from 'lodash-es'
 import { Center, HStack } from 'styled-system/jsx'
 
 import { BtcTransactionCardInAddress } from '@/components/btc/btc-transaction-card-in-address'
 import { FailedFallback } from '@/components/failed-fallback'
+import { NoData } from '@/components/no-data'
 import { Button } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { graphql } from '@/gql'
 import { BitcoinTransaction } from '@/gql/graphql'
+import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { getUrl } from '@/lib/get-url'
 import { graphQLClient } from '@/lib/graphql'
 
@@ -76,6 +79,7 @@ const query = graphql(`
 `)
 
 export async function BtcTransactionsByAddress({ address }: { address: string }) {
+  const i18n = getI18nFromHeaders()
   const url = getUrl()
   const afterTxid = url.searchParams.get('afterTxid')
 
@@ -92,14 +96,20 @@ export async function BtcTransactionsByAddress({ address }: { address: string })
 
   return (
     <>
-      {btcAddress.transactions.map((tx) => {
-        return <BtcTransactionCardInAddress address={address} tx={tx as BitcoinTransaction} key={tx.txid} />
-      })}
+      {!btcAddress.transactions.length ? (
+        <Center w="100%" bg="bg.card" pt="80px" pb="120px" rounded="8px">
+          <NoData>{t(i18n)`No Transaction`}</NoData>
+        </Center>
+      ) : (
+        btcAddress.transactions.map((tx) => {
+          return <BtcTransactionCardInAddress address={address} tx={tx as BitcoinTransaction} key={tx.txid} />
+        })
+      )}
       <Center w="100%">
         <HStack gap="16px">
           {afterTxid ? (
             <Link href={`/address/${address}/transactions`}>
-              <Button>Back to first page</Button>
+              <Button>{t(i18n)`Back to first page`}</Button>
             </Link>
           ) : null}
           {nextCursor ? (
@@ -111,7 +121,7 @@ export async function BtcTransactionsByAddress({ address }: { address: string })
                 },
               }}
             >
-              <Button>Next</Button>
+              <Button>{t(i18n)`Next`}</Button>
             </Link>
           ) : null}
         </HStack>

@@ -1,9 +1,10 @@
 import { t } from '@lingui/macro'
-import { Flex, HStack, VStack } from 'styled-system/jsx'
+import { Center, Flex, HStack, VStack } from 'styled-system/jsx'
 
 import { CkbCellTables } from '@/components/ckb/ckb-cell-tables'
 import { Copier } from '@/components/copier'
 import { FailedFallback } from '@/components/failed-fallback'
+import { NoData } from '@/components/no-data'
 import { PaginationSearchParams } from '@/components/pagination-searchparams'
 import { TimeFormatter } from '@/components/time-formatter'
 import { Text } from '@/components/ui'
@@ -106,29 +107,35 @@ export async function CkbTransactionsByAddress({ address }: { address: string })
 
   return (
     <>
-      {ckbAddress.transactions.map((tx) => {
-        return (
-          <VStack key={tx.hash} w="100%" gap={0} bg="bg.card" rounded="8px">
-            <Flex w="100%" bg="bg.input" justifyContent="space-between" py="20px" px="30px" roundedTop="8px">
-              <Copier value={tx.hash} onlyIcon>
-                <Link color="brand" href={`/transaction/${tx.hash}`}>
-                  {tx.hash}
-                </Link>
-              </Copier>
-              {tx.block ? <TimeFormatter timestamp={tx.block.timestamp} /> : null}
-            </Flex>
-            <CkbCellTables inputs={tx.inputs} outputs={tx.outputs} isCellbase={tx.isCellbase} address={address} />
-            <UtxoOrCellFooter
-              fee={tx.fee}
-              confirmations={tx.confirmations}
-              feeRate={tx.feeRate}
-              ckbCell={tx}
-              feeUnit={t(i18n)`shannons`}
-              address={address}
-            />
-          </VStack>
-        )
-      })}
+      {!ckbAddress.transactions.length ? (
+        <Center w="100%" bg="bg.card" pt="80px" pb="120px" rounded="8px">
+          <NoData>{t(i18n)`No Transaction`}</NoData>
+        </Center>
+      ) : (
+        ckbAddress.transactions.map((tx) => {
+          return (
+            <VStack key={tx.hash} w="100%" gap={0} bg="bg.card" rounded="8px">
+              <Flex w="100%" bg="bg.input" justifyContent="space-between" py="20px" px="30px" roundedTop="8px">
+                <Copier value={tx.hash} onlyIcon>
+                  <Link color="brand" href={`/transaction/${tx.hash}`}>
+                    {tx.hash}
+                  </Link>
+                </Copier>
+                {tx.block ? <TimeFormatter timestamp={tx.block.timestamp} /> : null}
+              </Flex>
+              <CkbCellTables inputs={tx.inputs} outputs={tx.outputs} isCellbase={tx.isCellbase} address={address} />
+              <UtxoOrCellFooter
+                fee={tx.fee}
+                confirmations={tx.confirmations}
+                feeRate={tx.feeRate}
+                ckbCell={tx}
+                feeUnit={t(i18n)`shannons`}
+                address={address}
+              />
+            </VStack>
+          )
+        })
+      )}
       <HStack ml="auto" gap="16px" mt="auto" p="30px">
         <Text fontSize="14px">{t(i18n)`Total ${formatNumber(ckbAddress.transactionsCount)} Items`}</Text>
         <PaginationSearchParams count={ckbAddress.transactionsCount ?? 0} pageSize={pageSize} />
