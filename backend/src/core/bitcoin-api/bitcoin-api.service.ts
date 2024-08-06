@@ -206,7 +206,6 @@ export class BitcoinApiService {
   }
 
   public async getTransactionTimes({ txids }: { txids: string[] }) {
-    console.log('txids', txids);
     return this.call('getTransactionTimes', { txids });
   }
 
