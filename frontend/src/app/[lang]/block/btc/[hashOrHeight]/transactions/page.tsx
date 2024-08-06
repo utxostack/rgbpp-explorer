@@ -1,7 +1,8 @@
 import { t } from '@lingui/macro'
 import { notFound } from 'next/navigation'
-import { Flex, VStack } from 'styled-system/jsx'
+import { Flex, HStack, VStack } from 'styled-system/jsx'
 
+import { BtcOutputsSum } from '@/components/btc/btc-outputs-sum'
 import { BtcUtxoTables } from '@/components/btc/btc-utxo-tables'
 import { TimeFormatter } from '@/components/time-formatter'
 import { Text } from '@/components/ui'
@@ -118,6 +119,9 @@ export default async function Page({ params: { hashOrHeight } }: { params: { has
                 </Text>
                 {t(i18n)`sats/vB`}
               </Text>
+              <HStack ml="auto" gap="16px">
+                <BtcOutputsSum vout={transaction.vout as BitcoinOutput[]} />
+              </HStack>
             </Flex>
           </VStack>
         )

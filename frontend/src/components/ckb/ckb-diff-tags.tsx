@@ -2,7 +2,7 @@
 
 import { Trans } from '@lingui/macro'
 import BigNumber from 'bignumber.js'
-import { compact, sum } from 'lodash-es'
+import { compact, sum, uniqBy } from 'lodash-es'
 import { memo } from 'react'
 import { Flex } from 'styled-system/jsx'
 
@@ -19,7 +19,6 @@ export const CkbDiffTags = memo(function CkbDiffTags({
 }: {
   inputs?: CkbCell[]
   outputs?: CkbCell[]
-  fee?: BigNumber.Value
   address: string
 }) {
   // ckb
@@ -30,22 +29,14 @@ export const CkbDiffTags = memo(function CkbDiffTags({
   const ckbDiff = shannonToCKB(BigNumber(outputBalanceWithoutThisAddress).minus(BigNumber(inputBalance)))
 
   // xudt
-  const allXudt = compact(inputs.map((x) => x.xudtInfo))
+  const allXudt = uniqBy(compact(inputs.map((x) => x.xudtInfo)), (x) => x?.symbol)
   const xudtTags = allXudt.map((xudt) => {
-    const balance = sum(
-      compact(
-        inputs
-          .filter((x) => scriptToAddress(x.lock) === address && x.xudtInfo?.symbol === xudt?.symbol)
-          .map((x) => x.xudtInfo?.amount),
-      ),
-    )
-    const xudtBalanceWithoutThisAddress = sum(
-      compact(
-        outputs
-          .filter((x) => scriptToAddress(x.lock) === address && x.xudtInfo?.symbol === xudt?.symbol)
-          .map((x) => x.xudtInfo?.amount),
-      ),
-    )
+    const balance = inputs
+      .filter((x) => scriptToAddress(x.lock) === address && x.xudtInfo?.symbol === xudt?.symbol)
+      .reduce((acc, x) => acc.plus(x.xudtInfo?.amount || 0), BigNumber(0))
+    const xudtBalanceWithoutThisAddress = outputs
+      .filter((x) => scriptToAddress(x.lock) === address && x.xudtInfo?.symbol === xudt?.symbol)
+      .reduce((acc, x) => acc.plus(x.xudtInfo?.amount || 0), BigNumber(0))
     const diff = BigNumber(xudtBalanceWithoutThisAddress).minus(BigNumber(balance))
     return !diff.isZero() ? (
       <Flex align="center" bg="brand" py="8px" px="16px" rounded="4px">

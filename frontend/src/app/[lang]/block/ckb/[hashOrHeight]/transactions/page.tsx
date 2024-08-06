@@ -1,8 +1,9 @@
 import { t } from '@lingui/macro'
 import { notFound } from 'next/navigation'
-import { Flex, VStack } from 'styled-system/jsx'
+import { Flex, HStack, VStack } from 'styled-system/jsx'
 
 import { CkbCellTables } from '@/components/ckb/ckb-cell-tables'
+import { CkbOutputsSum } from '@/components/ckb/ckb-outputs-sum'
 import { TimeFormatter } from '@/components/time-formatter'
 import { Text } from '@/components/ui'
 import Link from '@/components/ui/link'
@@ -131,6 +132,9 @@ export default async function Page({ params: { hashOrHeight } }: { params: { has
                 </Text>
                 {t(i18n)`shannons/kB`}
               </Text>
+              <HStack gap="16px" ml="auto">
+                <CkbOutputsSum outputs={transaction.outputs} />
+              </HStack>
             </Flex>
           </VStack>
         )
