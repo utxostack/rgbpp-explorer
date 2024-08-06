@@ -93,7 +93,11 @@ function UtxoInput({ vin, currentAddress }: { vin: BitcoinInput; currentAddress?
       borderBottomColor="border.primary"
     >
       <HStack gap="8px">
-        <SubTractIcon color={vin.prevout?.status.spent ? 'text.third' : 'success.unspent'} w="16px" h="16px" />
+        <SubTractIcon
+          color={vin.isCoinbase || vin.prevout?.status.spent ? 'text.third' : 'success.unspent'}
+          w="16px"
+          h="16px"
+        />
         {text}
       </HStack>
       <VStack gap={0}>
