@@ -21,7 +21,7 @@ export class RgbppTransactionService {
     private ckbRpcService: CkbRpcWebsocketService,
     private bitcoinApiService: BitcoinApiService,
     private configService: ConfigService<Env>,
-  ) {}
+  ) { }
 
   public async getLatestTransactions(
     page: number,
@@ -61,17 +61,23 @@ export class RgbppTransactionService {
             },
             script_type: 'lock',
           },
-          'desc',
+          'asc',
           '0x64',
         );
       }),
     );
     for (const ckbTx of ckbTxs) {
-      if (ckbTx.objects.length > 0) {
-        const [tx] = ckbTx.objects;
+      if (ckbTx.objects.length === 0) {
+        continue;
+      }
+
+      for (const tx of ckbTx.objects) {
         const response = await this.ckbExplorerService.getTransaction(tx.tx_hash);
         if (response.data.attributes.is_rgb_transaction) {
-          return RgbppTransaction.fromCkbTransaction(response.data.attributes);
+          const rgbppTx = RgbppTransaction.fromCkbTransaction(response.data.attributes);
+          if (rgbppTx.btcTxid === txid) {
+            return rgbppTx;
+          }
         }
       }
     }
@@ -90,6 +96,7 @@ export class RgbppTransactionService {
     } catch (err) {
       this.logger.error(err);
     }
+    console.log(tx);
     return tx;
   }
 
