@@ -4,10 +4,11 @@ import type { PropsWithChildren, ReactNode } from 'react'
 import { HStack, VStack } from 'styled-system/jsx'
 
 import { BtcAddressOverview } from '@/components/btc/btc-address-overview'
+import { BtcAddressType } from '@/components/btc/btc-address-type'
 import { CkbAddressOverview } from '@/components/ckb/ckb-address-overview'
 import { Copier } from '@/components/copier'
 import { LinkTabs } from '@/components/link-tabs'
-import { Heading } from '@/components/ui'
+import { Heading, Text } from '@/components/ui'
 import { graphql } from '@/gql'
 import { isValidBTCAddress } from '@/lib/btc/is-valid-btc-address'
 import { isValidCkbAddress } from '@/lib/ckb/is-valid-ckb-address'
@@ -66,7 +67,14 @@ export default async function Layout({
         <Heading fontSize="20px" fontWeight="semibold">
           {t(i18n)`Address`}
         </Heading>
-        <Copier value={address}>{address}</Copier>
+        <Copier value={address}>
+          <HStack maxW="calc(1160px - 100px - 24px)" truncate>
+            <Text as="span" wordBreak="break-all" whiteSpace="wrap" textAlign="left">
+              {address}
+            </Text>
+            <BtcAddressType address={address} />
+          </HStack>
+        </Copier>
       </HStack>
       {overflow}
       <LinkTabs
