@@ -1,22 +1,19 @@
-import { t } from '@lingui/macro'
-import { Flex, VStack } from 'styled-system/jsx'
+import { last } from 'lodash-es'
+import { Center, HStack } from 'styled-system/jsx'
 
-import { BtcUtxoTables } from '@/components/btc/btc-utxo-tables'
-import { Copier } from '@/components/copier'
+import { BtcTransactionCardInAddress } from '@/components/btc/btc-transaction-card-in-address'
 import { FailedFallback } from '@/components/failed-fallback'
-import { TimeFormatter } from '@/components/time-formatter'
+import { Button } from '@/components/ui'
 import Link from '@/components/ui/link'
-import { UtxoOrCellFooter } from '@/components/utxo-or-cell-footer'
 import { graphql } from '@/gql'
-import { BitcoinInput, BitcoinOutput } from '@/gql/graphql'
-import { resolveBtcTime } from '@/lib/btc/resolve-btc-time'
-import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
+import { BitcoinTransaction } from '@/gql/graphql'
+import { getUrl } from '@/lib/get-url'
 import { graphQLClient } from '@/lib/graphql'
 
 const query = graphql(`
-  query BtcTransactionByAddress($address: String!) {
+  query BtcTransactionByAddress($address: String!, $afterTxid: String) {
     btcAddress(address: $address) {
-      transactions {
+      transactions(afterTxid: $afterTxid) {
         blockHeight
         blockHash
         txid
@@ -79,38 +76,42 @@ const query = graphql(`
 `)
 
 export async function BtcTransactionsByAddress({ address }: { address: string }) {
-  const i18n = getI18nFromHeaders()
+  const url = getUrl()
+  const afterTxid = url.searchParams.get('afterTxid')
+
   const { btcAddress } = await graphQLClient.request(query, {
     address,
-    page: 1,
-    pageSize: 10,
+    afterTxid,
   })
 
   if (!btcAddress) {
     return <FailedFallback />
   }
 
-  return btcAddress.transactions.map((tx) => {
-    return (
-      <VStack key={tx.txid} w="100%" gap={0} bg="bg.card" rounded="8px">
-        <Flex w="100%" bg="bg.input" justifyContent="space-between" py="20px" px="30px" roundedTop="8px">
-          <Copier value={tx.txid} onlyIcon>
-            <Link color="brand" href={`/transaction/${tx.txid}`}>
-              {tx.txid}
+  return (
+    <>
+      {btcAddress.transactions.map((tx) => {
+        return <BtcTransactionCardInAddress address={address} tx={tx as BitcoinTransaction} key={tx.txid} />
+      })}
+      <Center w="100%">
+        <HStack gap="16px">
+          {afterTxid ? (
+            <Link href={`/address/${address}/transactions`}>
+              <Button>Back to first page</Button>
             </Link>
-          </Copier>
-          {tx.transactionTime ? <TimeFormatter timestamp={resolveBtcTime(tx.transactionTime)} /> : null}
-        </Flex>
-        <BtcUtxoTables vin={tx.vin as BitcoinInput[]} vout={tx.vout as BitcoinOutput[]} currentAddress={address} />
-        <UtxoOrCellFooter
-          fee={tx.fee}
-          confirmations={tx.confirmations}
-          feeRate={tx.feeRate}
-          feeUnit={t(i18n)`sats`}
-          address={address}
-          btcUtxo={{ vin: tx.vin as BitcoinInput[], vout: tx.vout as BitcoinOutput[] }}
-        />
-      </VStack>
-    )
-  })
+          ) : null}
+          <Link
+            href={{
+              pathname: `/address/${address}/transactions`,
+              query: {
+                afterTxid: last(btcAddress.transactions)?.txid,
+              },
+            }}
+          >
+            <Button>Next</Button>
+          </Link>
+        </HStack>
+      </Center>
+    </>
+  )
 }
