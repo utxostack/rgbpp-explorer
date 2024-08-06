@@ -65,7 +65,7 @@ export function UtxoOrCellFooter({
           </Text>
         ) : null}
       </HStack>
-      <HStack gap="16px">
+      <HStack gap="16px" ml="auto" flexWrap="wrap" justify="right" py="12px">
         {ckbCell ? <CkbDiffTags {...ckbCell} address={address} /> : null}
         {btcUtxo ? <BtcDiffTags {...btcUtxo} address={address} /> : null}
         {isNumber(confirmations) ? (

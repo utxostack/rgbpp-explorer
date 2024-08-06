@@ -110,29 +110,31 @@ export default async function Page({ params: { hashOrHeight } }: { params: { has
               isCellbase={transaction.isCellbase}
             />
             <Flex
-              gap="32px"
-              h="72px"
+              minH="72px"
               px="30px"
               w="100%"
               alignItems="center"
               borderTop="1px solid"
               borderTopColor="border.primary"
+              whiteSpace="nowrap"
             >
-              <Text as="span" fontSize="14px" color="text.third">
-                {t(i18n)`Txn fee: `}
-                <Text as="span" color="text.primary" fontWeight="semibold" mx="4px">
-                  {formatNumber(transaction.fee)}
+              <HStack gap="32px" mb="auto" h="72px">
+                <Text as="span" fontSize="14px" color="text.third">
+                  {t(i18n)`Txn fee: `}
+                  <Text as="span" color="text.primary" fontWeight="semibold" mx="4px">
+                    {formatNumber(transaction.fee)}
+                  </Text>
+                  {t(i18n)`shannons`}
                 </Text>
-                {t(i18n)`shannons`}
-              </Text>
-              <Text as="span" fontSize="14px" color="text.third">
-                {t(i18n)`Fee rate: `}
-                <Text as="span" color="text.primary" fontWeight="semibold" mx="4px">
-                  {formatNumber(transaction.feeRate)}
+                <Text as="span" fontSize="14px" color="text.third">
+                  {t(i18n)`Fee rate: `}
+                  <Text as="span" color="text.primary" fontWeight="semibold" mx="4px">
+                    {formatNumber(transaction.feeRate)}
+                  </Text>
+                  {t(i18n)`shannons/kB`}
                 </Text>
-                {t(i18n)`shannons/kB`}
-              </Text>
-              <HStack gap="16px" ml="auto">
+              </HStack>
+              <HStack gap="16px" ml="auto" flexWrap="wrap" justify="right" py="12px">
                 <CkbOutputsSum outputs={transaction.outputs} />
               </HStack>
             </Flex>
