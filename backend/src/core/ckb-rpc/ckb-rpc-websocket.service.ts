@@ -32,7 +32,7 @@ export class CkbRpcWebsocketService {
 
   private async isSafeConfirmations(blockNumber: string): Promise<boolean> {
     const tipBlockNumber = await this.getTipBlockNumber();
-    return BI.from(blockNumber).gt(BI.from(tipBlockNumber).add(CKB_MIN_SAFE_CONFIRMATIONS));
+    return BI.from(blockNumber).lt(BI.from(tipBlockNumber).sub(CKB_MIN_SAFE_CONFIRMATIONS));
   }
 
   @Cacheable({

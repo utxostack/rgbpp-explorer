@@ -22,13 +22,11 @@ import {
 } from './transaction.model';
 import { RgbppTransactionLoader, RgbppTransactionLoaderType } from './transaction.dataloader';
 import { HashType, Output } from '@ckb-lumos/lumos';
-import { RgbppService } from '../rgbpp.service';
 
 @Resolver(() => RgbppTransaction)
 export class RgbppTransactionResolver {
   constructor(
     private rgbppTransactionService: RgbppTransactionService,
-    private rgbppService: RgbppService,
   ) { }
 
   @Query(() => RgbppLatestTransactionList, { name: 'rgbppLatestTransactions' })
@@ -57,44 +55,7 @@ export class RgbppTransactionResolver {
     if (!ckbTx) {
       return null;
     }
-    const inputCells: Output[] = await Promise.all(
-      ckbTx.transaction.inputs.map(async (input) => {
-        const inputTx = await ckbRpcTxLoader.load(input.previous_output.tx_hash);
-        return inputTx?.transaction.outputs?.[input.previous_output.index] ?? null;
-      }),
-    );
-    const hasRgbppLockInput = inputCells.some(
-      (cell) => cell?.lock && this.rgbppService.isRgbppLockScript(cell.lock),
-    );
-    const hasRgbppLockOuput = ckbTx.transaction.outputs.some(
-      (output) =>
-        output?.lock &&
-        this.rgbppService.isRgbppLockScript({
-          codeHash: output.lock.code_hash,
-          hashType: output.lock.hash_type as HashType,
-          args: output.lock.args,
-        }),
-    );
-    const hasBtcTimeLockOutput = ckbTx.transaction.outputs.some(
-      (output) =>
-        output.lock &&
-        this.rgbppService.isBtcTimeLockScript({
-          codeHash: output.lock.code_hash,
-          hashType: output.lock.hash_type as HashType,
-          args: output.lock.args,
-        }),
-    );
-
-    if (hasRgbppLockInput && hasBtcTimeLockOutput) {
-      return LeapDirection.LeapOut;
-    }
-    if (hasRgbppLockInput && hasRgbppLockOuput) {
-      return LeapDirection.Within;
-    }
-    if (!hasRgbppLockInput && hasRgbppLockOuput) {
-      return LeapDirection.LeapIn;
-    }
-    return null;
+    return this.rgbppTransactionService.getLeapDirectionByCkbTx(ckbTx);
   }
 
   @ResolveField(() => CkbTransaction, { nullable: true })
