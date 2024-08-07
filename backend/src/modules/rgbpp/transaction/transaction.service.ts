@@ -14,7 +14,7 @@ import { buildRgbppLockArgs, genRgbppLockScript } from '@rgbpp-sdk/ckb/lib/utils
 import * as BitcoinApiInterface from 'src/core/bitcoin-api/bitcoin-api.schema';
 import * as CkbRpcInterface from 'src/core/ckb-rpc/ckb-rpc.interface';
 import { RgbppService } from '../rgbpp.service';
-import { HashType, Output } from '@ckb-lumos/lumos';
+import { BI, HashType } from '@ckb-lumos/lumos';
 import { Cacheable } from 'src/decorators/cacheable.decorator';
 import { ONE_MONTH_MS } from 'src/common/date';
 
@@ -84,14 +84,19 @@ export class RgbppTransactionService {
     ttl: ONE_MONTH_MS,
   })
   public async getLeapDirectionByCkbTx(ckbTx: CkbRpcInterface.TransactionWithStatusResponse) {
-    const inputCells: Output[] = await Promise.all(
+    const inputCells = await Promise.all(
       ckbTx.transaction.inputs.map(async (input) => {
         const inputTx = await this.ckbRpcService.getTransaction(input.previous_output.tx_hash);
-        return inputTx?.transaction.outputs?.[input.previous_output.index] ?? null;
+        const index = BI.from(input.previous_output.index).toNumber();
+        return inputTx?.transaction.outputs?.[index] ?? null;
       }),
     );
     const hasRgbppLockInput = inputCells.some(
-      (cell) => cell?.lock && this.rgbppService.isRgbppLockScript(cell.lock),
+      (cell) => cell?.lock && this.rgbppService.isRgbppLockScript({
+        codeHash: cell.lock.code_hash,
+        hashType: cell.lock.hash_type as HashType,
+        args: cell.lock.args,
+      }),
     );
     const hasRgbppLockOuput = ckbTx.transaction.outputs.some(
       (output) =>
@@ -111,7 +116,6 @@ export class RgbppTransactionService {
           args: output.lock.args,
         }),
     );
-
     if (hasRgbppLockInput && hasBtcTimeLockOutput) {
       return LeapDirection.LeapOut;
     }
