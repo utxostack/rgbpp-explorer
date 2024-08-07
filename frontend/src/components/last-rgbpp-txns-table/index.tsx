@@ -59,6 +59,7 @@ const query = graphql(`
             txHash
             index
             capacity
+            cellType
             lock {
               codeHash
               hashType
