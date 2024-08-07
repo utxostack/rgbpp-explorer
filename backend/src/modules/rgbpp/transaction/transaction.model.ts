@@ -16,12 +16,6 @@ export enum LeapDirection {
   Within = 'within',
 }
 
-export const LeapDirectionMap = {
-  [CkbExplorer.LeapDirection.In]: LeapDirection.LeapIn,
-  [CkbExplorer.LeapDirection.LeapOutBtc]: LeapDirection.LeapOut,
-  [CkbExplorer.LeapDirection.WithinBtc]: LeapDirection.Within,
-};
-
 registerEnumType(LeapDirection, {
   name: 'LeapDirection',
 });

@@ -71,11 +71,6 @@ export class RgbppTransactionService {
     return tx;
   }
 
-  public async getRgbppDigest(txHash: string): Promise<RgbppDigest | null> {
-    const response = await this.ckbExplorerService.getRgbppDigest(txHash);
-    return response.data ?? null;
-  }
-
   private async queryRgbppLockTx(btcTx: BitcoinApiInterface.Transaction) {
     const ckbTxs = await Promise.all(
       btcTx.vout.map(async (_, index) => {

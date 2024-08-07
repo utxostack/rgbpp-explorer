@@ -18,7 +18,6 @@ import {
   RgbppTransaction,
   RgbppBaseTransaction,
   RgbppLatestTransactionList,
-  LeapDirectionMap,
   LeapDirection,
 } from './transaction.model';
 import { RgbppTransactionLoader, RgbppTransactionLoaderType } from './transaction.dataloader';
