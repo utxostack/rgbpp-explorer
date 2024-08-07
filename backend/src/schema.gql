@@ -311,11 +311,11 @@ type Query {
   btcTransaction(txid: String!): BitcoinTransaction
   rgbppLatestTransactions(page: Int, pageSize: Int): RgbppLatestTransactionList!
   rgbppTransaction(txidOrTxHash: String!): RgbppTransaction
-  btcAddress(address: String!): BitcoinAddress
   rgbppAddress(address: String!): RgbppAddress
   rgbppCoins(page: Int, pageSize: Int, sort: TransactionListSortType): RgbppCoinList!
   rgbppCoin(typeHash: String!): RgbppCoin
   rgbppStatistic: RgbppStatistic!
+  btcAddress(address: String!): BitcoinAddress
   search(query: String!): SearchResult!
 }
 
