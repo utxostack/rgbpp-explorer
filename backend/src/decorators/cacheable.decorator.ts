@@ -3,6 +3,7 @@ import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Logger } from '@nestjs/common';
 import { CacheableRegisterOptions, Cacheable as _Cacheable } from 'nestjs-cacheable';
 import { cacheableHandle, generateComposedKey } from 'nestjs-cacheable/dist/cacheable.helper';
+import * as pkg from '../../package.json';
 
 export interface CustomCacheableRegisterOptions extends CacheableRegisterOptions {
   shouldCache?: (result: any, target: any) => boolean | Promise<boolean>;
@@ -42,7 +43,7 @@ export function Cacheable(options: CustomCacheableRegisterOptions): MethodDecora
         };
         const [key] = generateComposedKey(composeOptions);
         const returnVal = await cacheableHandle(
-          key,
+          `${pkg.name}@${pkg.version}/${key}`,
           () => originalMethod.apply(this, args),
           options.ttl,
         );
