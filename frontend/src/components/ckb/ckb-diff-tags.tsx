@@ -41,6 +41,7 @@ export const CkbDiffTags = memo(function CkbDiffTags({
     return !diff.isZero() ? (
       <Flex align="center" py="8px" px="16px" rounded="4px" bg={diff.isGreaterThan(0) ? 'success' : 'danger'}>
         <Trans>
+          {diff.isGreaterThan(0) ? '+' : ''}
           {formatNumber(diff, xudt?.decimal)} {xudt?.symbol}
         </Trans>
         <MoneyIcon w="16px" h="16px" ml="6px" />
@@ -61,7 +62,10 @@ export const CkbDiffTags = memo(function CkbDiffTags({
     <>
       {!ckbDiff.isZero() ? (
         <Flex align="center" py="8px" px="16px" rounded="4px" bg={ckbDiff.isGreaterThan(0) ? 'success' : 'danger'}>
-          <Trans>{formatNumber(ckbDiff)} CKB</Trans>
+          <Trans>
+            {ckbDiff.isGreaterThan(0) ? '+' : ''}
+            {formatNumber(ckbDiff)} CKB
+          </Trans>
           <MoneyIcon w="16px" h="16px" ml="6px" />
         </Flex>
       ) : null}

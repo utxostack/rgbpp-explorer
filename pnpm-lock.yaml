@@ -224,6 +224,9 @@ importers:
       '@bitcoinerlab/secp256k1':
         specifier: ^1.1.1
         version: 1.1.1
+      '@ckb-lumos/lumos':
+        specifier: ^0.23.0
+        version: 0.23.0
       '@graphql-typed-document-node/core':
         specifier: ^3.2.0
         version: 3.2.0(graphql@16.9.0)
@@ -239,6 +242,9 @@ importers:
       '@nervosnetwork/ckb-sdk-utils':
         specifier: ^0.109.2
         version: 0.109.3
+      '@rgbpp-sdk/ckb':
+        specifier: ^0.5.0
+        version: 0.5.0(@ckb-lumos/lumos@0.23.0)(lodash@4.17.21)
       '@tanstack/react-query':
         specifier: ^5.51.11
         version: 5.51.21(react@18.3.1)
@@ -251,6 +257,9 @@ importers:
       bitcoinjs-lib:
         specifier: ^6.1.6
         version: 6.1.6
+      codec:
+        specifier: link:@ckb-lumos/lumos/codec
+        version: link:@ckb-lumos/lumos/codec
       dayjs:
         specifier: ^1.11.12
         version: 1.11.12

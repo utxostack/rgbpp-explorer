@@ -53,7 +53,13 @@ export function CKBTransactionPage({
       <CkbTransactionOverview ckbTransaction={ckbTransaction} />
       <CkbCells ckbTransaction={ckbTransaction} />
       {btcTransaction ? (
-        <BtcUtxos txid={btcTransaction.txid} vin={btcTransaction.vin} vout={btcTransaction.vout} isBinding />
+        <BtcUtxos
+          txid={btcTransaction.txid}
+          vin={btcTransaction.vin}
+          vout={btcTransaction.vout}
+          isBinding
+          ckbCell={ckbTransaction}
+        />
       ) : null}
     </VStack>
   )

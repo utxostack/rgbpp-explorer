@@ -24,7 +24,12 @@ export function BtcTransactionCardInAddress({ tx, address }: { tx: BitcoinTransa
         </Copier>
         {tx.transactionTime ? <TimeFormatter timestamp={resolveBtcTime(tx.transactionTime)} /> : null}
       </Flex>
-      <BtcUtxoTables vin={tx.vin as BitcoinInput[]} vout={tx.vout as BitcoinOutput[]} currentAddress={address} />
+      <BtcUtxoTables
+        txid={tx.txid}
+        vin={tx.vin as BitcoinInput[]}
+        vout={tx.vout as BitcoinOutput[]}
+        currentAddress={address}
+      />
       <UtxoOrCellFooter
         fee={tx.fee}
         confirmations={tx.confirmations}

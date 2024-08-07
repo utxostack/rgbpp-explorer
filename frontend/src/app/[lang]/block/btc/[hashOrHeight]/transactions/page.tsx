@@ -98,7 +98,11 @@ export default async function Page({ params: { hashOrHeight } }: { params: { has
                 <TimeFormatter timestamp={resolveBtcTime(transaction.transactionTime)} />
               ) : null}
             </Flex>
-            <BtcUtxoTables vin={transaction.vin as BitcoinInput[]} vout={transaction.vout as BitcoinOutput[]} />
+            <BtcUtxoTables
+              txid={transaction.txid}
+              vin={transaction.vin as BitcoinInput[]}
+              vout={transaction.vout as BitcoinOutput[]}
+            />
             <Flex
               h="72px"
               gap="32px"
