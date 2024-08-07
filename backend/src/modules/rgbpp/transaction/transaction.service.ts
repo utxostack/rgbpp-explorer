@@ -12,17 +12,6 @@ import { Env } from 'src/env';
 import { CkbRpcWebsocketService } from 'src/core/ckb-rpc/ckb-rpc-websocket.service';
 import { buildRgbppLockArgs, genRgbppLockScript } from '@rgbpp-sdk/ckb/lib/utils/rgbpp';
 import * as BitcoinApiInterface from 'src/core/bitcoin-api/bitcoin-api.schema';
-import {
-  getBtcTimeLockScript,
-  isScriptEqual,
-  remove0x,
-  btcTxIdAndAfterFromBtcTimeLockArgs,
-} from '@rgbpp-sdk/ckb';
-import { SearchKey } from 'src/core/ckb-rpc/ckb-rpc.interface';
-import * as pLimit from 'p-limit';
-import { BI, HashType } from '@ckb-lumos/lumos';
-
-const limit = pLimit(100);
 
 @Injectable()
 export class RgbppTransactionService {
