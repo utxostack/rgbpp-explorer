@@ -14,10 +14,11 @@ export function HomeTitle() {
     const typed = new Typed(el.current, {
       strings: [
         '<span style="color: #F7931A">BTC</span>',
-        '<span style="color: red">R</span><span style="color: green">G</span><span style="color: blue">B</span>++',
+        'RGB++',
         '<span style="color: var(--colors-brand)">UTXO</span>',
       ],
-      typeSpeed: 50,
+      typeSpeed: 80,
+      backSpeed: 100,
       loop: true,
     })
 
