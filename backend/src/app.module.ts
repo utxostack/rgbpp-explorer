@@ -39,6 +39,7 @@ import configModule from './config';
       useFactory: async (configService: ConfigService<Env>) => {
         const store = (await redisStore({
           url: configService.get('REDIS_URL'),
+          isCacheable: (value) => value !== undefined,
         })) as unknown as CacheStore;
         return {
           store,
