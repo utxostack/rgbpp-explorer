@@ -53,7 +53,6 @@ export class RgbppTransaction {
     return {
       ckbTxHash: tx.tx_hash,
       btcTxid: tx.rgb_txid,
-      leapDirection: LeapDirectionMap[tx.leap_direction],
       blockNumber: tx.block_number,
       timestamp: new Date(tx.block_timestamp),
     };
@@ -62,7 +61,7 @@ export class RgbppTransaction {
   public static fromCkbTransaction(tx: CkbExplorer.Transaction) {
     return {
       ckbTxHash: tx.transaction_hash,
-      btcTxid: tx.rgb_txid,
+      btcTxid: tx.is_rgb_transaction ? tx.rgb_txid : null,
       blockNumber: toNumber(tx.block_number),
       timestamp: new Date(toNumber(tx.create_timestamp)),
     };
