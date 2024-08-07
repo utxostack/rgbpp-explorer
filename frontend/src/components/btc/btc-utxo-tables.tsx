@@ -1,7 +1,6 @@
 'use client'
 
 import { Trans } from '@lingui/macro'
-import { compact } from 'lodash-es'
 import { useMemo } from 'react'
 import { Box, Flex, Grid, HStack, VStack } from 'styled-system/jsx'
 
@@ -26,20 +25,6 @@ export interface BtcUtxoTablesProps {
 }
 
 export function BtcUtxoTables({ txid, vin = [], vout = [], currentAddress, ckbCell }: BtcUtxoTablesProps) {
-  const ckbOutputs = useMemo(() => {
-    if (!txid) return null
-    return compact(
-      ckbCell?.outputs?.filter(isRgbppLockCell).map((cell) => {
-        const { btcTxid, outIndex } = parseRgbppLockArgs(cell.lock.args)
-        if (btcTxid !== txid) return
-        const o = vout[outIndex]
-        if (!o) return
-        return { vout: o, outIndex, cell }
-      }),
-    )
-  }, [ckbCell?.outputs, txid, vout])
-  console.log(ckbOutputs)
-
   return (
     <Grid w="100%" gridTemplateColumns="repeat(2, 1fr)" gap="38px" pt="10px" pb="20px" px="30px">
       <VStack gap={0} w="100%">
