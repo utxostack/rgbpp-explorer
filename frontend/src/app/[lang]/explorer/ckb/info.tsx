@@ -13,7 +13,7 @@ import { formatNumber } from '@/lib/string/format-number'
 
 export async function Info() {
   const i18n = getI18nFromHeaders()
-  const { ckbChainInfo, rgbppStatistic } = await graphQLClient.request(
+  const { ckbChainInfo } = await graphQLClient.request(
     graphql(`
       query CkbChainInfo {
         ckbChainInfo {
@@ -24,9 +24,6 @@ export async function Info() {
             slow
             average
           }
-        }
-        rgbppStatistic {
-          holdersCount
         }
       }
     `),
@@ -54,11 +51,11 @@ export async function Info() {
           </VStack>
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`L2 RGB++ Txns(24H)`}</Text>
-            <Text>{formatNumber(ckbChainInfo.transactionsCountIn24Hours)}</Text>
+            <Text color="text.third">{t(i18n)`Coming Soon`}</Text>
           </VStack>
           <VStack gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`RGB++ Assets Holders`}</Text>
-            <Text>{formatNumber(rgbppStatistic.holdersCount)}</Text>
+            <Text color="text.third">{t(i18n)`Coming Soon`}</Text>
           </VStack>
         </Grid>
         <Grid gridTemplateColumns="repeat(3, 1fr)" bg="bg.card.hover" px="20px" pb="25px" pt="30px" rounded="8px">

@@ -26,7 +26,6 @@ export function Amount({ ckbTransaction }: { ckbTransaction?: Pick<CkbTransactio
   const cellDiff = ckbTransaction.outputs.find((x) => x.xudtInfo)
 
   if (!cellDiff) {
-    console.log(ckbTransaction.outputs)
     return <Trans>-</Trans>
   }
 
