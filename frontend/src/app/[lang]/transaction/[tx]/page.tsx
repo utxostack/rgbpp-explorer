@@ -8,7 +8,7 @@ import { graphQLClient } from '@/lib/graphql'
 
 export const revalidate = 60
 
-const query = graphql(`
+const rgbppTxQuery = graphql(`
   query RgbppTransaction($txidOrTxHash: String!) {
     rgbppTransaction(txidOrTxHash: $txidOrTxHash) {
       ckbTxHash
@@ -148,7 +148,11 @@ const query = graphql(`
         }
       }
     }
-    btcTransaction(txid: $txidOrTxHash) {
+  }
+`)
+const btcTxQuery = graphql(`
+  query BtcTx($txid: String!) {
+    btcTransaction(txid: $txid) {
       blockHeight
       blockHash
       txid
@@ -211,7 +215,11 @@ const query = graphql(`
         }
       }
     }
-    ckbTransaction(txHash: $txidOrTxHash) {
+  }
+`)
+const ckbTxQuery = graphql(`
+  query CkbTx($hash: String!) {
+    ckbTransaction(txHash: $hash) {
       isCellbase
       blockNumber
       hash
@@ -283,48 +291,41 @@ const query = graphql(`
 `)
 
 export default async function Page({ params: { tx } }: { params: { tx: string } }) {
-  const { rgbppTransaction, ...result } = await graphQLClient.request(query, { txidOrTxHash: tx })
-  const btcTransaction = rgbppTransaction?.btcTransaction || result.btcTransaction
-  const ckbTransaction = rgbppTransaction?.ckbTransaction || result.ckbTransaction
+  const { rgbppTransaction } = await graphQLClient.request(rgbppTxQuery, { txidOrTxHash: tx })
 
-  if (btcTransaction && !tx.startsWith('0x')) {
-    return (
-      <BTCTransactionPage
-        btcTransaction={btcTransaction as BitcoinTransaction}
-        ckbTransaction={ckbTransaction as CkbTransaction}
-        leapDirection={rgbppTransaction?.leapDirection}
-      />
-    )
+  if (rgbppTransaction) {
+    const { btcTransaction, ckbTransaction } = rgbppTransaction
+    if (btcTransaction && !tx.startsWith('0x')) {
+      return (
+        <BTCTransactionPage
+          btcTransaction={btcTransaction as BitcoinTransaction}
+          ckbTransaction={ckbTransaction as CkbTransaction}
+          leapDirection={rgbppTransaction?.leapDirection}
+        />
+      )
+    }
+
+    if (ckbTransaction && tx.startsWith('0x')) {
+      return (
+        <CKBTransactionPage
+          ckbTransaction={ckbTransaction as CkbTransaction}
+          btcTransaction={btcTransaction as BitcoinTransaction}
+          leapDirection={rgbppTransaction?.leapDirection}
+        />
+      )
+    }
   }
 
-  if (ckbTransaction && tx.startsWith('0x')) {
-    return (
-      <CKBTransactionPage
-        ckbTransaction={ckbTransaction as CkbTransaction}
-        btcTransaction={btcTransaction as BitcoinTransaction}
-        leapDirection={rgbppTransaction?.leapDirection}
-      />
-    )
+  const btcTxRes = await graphQLClient.request(btcTxQuery, { txid: tx })
+
+  if (btcTxRes.btcTransaction) {
+    return <BTCTransactionPage btcTransaction={btcTxRes.btcTransaction as BitcoinTransaction} />
   }
 
-  if (btcTransaction) {
-    return (
-      <BTCTransactionPage
-        btcTransaction={btcTransaction as BitcoinTransaction}
-        ckbTransaction={ckbTransaction as CkbTransaction}
-        leapDirection={rgbppTransaction?.leapDirection}
-      />
-    )
+  const ckbTxRes = await graphQLClient.request(ckbTxQuery, { hash: tx })
+  if (ckbTxRes.ckbTransaction) {
+    return <CKBTransactionPage ckbTransaction={ckbTxRes.ckbTransaction as CkbTransaction} />
   }
 
-  if (ckbTransaction) {
-    return (
-      <CKBTransactionPage
-        ckbTransaction={ckbTransaction as CkbTransaction}
-        btcTransaction={btcTransaction}
-        leapDirection={rgbppTransaction?.leapDirection}
-      />
-    )
-  }
   notFound()
 }

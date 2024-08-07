@@ -6,17 +6,15 @@ import { BtcUtxoTables } from '@/components/btc/btc-utxo-tables'
 import { Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { ViewMemPool } from '@/components/view-mempool'
-import { BitcoinInput, BitcoinOutput, BitcoinTransaction } from '@/gql/graphql'
+import { BitcoinInput, BitcoinOutput, BitcoinTransaction, CkbTransaction } from '@/gql/graphql'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 
-export function BtcUtxos({
-  txid,
-  vin,
-  vout,
-  isBinding,
-}: Pick<BitcoinTransaction, 'txid' | 'vin' | 'vout'> & {
+export interface BtcUtxosProps extends Pick<BitcoinTransaction, 'txid' | 'vin' | 'vout'> {
   isBinding?: boolean
-}) {
+  ckbCell?: Pick<CkbTransaction, 'inputs' | 'outputs'>
+}
+
+export function BtcUtxos({ txid, vin, vout, isBinding, ckbCell }: BtcUtxosProps) {
   const i18n = getI18nFromHeaders()
   return (
     <VStack w="100%" gap={0} bg="bg.card" rounded="8px">
@@ -43,7 +41,7 @@ export function BtcUtxos({
         </HStack>
         <ViewMemPool txid={txid} />
       </Flex>
-      <BtcUtxoTables vin={vin as BitcoinInput[]} vout={vout as BitcoinOutput[]} />
+      <BtcUtxoTables txid={txid} vin={vin as BitcoinInput[]} vout={vout as BitcoinOutput[]} ckbCell={ckbCell} />
     </VStack>
   )
 }

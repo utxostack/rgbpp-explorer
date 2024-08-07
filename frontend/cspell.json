@@ -28,7 +28,10 @@
     "MNFT",
     "bitcoinerlab",
     "secp",
-    "bech"
+    "bech",
+    "lumos",
+    "hexify",
+    "bytify"
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",

@@ -51,7 +51,12 @@ export function BTCTransactionPage({
         </Box>
       </HStack>
       <BtcTransactionOverview btcTransaction={btcTransaction} />
-      <BtcUtxos txid={btcTransaction.txid} vin={btcTransaction.vin} vout={btcTransaction.vout} />
+      <BtcUtxos
+        txid={btcTransaction.txid}
+        vin={btcTransaction.vin}
+        vout={btcTransaction.vout}
+        ckbCell={ckbTransaction ?? undefined}
+      />
       {ckbTransaction ? <CkbCells ckbTransaction={ckbTransaction} isBinding /> : null}
     </VStack>
   )

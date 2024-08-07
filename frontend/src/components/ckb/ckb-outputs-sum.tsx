@@ -21,10 +21,7 @@ export const CkbOutputsSum = memo(function CkbDiffTags({ outputs = [] }: { outpu
     const balance = outputs
       .filter((x) => x.xudtInfo?.symbol === xudt?.symbol)
       .reduce((acc, x) => acc.plus(x.xudtInfo?.amount || 0), BigNumber(0))
-    console.log(
-      xudt?.symbol,
-      outputs.filter((x) => x.xudtInfo?.symbol === xudt?.symbol),
-    )
+
     return !balance.isZero() ? (
       <Flex align="center" bg="brand" py="8px" px="16px" rounded="4px">
         <Trans>
