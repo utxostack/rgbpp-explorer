@@ -42,10 +42,14 @@ export class CkbScriptService {
 
   public getCellTypeByScript(script: Script): CellType {
     for (const service of this.scriptServices) {
-      if (service.getScripts().some((s) => s.codeHash === script.codeHash)) {
+      if (service.matchScript(script)) {
         return service.type;
       }
     }
     throw new BadRequestException(`Unsupported script: ${JSON.stringify(script)}`);
+  }
+
+  public matchScript(script: Script) {
+    return this.scriptServices.some((service) => service.matchScript(script));
   }
 }

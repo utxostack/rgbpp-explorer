@@ -12,6 +12,7 @@ import { RgbppService } from '../rgbpp.service';
 import { BI, HashType } from '@ckb-lumos/lumos';
 import { Cacheable } from 'src/decorators/cacheable.decorator';
 import { ONE_MONTH_MS } from 'src/common/date';
+import { CkbScriptService } from 'src/modules/ckb/script/script.service';
 
 @Injectable()
 export class RgbppTransactionService {
@@ -20,6 +21,7 @@ export class RgbppTransactionService {
   constructor(
     private ckbExplorerService: CkbExplorerService,
     private ckbRpcService: CkbRpcWebsocketService,
+    private ckbScriptService: CkbScriptService,
     private rgbppService: RgbppService,
     private bitcoinApiService: BitcoinApiService,
     private configService: ConfigService<Env>,
@@ -37,6 +39,49 @@ export class RgbppTransactionService {
       txs: response.data.ckb_transactions.map((tx) => RgbppTransaction.from(tx)),
       total: response.meta.total,
       pageSize: response.meta.page_size,
+    };
+  }
+
+  public async getLatestL2Transactions(limit: number) {
+    const rgbppL2Txs: RgbppTransaction[] = [];
+    const tipBlockNumber = await this.ckbRpcService.getTipBlockNumber();
+    let blockNumber = BI.from(tipBlockNumber);
+    while (rgbppL2Txs.length < limit) {
+      const txss = await Promise.all(
+        Array({ length: limit }).map(async (_, index) => {
+          const block = await this.ckbRpcService.getBlockByNumber(
+            blockNumber.sub(index).toHexString(),
+          );
+
+          const ckbTxs = block.transactions.filter((tx) => {
+            return tx.outputs.some((output) => {
+              if (!output.type) {
+                return false;
+              }
+              return this.ckbScriptService.matchScript({
+                codeHash: output.type.code_hash,
+                hashType: output.type.hash_type as HashType,
+                args: output.type.args,
+              });
+            });
+          });
+
+          const txs = await Promise.all(
+            ckbTxs.map((tx) => this.ckbExplorerService.getTransaction(tx.hash)),
+          );
+          return txs;
+        }),
+      );
+      rgbppL2Txs.push(
+        ...txss.flat().map((tx) => RgbppTransaction.fromCkbTransaction(tx.data.attributes)),
+      );
+      blockNumber = blockNumber.sub(limit);
+    }
+
+    return {
+      txs: rgbppL2Txs.slice(0, limit),
+      total: 0,
+      pageSize: limit,
     };
   }
 
