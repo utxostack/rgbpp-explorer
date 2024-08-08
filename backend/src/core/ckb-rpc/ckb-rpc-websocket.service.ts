@@ -57,13 +57,16 @@ export class CkbRpcWebsocketService {
     key: (blockHash: string) => `getBlock:${blockHash}`,
     ttl: ONE_MONTH_MS,
     shouldCache: async (block: Block, that: CkbRpcWebsocketService) => {
+      if (!block?.header) {
+        return false;
+      }
       const { number } = block.header;
       return that.isSafeConfirmations(number);
     },
   })
   public async getBlock(blockHash: string): Promise<Block> {
     this.logger.debug(`get_block - blockHash: ${blockHash}`);
-    const block = await this.websocket.call('get_block', [blockHash]);
+    let block = await this.websocket.call('get_block', [blockHash]);
     return block as Block;
   }
 

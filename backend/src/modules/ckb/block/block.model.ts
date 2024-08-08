@@ -25,8 +25,8 @@ export class CkbBlock {
   @Field(() => Int)
   transactionsCount: number;
 
-  @Field(() => Float)
-  totalFee: number;
+  @Field(() => Float, { nullable: true })
+  totalFee: number | null;
 
   @Field(() => CkbAddress)
   miner: CkbAddress;

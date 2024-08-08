@@ -67,7 +67,7 @@ type CkbBlock {
   number: Int!
   timestamp: Timestamp!
   transactionsCount: Int!
-  totalFee: Float!
+  totalFee: Float
   miner: CkbAddress!
   reward: Float!
   transactions: [CkbTransaction!]!
