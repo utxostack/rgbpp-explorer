@@ -109,7 +109,7 @@ export class RgbppStatisticService {
       blockTxs.map(async (tx: BitcoinApiInterface.Transaction) => {
         const rgbppTransaction =
           (await this.rgbppTransactionService.queryRgbppLockTx(tx)) ??
-          (await this.rgbppTransactionService.getRgbppBtcTimeLockTx(tx));
+          (await this.rgbppTransactionService.queryRgbppBtcTimeLockTx(tx));
         return rgbppTransaction;
       }),
     );
