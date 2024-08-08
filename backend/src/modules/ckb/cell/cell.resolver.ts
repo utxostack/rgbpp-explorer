@@ -7,7 +7,7 @@ import {
   CkbRpcTransactionLoader,
   CkbRpcTransactionLoaderType,
 } from '../transaction/transaction.dataloader';
-import { CkbCell, CkbXUDTInfo, CkbBaseCellStatus, CkbCellStatus, CkbBaseCell } from './cell.model';
+import { CkbCell, CkbXUDTInfo, CkbCellStatus } from './cell.model';
 import { CkbCellService } from './cell.service';
 import { CellType } from '../script/script.model';
 import { CkbScriptService } from '../script/script.service';
@@ -21,7 +21,7 @@ export class CkbCellResolver {
 
   @ResolveField(() => CkbXUDTInfo, { nullable: true })
   public async xudtInfo(
-    @Parent() cell: CkbBaseCell,
+    @Parent() cell: CkbCell,
     @Loader(CkbExplorerTransactionLoader) explorerTxLoader: CkbExplorerTransactionLoaderType,
   ): Promise<CkbXUDTInfo | null> {
     const tx = await explorerTxLoader.load(cell.txHash);
@@ -34,10 +34,10 @@ export class CkbCellResolver {
 
   @ResolveField(() => CkbCellStatus, { nullable: true })
   public async status(
-    @Parent() cell: CkbBaseCell,
+    @Parent() cell: CkbCell,
     @Loader(CkbRpcTransactionLoader) rpcTxLoader: CkbRpcTransactionLoaderType,
     @Loader(CkbExplorerTransactionLoader) explorerTxLoader: CkbExplorerTransactionLoaderType,
-  ): Promise<CkbCellStatus | CkbBaseCellStatus | null> {
+  ): Promise<CkbCellStatus | CkbCellStatus | null> {
     const tx = await explorerTxLoader.load(cell.txHash);
     if (!tx || !tx.display_outputs[cell.index]) {
       return null;
@@ -62,12 +62,14 @@ export class CkbCellResolver {
     } else {
       return {
         consumed,
+        txHash: null,
+        index: null,
       };
     }
   }
 
   @ResolveField(() => CellType, { nullable: true })
-  public cellType(@Parent() cell: CkbBaseCell) {
+  public cellType(@Parent() cell: CkbCell) {
     if (!cell.type) {
       return null;
     }

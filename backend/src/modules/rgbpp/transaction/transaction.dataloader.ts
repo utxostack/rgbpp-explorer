@@ -3,11 +3,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import { NestDataLoader } from '@applifting-io/nestjs-dataloader';
 import { DataLoaderResponse } from 'src/common/type/dataloader';
 import { RgbppTransactionService } from './transaction.service';
-import { RgbppBaseTransaction } from './transaction.model';
+import { RgbppTransaction } from './transaction.model';
 import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 
 @Injectable()
-export class RgbppTransactionLoader implements NestDataLoader<string, RgbppBaseTransaction | null> {
+export class RgbppTransactionLoader implements NestDataLoader<string, RgbppTransaction | null> {
   private logger = new Logger(RgbppTransactionLoader.name);
 
   constructor(
@@ -32,5 +32,5 @@ export class RgbppTransactionLoader implements NestDataLoader<string, RgbppBaseT
     };
   }
 }
-export type RgbppTransactionLoaderType = DataLoader<string, RgbppBaseTransaction | null>;
+export type RgbppTransactionLoaderType = DataLoader<string, RgbppTransaction | null>;
 export type RgbppTransactionLoaderResponse = DataLoaderResponse<RgbppTransactionLoader>;

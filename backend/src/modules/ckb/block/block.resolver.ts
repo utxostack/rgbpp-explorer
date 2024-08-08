@@ -2,9 +2,9 @@ import { BI } from '@ckb-lumos/bi';
 import { toNumber } from 'lodash';
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { CkbBaseTransaction, CkbTransaction } from '../transaction/transaction.model';
-import { CkbAddress, CkbBaseAddress } from '../address/address.model';
-import { CkbBlock, CkbBaseBlock } from './block.model';
+import { CkbTransaction } from '../transaction/transaction.model';
+import { CkbAddress } from '../address/address.model';
+import { CkbBlock } from './block.model';
 import {
   CkbBlockEconomicStateLoader,
   CkbBlockEconomicStateLoaderType,
@@ -27,7 +27,7 @@ export class CkbBlockResolver {
   public async getBlock(
     @Args('heightOrHash', { type: () => String }) heightOrHash: string,
     @Loader(CkbRpcBlockLoader) rpcBlockLoader: CkbRpcBlockLoaderType,
-  ): Promise<CkbBaseBlock | null> {
+  ): Promise<CkbBlock | null> {
     const block = await rpcBlockLoader.load(heightOrHash);
     if (!block) {
       return null;
@@ -37,7 +37,7 @@ export class CkbBlockResolver {
 
   @ResolveField(() => Float, { nullable: true })
   public async totalFee(
-    @Parent() block: CkbBaseBlock,
+    @Parent() block: CkbBlock,
     @Loader(CkbBlockEconomicStateLoader) blockEconomicLoader: CkbBlockEconomicStateLoaderType,
   ): Promise<number | null> {
     const blockEconomicState = await blockEconomicLoader.load(block.hash);
@@ -49,9 +49,9 @@ export class CkbBlockResolver {
 
   @ResolveField(() => CkbAddress, { nullable: true })
   public async miner(
-    @Parent() block: CkbBaseBlock,
+    @Parent() block: CkbBlock,
     @Loader(CkbExplorerBlockLoader) explorerBlockLoader: CkbExplorerBlockLoaderType,
-  ): Promise<CkbBaseAddress | null> {
+  ): Promise<CkbAddress | null> {
     const explorerBlock = await explorerBlockLoader.load(block.hash);
     if (!explorerBlock) {
       return null;
@@ -61,7 +61,7 @@ export class CkbBlockResolver {
 
   @ResolveField(() => Float, { nullable: true })
   public async reward(
-    @Parent() block: CkbBaseBlock,
+    @Parent() block: CkbBlock,
     @Loader(CkbExplorerBlockLoader) explorerBlockLoader: CkbExplorerBlockLoaderType,
   ): Promise<number | null> {
     const explorerBlock = await explorerBlockLoader.load(block.hash);
@@ -71,12 +71,12 @@ export class CkbBlockResolver {
     return toNumber(explorerBlock.miner_reward);
   }
 
-  @ResolveField(() => [String], { nullable: true })
+  @ResolveField(() => [CkbTransaction], { nullable: true })
   public async transactions(
-    @Parent() { hash }: CkbBaseBlock,
+    @Parent() { hash }: CkbBlock,
     @Loader(CkbRpcBlockLoader) rpcBlockLoader: CkbRpcBlockLoaderType,
     @Loader(CkbRpcTransactionLoader) rpcTxLoader: CkbRpcTransactionLoaderType,
-  ): Promise<(CkbBaseTransaction | null)[] | null> {
+  ): Promise<(CkbTransaction | null)[] | null> {
     const block = await rpcBlockLoader.load(hash);
     if (!block) {
       return null;
@@ -94,7 +94,7 @@ export class CkbBlockResolver {
 
   @ResolveField(() => Float)
   public async size(
-    @Parent() block: CkbBaseBlock,
+    @Parent() block: CkbBlock,
     @Loader(CkbExplorerBlockLoader) explorerBlockLoader: CkbExplorerBlockLoaderType,
   ): Promise<number | null> {
     const explorerBlock = await explorerBlockLoader.load(block.hash);
@@ -106,7 +106,7 @@ export class CkbBlockResolver {
 
   @ResolveField(() => Float)
   public async confirmations(
-    @Parent() block: CkbBaseBlock,
+    @Parent() block: CkbBlock,
     @Loader(CkbExplorerBlockLoader) explorerBlockLoader: CkbExplorerBlockLoaderType,
   ): Promise<number | null> {
     const tipBlockNumber = await this.ckbRpcService.getTipBlockNumber();

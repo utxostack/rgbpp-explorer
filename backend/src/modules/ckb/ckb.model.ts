@@ -12,16 +12,8 @@ export class CkbFees {
   average: number;
 }
 
-export type CkbBaseChainInfo = Omit<CkbChainInfo, 'fees' | 'transactionsCountIn24Hours'>;
-
 @ObjectType({ description: 'CKB ChainInfo' })
 export class CkbChainInfo {
   @Field(() => Float)
   tipBlockNumber: number;
-
-  @Field(() => Float)
-  transactionsCountIn24Hours: number;
-
-  @Field(() => CkbFees)
-  fees: CkbFees;
 }

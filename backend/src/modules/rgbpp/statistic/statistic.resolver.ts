@@ -1,6 +1,6 @@
 import { Float, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
-import { RgbppBaseStatistic, RgbppStatistic } from './statistic.model';
+import { RgbppStatistic } from './statistic.model';
 import { RgbppStatisticService } from './statistic.service';
 
 @Resolver(() => RgbppStatistic)
@@ -11,7 +11,7 @@ export class RgbppStatisticResolver {
   ) {}
 
   @Query(() => RgbppStatistic, { name: 'rgbppStatistic' })
-  public async getRgbppStatistic(): Promise<RgbppBaseStatistic> {
+  public async getRgbppStatistic(): Promise<RgbppStatistic> {
     return {};
   }
 

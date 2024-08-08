@@ -32,7 +32,7 @@ type CkbCell {
   type: CkbScript
   lock: CkbScript!
   xudtInfo: CkbXUDTInfo
-  status: CkbCellStatus!
+  status: CkbCellStatus
   cellType: CellType
 }
 
@@ -42,6 +42,21 @@ enum CellType {
   SUDT
   DOB
   MNFT
+}
+
+"""CKB Transaction"""
+type CkbTransaction {
+  isCellbase: Boolean!
+  blockNumber: Float!
+  hash: String!
+  size: Float!
+  outputs: [CkbCell!]!
+  confirmed: Boolean!
+  inputs: [CkbCell!]
+  block: CkbBlock
+  fee: Float
+  feeRate: Float
+  confirmations: Float!
 }
 
 """CKB Address Balance"""
@@ -54,10 +69,10 @@ type CkbAddressBalance {
 """CKB Address"""
 type CkbAddress {
   address: String!
-  shannon: Float!
-  transactionsCount: Float!
-  transactions(page: Float, pageSize: Float): [CkbTransaction!]!
-  balance: CkbAddressBalance!
+  shannon: Float
+  transactionsCount: Float
+  transactions(page: Float, pageSize: Float): [CkbTransaction!]
+  balance: CkbAddressBalance
 }
 
 """CKB Block"""
@@ -68,32 +83,17 @@ type CkbBlock {
   timestamp: Timestamp!
   transactionsCount: Int!
   totalFee: Float
-  miner: CkbAddress!
-  reward: Float!
-  transactions: [CkbTransaction!]!
-  size: Float
-  confirmations: Float
+  miner: CkbAddress
+  reward: Float
+  transactions: [CkbTransaction!]
+  size: Float!
+  confirmations: Float!
 }
 
 """
 `Date` type as integer. Type represents date and time as number of milliseconds from start of UNIX epoch.
 """
 scalar Timestamp
-
-"""CKB Transaction"""
-type CkbTransaction {
-  isCellbase: Boolean!
-  blockNumber: Float!
-  hash: String!
-  fee: Float!
-  feeRate: Float!
-  size: Float!
-  inputs: [CkbCell!]!
-  outputs: [CkbCell!]!
-  block: CkbBlock!
-  confirmed: Boolean!
-  confirmations: Float!
-}
 
 """CKB Fees"""
 type CkbFees {
@@ -109,11 +109,59 @@ type CkbChainInfo {
   fees: CkbFees!
 }
 
-"""Rgbpp Asset"""
-type RgbppAsset {
-  owner: String!
-  cell: CkbCell!
-  utxo: BitcoinOutput
+"""RGB++ Transaction"""
+type RgbppTransaction {
+  ckbTxHash: String!
+  btcTxid: String
+  blockNumber: Int!
+  timestamp: Timestamp!
+  leapDirection: LeapDirection
+  ckbTransaction: CkbTransaction
+  btcTransaction: BitcoinTransaction
+}
+
+enum LeapDirection {
+  LeapIn
+  LeapOut
+  Within
+}
+
+"""RGB++ latest transaction list"""
+type RgbppLatestTransactionList {
+  txs: [RgbppTransaction!]!
+  total: Int!
+  pageSize: Int!
+}
+
+"""RGB++ Coin"""
+type RgbppCoin {
+  name: String
+  description: String
+  symbol: String!
+  decimal: Float!
+  icon: String
+  typeHash: String
+  typeScript: CkbScript
+  holdersCount: Int!
+  h24CkbTransactionsCount: Int!
+  totalAmount: Float!
+  issuer: String!
+  deployedAt: Timestamp!
+  transactions(page: Int, pageSize: Int): [RgbppTransaction!]
+  transactionsCount: Float
+}
+
+"""RGB++ Coin List"""
+type RgbppCoinList {
+  coins: [RgbppCoin!]!
+  total: Int!
+  pageSize: Int!
+}
+
+"""RGB++ Coin"""
+type RgbppStatistic {
+  transactionsCount: Float!
+  holdersCount: Float!
 }
 
 """Rgbpp Address"""
@@ -215,59 +263,10 @@ type BitcoinTransaction {
   rgbppTransaction: RgbppTransaction
 }
 
-"""RGB++ Transaction"""
-type RgbppTransaction {
-  ckbTxHash: String!
-  btcTxid: String
-  leapDirection: LeapDirection
-  blockNumber: Int!
-  timestamp: Timestamp!
-  ckbTransaction: CkbTransaction
-  btcTransaction: BitcoinTransaction
-}
-
-enum LeapDirection {
-  LeapIn
-  LeapOut
-  Within
-}
-
-"""RGB++ latest transaction list"""
-type RgbppLatestTransactionList {
-  txs: [RgbppTransaction!]!
-  total: Int!
-  pageSize: Int!
-}
-
-"""RGB++ Coin"""
-type RgbppCoin {
-  name: String
-  description: String
-  symbol: String!
-  decimal: Float!
-  icon: String
-  typeHash: String
-  typeScript: CkbScript
-  holdersCount: Int!
-  h24CkbTransactionsCount: Int!
-  totalAmount: Float!
-  issuer: String!
-  deployedAt: Timestamp!
-  transactions(page: Int, pageSize: Int): [RgbppTransaction!]
-  transactionsCount: Float
-}
-
-"""RGB++ Coin List"""
-type RgbppCoinList {
-  coins: [RgbppCoin!]!
-  total: Int!
-  pageSize: Int!
-}
-
-"""RGB++ Coin"""
-type RgbppStatistic {
-  transactionsCount: Float!
-  holdersCount: Float!
+"""Rgbpp Asset"""
+type RgbppAsset {
+  owner: String!
+  cell: CkbCell!
 }
 
 """Bitcoin Fees"""
