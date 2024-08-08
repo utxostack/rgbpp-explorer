@@ -1,7 +1,7 @@
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { CkbBaseTransaction, CkbTransaction } from '../transaction/transaction.model';
-import { CkbAddress, CkbAddressBalance, CkbBaseAddress } from './address.model';
+import { CkbTransaction } from '../transaction/transaction.model';
+import { CkbAddressBalance, CkbAddress } from './address.model';
 import {
   CkbAddressLoader,
   CkbAddressLoaderType,
@@ -20,7 +20,7 @@ export class CkbAddressResolver {
   @Query(() => CkbAddress, { name: 'ckbAddress', nullable: true })
   public async getCkbAddress(
     @Args('address', ValidateCkbAddressPipe) address: string,
-  ): Promise<CkbBaseAddress> {
+  ): Promise<CkbAddress> {
     return {
       address,
     };
@@ -28,7 +28,7 @@ export class CkbAddressResolver {
 
   @ResolveField(() => Float, { nullable: true })
   public async shannon(
-    @Parent() address: CkbBaseAddress,
+    @Parent() address: CkbAddress,
     @Loader(CkbAddressLoader) addressLoader: CkbAddressLoaderType,
   ): Promise<number | null> {
     const addressInfo = await addressLoader.load({ address: address.address });
@@ -40,7 +40,7 @@ export class CkbAddressResolver {
 
   @ResolveField(() => Float, { nullable: true })
   public async transactionsCount(
-    @Parent() address: CkbBaseAddress,
+    @Parent() address: CkbAddress,
     @Loader(CkbAddressLoader) addressLoader: CkbAddressLoaderType,
   ): Promise<number | null> {
     const addressInfo = await addressLoader.load({ address: address.address });
@@ -52,12 +52,12 @@ export class CkbAddressResolver {
 
   @ResolveField(() => [CkbTransaction], { nullable: true })
   public async transactions(
-    @Parent() address: CkbBaseAddress,
+    @Parent() address: CkbAddress,
     @Loader(CkbAddressTransactionsLoader) addressTxsLoader: CkbAddressTransactionsLoaderType,
     @Loader(CkbRpcTransactionLoader) rpcTxLoader: CkbRpcTransactionLoaderType,
     @Args('page', { nullable: true }) page?: number,
     @Args('pageSize', { nullable: true }) pageSize?: number,
-  ): Promise<(CkbBaseTransaction | null)[] | null> {
+  ): Promise<(CkbTransaction | null)[] | null> {
     const res = await addressTxsLoader.load({
       address: address.address,
       pageSize,
@@ -79,7 +79,7 @@ export class CkbAddressResolver {
 
   @ResolveField(() => CkbAddressBalance, { nullable: true })
   public async balance(
-    @Parent() address: CkbBaseAddress,
+    @Parent() address: CkbAddress,
     @Loader(CkbAddressLoader) addressLoader: CkbAddressLoaderType,
   ): Promise<CkbAddressBalance | null> {
     const addressInfo = await addressLoader.load({ address: address.address });

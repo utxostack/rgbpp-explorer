@@ -3,10 +3,10 @@ import { toNumber } from 'lodash';
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { CkbRpcBlockLoader, CkbRpcBlockLoaderType } from '../block/block.dataloader';
-import { CkbBaseBlock, CkbBlock } from '../block/block.model';
-import { CkbBaseCell, CkbCell } from '../cell/cell.model';
+import { CkbBlock } from '../block/block.model';
+import { CkbCell } from '../cell/cell.model';
 import { CkbTransactionService } from './transaction.service';
-import { CkbTransaction, CkbBaseTransaction, CkbSearchKeyInput } from './transaction.model';
+import { CkbTransaction, CkbSearchKeyInput } from './transaction.model';
 import {
   CkbRpcTransactionLoader,
   CkbRpcTransactionLoaderType,
@@ -38,7 +38,7 @@ export class CkbTransactionResolver {
     @Args('limit', { type: () => Float, nullable: true }) limit: number = 10,
     @Args('order', { type: () => OrderType, nullable: true }) order: OrderType = OrderType.Desc,
     @Args('after', { type: () => String, nullable: true }) after: string | null,
-  ): Promise<CkbBaseTransaction[]> {
+  ): Promise<CkbTransaction[]> {
     if (types && scriptKey) {
       throw new BadRequestException('Only one of types and scriptKey can be provided');
     }
@@ -97,7 +97,7 @@ export class CkbTransactionResolver {
   public async getTransaction(
     @Args('txHash') txHash: string,
     @Loader(CkbRpcTransactionLoader) rpcTxLoader: CkbRpcTransactionLoaderType,
-  ): Promise<CkbBaseTransaction | null> {
+  ): Promise<CkbTransaction | null> {
     const tx = await rpcTxLoader.load(txHash);
     if (!tx) {
       return null;
@@ -107,9 +107,9 @@ export class CkbTransactionResolver {
 
   @ResolveField(() => [CkbCell], { nullable: true })
   public async inputs(
-    @Parent() tx: CkbBaseTransaction,
+    @Parent() tx: CkbTransaction,
     @Loader(CkbRpcTransactionLoader) rpcTxLoader: CkbRpcTransactionLoaderType,
-  ): Promise<(CkbBaseCell | null)[] | null> {
+  ): Promise<(CkbCell | null)[] | null> {
     const rpcTx = await rpcTxLoader.load(tx.hash);
     if (!rpcTx) {
       return null;
@@ -132,9 +132,9 @@ export class CkbTransactionResolver {
 
   @ResolveField(() => CkbBlock, { nullable: true })
   public async block(
-    @Parent() tx: CkbBaseTransaction,
+    @Parent() tx: CkbTransaction,
     @Loader(CkbRpcBlockLoader) rpcBlockLoader: CkbRpcBlockLoaderType,
-  ): Promise<CkbBaseBlock | null> {
+  ): Promise<CkbBlock | null> {
     const block = await rpcBlockLoader.load(tx.blockNumber.toString());
     if (!block) {
       return null;
@@ -144,7 +144,7 @@ export class CkbTransactionResolver {
 
   @ResolveField(() => Float, { nullable: true })
   public async fee(
-    @Parent() tx: CkbBaseTransaction,
+    @Parent() tx: CkbTransaction,
     @Loader(CkbExplorerTransactionLoader) explorerTxLoader: CkbExplorerTransactionLoaderType,
   ): Promise<number | null> {
     const explorerTx = await explorerTxLoader.load(tx.hash);
@@ -156,7 +156,7 @@ export class CkbTransactionResolver {
 
   @ResolveField(() => Float, { nullable: true })
   public async feeRate(
-    @Parent() tx: CkbBaseTransaction,
+    @Parent() tx: CkbTransaction,
     @Loader(CkbExplorerTransactionLoader) explorerTxLoader: CkbExplorerTransactionLoaderType,
   ): Promise<number | null> {
     const explorerTx = await explorerTxLoader.load(tx.hash);
@@ -170,7 +170,7 @@ export class CkbTransactionResolver {
   }
 
   @ResolveField(() => Float)
-  public async confirmations(@Parent() tx: CkbBaseTransaction): Promise<number> {
+  public async confirmations(@Parent() tx: CkbTransaction): Promise<number> {
     if (!tx.confirmed) {
       return 0;
     }

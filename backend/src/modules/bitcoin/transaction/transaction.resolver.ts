@@ -3,10 +3,7 @@ import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/grap
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import { BitcoinBaseTransaction, BitcoinTransaction } from './transaction.model';
 import { BitcoinTransactionLoader, BitcoinTransactionLoaderType } from './transaction.dataloader';
-import {
-  RgbppBaseTransaction,
-  RgbppTransaction,
-} from 'src/modules/rgbpp/transaction/transaction.model';
+import { RgbppTransaction } from 'src/modules/rgbpp/transaction/transaction.model';
 import {
   RgbppTransactionLoader,
   RgbppTransactionLoaderType,
@@ -16,7 +13,7 @@ import { BitcoinBlockLoader, BitcoinBlockLoaderType } from '../block/dataloader/
 
 @Resolver(() => BitcoinTransaction)
 export class BitcoinTransactionResolver {
-  constructor(private bitcoinApiService: BitcoinApiService) {}
+  constructor(private bitcoinApiService: BitcoinApiService) { }
 
   @Query(() => BitcoinTransaction, { name: 'btcTransaction', nullable: true })
   public async getTransaction(
@@ -67,7 +64,7 @@ export class BitcoinTransactionResolver {
   public async rgbppTransaction(
     @Parent() tx: BitcoinBaseTransaction,
     @Loader(RgbppTransactionLoader) txLoader: RgbppTransactionLoaderType,
-  ): Promise<RgbppBaseTransaction | null> {
+  ): Promise<RgbppTransaction | null> {
     const result = await txLoader.load(tx.txid);
     return result || null;
   }

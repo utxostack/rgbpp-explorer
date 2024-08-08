@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Parent, ResolveField } from '@nestjs/graphql';
 import { BitcoinBaseOutput, BitcoinOutput } from 'src/modules/bitcoin/output/output.model';
-import { RgbppBaseAsset } from './asset.model';
+import { RgbppAsset } from './asset.model';
 import {
   BitcoinTransactionLoader,
   BitcoinTransactionLoaderType,
@@ -15,7 +15,7 @@ export class AssetResolver {
 
   @ResolveField(() => BitcoinOutput, { nullable: true })
   public async utxo(
-    @Parent() asset: RgbppBaseAsset,
+    @Parent() asset: RgbppAsset,
     @Loader(BitcoinTransactionLoader) txLoader: BitcoinTransactionLoaderType,
   ): Promise<BitcoinBaseOutput | null> {
     try {

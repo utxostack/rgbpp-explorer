@@ -2,7 +2,7 @@ import { toNumber } from 'lodash';
 import { Float, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { CkbRpcWebsocketService } from 'src/core/ckb-rpc/ckb-rpc-websocket.service';
 import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
-import { CkbBaseChainInfo, CkbChainInfo, CkbFees } from './ckb.model';
+import { CkbChainInfo, CkbFees } from './ckb.model';
 import { CkbService } from './ckb.service';
 import { calcFeeRate, getWeightedMedian } from 'src/common/fee-rate';
 
@@ -15,7 +15,7 @@ export class CkbResolver {
   ) { }
 
   @Query(() => CkbChainInfo, { name: 'ckbChainInfo' })
-  public async chainInfo(): Promise<CkbBaseChainInfo> {
+  public async chainInfo(): Promise<CkbChainInfo> {
     const tipBlockNumber = await this.ckbRpcService.getTipBlockNumber();
     return {
       tipBlockNumber,

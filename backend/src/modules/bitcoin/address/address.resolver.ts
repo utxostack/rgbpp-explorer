@@ -1,6 +1,6 @@
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { RgbppAddress, RgbppBaseAddress } from 'src/modules/rgbpp/address/address.model';
+import { RgbppAddress } from 'src/modules/rgbpp/address/address.model';
 import { BitcoinBaseTransaction, BitcoinTransaction } from '../transaction/transaction.model';
 import { BitcoinAddress, BitcoinBaseAddress } from './address.model';
 import {
@@ -72,7 +72,7 @@ export class BitcoinAddressResolver {
   }
 
   @ResolveField(() => RgbppAddress)
-  public async rgbppAddress(@Parent() address: BitcoinBaseAddress): Promise<RgbppBaseAddress> {
+  public async rgbppAddress(@Parent() address: BitcoinBaseAddress): Promise<RgbppAddress> {
     return RgbppAddress.from(address.address);
   }
 }

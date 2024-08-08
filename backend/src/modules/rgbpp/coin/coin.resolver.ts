@@ -1,8 +1,8 @@
 import { Args, Float, Int, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
 import { TransactionListSortType, XUDTTag } from 'src/core/ckb-explorer/ckb-explorer.interface';
-import { RgbppBaseTransaction, RgbppTransaction } from '../transaction/transaction.model';
-import { RgbppBaseCoin, RgbppCoin, RgbppCoinList } from './coin.model';
+import { RgbppTransaction } from '../transaction/transaction.model';
+import { RgbppCoin, RgbppCoinList } from './coin.model';
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import {
   CkbExplorerXUDTTransactionsLoader,
@@ -39,18 +39,18 @@ export class RgbppCoinResolver {
   @Query(() => RgbppCoin, { name: 'rgbppCoin', nullable: true })
   public async coin(
     @Args('typeHash', { type: () => String }) typeHash: string,
-  ): Promise<RgbppBaseCoin | null> {
+  ): Promise<RgbppCoin | null> {
     const response = await this.ckbExplorerService.getXUDT(typeHash);
     return RgbppCoin.from(response.data.attributes);
   }
 
   @ResolveField(() => [RgbppTransaction], { nullable: true })
   public async transactions(
-    @Parent() coin: RgbppBaseCoin,
+    @Parent() coin: RgbppCoin,
     @Args('page', { type: () => Int, nullable: true }) page: number = 1,
     @Args('pageSize', { type: () => Int, nullable: true }) pageSize: number = 10,
     @Loader(CkbExplorerXUDTTransactionsLoader) txsLoader: CkbExplorerXUDTTransactionsLoaderType,
-  ): Promise<RgbppBaseTransaction[] | null> {
+  ): Promise<RgbppTransaction[] | null> {
     if (!coin.typeHash) {
       return null;
     }
@@ -67,7 +67,7 @@ export class RgbppCoinResolver {
 
   @ResolveField(() => Float, { nullable: true })
   public async transactionsCount(
-    @Parent() coin: RgbppBaseCoin,
+    @Parent() coin: RgbppCoin,
     @Loader(CkbExplorerXUDTTransactionsLoader) txsLoader: CkbExplorerXUDTTransactionsLoaderType,
   ): Promise<number | null> {
     if (!coin.typeHash) {

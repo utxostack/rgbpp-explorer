@@ -1,7 +1,7 @@
 import { toNumber } from 'lodash';
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
-import { CellType, CkbScript } from '../script/script.model';
+import { CkbScript } from '../script/script.model';
 
 @ObjectType({ description: 'CKB XUDT Info' })
 export class CkbXUDTInfo {
@@ -18,8 +18,6 @@ export class CkbXUDTInfo {
   typeHash: string;
 }
 
-export type CkbBaseCellStatus = Omit<CkbCellStatus, 'txHash' | 'index'>;
-
 @ObjectType({ description: 'CKB Cell Status' })
 export class CkbCellStatus {
   @Field(() => Boolean)
@@ -31,8 +29,6 @@ export class CkbCellStatus {
   @Field(() => Float, { nullable: true })
   index: number | null;
 }
-
-export type CkbBaseCell = Omit<CkbCell, 'xudtInfo' | 'status' | 'cellType'>;
 
 @ObjectType({ description: 'CKB Cell' })
 export class CkbCell {
@@ -51,16 +47,7 @@ export class CkbCell {
   @Field(() => CkbScript)
   lock: CkbScript;
 
-  @Field(() => CkbXUDTInfo, { nullable: true })
-  xudtInfo: CkbXUDTInfo | null;
-
-  @Field(() => CkbCellStatus)
-  status: CkbCellStatus;
-
-  @Field(() => CellType, { nullable: true })
-  cellType: CellType | null;
-
-  public static fromTransaction(tx: CkbRpc.Transaction, index: number): CkbBaseCell {
+  public static fromTransaction(tx: CkbRpc.Transaction, index: number): CkbCell {
     const output = tx.outputs[index];
     return {
       txHash: tx.hash,
@@ -71,7 +58,7 @@ export class CkbCell {
     };
   }
 
-  public static fromCell(cell: CkbRpc.Cell): CkbBaseCell {
+  public static fromCell(cell: CkbRpc.Cell): CkbCell {
     return {
       txHash: cell.out_point.tx_hash,
       index: toNumber(cell.out_point.index),
