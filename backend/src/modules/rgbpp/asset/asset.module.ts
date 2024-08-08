@@ -1,9 +1,9 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { AssetResolver } from './asset.resolver';
+import { RgbppAssetResolver } from './asset.resolver';
 import { RgbppModule } from '../rgbpp.module';
 
 @Module({
   imports: [forwardRef(() => RgbppModule)],
-  providers: [AssetResolver],
+  providers: [RgbppAssetResolver],
 })
-export class RgbppAddressModule {}
+export class RgbppAssetModule {}

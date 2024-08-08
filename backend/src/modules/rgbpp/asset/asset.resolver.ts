@@ -1,5 +1,4 @@
-import { Injectable } from '@nestjs/common';
-import { Parent, ResolveField } from '@nestjs/graphql';
+import { Parent, ResolveField, Resolver } from '@nestjs/graphql';
 import { BitcoinBaseOutput, BitcoinOutput } from 'src/modules/bitcoin/output/output.model';
 import { RgbppAsset } from './asset.model';
 import {
@@ -9,8 +8,8 @@ import {
 import { RgbppService } from '../rgbpp.service';
 import { Loader } from '@applifting-io/nestjs-dataloader';
 
-@Injectable()
-export class AssetResolver {
+@Resolver(() => RgbppAsset)
+export class RgbppAssetResolver {
   constructor(private rgbppService: RgbppService) {}
 
   @ResolveField(() => BitcoinOutput, { nullable: true })
