@@ -72,9 +72,13 @@ export class RgbppTransactionService {
           return txs;
         }),
       );
-      rgbppL2Txs.push(
-        ...txss.flat().map((tx) => RgbppTransaction.fromCkbTransaction(tx.data.attributes)),
-      );
+      const flatTxs = txss.flat().filter(res => {
+        const attr = res?.data?.attributes;
+        if (!attr) return false;
+        return attr.is_rgb_transaction !== true && attr.is_btc_time_lock !== true;
+      }).map((tx) => RgbppTransaction.fromCkbTransaction(tx.data.attributes));
+
+      rgbppL2Txs.push(...flatTxs);
       blockNumber = blockNumber.sub(limit);
     }
 
