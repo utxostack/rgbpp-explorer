@@ -6,15 +6,13 @@ import * as pLimit from 'p-limit';
 import { BI } from '@ckb-lumos/bi';
 import { CkbScriptService } from 'src/modules/ckb/script/script.service';
 import { CellType } from 'src/modules/ckb/script/script.model';
-import { buildRgbppLockArgs, genRgbppLockScript, getRgbppLockScript, isScriptEqual } from '@rgbpp-sdk/ckb';
-import { HashType } from '@ckb-lumos/lumos';
-import { ConfigService } from '@nestjs/config';
-import { Env } from 'src/env';
-import { BtcTestnetTypeMap, CKB_MIN_SAFE_CONFIRMATIONS, NetworkType } from 'src/constants';
-import { Cacheable } from 'src/decorators/cacheable.decorator';
-import * as CkbRpcInterface from 'src/core/ckb-rpc/ckb-rpc.interface';
+import { isScriptEqual } from '@rgbpp-sdk/ckb';
+import { HashType, Script } from '@ckb-lumos/lumos';
 import * as BitcoinApiInterface from 'src/core/bitcoin-api/bitcoin-api.interface';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
+import { RgbppService } from '../rgbpp.service';
+import { RgbppTransactionService } from '../transaction/transaction.service';
+import { RgbppTransaction } from '../transaction/transaction.model';
 
 const BTC_24_HOURS_BLOCK_NUMBER = ONE_DAY_MS / TEN_MINUTES_MS;
 const CKB_24_HOURS_BLOCK_NUMBER = ONE_DAY_MS / 10000;
@@ -37,7 +35,8 @@ export class RgbppStatisticService {
     private ckbRpcService: CkbRpcWebsocketService,
     private bitcoinApiService: BitcoinApiService,
     private ckbScriptService: CkbScriptService,
-    private configService: ConfigService<Env>,
+    private rgbppService: RgbppService,
+    private rgbppTransactionService: RgbppTransactionService,
     @Inject(CACHE_MANAGER) protected cacheManager: Cache,
   ) {
     this.collectLatest24L1Transactions();
@@ -53,9 +52,9 @@ export class RgbppStatisticService {
   }
 
   public async getLatest24L2Transactions() {
-    const txids = await this.cacheManager.get(this.latest24L2TransactionsCacheKey);
-    if (txids) {
-      return txids as string[];
+    const txhashes = await this.cacheManager.get(this.latest24L2TransactionsCacheKey);
+    if (txhashes) {
+      return txhashes as string[];
     }
     return this.collectLatest24L2Transactions();
   }
@@ -63,31 +62,32 @@ export class RgbppStatisticService {
   public async collectLatest24L1Transactions() {
     const info = await this.bitcoinApiService.getBlockchainInfo();
     this.logger.log(
-      `Collecting latest 24 hours L1 transactions from block ${info.blocks - BTC_24_HOURS_BLOCK_NUMBER}`,
+      `start collectLatest24L1Transactions: ${info.blocks - BTC_24_HOURS_BLOCK_NUMBER}`,
     );
     const blocks = await Promise.all(
       Array.from({ length: BTC_24_HOURS_BLOCK_NUMBER }).map((_, index) => {
-        return limit(() => this.getRgbppL1TxidsByBlockNumber(info.blocks - index));
+        return limit(() => this.getRgbppL1TxidsByBtcBlockHeight(info.blocks - index));
       }),
     );
     const txids = blocks
       .flat()
       .map(({ txids }) => txids)
       .flat();
-    await this.cacheManager.set(this.latest24L1TransactionsCacheKey, txids);
+    await this.cacheManager.set(this.latest24L1TransactionsCacheKey, txids, ONE_DAY_MS);
+    this.logger.log(`finish collectLatest24L1Transactions: ${txids.length}`);
     return txids;
   }
 
   public async collectLatest24L2Transactions() {
     const tipBlockNumber = await this.ckbRpcService.getTipBlockNumber();
     this.logger.log(
-      `Collecting latest 24 hours L2 transactions from block ${tipBlockNumber - CKB_24_HOURS_BLOCK_NUMBER}`,
+      `start collectLatest24L2Transactions: ${BI.from(tipBlockNumber).sub(CKB_24_HOURS_BLOCK_NUMBER).toNumber()}`,
     );
 
     const blocks = await Promise.all(
       Array.from({ length: CKB_24_HOURS_BLOCK_NUMBER }).map((_, index) => {
         return limit(() =>
-          this.getRgbppL2TxHashsByBlockNumber(BI.from(tipBlockNumber).sub(index).toHexString()),
+          this.getRgbppL2TxHashsByCkbBlockNumber(BI.from(tipBlockNumber).sub(index).toHexString()),
         );
       }),
     );
@@ -95,105 +95,67 @@ export class RgbppStatisticService {
       .flat()
       .map(({ txhashs }) => txhashs)
       .flat();
-    await this.cacheManager.set(this.latest24L2TransactionsCacheKey, txhashs);
+    await this.cacheManager.set(this.latest24L2TransactionsCacheKey, txhashs, ONE_DAY_MS);
+    this.logger.log(`finish collectLatest24L2Transactions: ${txhashs.length}`);
     return txhashs;
   }
 
-  private getRgbppLockScript() {
-    const network = this.configService.get('NETWORK');
-    const rgbppLockScript = getRgbppLockScript(
-      network === NetworkType.mainnet,
-      BtcTestnetTypeMap[network],
-    );
-    return rgbppLockScript;
-  }
-
-  @Cacheable({
-    namespace: 'RgbppStatisticService',
-    key: (blockNumber: string) => `getRgbppL1TxidsByBlockNumber:${blockNumber}`,
-    ttl: ONE_DAY_MS,
-    shouldCache: async (block: BitcoinApiInterface.Block, that: RgbppStatisticService) => {
-      const info = await that.bitcoinApiService.getBlockchainInfo();
-      return block.height < info.blocks;
-    },
-  })
-  private async getRgbppL1TxidsByBlockNumber(blockHeight: number) {
+  private async getRgbppL1TxidsByBtcBlockHeight(blockHeight: number) {
     const hash = await this.bitcoinApiService.getBlockHeight({ height: blockHeight });
     const block = await this.bitcoinApiService.getBlock({ hash });
     const blockTxs = await this.bitcoinApiService.getBlockTxs({ hash });
-    const network = this.configService.get('NETWORK');
 
     const txs = await Promise.all(
       blockTxs.map(async (tx: BitcoinApiInterface.Transaction) => {
-        const { txid, vout } = tx;
-        for (let index = 0; index < vout.length; index += 1) {
-          const args = buildRgbppLockArgs(index, txid);
-          const rgbppLock = genRgbppLockScript(args, network === NetworkType.mainnet);
-          const searchKey: CkbRpcInterface.SearchKey = {
-            script: {
-              code_hash: rgbppLock.codeHash,
-              hash_type: rgbppLock.hashType,
-              args: rgbppLock.args,
-            },
-            script_type: 'lock',
-          };
-          const ckbTxs = await this.ckbRpcService.getTransactions(searchKey, 'desc', '0x1');
-          if (ckbTxs.objects.length > 0) {
-            return txid;
-          }
-        }
-        return null;
+        const rgbppTransaction =
+          (await this.rgbppTransactionService.queryRgbppLockTx(tx)) ??
+          (await this.rgbppTransactionService.getRgbppBtcTimeLockTx(tx));
+        return rgbppTransaction;
       }),
     );
-    const txids = txs.filter((txid) => txid !== null);
+    const txids = txs.filter((tx: RgbppTransaction) => tx?.btcTxid).map((tx) => tx!.btcTxid);
     return {
       ...block,
       txids,
     };
   }
 
-  @Cacheable({
-    namespace: 'RgbppStatisticService',
-    key: (blockNumber: string) => `getRgbppL2TxsByBlockNumber:${blockNumber}`,
-    ttl: ONE_DAY_MS,
-    shouldCache: async (block: CkbRpcInterface.Block, that: RgbppStatisticService) => {
-      const tipBlockNumber = await that.ckbRpcService.getTipBlockNumber();
-      if (!block.header?.number) {
-        return false;
-      }
-      return BI.from(block.header.number).lt(
-        BI.from(tipBlockNumber).sub(CKB_MIN_SAFE_CONFIRMATIONS),
-      );
-    },
-  })
-  private async getRgbppL2TxHashsByBlockNumber(blockNumber: string) {
+  private async getRgbppL2TxHashsByCkbBlockNumber(blockNumber: string) {
     const block = await this.ckbRpcService.getBlockByNumber(blockNumber);
-    const rgbppLockScript = this.getRgbppLockScript();
     const rgbppL2Txs = block.transactions.filter((tx) => {
       const isRgbppL2Tx = tx.outputs.some((output) => {
         if (!output.type) {
           return false;
         }
-        const hasRgbppLockCell = tx.outputs.some((cell) =>
-          isScriptEqual(
-            {
-              codeHash: cell.lock.code_hash,
-              hashType: cell.lock.hash_type as HashType,
-              args: '0x',
-            },
-            rgbppLockScript,
-          ),
-        );
-        if (hasRgbppLockCell) {
-          return false;
-        }
-        return this.rgbppAssetsTypeScripts.some((script) =>
+
+        // Skip txs without RGB++ assets
+        const hasRgbppAssets = this.rgbppAssetsTypeScripts.some((script) =>
           isScriptEqual(script, {
             codeHash: output.type!.code_hash,
             hashType: output.type!.hash_type as HashType,
             args: '0x',
           }),
         );
+        if (!hasRgbppAssets) {
+          return false;
+        }
+
+        // Skip txs with RGB++ lock script
+        const hasRgbppOuputCell = tx.outputs.some((cell) => {
+          const lock: Script = {
+            codeHash: cell.lock.code_hash,
+            hashType: cell.lock.hash_type as HashType,
+            args: cell.lock.args,
+          };
+          return (
+            this.rgbppService.isRgbppLockScript(lock) || this.rgbppService.isBtcTimeLockScript(lock)
+          );
+        });
+        if (hasRgbppOuputCell) {
+          return false;
+        }
+
+        return true;
       });
       return isRgbppL2Tx;
     });

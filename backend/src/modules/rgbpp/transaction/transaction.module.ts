@@ -17,6 +17,6 @@ import { RgbppModule } from '../rgbpp.module';
     forwardRef(() => RgbppModule),
   ],
   providers: [RgbppTransactionResolver, RgbppTransactionService, RgbppTransactionLoader],
-  exports: [RgbppTransactionLoader],
+  exports: [RgbppTransactionLoader, RgbppTransactionService],
 })
 export class RgbppTransactionModule { }
