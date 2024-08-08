@@ -29,15 +29,9 @@ export class RgbppStatisticModule {
     private schedulerRegistry: SchedulerRegistry,
   ) {
     this.schedulerRegistry.addCronJob(
-      'collectLatest24L1Transactions',
+      'collectLatest24HourRgbppTransactions',
       new CronJob(CronExpression.EVERY_HOUR, () => {
-        this.rgbppStatisticService.collectLatest24L1Transactions();
-      }),
-    );
-    this.schedulerRegistry.addCronJob(
-      'collectLatest24L2Transactions',
-      new CronJob(CronExpression.EVERY_HOUR, () => {
-        this.rgbppStatisticService.collectLatest24L2Transactions();
+        this.rgbppStatisticService.collectLatest24HourRgbppTransactions();
       }),
     );
   }
