@@ -50,7 +50,7 @@ export class RgbppTransactionService {
 
   public async getTransactionByBtcTxid(txid: string): Promise<RgbppTransaction | null> {
     const btcTx = await this.bitcoinApiService.getTx({ txid });
-    const tx = (await this.queryRgbppLockTx(btcTx)) ?? (await this.getRgbppBtcTimeLockTx(btcTx));
+    const tx = (await this.queryRgbppLockTx(btcTx)) ?? (await this.queryRgbppBtcTimeLockTx(btcTx));
     if (tx) {
       return tx;
     }
@@ -125,7 +125,7 @@ export class RgbppTransactionService {
     return null;
   }
 
-  private async queryRgbppLockTx(btcTx: BitcoinApiInterface.Transaction) {
+  public async queryRgbppLockTx(btcTx: BitcoinApiInterface.Transaction) {
     const ckbTxs = await Promise.all(
       btcTx.vout.map(async (_, index) => {
         const args = buildRgbppLockArgs(index, btcTx.txid);
@@ -162,7 +162,7 @@ export class RgbppTransactionService {
     return null;
   }
 
-  private async getRgbppBtcTimeLockTx(btcTx: BitcoinApiInterface.Transaction) {
+  public async queryRgbppBtcTimeLockTx(btcTx: BitcoinApiInterface.Transaction) {
     const ckbTxs = (
       await Promise.all(
         btcTx.vin.map(async ({ txid, vout }) => {
