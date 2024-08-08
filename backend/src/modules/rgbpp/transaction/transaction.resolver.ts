@@ -34,7 +34,7 @@ export class RgbppTransactionResolver {
   public async getLatestL2Transactions(
     @Args('limit', { type: () => Int, nullable: true }) limit: number = 10,
   ): Promise<RgbppLatestTransactionList> {
-    return await this.rgbppTransactionService.getLatestL2Transactions(limit);
+    return this.rgbppTransactionService.getLatestL2Transactions(limit);
   }
 
   @Query(() => RgbppTransaction, { name: 'rgbppTransaction', nullable: true })
