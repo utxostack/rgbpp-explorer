@@ -6,6 +6,7 @@ import { RgbppAddressModule } from './address/address.module';
 import { CkbExplorerModule } from 'src/core/ckb-explorer/ckb-explorer.module';
 import { CkbRpcModule } from 'src/core/ckb-rpc/ckb-rpc.module';
 import { RgbppService } from './rgbpp.service';
+import { RgbppAssetModule } from './asset/asset.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { RgbppService } from './rgbpp.service';
     RgbppTransactionModule,
     RgbppCoinModule,
     RgbppStatisticModule,
+    RgbppAssetModule,
   ],
   providers: [RgbppService],
   exports: [RgbppService],

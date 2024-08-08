@@ -267,6 +267,7 @@ type BitcoinTransaction {
 type RgbppAsset {
   owner: String!
   cell: CkbCell!
+  utxo: BitcoinOutput
 }
 
 """Bitcoin Fees"""
