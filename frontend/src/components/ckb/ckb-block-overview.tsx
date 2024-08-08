@@ -1,28 +1,28 @@
 import { t } from '@lingui/macro'
-import BigNumber from 'bignumber.js'
 import { Grid, HStack, VStack } from 'styled-system/jsx'
 
-import { BtcBlock } from '@/apis/types/explorer-graphql'
 import OverflowSVG from '@/assets/overview.svg'
-import { TextOverflowTooltip } from '@/components/text-overflow-tooltip'
+import { OverflowAmount } from '@/components/overflow-amount'
 import { TimeFormatter } from '@/components/time-formatter'
 import { Heading, Text, Tooltip } from '@/components/ui'
 import Link from '@/components/ui/link'
+import { CkbBlock } from '@/gql/graphql'
+import { formatCkbAddress } from '@/lib/address/format-ckb-address'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { formatNumber } from '@/lib/string/format-number'
-import { truncateMiddle } from '@/lib/string/truncate-middle'
 
-export function BtcBlockOverflow({
+export function CkbBlockOverview({
   block,
 }: {
-  block: Pick<BtcBlock, 'timestamp' | 'size' | 'transactionsCount' | 'feeRateRange' | 'totalFee' | 'miner' | 'height'>
+  block: Pick<CkbBlock, 'timestamp' | 'transactionsCount' | 'miner' | 'reward' | 'size' | 'confirmations'>
 }) {
+  if (!block) return null
   const i18n = getI18nFromHeaders()
   return (
     <VStack gap={0} w="100%" bg="bg.card" rounded="8px">
       <HStack w="100%" px="30px" py="16px" gap="12px" borderBottom="1px solid" borderBottomColor="border.primary">
         <OverflowSVG w="24px" />
-        <Heading fontSize="16px" fontWeight="semibold">{t(i18n)`Overflow`}</Heading>
+        <Heading fontSize="16px" fontWeight="semibold">{t(i18n)`Overview`}</Heading>
         {block.timestamp ? <TimeFormatter timestamp={block.timestamp} /> : null}
       </HStack>
       <Grid w="100%" gridTemplateColumns="repeat(2, 1fr)" gap="30px" pt="20px" pb="30px" px="30px" textAlign="center">
@@ -37,11 +37,8 @@ export function BtcBlockOverflow({
         >
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Block size`}</Text>
-            <Text color="brand">
-              {formatNumber(block.size)}
-              <Text as="span" color="12px">
-                {t(i18n)`bytes`}
-              </Text>
+            <Text>
+              <OverflowAmount amount={formatNumber(block.size ?? undefined)} symbol={t(i18n)`bytes`} />
             </Text>
           </VStack>
           <VStack gap="15px">
@@ -59,56 +56,34 @@ export function BtcBlockOverflow({
           lineHeight="100%"
         >
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`Fee rate span`}</Text>
-            <TextOverflowTooltip
-              label={
-                <Text whiteSpace="nowrap">
-                  {formatNumber(block.feeRateRange.min)}
-                  <Text as="span" color="12px">
-                    {t(i18n)`sats/VB`}
-                  </Text>
-                  ~ {formatNumber(BigNumber(block.feeRateRange.max))}{' '}
-                  <Text as="span" color="12px">
-                    {t(i18n)`sats/VB`}
-                  </Text>
-                </Text>
-              }
-            >
-              <Text whiteSpace="nowrap" maxW="250px" truncate>
-                {formatNumber(block.feeRateRange.min)}
-                <Text as="span" color="12px">
-                  {t(i18n)`sats/VB`}
-                </Text>
-                ~ {formatNumber(BigNumber(block.feeRateRange.max))}{' '}
-                <Text as="span" color="12px">
-                  {t(i18n)`sats/VB`}
-                </Text>
-              </Text>
-            </TextOverflowTooltip>
-          </VStack>
-          <VStack gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`Minter`}</Text>
+            <Text color="text.third" fontSize="14px">{t(i18n)`Miner`}</Text>
             <Tooltip.Root openDelay={0} closeDelay={0}>
-              <Tooltip.Trigger>
+              <Tooltip.Trigger cursor="pointer">
                 <Link
                   href={`/address/${block.miner.address}`}
+                  whiteSpace="nowrap"
+                  maxW="250px"
+                  truncate
                   color="brand"
-                  _hover={{
-                    textDecoration: 'underline',
-                  }}
+                  _hover={{ textDecoration: 'underline' }}
+                  cursor="pointer"
                 >
-                  {truncateMiddle(block.miner.address, 5, 5)}
+                  {formatCkbAddress(block.miner.address)}
                 </Link>
               </Tooltip.Trigger>
               <Tooltip.Positioner>
                 <Tooltip.Arrow>
                   <Tooltip.ArrowTip />
                 </Tooltip.Arrow>
-                <Tooltip.Content whiteSpace="nowrap" maxW="unset">
-                  {block.miner.address}
-                </Tooltip.Content>
+                <Tooltip.Content maxW="unset">{block.miner.address}</Tooltip.Content>
               </Tooltip.Positioner>
             </Tooltip.Root>
+          </VStack>
+          <VStack gap="15px">
+            <Text color="text.third" fontSize="14px">{t(i18n)`Miner Reward`}</Text>
+            <Text>
+              <OverflowAmount amount={formatNumber(block.reward)} symbol={t(i18n)`CKB`} />
+            </Text>
           </VStack>
         </Grid>
       </Grid>

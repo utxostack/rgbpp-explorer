@@ -7,7 +7,7 @@ import { BitcoinBlock } from '../block/block.model';
 
 export type BitcoinBaseTransaction = Omit<
   BitcoinTransaction,
-  'confirmations' | 'block' | 'rgbppTransaction'
+  'confirmations' | 'block' | 'rgbppTransaction' | 'transactionTime'
 >;
 
 @ObjectType({ description: 'Bitcoin Transaction' })
@@ -17,6 +17,9 @@ export class BitcoinTransaction {
 
   @Field(() => String, { nullable: true })
   blockHash: string | null;
+
+  @Field(() => Date, { nullable: true })
+  blockTime: Date | null;
 
   @Field(() => String)
   txid: string;
@@ -51,6 +54,9 @@ export class BitcoinTransaction {
   @Field(() => Float)
   confirmations: number;
 
+  @Field(() => Date)
+  transactionTime: Date;
+
   @Field(() => BitcoinBlock)
   block: BitcoinBlock;
 
@@ -63,6 +69,7 @@ export class BitcoinTransaction {
     return {
       blockHeight: tx.status.block_height ?? null,
       blockHash: tx.status.block_hash ?? null,
+      blockTime: tx.status.block_time ? new Date(tx.status.block_time * 1000) : null,
       txid: tx.txid,
       version: tx.version,
       vin: tx.vin.map(BitcoinInput.from),

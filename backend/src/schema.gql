@@ -44,12 +44,20 @@ enum CellType {
   MNFT
 }
 
+"""CKB Address Balance"""
+type CkbAddressBalance {
+  total: String!
+  available: String!
+  occupied: String!
+}
+
 """CKB Address"""
 type CkbAddress {
   address: String!
   shannon: Float!
   transactionsCount: Float!
   transactions(page: Float, pageSize: Float): [CkbTransaction!]!
+  balance: CkbAddressBalance!
 }
 
 """CKB Block"""
@@ -183,12 +191,14 @@ type BitcoinBlock {
     """For pagination, must be a multiplication of 25"""
     startIndex: Float
   ): [BitcoinTransaction!]!
+  confirmations: Float
 }
 
 """Bitcoin Transaction"""
 type BitcoinTransaction {
   blockHeight: Float
   blockHash: String
+  blockTime: Timestamp
   txid: String!
   version: Int!
   vin: [BitcoinInput!]
@@ -200,6 +210,7 @@ type BitcoinTransaction {
   feeRate: Float!
   confirmed: Boolean!
   confirmations: Float!
+  transactionTime: Timestamp!
   block: BitcoinBlock!
   rgbppTransaction: RgbppTransaction
 }
@@ -300,11 +311,11 @@ type Query {
   btcTransaction(txid: String!): BitcoinTransaction
   rgbppLatestTransactions(page: Int, pageSize: Int): RgbppLatestTransactionList!
   rgbppTransaction(txidOrTxHash: String!): RgbppTransaction
-  btcAddress(address: String!): BitcoinAddress
   rgbppAddress(address: String!): RgbppAddress
   rgbppCoins(page: Int, pageSize: Int, sort: TransactionListSortType): RgbppCoinList!
   rgbppCoin(typeHash: String!): RgbppCoin
   rgbppStatistic: RgbppStatistic!
+  btcAddress(address: String!): BitcoinAddress
   search(query: String!): SearchResult!
 }
 

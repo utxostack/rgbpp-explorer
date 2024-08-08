@@ -2,23 +2,44 @@ import { t } from '@lingui/macro'
 import dayjs from 'dayjs'
 import { HStack, styled, VStack } from 'styled-system/jsx'
 
-import { explorerGraphql } from '@/apis/explorer-graphql'
 import BtcIcon from '@/assets/chains/btc.svg'
 import { PaginationSearchParams } from '@/components/pagination-searchparams'
 import { TextOverflowTooltip } from '@/components/text-overflow-tooltip'
 import { Table, Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { TIME_TEMPLATE } from '@/constants'
+import { graphql } from '@/gql'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
+import { graphQLClient } from '@/lib/graphql'
 import { resolveSearchParamsPage } from '@/lib/resolve-searchparams-page'
 import { formatNumber } from '@/lib/string/format-number'
+
+const query = graphql(`
+  query RgbppCoins($page: Int!, $pageSize: Int!) {
+    rgbppCoins(page: $page, pageSize: $pageSize) {
+      total
+      pageSize
+      coins {
+        icon
+        name
+        symbol
+        holdersCount
+        h24CkbTransactionsCount
+        totalAmount
+        deployedAt
+        decimal
+        typeHash
+      }
+    }
+  }
+`)
 
 export default async function Page() {
   const i18n = getI18nFromHeaders()
   const page = resolveSearchParamsPage()
 
   const pageSize = 10
-  const response = await explorerGraphql.getRGBppCoins({ page, pageSize })
+  const response = await graphQLClient.request(query, { page, pageSize })
 
   return (
     <VStack w="100%" bg="bg.card" maxW="content" rounded="8px" pt="30px" flex={1}>
@@ -43,10 +64,15 @@ export default async function Page() {
                     alignItems="center"
                     gap={3}
                     color="text.link"
+                    cursor="pointer"
                   >
-                    {coin.icon ? <styled.img w="32px" h="32px" src={coin.icon} /> : <BtcIcon w="32px" h="32px" />}
+                    {coin.icon ? (
+                      <styled.img w="32px" h="32px" src={coin.icon} rounded="100%" />
+                    ) : (
+                      <BtcIcon w="32px" h="32px" />
+                    )}
                     <TextOverflowTooltip label={coin.symbol}>
-                      <Text maxW="200px" truncate>
+                      <Text maxW="200px" truncate cursor="pointer">
                         {coin.symbol}
                       </Text>
                     </TextOverflowTooltip>

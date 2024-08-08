@@ -1,23 +1,30 @@
 'use client'
 
 import { Trans } from '@lingui/macro'
+import { useMemo } from 'react'
 import { Box, Flex, Grid, HStack, VStack } from 'styled-system/jsx'
 
-import { ScriptpubkeyType, Vin, Vout } from '@/apis/types/explorer-graphql'
 import SubTractIcon from '@/assets/subtract.svg'
+import { parseRgbppLockArgs } from '@/components/ckb/parse-rgbpp-lock-args'
 import { Copier } from '@/components/copier'
 import { Heading, Text } from '@/components/ui'
 import Link from '@/components/ui/link'
+import { BitcoinInput, BitcoinOutput, CellType, CkbCell, CkbTransaction } from '@/gql/graphql'
 import { satsToBtc } from '@/lib/btc/sats-to-btc'
+import { isRgbppLockCell } from '@/lib/ckb/is-rgbpp-lock-cell'
 import { formatNumber } from '@/lib/string/format-number'
 import { truncateMiddle } from '@/lib/string/truncate-middle'
+import { ScriptpubkeyType } from '@/types/graphql'
 
 export interface BtcUtxoTablesProps {
-  vin?: Vin[]
-  vout?: Vout[]
+  vin?: BitcoinInput[]
+  vout?: BitcoinOutput[]
+  currentAddress?: string
+  ckbCell?: Pick<CkbTransaction, 'inputs' | 'outputs'>
+  txid?: string
 }
 
-export function BtcUtxoTables({ vin = [], vout = [] }: BtcUtxoTablesProps) {
+export function BtcUtxoTables({ txid, vin = [], vout = [], currentAddress, ckbCell }: BtcUtxoTablesProps) {
   return (
     <Grid w="100%" gridTemplateColumns="repeat(2, 1fr)" gap="38px" pt="10px" pb="20px" px="30px">
       <VStack gap={0} w="100%">
@@ -32,9 +39,14 @@ export function BtcUtxoTables({ vin = [], vout = [] }: BtcUtxoTablesProps) {
         >
           <Trans>Inputs ({vin.length})</Trans>
         </Heading>
-        {vin.map((input, i) => (
-          <UtxoInput vin={input} key={i} />
-        ))}
+        {vin.map((input, i) => {
+          const bindingCkbCell = ckbCell?.inputs?.find((cell) => {
+            if (!isRgbppLockCell(cell)) return false
+            const { btcTxid, outIndex } = parseRgbppLockArgs(cell.lock.args)
+            return !(btcTxid !== txid || outIndex !== i || !vin[outIndex])
+          })
+          return <UtxoInput txid={txid} vin={input} key={i} currentAddress={currentAddress} ckbCell={bindingCkbCell} />
+        })}
       </VStack>
       <VStack gap={0}>
         <Heading
@@ -48,15 +60,60 @@ export function BtcUtxoTables({ vin = [], vout = [] }: BtcUtxoTablesProps) {
         >
           <Trans>Outputs ({vout.length})</Trans>
         </Heading>
-        {vout.map((output, i) => (
-          <UtxoOutput vout={output} key={i} />
-        ))}
+        {vout.map((output, i) => {
+          const bindingCkbCell = ckbCell?.outputs?.find((cell) => {
+            if (!isRgbppLockCell(cell)) return false
+            const { btcTxid, outIndex } = parseRgbppLockArgs(cell.lock.args)
+            return !(btcTxid !== txid || outIndex !== i || !vout[outIndex])
+          })
+          return (
+            <UtxoOutput
+              ckbCell={bindingCkbCell}
+              vout={output}
+              key={i}
+              currentAddress={currentAddress}
+              ckbOutputs={ckbCell?.outputs}
+            />
+          )
+        })}
       </VStack>
     </Grid>
   )
 }
 
-function UtxoInput({ vin }: { vin: Vin }) {
+function UtxoInput({
+  vin,
+  currentAddress,
+  ckbCell: cell,
+}: {
+  txid?: string
+  vin: BitcoinInput
+  currentAddress?: string
+  ckbCell?: CkbCell
+}) {
+  const text = useMemo(() => {
+    if (vin.isCoinbase)
+      return (
+        <Text fontSize="14px" fontWeight="semibold">
+          <Trans>Coinbase</Trans>
+        </Text>
+      )
+    if (!vin.prevout) return null
+    return (
+      <Copier onlyIcon value={vin.prevout.address?.address}>
+        {currentAddress === vin.prevout.address?.address ? (
+          <Text as="span" color="text.primary">
+            {truncateMiddle(currentAddress, 10, 10)}
+          </Text>
+        ) : (
+          <Link href={`/address/${vin.prevout.address?.address}`} color="brand" fontSize="14px">
+            {truncateMiddle(vin.prevout.address?.address, 10, 10)}
+          </Link>
+        )}
+      </Copier>
+    )
+  }, [vin, currentAddress])
+
   return (
     <Flex
       justifyContent="space-between"
@@ -67,28 +124,55 @@ function UtxoInput({ vin }: { vin: Vin }) {
       borderBottomColor="border.primary"
     >
       <HStack gap="8px">
-        <SubTractIcon color={vin.prevout?.status.spent ? 'text.third' : 'success.unspent'} w="16px" h="16px" />
-        {vin.prevout ? (
-          <Copier onlyIcon value={vin.prevout.address?.address}>
-            <Link href={`/address/${vin.prevout.address?.address}`} color="brand" fontSize="14px">
-              {truncateMiddle(vin.prevout.address?.address, 10, 10)}
-            </Link>
-          </Copier>
-        ) : null}
+        <SubTractIcon
+          color={vin.isCoinbase || vin.prevout?.status.spent ? 'text.third' : 'success.unspent'}
+          w="16px"
+          h="16px"
+        />
+        {text}
       </HStack>
-      <VStack gap={0}>
+      <VStack gap={0} textAlign="right" alignItems="right">
         <Box>
           {formatNumber(satsToBtc(vin.prevout?.value ?? '0'))}{' '}
           <Text as="span" fontSize="12px" color="text.third">
             <Trans>BTC</Trans>
           </Text>
         </Box>
+        {cell ? (
+          <>
+            {cell.xudtInfo ? (
+              <Box>
+                {formatNumber(cell.xudtInfo.amount, cell.xudtInfo.decimal)}{' '}
+                <Text as="span" fontSize="12px" color="text.third">
+                  {cell.xudtInfo.symbol}
+                </Text>
+              </Box>
+            ) : null}
+            {cell.cellType === CellType.Dob || cell.cellType === CellType.Mnft ? (
+              <Box>
+                1
+                <Text as="span" fontSize="12px" color="text.third" ml="4px">
+                  <Trans>DOB</Trans>
+                </Text>
+              </Box>
+            ) : null}
+          </>
+        ) : null}
       </VStack>
     </Flex>
   )
 }
 
-function UtxoOutput({ vout }: { vout: Vout }) {
+function UtxoOutput({
+  vout,
+  currentAddress,
+  ckbCell: cell,
+}: {
+  vout: BitcoinOutput
+  ckbCell?: CkbCell
+  currentAddress?: string
+  ckbOutputs?: CkbTransaction['outputs']
+}) {
   return (
     <Flex
       justifyContent="space-between"
@@ -99,24 +183,56 @@ function UtxoOutput({ vout }: { vout: Vout }) {
       borderBottomColor="border.primary"
     >
       <HStack gap="8px">
-        <SubTractIcon color={vout.status.spent ? 'text.third' : 'success.unspent'} w="16px" h="16px" />
+        <SubTractIcon
+          color={
+            vout.status.spent || vout.scriptpubkeyType === ScriptpubkeyType.OpReturn ? 'text.third' : 'success.unspent'
+          }
+          w="16px"
+          h="16px"
+        />
         {vout.scriptpubkeyType === ScriptpubkeyType.OpReturn ? (
           <Trans>OP_RETURN</Trans>
         ) : (
           <Copier onlyIcon value={vout.address?.address}>
-            <Link href={`/address/${vout.address?.address}`} color="brand" fontSize="14px">
-              {truncateMiddle(vout.address?.address, 10, 10)}
-            </Link>
+            {currentAddress === vout.address?.address ? (
+              <Text as="span" color="text.primary">
+                {truncateMiddle(currentAddress, 10, 10)}
+              </Text>
+            ) : (
+              <Link href={`/address/${vout.address?.address}`} color="brand" fontSize="14px">
+                {truncateMiddle(vout.address?.address, 10, 10)}
+              </Link>
+            )}
           </Copier>
         )}
       </HStack>
-      <VStack gap={0}>
+      <VStack gap={0} alignItems="right" textAlign="right">
         <Box>
           {formatNumber(satsToBtc(vout.value))}{' '}
           <Text as="span" fontSize="12px" color="text.third">
             <Trans>BTC</Trans>
           </Text>
         </Box>
+        {cell ? (
+          <>
+            {cell.xudtInfo ? (
+              <Box>
+                {formatNumber(cell.xudtInfo.amount, cell.xudtInfo.decimal)}{' '}
+                <Text as="span" fontSize="12px" color="text.third">
+                  {cell.xudtInfo.symbol}
+                </Text>
+              </Box>
+            ) : null}
+            {cell.cellType === CellType.Dob || cell.cellType === CellType.Mnft ? (
+              <Box>
+                1
+                <Text as="span" fontSize="12px" color="text.third" ml="4px">
+                  <Trans>DOB</Trans>
+                </Text>
+              </Box>
+            ) : null}
+          </>
+        ) : null}
       </VStack>
     </Flex>
   )

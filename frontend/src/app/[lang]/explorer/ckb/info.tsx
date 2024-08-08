@@ -1,18 +1,33 @@
 import { t } from '@lingui/macro'
 import { Grid, HStack, VStack } from 'styled-system/jsx'
 
-import { explorerGraphql } from '@/apis/explorer-graphql'
 import CkbIcon from '@/assets/chains/ckb.svg'
 import SpeedHighIcon from '@/assets/speed/high.svg'
 import SpeedLowIcon from '@/assets/speed/low.svg'
 import SpeedMediumIcon from '@/assets/speed/medium.svg'
 import { Heading, Text } from '@/components/ui'
+import { graphql } from '@/gql'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
+import { graphQLClient } from '@/lib/graphql'
 import { formatNumber } from '@/lib/string/format-number'
 
 export async function Info() {
   const i18n = getI18nFromHeaders()
-  const { ckbChainInfo, rgbppStatistic } = await explorerGraphql.getCkbChainInfo()
+  const { ckbChainInfo } = await graphQLClient.request(
+    graphql(`
+      query CkbChainInfo {
+        ckbChainInfo {
+          tipBlockNumber
+          transactionsCountIn24Hours
+          fees {
+            fast
+            slow
+            average
+          }
+        }
+      }
+    `),
+  )
 
   return (
     <VStack gridColumn="1/3" gap="20px" bg="bg.card" p="30px" alignItems="start" rounded="8px">
@@ -36,11 +51,11 @@ export async function Info() {
           </VStack>
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`L2 RGB++ Txns(24H)`}</Text>
-            <Text>{formatNumber(ckbChainInfo.transactionsCountIn24Hours)}</Text>
+            <Text color="text.third">{t(i18n)`Coming Soon`}</Text>
           </VStack>
           <VStack gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`RGB++ Assets Holders`}</Text>
-            <Text>{formatNumber(rgbppStatistic.holdersCount)}</Text>
+            <Text color="text.third">{t(i18n)`Coming Soon`}</Text>
           </VStack>
         </Grid>
         <Grid gridTemplateColumns="repeat(3, 1fr)" bg="bg.card.hover" px="20px" pb="25px" pt="30px" rounded="8px">

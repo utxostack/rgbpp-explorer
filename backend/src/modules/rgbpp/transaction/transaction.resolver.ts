@@ -18,21 +18,23 @@ import {
   RgbppTransaction,
   RgbppBaseTransaction,
   RgbppLatestTransactionList,
-  LeapDirectionMap,
   LeapDirection,
 } from './transaction.model';
 import { RgbppTransactionLoader, RgbppTransactionLoaderType } from './transaction.dataloader';
+import { HashType, Output } from '@ckb-lumos/lumos';
 
 @Resolver(() => RgbppTransaction)
 export class RgbppTransactionResolver {
-  constructor(private transactionService: RgbppTransactionService) {}
+  constructor(
+    private rgbppTransactionService: RgbppTransactionService,
+  ) { }
 
   @Query(() => RgbppLatestTransactionList, { name: 'rgbppLatestTransactions' })
   public async getLatestTransactions(
     @Args('page', { type: () => Int, nullable: true }) page: number = 1,
     @Args('pageSize', { type: () => Int, nullable: true }) pageSize: number = 10,
   ): Promise<RgbppLatestTransactionList> {
-    return await this.transactionService.getLatestTransactions(page, pageSize);
+    return await this.rgbppTransactionService.getLatestTransactions(page, pageSize);
   }
 
   @Query(() => RgbppTransaction, { name: 'rgbppTransaction', nullable: true })
@@ -45,9 +47,15 @@ export class RgbppTransactionResolver {
   }
 
   @ResolveField(() => LeapDirection, { nullable: true })
-  public async leapDirection(@Parent() tx: RgbppBaseTransaction): Promise<LeapDirection | null> {
-    const digest = await this.transactionService.getRgbppDigest(tx.ckbTxHash);
-    return digest?.leap_direction ? LeapDirectionMap[digest.leap_direction] : null;
+  public async leapDirection(
+    @Parent() tx: RgbppBaseTransaction,
+    @Loader(CkbRpcTransactionLoader) ckbRpcTxLoader: CkbRpcTransactionLoaderType,
+  ): Promise<LeapDirection | null> {
+    const ckbTx = await ckbRpcTxLoader.load(tx.ckbTxHash);
+    if (!ckbTx) {
+      return null;
+    }
+    return this.rgbppTransactionService.getLeapDirectionByCkbTx(ckbTx);
   }
 
   @ResolveField(() => CkbTransaction, { nullable: true })

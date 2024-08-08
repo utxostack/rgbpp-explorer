@@ -1,4 +1,3 @@
-import { Logger } from '@nestjs/common';
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { BitcoinBaseTransaction, BitcoinTransaction } from '../transaction/transaction.model';
@@ -9,10 +8,11 @@ import {
   BitcoinBlockTransactionsLoader,
   BitcoinBlockTransactionsLoaderType,
 } from './dataloader/block-transactions.loader';
+import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 
 @Resolver(() => BitcoinBlock)
 export class BitcoinBlockResolver {
-  private logger = new Logger(BitcoinBlockResolver.name);
+  constructor(private bitcoinApiService: BitcoinApiService) {}
 
   @Query(() => BitcoinBlock, { name: 'btcBlock', nullable: true })
   public async getBlock(
@@ -101,5 +101,13 @@ export class BitcoinBlockResolver {
       return null;
     }
     return txs.map((tx) => BitcoinTransaction.from(tx));
+  }
+
+  @ResolveField(() => Float, { nullable: true })
+  public async confirmations(
+    @Parent() block: BitcoinBaseBlock,
+  ): Promise<number | null> {
+    const info = await this.bitcoinApiService.getBlockchainInfo();
+    return info.blocks - block.height;
   }
 }

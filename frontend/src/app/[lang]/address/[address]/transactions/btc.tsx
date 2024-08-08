@@ -1,34 +1,131 @@
-import { Flex, VStack } from 'styled-system/jsx'
+import { t } from '@lingui/macro'
+import { last } from 'lodash-es'
+import { Center, HStack } from 'styled-system/jsx'
 
-import { explorerGraphql } from '@/apis/explorer-graphql'
-import { BtcUtxoTables } from '@/components/btc/btc-utxo-tables'
-import { Copier } from '@/components/copier'
+import { BtcTransactionCardInAddress } from '@/components/btc/btc-transaction-card-in-address'
 import { FailedFallback } from '@/components/failed-fallback'
-import { TimeFormatter } from '@/components/time-formatter'
+import { NoData } from '@/components/no-data'
+import { Button } from '@/components/ui'
 import Link from '@/components/ui/link'
-import { UtxoOrCellFooter } from '@/components/utxo-or-cell-footer'
+import { graphql } from '@/gql'
+import { BitcoinTransaction } from '@/gql/graphql'
+import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
+import { getUrl } from '@/lib/get-url'
+import { graphQLClient } from '@/lib/graphql'
+
+const query = graphql(`
+  query BtcTransactionByAddress($address: String!, $afterTxid: String) {
+    btcAddress(address: $address) {
+      transactions(afterTxid: $afterTxid) {
+        blockHeight
+        blockHash
+        txid
+        version
+        size
+        locktime
+        weight
+        fee
+        feeRate
+        confirmed
+        confirmations
+        transactionTime
+        vin {
+          txid
+          vout
+          scriptsig
+          scriptsigAsm
+          isCoinbase
+          sequence
+          prevout {
+            scriptpubkey
+            scriptpubkeyAsm
+            scriptpubkeyType
+            scriptpubkeyAddress
+            value
+            status {
+              spent
+              txid
+              vin
+            }
+            address {
+              address
+              satoshi
+              pendingSatoshi
+              transactionsCount
+            }
+          }
+        }
+        vout {
+          scriptpubkey
+          scriptpubkeyAsm
+          scriptpubkeyType
+          scriptpubkeyAddress
+          value
+          status {
+            spent
+            txid
+            vin
+          }
+          address {
+            address
+            satoshi
+            pendingSatoshi
+            transactionsCount
+          }
+        }
+      }
+    }
+  }
+`)
 
 export async function BtcTransactionsByAddress({ address }: { address: string }) {
-  const { btcAddress } = await explorerGraphql.getBtcTransactionsByAddress(address)
+  const i18n = getI18nFromHeaders()
+  const url = getUrl()
+  const afterTxid = url.searchParams.get('afterTxid')
+
+  const { btcAddress } = await graphQLClient.request(query, {
+    address,
+    afterTxid,
+  })
+
+  const nextCursor = last(btcAddress?.transactions)?.txid
 
   if (!btcAddress) {
     return <FailedFallback />
   }
 
-  return btcAddress.transactions.map((tx) => {
-    return (
-      <VStack key={tx.txid} w="100%" gap={0} bg="bg.card" rounded="8px">
-        <Flex w="100%" bg="bg.input" justifyContent="space-between" py="20px" px="30px" roundedTop="8px">
-          <Copier value={tx.txid} onlyIcon>
-            <Link color="brand" href={`/transaction/${tx.txid}`}>
-              {tx.txid}
+  return (
+    <>
+      {!btcAddress.transactions.length ? (
+        <Center w="100%" bg="bg.card" pt="80px" pb="120px" rounded="8px">
+          <NoData>{t(i18n)`No Transaction`}</NoData>
+        </Center>
+      ) : (
+        btcAddress.transactions.map((tx) => {
+          return <BtcTransactionCardInAddress address={address} tx={tx as BitcoinTransaction} key={tx.txid} />
+        })
+      )}
+      <Center w="100%">
+        <HStack gap="16px">
+          {afterTxid ? (
+            <Link href={`/address/${address}/transactions`}>
+              <Button>{t(i18n)`Back to first page`}</Button>
             </Link>
-          </Copier>
-          <TimeFormatter timestamp={tx.locktime} />
-        </Flex>
-        <BtcUtxoTables vin={tx.vin} vout={tx.vout} />
-        <UtxoOrCellFooter fee={tx.fee} confirmations={tx.confirmations} feeRate={tx.feeRate} />
-      </VStack>
-    )
-  })
+          ) : null}
+          {nextCursor ? (
+            <Link
+              href={{
+                pathname: `/address/${address}/transactions`,
+                query: {
+                  afterTxid: nextCursor,
+                },
+              }}
+            >
+              <Button>{t(i18n)`Next`}</Button>
+            </Link>
+          ) : null}
+        </HStack>
+      </Center>
+    </>
+  )
 }

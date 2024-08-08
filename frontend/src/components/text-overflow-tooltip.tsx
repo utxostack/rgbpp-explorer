@@ -1,6 +1,8 @@
 'use client'
 
+import type { Assign, Tooltip as ArkTooltip } from '@ark-ui/react'
 import { cloneElement, ReactElement, ReactNode } from 'react'
+import type { HTMLStyledProps } from 'styled-system/types'
 
 import { Tooltip } from '@/components/ui'
 import { useDetectOverflow } from '@/hooks/useDetectOverflow'
@@ -8,9 +10,10 @@ import { useDetectOverflow } from '@/hooks/useDetectOverflow'
 export interface TextOverflowTooltipProps {
   children: ReactElement
   label: ReactNode
+  contentProps?: Assign<HTMLStyledProps<'div'>, ArkTooltip.ContentBaseProps>
 }
 
-export function TextOverflowTooltip({ children, label }: TextOverflowTooltipProps) {
+export function TextOverflowTooltip({ children, label, contentProps }: TextOverflowTooltipProps) {
   const [isOverflow, ref] = useDetectOverflow()
 
   return (
@@ -20,7 +23,7 @@ export function TextOverflowTooltip({ children, label }: TextOverflowTooltipProp
         <Tooltip.Arrow>
           <Tooltip.ArrowTip />
         </Tooltip.Arrow>
-        <Tooltip.Content>{label}</Tooltip.Content>
+        <Tooltip.Content {...contentProps}>{label}</Tooltip.Content>
       </Tooltip.Positioner>
     </Tooltip.Root>
   )

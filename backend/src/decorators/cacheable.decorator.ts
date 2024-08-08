@@ -42,7 +42,7 @@ export function Cacheable(options: CustomCacheableRegisterOptions): MethodDecora
         };
         const [key] = generateComposedKey(composeOptions);
         const returnVal = await cacheableHandle(
-          key,
+          `@utxo-stack-explorer@v0.0.1/${key}`,
           () => originalMethod.apply(this, args),
           options.ttl,
         );

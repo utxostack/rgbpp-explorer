@@ -2,40 +2,39 @@
 
 import { Trans } from '@lingui/macro'
 
-import { CellType, CkbTransaction } from '@/apis/types/explorer-graphql'
-import { resolveCellDiff } from '@/lib/resolve-cell-diff'
+import { Text } from '@/components/ui'
+import { CellType, CkbTransaction } from '@/gql/graphql'
 import { formatNumber } from '@/lib/string/format-number'
 
-export function Amount({ ckbTransaction }: { ckbTransaction?: CkbTransaction }) {
-  const cellDiff = resolveCellDiff(ckbTransaction)
-
+export function Amount({ ckbTransaction }: { ckbTransaction?: Pick<CkbTransaction, 'outputs'> | null }) {
   if (!ckbTransaction) return <Trans>-</Trans>
 
-  const dobInputCount = ckbTransaction?.inputs.filter(
-    (input) => input.cellType === CellType.DOB || input.cellType === CellType.MNFT,
-  )
-  if (dobInputCount?.length) {
-    return (
-      <Trans>
-        <b>{dobInputCount.length}</b> DOB
-      </Trans>
-    )
-  }
-
   const dobOutputCount = ckbTransaction?.outputs.filter(
-    (output) => output.cellType === CellType.DOB || output.cellType === CellType.MNFT,
+    (output) => output.cellType === CellType.Dob || output.cellType === CellType.Mnft,
   )
   if (dobOutputCount?.length) {
     return (
       <Trans>
-        <b>{dobOutputCount.length}</b> DOB
+        <b>{dobOutputCount.length}</b>
+        <Text as="span" color="text.third" fontSize="14px" fontWeight="medium" ml="4px">
+          DOB
+        </Text>
       </Trans>
     )
   }
 
+  const cellDiff = ckbTransaction.outputs.find((x) => x.xudtInfo)
+
+  if (!cellDiff) {
+    return <Trans>-</Trans>
+  }
+
   return (
     <>
-      <b>{formatNumber(cellDiff.value)}</b> {cellDiff.symbol}
+      <b>{formatNumber(cellDiff.xudtInfo?.amount, cellDiff.xudtInfo?.decimal)}</b>
+      <Text as="span" color="text.third" fontSize="14px" fontWeight="medium" ml="4px">
+        {cellDiff.xudtInfo?.symbol}
+      </Text>
     </>
   )
 }

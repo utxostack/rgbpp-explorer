@@ -1,11 +1,11 @@
-import { Box, Center } from 'styled-system/jsx'
+import { Box, Center, CenterProps } from 'styled-system/jsx'
 
 import LoadingSpritePng from '@/assets/loading-sprite.png'
 import { Image } from '@/components/ui/image'
 
-export function Loading() {
+export function Loading(props: CenterProps) {
   return (
-    <Center>
+    <Center {...props}>
       <Box pos="relative" w="80px" h="80px" overflow="hidden">
         <Image
           minW="1752px"

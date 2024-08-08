@@ -1,15 +1,26 @@
 import { t } from '@lingui/macro'
 import { Box, Grid, VStack } from 'styled-system/jsx'
 
-import { explorerGraphql } from '@/apis/explorer-graphql'
+import { graphql } from '@/gql'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
+import { graphQLClient } from '@/lib/graphql'
 import { formatNumber } from '@/lib/string/format-number'
 
 export async function HomeQuickInfo() {
   const i18n = getI18nFromHeaders()
-  const { rgbppStatistic } = await explorerGraphql
-    .getRGBppStatistic()
+  const { rgbppStatistic } = await graphQLClient
+    .request(
+      graphql(`
+        query RgbppStatistic {
+          rgbppStatistic {
+            transactionsCount
+            holdersCount
+          }
+        }
+      `),
+    )
     .catch(() => ({ rgbppStatistic: { transactionsCount: undefined, holdersCount: undefined } }))
+
   return (
     <Grid
       rounded="200px"
