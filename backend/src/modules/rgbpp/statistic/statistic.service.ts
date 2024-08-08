@@ -15,6 +15,9 @@ import { RgbppTransactionService } from '../transaction/transaction.service';
 import { RgbppBaseTransaction } from '../transaction/transaction.model';
 
 const BTC_24_HOURS_BLOCK_NUMBER = ONE_DAY_MS / TEN_MINUTES_MS;
+// TODO: refactor the `Average Block Time` constant
+// CKB testnet: ~8s, see https://pudge.explorer.nervos.org/charts/average-block-time
+// CKB mainnet: ~10s, see https://explorer.nervos.org/charts/average-block-time
 const CKB_24_HOURS_BLOCK_NUMBER = ONE_DAY_MS / 10000;
 const RGBPP_ASSETS_CELL_TYPE = [CellType.XUDT, CellType.SUDT, CellType.DOB, CellType.MNFT];
 const limit = pLimit(200);
