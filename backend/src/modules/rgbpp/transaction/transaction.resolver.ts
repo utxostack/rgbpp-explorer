@@ -30,6 +30,13 @@ export class RgbppTransactionResolver {
     return await this.rgbppTransactionService.getLatestTransactions(page, pageSize);
   }
 
+  @Query(() => RgbppLatestTransactionList, { name: 'rgbppLatestL2Transactions' })
+  public async getLatestL2Transactions(
+    @Args('limit', { type: () => Int, nullable: true }) limit: number = 10,
+  ): Promise<RgbppLatestTransactionList> {
+    return this.rgbppTransactionService.getLatestL2Transactions(limit);
+  }
+
   @Query(() => RgbppTransaction, { name: 'rgbppTransaction', nullable: true })
   public async getTransaction(
     @Args('txidOrTxHash') txidOrTxHash: string,

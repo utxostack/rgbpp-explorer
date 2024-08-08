@@ -7,12 +7,14 @@ import { RgbppTransactionService } from './transaction.service';
 import { RgbppTransactionLoader } from './transaction.dataloader';
 import { CkbRpcModule } from 'src/core/ckb-rpc/ckb-rpc.module';
 import { RgbppModule } from '../rgbpp.module';
+import { CkbScriptModule } from 'src/modules/ckb/script/script.module';
 
 @Module({
   imports: [
     CkbExplorerModule,
     CkbRpcModule,
     CkbTransactionModule,
+    CkbScriptModule,
     BitcoinApiModule,
     forwardRef(() => RgbppModule),
   ],
