@@ -55,7 +55,7 @@ export abstract class BaseScriptService {
         const txs = await this.ckbRpcService.getTransactions(
           searchKey,
           order,
-          BI.from(limit * 1000).toHexString(),
+          BI.from(limit).toHexString(),
           after,
         );
         return txs;
