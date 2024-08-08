@@ -92,11 +92,13 @@ export class RgbppTransactionService {
       }),
     );
     const hasRgbppLockInput = inputCells.some(
-      (cell) => cell?.lock && this.rgbppService.isRgbppLockScript({
-        codeHash: cell.lock.code_hash,
-        hashType: cell.lock.hash_type as HashType,
-        args: cell.lock.args,
-      }),
+      (cell) =>
+        cell?.lock &&
+        this.rgbppService.isRgbppLockScript({
+          codeHash: cell.lock.code_hash,
+          hashType: cell.lock.hash_type as HashType,
+          args: cell.lock.args,
+        }),
     );
     const hasRgbppLockOuput = ckbTx.transaction.outputs.some(
       (output) =>
@@ -128,7 +130,7 @@ export class RgbppTransactionService {
     return null;
   }
 
-  private async queryRgbppLockTx(btcTx: BitcoinApiInterface.Transaction) {
+  public async queryRgbppLockTx(btcTx: BitcoinApiInterface.Transaction) {
     const ckbTxs = await Promise.all(
       btcTx.vout.map(async (_, index) => {
         const args = buildRgbppLockArgs(index, btcTx.txid);
@@ -165,7 +167,7 @@ export class RgbppTransactionService {
     return null;
   }
 
-  private async getRgbppBtcTimeLockTx(btcTx: BitcoinApiInterface.Transaction) {
+  public async getRgbppBtcTimeLockTx(btcTx: BitcoinApiInterface.Transaction) {
     const ckbTxs = (
       await Promise.all(
         btcTx.vin.map(async ({ txid, vout }) => {

@@ -8,6 +8,7 @@ import { RgbppModule } from '../rgbpp.module';
 import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { CkbScriptModule } from 'src/modules/ckb/script/script.module';
+import { RgbppTransactionModule } from '../transaction/transaction.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { CkbScriptModule } from 'src/modules/ckb/script/script.module';
     CkbRpcModule,
     BitcoinApiModule,
     CkbScriptModule,
+    RgbppTransactionModule,
     forwardRef(() => RgbppModule),
   ],
   providers: [RgbppStatisticResolver, RgbppStatisticService],

@@ -1,18 +1,18 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, Float, ObjectType } from '@nestjs/graphql';
 
 export type RgbppBaseStatistic = Record<string, never>;
 
 @ObjectType({ description: 'RGB++ Statistic' })
 export class RgbppStatistic {
-  @Field(() => Number)
+  @Field(() => Float)
   transactionsCount: number;
 
-  @Field(() => Number)
+  @Field(() => Float)
   holdersCount: number;
 
-  @Field(() => Number)
+  @Field(() => Float)
   latest24HoursL1TransactionsCount: number;
 
-  @Field(() => Number)
+  @Field(() => Float)
   latest24HoursL2TransactionsCount: number;
 }
