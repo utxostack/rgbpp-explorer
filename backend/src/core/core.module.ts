@@ -6,6 +6,7 @@ import { BitcoinApiModule } from './bitcoin-api/bitcoin-api.module';
 import { CkbRpcModule } from './ckb-rpc/ckb-rpc.module';
 import { CkbRpcWebsocketService } from './ckb-rpc/ckb-rpc-websocket.service';
 import { BitcoinApiService } from './bitcoin-api/bitcoin-api.service';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { BitcoinApiService } from './bitcoin-api/bitcoin-api.service';
     CkbExplorerModule,
     CkbRpcModule,
     BitcoinApiModule,
+    HealthModule,
   ],
   providers: [CkbExplorerService, CkbRpcWebsocketService, BitcoinApiService],
   exports: [CkbExplorerService, CkbRpcWebsocketService, BitcoinApiService],
