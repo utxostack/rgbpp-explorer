@@ -52,6 +52,7 @@
     "bullmq": "^5.11.0",
     "cache-manager": "^5.2.3",
     "cache-manager-redis-yet": "^4.1.2",
+    "cron": "^3.1.7",
     "dataloader": "^2.2.2",
     "fastify": "^4.28.1",
     "graphql": "^16.9.0",

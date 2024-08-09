@@ -1,9 +1,9 @@
 import { Args, Float, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
-import { RgbppAddress, RgbppBaseAddress } from './address.model';
+import { RgbppAddress } from './address.model';
 import { RgbppAddressService } from './address.service';
 import { ParentField } from 'src/decorators/parent-field.decorator';
-import { RgbppAsset, RgbppBaseAsset } from '../asset/asset.model';
+import { RgbppAsset } from '../asset/asset.model';
 import { CkbXUDTInfo } from 'src/modules/ckb/cell/cell.model';
 import * as pLimit from 'p-limit';
 import { Loader } from '@applifting-io/nestjs-dataloader';
@@ -20,10 +20,10 @@ export class RgbppAddressResolver {
   constructor(
     private ckbExplorerService: CkbExplorerService,
     private rgbppAddressService: RgbppAddressService,
-  ) {}
+  ) { }
 
   @Query(() => RgbppAddress, { name: 'rgbppAddress', nullable: true })
-  public async getBtcAddress(@Args('address') address: string): Promise<RgbppBaseAddress> {
+  public async getBtcAddress(@Args('address') address: string): Promise<RgbppAddress> {
     return RgbppAddress.from(address);
   }
 
@@ -42,12 +42,12 @@ export class RgbppAddressResolver {
   }
 
   @ResolveField(() => [RgbppAsset])
-  public async assets(@ParentField('address') address: string): Promise<RgbppBaseAsset[]> {
+  public async assets(@ParentField('address') address: string): Promise<RgbppAsset[]> {
     const cells = await this.rgbppAddressService.getRgbppAddressCells(address);
     return cells.map((cell) => RgbppAsset.from(address, cell));
   }
 
-  @ResolveField(() => [Float])
+  @ResolveField(() => [CkbXUDTInfo])
   public async balances(
     @ParentField('address') address: string,
     @Loader(CkbExplorerTransactionLoader) explorerTxLoader: CkbExplorerTransactionLoaderType,

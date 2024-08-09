@@ -1,33 +1,22 @@
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Int, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { CkbBaseTransaction, CkbTransaction } from 'src/modules/ckb/transaction/transaction.model';
+import { CkbTransaction } from 'src/modules/ckb/transaction/transaction.model';
 import {
   CkbRpcTransactionLoader,
   CkbRpcTransactionLoaderType,
 } from 'src/modules/ckb/transaction/transaction.dataloader';
-import {
-  BitcoinBaseTransaction,
-  BitcoinTransaction,
-} from 'src/modules/bitcoin/transaction/transaction.model';
+import { BitcoinTransaction } from 'src/modules/bitcoin/transaction/transaction.model';
 import { RgbppTransactionService } from './transaction.service';
 import {
   BitcoinTransactionLoader,
   BitcoinTransactionLoaderType,
 } from 'src/modules/bitcoin/transaction/transaction.dataloader';
-import {
-  RgbppTransaction,
-  RgbppBaseTransaction,
-  RgbppLatestTransactionList,
-  LeapDirection,
-} from './transaction.model';
+import { RgbppTransaction, RgbppLatestTransactionList, LeapDirection } from './transaction.model';
 import { RgbppTransactionLoader, RgbppTransactionLoaderType } from './transaction.dataloader';
-import { HashType, Output } from '@ckb-lumos/lumos';
 
 @Resolver(() => RgbppTransaction)
 export class RgbppTransactionResolver {
-  constructor(
-    private rgbppTransactionService: RgbppTransactionService,
-  ) { }
+  constructor(private rgbppTransactionService: RgbppTransactionService) { }
 
   @Query(() => RgbppLatestTransactionList, { name: 'rgbppLatestTransactions' })
   public async getLatestTransactions(
@@ -37,18 +26,25 @@ export class RgbppTransactionResolver {
     return await this.rgbppTransactionService.getLatestTransactions(page, pageSize);
   }
 
+  @Query(() => RgbppLatestTransactionList, { name: 'rgbppLatestL2Transactions' })
+  public async getLatestL2Transactions(
+    @Args('limit', { type: () => Int, nullable: true }) limit: number = 10,
+  ): Promise<RgbppLatestTransactionList> {
+    return this.rgbppTransactionService.getLatestL2Transactions(limit);
+  }
+
   @Query(() => RgbppTransaction, { name: 'rgbppTransaction', nullable: true })
   public async getTransaction(
     @Args('txidOrTxHash') txidOrTxHash: string,
     @Loader(RgbppTransactionLoader) txLoader: RgbppTransactionLoaderType,
-  ): Promise<RgbppBaseTransaction | null> {
+  ): Promise<RgbppTransaction | null> {
     const tx = await txLoader.load(txidOrTxHash);
     return tx || null;
   }
 
   @ResolveField(() => LeapDirection, { nullable: true })
   public async leapDirection(
-    @Parent() tx: RgbppBaseTransaction,
+    @Parent() tx: RgbppTransaction,
     @Loader(CkbRpcTransactionLoader) ckbRpcTxLoader: CkbRpcTransactionLoaderType,
   ): Promise<LeapDirection | null> {
     const ckbTx = await ckbRpcTxLoader.load(tx.ckbTxHash);
@@ -60,9 +56,9 @@ export class RgbppTransactionResolver {
 
   @ResolveField(() => CkbTransaction, { nullable: true })
   public async ckbTransaction(
-    @Parent() tx: RgbppBaseTransaction,
+    @Parent() tx: RgbppTransaction,
     @Loader(CkbRpcTransactionLoader) ckbRpcTxLoader: CkbRpcTransactionLoaderType,
-  ): Promise<CkbBaseTransaction | null> {
+  ): Promise<CkbTransaction | null> {
     const ckbTx = await ckbRpcTxLoader.load(tx.ckbTxHash);
     if (!ckbTx) {
       return null;
@@ -72,9 +68,9 @@ export class RgbppTransactionResolver {
 
   @ResolveField(() => BitcoinTransaction, { nullable: true })
   public async btcTransaction(
-    @Parent() tx: RgbppBaseTransaction,
+    @Parent() tx: RgbppTransaction,
     @Loader(BitcoinTransactionLoader) txLoader: BitcoinTransactionLoaderType,
-  ): Promise<BitcoinBaseTransaction | null> {
+  ): Promise<BitcoinTransaction | null> {
     if (!tx.btcTxid) {
       return null;
     }

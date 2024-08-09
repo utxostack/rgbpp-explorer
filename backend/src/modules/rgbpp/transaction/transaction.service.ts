@@ -1,12 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
-import {
-  RgbppTransaction,
-  RgbppBaseTransaction,
-  RgbppLatestTransactionList,
-  LeapDirection,
-} from './transaction.model';
+import { RgbppTransaction, RgbppLatestTransactionList, LeapDirection } from './transaction.model';
 import { ConfigService } from '@nestjs/config';
 import { Env } from 'src/env';
 import { CkbRpcWebsocketService } from 'src/core/ckb-rpc/ckb-rpc-websocket.service';
@@ -17,6 +12,7 @@ import { RgbppService } from '../rgbpp.service';
 import { BI, HashType } from '@ckb-lumos/lumos';
 import { Cacheable } from 'src/decorators/cacheable.decorator';
 import { ONE_MONTH_MS } from 'src/common/date';
+import { CkbScriptService } from 'src/modules/ckb/script/script.service';
 
 @Injectable()
 export class RgbppTransactionService {
@@ -25,10 +21,11 @@ export class RgbppTransactionService {
   constructor(
     private ckbExplorerService: CkbExplorerService,
     private ckbRpcService: CkbRpcWebsocketService,
+    private ckbScriptService: CkbScriptService,
     private rgbppService: RgbppService,
     private bitcoinApiService: BitcoinApiService,
     private configService: ConfigService<Env>,
-  ) {}
+  ) { }
 
   public async getLatestTransactions(
     page: number,
@@ -45,7 +42,54 @@ export class RgbppTransactionService {
     };
   }
 
-  public async getTransactionByCkbTxHash(txHash: string): Promise<RgbppBaseTransaction | null> {
+  public async getLatestL2Transactions(limit: number) {
+    const rgbppL2Txs: RgbppTransaction[] = [];
+    const tipBlockNumber = await this.ckbRpcService.getTipBlockNumber();
+    let blockNumber = BI.from(tipBlockNumber);
+    while (rgbppL2Txs.length < limit) {
+      const txss = await Promise.all(
+        Array({ length: limit }).map(async (_, index) => {
+          const block = await this.ckbRpcService.getBlockByNumber(
+            blockNumber.sub(index).toHexString(),
+          );
+
+          const ckbTxs = block.transactions.filter((tx) => {
+            return tx.outputs.some((output) => {
+              if (!output.type) {
+                return false;
+              }
+              return this.ckbScriptService.matchScript({
+                codeHash: output.type.code_hash,
+                hashType: output.type.hash_type as HashType,
+                args: output.type.args,
+              });
+            });
+          });
+
+          const txs = await Promise.all(
+            ckbTxs.map((tx) => this.ckbExplorerService.getTransaction(tx.hash)),
+          );
+          return txs;
+        }),
+      );
+      const flatTxs = txss.flat().filter(res => {
+        const attr = res?.data?.attributes;
+        if (!attr) return false;
+        return attr.is_rgb_transaction !== true && attr.is_btc_time_lock !== true;
+      }).map((tx) => RgbppTransaction.fromCkbTransaction(tx.data.attributes));
+
+      rgbppL2Txs.push(...flatTxs);
+      blockNumber = blockNumber.sub(limit);
+    }
+
+    return {
+      txs: rgbppL2Txs.slice(0, limit),
+      total: 0,
+      pageSize: limit,
+    };
+  }
+
+  public async getTransactionByCkbTxHash(txHash: string): Promise<RgbppTransaction | null> {
     const response = await this.ckbExplorerService.getTransaction(txHash);
     if (!response.data.attributes.is_rgb_transaction) {
       return null;
@@ -53,17 +97,17 @@ export class RgbppTransactionService {
     return RgbppTransaction.fromCkbTransaction(response.data.attributes);
   }
 
-  public async getTransactionByBtcTxid(txid: string): Promise<RgbppBaseTransaction | null> {
+  public async getTransactionByBtcTxid(txid: string): Promise<RgbppTransaction | null> {
     const btcTx = await this.bitcoinApiService.getTx({ txid });
-    const tx = (await this.queryRgbppLockTx(btcTx)) ?? (await this.getRgbppBtcTimeLockTx(btcTx));
+    const tx = (await this.queryRgbppLockTx(btcTx)) ?? (await this.queryRgbppBtcTimeLockTx(btcTx));
     if (tx) {
       return tx;
     }
     return null;
   }
 
-  public async getTransaction(txidOrTxHash: string): Promise<RgbppBaseTransaction | null> {
-    let tx: RgbppBaseTransaction | null = null;
+  public async getTransaction(txidOrTxHash: string): Promise<RgbppTransaction | null> {
+    let tx: RgbppTransaction | null = null;
     try {
       tx = await this.getTransactionByCkbTxHash(txidOrTxHash);
     } catch (err) {
@@ -92,11 +136,13 @@ export class RgbppTransactionService {
       }),
     );
     const hasRgbppLockInput = inputCells.some(
-      (cell) => cell?.lock && this.rgbppService.isRgbppLockScript({
-        codeHash: cell.lock.code_hash,
-        hashType: cell.lock.hash_type as HashType,
-        args: cell.lock.args,
-      }),
+      (cell) =>
+        cell?.lock &&
+        this.rgbppService.isRgbppLockScript({
+          codeHash: cell.lock.code_hash,
+          hashType: cell.lock.hash_type as HashType,
+          args: cell.lock.args,
+        }),
     );
     const hasRgbppLockOuput = ckbTx.transaction.outputs.some(
       (output) =>
@@ -128,7 +174,7 @@ export class RgbppTransactionService {
     return null;
   }
 
-  private async queryRgbppLockTx(btcTx: BitcoinApiInterface.Transaction) {
+  public async queryRgbppLockTx(btcTx: BitcoinApiInterface.Transaction) {
     const ckbTxs = await Promise.all(
       btcTx.vout.map(async (_, index) => {
         const args = buildRgbppLockArgs(index, btcTx.txid);
@@ -165,7 +211,7 @@ export class RgbppTransactionService {
     return null;
   }
 
-  private async getRgbppBtcTimeLockTx(btcTx: BitcoinApiInterface.Transaction) {
+  public async queryRgbppBtcTimeLockTx(btcTx: BitcoinApiInterface.Transaction) {
     const ckbTxs = (
       await Promise.all(
         btcTx.vin.map(async ({ txid, vout }) => {

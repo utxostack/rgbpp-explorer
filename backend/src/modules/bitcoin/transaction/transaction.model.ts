@@ -1,14 +1,7 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import * as BitcoinApi from 'src/core/bitcoin-api/bitcoin-api.schema';
-import { BitcoinBaseOutput, BitcoinOutput } from '../output/output.model';
+import { BitcoinOutput } from '../output/output.model';
 import { BitcoinInput } from '../input/input.model';
-import { RgbppTransaction } from 'src/modules/rgbpp/transaction/transaction.model';
-import { BitcoinBlock } from '../block/block.model';
-
-export type BitcoinBaseTransaction = Omit<
-  BitcoinTransaction,
-  'confirmations' | 'block' | 'rgbppTransaction' | 'transactionTime'
->;
 
 @ObjectType({ description: 'Bitcoin Transaction' })
 export class BitcoinTransaction {
@@ -31,7 +24,7 @@ export class BitcoinTransaction {
   vin: BitcoinInput[];
 
   @Field(() => [BitcoinOutput])
-  vout: BitcoinBaseOutput[];
+  vout: BitcoinOutput[];
 
   @Field(() => Float)
   size: number;
@@ -51,19 +44,7 @@ export class BitcoinTransaction {
   @Field(() => Boolean)
   confirmed: boolean;
 
-  @Field(() => Float)
-  confirmations: number;
-
-  @Field(() => Date)
-  transactionTime: Date;
-
-  @Field(() => BitcoinBlock)
-  block: BitcoinBlock;
-
-  @Field(() => RgbppTransaction, { nullable: true })
-  rgbppTransaction?: RgbppTransaction;
-
-  public static from(tx: BitcoinApi.Transaction): BitcoinBaseTransaction {
+  public static from(tx: BitcoinApi.Transaction): BitcoinTransaction {
     const vSize = Math.ceil(tx.weight / 4);
 
     return {

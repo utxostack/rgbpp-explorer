@@ -31,7 +31,7 @@ export abstract class BaseScriptService {
 
   public abstract getScripts(): Script[];
 
-  public async matchScript(script: Script) {
+  public matchScript(script: Script) {
     const scripts = this.getScripts();
     return scripts.some((s) => isScriptEqual(s, { ...script, args: '0x' }));
   }

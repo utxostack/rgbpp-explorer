@@ -21,6 +21,7 @@ import {
   Statistics,
   TransactionFeesStatistic,
   TransactionListSortType,
+  TransactionListItem,
 } from './ckb-explorer.interface';
 import { ONE_MONTH_MS } from 'src/common/date';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
@@ -61,6 +62,10 @@ type GetXUDTListParams = BasePaginationParams & {
 type GetXUDTTransactionsParams = BasePaginationParams & {
   txHash?: string;
   addressHash?: string;
+};
+
+type GetTransactionListParams = BasePaginationParams & {
+  sort?: 'height.desc' | 'height.asc';
 };
 
 @Injectable()
@@ -215,6 +220,21 @@ export class CkbExplorerService {
   })
   public async getTransaction(txHash: string): Promise<NonPaginatedResponse<DetailTransaction>> {
     const response = await this.request.get(`/v1/transactions/${txHash}`);
+    return response.data;
+  }
+
+  public async getTransactionList({
+    page = 1,
+    pageSize = 10,
+    sort = 'height.desc',
+  }: GetTransactionListParams): Promise<PaginatedResponse<TransactionListItem>> {
+    const response = await this.request.get('/v1/transactions', {
+      params: {
+        page,
+        page_size: pageSize,
+        sort,
+      },
+    });
     return response.data;
   }
 

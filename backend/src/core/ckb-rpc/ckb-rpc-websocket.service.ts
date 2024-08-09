@@ -19,13 +19,17 @@ import { CKB_MIN_SAFE_CONFIRMATIONS } from 'src/constants';
 export class CkbRpcWebsocketService {
   private logger = new Logger(CkbRpcWebsocketService.name);
   private websocket: RpcWebsocketsClient;
+  private websocketReady: Promise<void>;
 
   constructor(private configService: ConfigService<Env>) {
     this.websocket = new RpcWebsocketsClient(this.configService.get('CKB_RPC_WEBSOCKET_URL'));
 
-    this.websocket.on('open', () => {
-      this.websocket.on('error', (error) => {
-        this.logger.error(error.message);
+    this.websocketReady = new Promise((resolve) => {
+      this.websocket.on('open', () => {
+        this.websocket.on('error', (error) => {
+          this.logger.error(error.message);
+        });
+        resolve();
       });
     });
   }
@@ -47,6 +51,7 @@ export class CkbRpcWebsocketService {
     },
   })
   public async getTransaction(txHash: string): Promise<TransactionWithStatusResponse> {
+    await this.websocketReady;
     this.logger.debug(`get_transaction - txHash: ${txHash}`);
     const tx = await this.websocket.call('get_transaction', [txHash]);
     return tx as TransactionWithStatusResponse;
@@ -57,17 +62,31 @@ export class CkbRpcWebsocketService {
     key: (blockHash: string) => `getBlock:${blockHash}`,
     ttl: ONE_MONTH_MS,
     shouldCache: async (block: Block, that: CkbRpcWebsocketService) => {
+      if (!block?.header) {
+        return false;
+      }
       const { number } = block.header;
       return that.isSafeConfirmations(number);
     },
   })
   public async getBlock(blockHash: string): Promise<Block> {
+    await this.websocketReady;
     this.logger.debug(`get_block - blockHash: ${blockHash}`);
-    const block = await this.websocket.call('get_block', [blockHash]);
+    let block = await this.websocket.call('get_block', [blockHash]);
     return block as Block;
   }
 
+  @Cacheable({
+    namespace: 'CkbRpcWebsocketService',
+    key: (blockNumber: string) => `getBlockByNumber:${blockNumber}`,
+    ttl: ONE_MONTH_MS,
+    shouldCache: async (block: Block, that: CkbRpcWebsocketService) => {
+      const { number } = block.header;
+      return that.isSafeConfirmations(number);
+    },
+  })
   public async getBlockByNumber(blockNumber: string): Promise<Block> {
+    await this.websocketReady;
     this.logger.debug(`get_block_by_number - blockNumber: ${blockNumber}`);
     const block = await this.websocket.call('get_block_by_number', [
       BI.from(blockNumber).toHexString(),
@@ -81,6 +100,7 @@ export class CkbRpcWebsocketService {
     ttl: ONE_MONTH_MS,
   })
   public async getBlockEconomicState(blockHash: string): Promise<BlockEconomicState> {
+    await this.websocketReady;
     this.logger.debug(`get_block_economic_state - blockHash: ${blockHash}`);
     const blockEconomicState = await this.websocket.call('get_block_economic_state', [blockHash]);
     return blockEconomicState as BlockEconomicState;
@@ -93,6 +113,7 @@ export class CkbRpcWebsocketService {
     ttl: 1000,
   })
   public async getTipBlockNumber(): Promise<number> {
+    await this.websocketReady;
     this.logger.debug('get_tip_block_number');
     const tipBlockNumber = await this.websocket.call('get_tip_block_number', []);
     return BI.from(tipBlockNumber).toNumber();
@@ -104,6 +125,7 @@ export class CkbRpcWebsocketService {
     limit: string,
     after?: string,
   ): Promise<GetTransactionsResult> {
+    await this.websocketReady;
     this.logger.debug(
       `get_transactions - searchKey: ${JSON.stringify(searchKey)}, order: ${order}, limit: ${limit}, after: ${after}`,
     );
@@ -122,6 +144,7 @@ export class CkbRpcWebsocketService {
     limit: string,
     after?: string,
   ): Promise<GetCellsResult> {
+    await this.websocketReady;
     this.logger.debug(
       `get_cells - searchKey: ${JSON.stringify(searchKey)}, order: ${order}, limit: ${limit}, after: ${after}`,
     );

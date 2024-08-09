@@ -1,15 +1,7 @@
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { toNumber } from 'lodash';
 import * as CkbExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
-import { BitcoinTransaction } from 'src/modules/bitcoin/transaction/transaction.model';
-import { CkbTransaction } from 'src/modules/ckb/transaction/transaction.model';
 
-export type RgbppBaseTransaction = Omit<
-  RgbppTransaction,
-  'ckbTransaction' | 'btcTransaction' | 'leapDirection'
->;
-
-// XXX: ts-graphql uses enum keys as values in GQL: https://typegraphql.com/docs/enums.html#interoperability
 export enum LeapDirection {
   LeapIn = 'leap_in',
   LeapOut = 'leap_out',
@@ -28,20 +20,11 @@ export class RgbppTransaction {
   @Field(() => String, { nullable: true })
   btcTxid: string | null;
 
-  @Field(() => LeapDirection, { nullable: true })
-  leapDirection: LeapDirection | null;
-
   @Field(() => Int)
   blockNumber: number;
 
   @Field(() => Date)
   timestamp: Date;
-
-  @Field(() => CkbTransaction, { nullable: true })
-  ckbTransaction: CkbTransaction | null;
-
-  @Field(() => BitcoinTransaction, { nullable: true })
-  btcTransaction: BitcoinTransaction | null;
 
   public static from(tx: CkbExplorer.RgbppTransaction) {
     return {
@@ -65,7 +48,7 @@ export class RgbppTransaction {
 @ObjectType({ description: 'RGB++ latest transaction list' })
 export class RgbppLatestTransactionList {
   @Field(() => [RgbppTransaction])
-  txs: RgbppBaseTransaction[];
+  txs: RgbppTransaction[];
 
   @Field(() => Int)
   total: number;

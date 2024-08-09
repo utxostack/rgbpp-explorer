@@ -1,6 +1,6 @@
 import { Field, Float, ObjectType } from '@nestjs/graphql';
 import * as BitcoinApi from 'src/core/bitcoin-api/bitcoin-api.schema';
-import { BitcoinBaseOutput, BitcoinOutput } from '../output/output.model';
+import { BitcoinOutput } from '../output/output.model';
 
 @ObjectType({ description: 'Bitcoin Input' })
 export class BitcoinInput {
@@ -11,7 +11,7 @@ export class BitcoinInput {
   vout: number;
 
   @Field(() => BitcoinOutput, { nullable: true })
-  prevout: BitcoinBaseOutput | null;
+  prevout: BitcoinOutput | null;
 
   @Field(() => String)
   scriptsig: string;

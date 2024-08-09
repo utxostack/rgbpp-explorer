@@ -57,27 +57,31 @@ export function CkbBlockOverview({
         >
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Miner`}</Text>
-            <Tooltip.Root openDelay={0} closeDelay={0}>
-              <Tooltip.Trigger cursor="pointer">
-                <Link
-                  href={`/address/${block.miner.address}`}
-                  whiteSpace="nowrap"
-                  maxW="250px"
-                  truncate
-                  color="brand"
-                  _hover={{ textDecoration: 'underline' }}
-                  cursor="pointer"
-                >
-                  {formatCkbAddress(block.miner.address)}
-                </Link>
-              </Tooltip.Trigger>
-              <Tooltip.Positioner>
-                <Tooltip.Arrow>
-                  <Tooltip.ArrowTip />
-                </Tooltip.Arrow>
-                <Tooltip.Content maxW="unset">{block.miner.address}</Tooltip.Content>
-              </Tooltip.Positioner>
-            </Tooltip.Root>
+            {block.miner ? (
+              <Tooltip.Root openDelay={0} closeDelay={0}>
+                <Tooltip.Trigger cursor="pointer">
+                  <Link
+                    href={`/address/${block.miner.address}`}
+                    whiteSpace="nowrap"
+                    maxW="250px"
+                    truncate
+                    color="brand"
+                    _hover={{ textDecoration: 'underline' }}
+                    cursor="pointer"
+                  >
+                    {formatCkbAddress(block.miner.address)}
+                  </Link>
+                </Tooltip.Trigger>
+                <Tooltip.Positioner>
+                  <Tooltip.Arrow>
+                    <Tooltip.ArrowTip />
+                  </Tooltip.Arrow>
+                  <Tooltip.Content maxW="unset">{block.miner.address}</Tooltip.Content>
+                </Tooltip.Positioner>
+              </Tooltip.Root>
+            ) : (
+              <Text color="text.third">-</Text>
+            )}
           </VStack>
           <VStack gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Miner Reward`}</Text>

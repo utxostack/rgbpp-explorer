@@ -1,28 +1,25 @@
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
-import { BitcoinBaseTransaction, BitcoinTransaction } from './transaction.model';
+import { BitcoinTransaction } from './transaction.model';
 import { BitcoinTransactionLoader, BitcoinTransactionLoaderType } from './transaction.dataloader';
-import {
-  RgbppBaseTransaction,
-  RgbppTransaction,
-} from 'src/modules/rgbpp/transaction/transaction.model';
+import { RgbppTransaction } from 'src/modules/rgbpp/transaction/transaction.model';
 import {
   RgbppTransactionLoader,
   RgbppTransactionLoaderType,
 } from 'src/modules/rgbpp/transaction/transaction.dataloader';
-import { BitcoinBaseBlock, BitcoinBlock } from '../block/block.model';
+import { BitcoinBlock } from '../block/block.model';
 import { BitcoinBlockLoader, BitcoinBlockLoaderType } from '../block/dataloader/block.loader';
 
 @Resolver(() => BitcoinTransaction)
 export class BitcoinTransactionResolver {
-  constructor(private bitcoinApiService: BitcoinApiService) {}
+  constructor(private bitcoinApiService: BitcoinApiService) { }
 
   @Query(() => BitcoinTransaction, { name: 'btcTransaction', nullable: true })
   public async getTransaction(
     @Args('txid') txid: string,
     @Loader(BitcoinTransactionLoader) txLoader: BitcoinTransactionLoaderType,
-  ): Promise<BitcoinBaseTransaction | null> {
+  ): Promise<BitcoinTransaction | null> {
     const transaction = await txLoader.load(txid);
     if (!transaction) {
       return null;
@@ -31,7 +28,7 @@ export class BitcoinTransactionResolver {
   }
 
   @ResolveField(() => Float)
-  public async confirmations(@Parent() tx: BitcoinBaseTransaction): Promise<number> {
+  public async confirmations(@Parent() tx: BitcoinTransaction): Promise<number> {
     if (!tx.confirmed) {
       return 0;
     }
@@ -39,10 +36,10 @@ export class BitcoinTransactionResolver {
     return info.blocks - tx.blockHeight! + 1;
   }
 
-  @ResolveField(() => Date)
-  public async transactionTime(@Parent() tx: BitcoinBaseTransaction): Promise<Date> {
+  @ResolveField(() => Date, { nullable: true })
+  public async transactionTime(@Parent() tx: BitcoinTransaction): Promise<Date | null> {
     const [txTime] = await this.bitcoinApiService.getTransactionTimes({ txids: [tx.txid] });
-    if (txTime === 0) {
+    if (!txTime) {
       return tx.blockTime!;
     }
     return new Date(txTime * 1000);
@@ -50,9 +47,9 @@ export class BitcoinTransactionResolver {
 
   @ResolveField(() => BitcoinBlock, { nullable: true })
   public async block(
-    @Parent() tx: BitcoinBaseTransaction,
+    @Parent() tx: BitcoinTransaction,
     @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
-  ): Promise<BitcoinBaseBlock | null> {
+  ): Promise<BitcoinBlock | null> {
     if (!tx.blockHash) {
       return null;
     }
@@ -65,9 +62,9 @@ export class BitcoinTransactionResolver {
 
   @ResolveField(() => RgbppTransaction, { nullable: true })
   public async rgbppTransaction(
-    @Parent() tx: BitcoinBaseTransaction,
+    @Parent() tx: BitcoinTransaction,
     @Loader(RgbppTransactionLoader) txLoader: RgbppTransactionLoaderType,
-  ): Promise<RgbppBaseTransaction | null> {
+  ): Promise<RgbppTransaction | null> {
     const result = await txLoader.load(tx.txid);
     return result || null;
   }

@@ -1,8 +1,8 @@
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { RgbppAddress, RgbppBaseAddress } from 'src/modules/rgbpp/address/address.model';
-import { BitcoinBaseTransaction, BitcoinTransaction } from '../transaction/transaction.model';
-import { BitcoinAddress, BitcoinBaseAddress } from './address.model';
+import { RgbppAddress } from 'src/modules/rgbpp/address/address.model';
+import { BitcoinTransaction } from '../transaction/transaction.model';
+import { BitcoinAddress } from './address.model';
 import {
   BitcoinAddressLoader,
   BitcoinAddressLoaderType,
@@ -16,13 +16,13 @@ export class BitcoinAddressResolver {
   @Query(() => BitcoinAddress, { name: 'btcAddress', nullable: true })
   public async getBtcAddress(
     @Args('address', ValidateBtcAddressPipe) address: string,
-  ): Promise<BitcoinBaseAddress | null> {
+  ): Promise<BitcoinAddress | null> {
     return BitcoinAddress.from(address);
   }
 
   @ResolveField(() => Float)
   public async satoshi(
-    @Parent() address: BitcoinBaseAddress,
+    @Parent() address: BitcoinAddress,
     @Loader(BitcoinAddressLoader) addressLoader: BitcoinAddressLoaderType,
   ): Promise<number | null> {
     const addressStats = await addressLoader.load(address.address);
@@ -34,7 +34,7 @@ export class BitcoinAddressResolver {
 
   @ResolveField(() => Float)
   public async pendingSatoshi(
-    @Parent() address: BitcoinBaseAddress,
+    @Parent() address: BitcoinAddress,
     @Loader(BitcoinAddressLoader) addressLoader: BitcoinAddressLoaderType,
   ): Promise<number | null> {
     const addressStats = await addressLoader.load(address.address);
@@ -46,7 +46,7 @@ export class BitcoinAddressResolver {
 
   @ResolveField(() => Float, { nullable: true })
   public async transactionsCount(
-    @Parent() address: BitcoinBaseAddress,
+    @Parent() address: BitcoinAddress,
     @Loader(BitcoinAddressLoader) addressLoader: BitcoinAddressLoaderType,
   ): Promise<number | null> {
     // TODO: addressInfo.mempool_stats.tx_count is not included in the response, not sure if it should be included
@@ -59,11 +59,11 @@ export class BitcoinAddressResolver {
 
   @ResolveField(() => [BitcoinTransaction], { nullable: true })
   public async transactions(
-    @Parent() address: BitcoinBaseAddress,
+    @Parent() address: BitcoinAddress,
     @Loader(BitcoinAddressTransactionsLoader)
     addressTxsLoader: BitcoinAddressTransactionsLoaderType,
     @Args('afterTxid', { nullable: true }) afterTxid?: string,
-  ): Promise<BitcoinBaseTransaction[] | null> {
+  ): Promise<BitcoinTransaction[] | null> {
     const list = await addressTxsLoader.load({
       address: address.address,
       afterTxid: afterTxid,
@@ -72,7 +72,7 @@ export class BitcoinAddressResolver {
   }
 
   @ResolveField(() => RgbppAddress)
-  public async rgbppAddress(@Parent() address: BitcoinBaseAddress): Promise<RgbppBaseAddress> {
+  public async rgbppAddress(@Parent() address: BitcoinAddress): Promise<RgbppAddress> {
     return RgbppAddress.from(address.address);
   }
 }

@@ -3,14 +3,8 @@ import { Field, Float, InputType, ObjectType } from '@nestjs/graphql';
 import { ResultFormatter, RPCTypes } from '@ckb-lumos/lumos/rpc';
 import { blockchain } from '@ckb-lumos/lumos/codec';
 import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
-import { CkbBaseCell, CkbCell } from '../cell/cell.model';
-import { CkbBlock } from '../block/block.model';
+import { CkbCell } from '../cell/cell.model';
 import { CkbScriptInput } from '../script/script.model';
-
-export type CkbBaseTransaction = Omit<
-  CkbTransaction,
-  'block' | 'inputs' | 'fee' | 'feeRate' | 'confirmations'
->;
 
 @InputType({ description: 'Search key for CKB transactions' })
 export class CkbSearchKeyInput {
@@ -33,32 +27,17 @@ export class CkbTransaction {
   hash: string;
 
   @Field(() => Float)
-  fee: number;
-
-  @Field(() => Float)
-  feeRate: number;
-
-  @Field(() => Float)
   size: number;
 
   @Field(() => [CkbCell])
-  inputs: CkbBaseCell[];
-
-  @Field(() => [CkbCell])
-  outputs: CkbBaseCell[];
-
-  @Field(() => CkbBlock)
-  block: CkbBlock;
+  outputs: CkbCell[];
 
   @Field(() => Boolean)
   confirmed: boolean;
 
-  @Field(() => Float)
-  confirmations: number;
-
   public static from(
     transactionWithStatus: CkbRpc.TransactionWithStatusResponse,
-  ): CkbBaseTransaction | null {
+  ): CkbTransaction | null {
     const { transaction, tx_status } = transactionWithStatus;
     if (!transaction || tx_status?.status === 'unknown') {
       return null;

@@ -14,13 +14,16 @@ import { formatNumber } from '@/lib/string/format-number'
 import { truncateMiddle } from '@/lib/string/truncate-middle'
 
 export interface CellTablesProps {
-  inputs?: CkbCell[]
-  outputs?: CkbCell[]
+  inputs?: CkbCell[] | null
+  outputs?: CkbCell[] | null
   isCellbase?: boolean
   address?: string
 }
 
 export function CkbCellTables({ inputs = [], outputs = [], isCellbase, address }: CellTablesProps) {
+  if (!inputs) inputs = []
+  if (!outputs) outputs = []
+
   return (
     <Grid w="100%" gridTemplateColumns="repeat(2, 1fr)" gap="38px" pt="10px" pb="20px" px="30px">
       <VStack gap={0} w="100%">
@@ -88,7 +91,7 @@ function Cell({ cell, address: currentAddress }: { cell: CkbCell; address?: stri
       borderBottomColor="border.primary"
     >
       <HStack gap="8px">
-        <SubTractIcon w="16px" h="16px" color={cell.status.consumed ? 'text.third' : 'success.unspent'} />
+        <SubTractIcon w="16px" h="16px" color={cell.status?.consumed ? 'text.third' : 'success.unspent'} />
         <Copier onlyIcon value={address}>
           {currentAddress !== address ? (
             <Link

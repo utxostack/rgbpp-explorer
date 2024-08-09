@@ -210,6 +210,14 @@ export interface RgbppTransaction {
   rgb_txid: string;
 }
 
+export interface TransactionListItem {
+  transaction_hash: string;
+  block_number: string;
+  block_timestamp: string;
+  capacity_involved: string;
+  live_cell_changes: string;
+}
+
 export enum XUDTTag {
   RgbppCompatible = 'rgbpp-compatible',
   Layer1Asset = 'layer-1-asset',

@@ -21,8 +21,8 @@ export function UtxoOrCellFooter({
   address,
 }: {
   address: string
-  fee?: number
-  feeRate?: number
+  fee?: number | null
+  feeRate?: number | null
   confirmations?: number
   ckbCell?: Pick<CkbTransaction, 'inputs' | 'outputs'>
   btcUtxo?: {

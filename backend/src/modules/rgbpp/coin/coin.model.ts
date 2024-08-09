@@ -2,9 +2,6 @@ import { toNumber } from 'lodash';
 import { Field, Float, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { CkbScript } from 'src/modules/ckb/script/script.model';
 import * as CkbExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
-import { RgbppTransaction } from '../transaction/transaction.model';
-
-export type RgbppBaseCoin = Omit<RgbppCoin, 'transactions' | 'transactionsCount'>;
 
 registerEnumType(CkbExplorer.TransactionListSortType, {
   name: 'TransactionListSortType',
@@ -48,13 +45,7 @@ export class RgbppCoin {
   @Field(() => Date)
   deployedAt: Date;
 
-  @Field(() => [RgbppTransaction], { nullable: true })
-  transactions: RgbppTransaction[] | null;
-
-  @Field(() => Float, { nullable: true })
-  transactionsCount: number | null;
-
-  public static from(xudt: CkbExplorer.XUDT): RgbppBaseCoin | null {
+  public static from(xudt: CkbExplorer.XUDT): RgbppCoin | null {
     if (!xudt) {
       return null;
     }
@@ -78,7 +69,7 @@ export class RgbppCoin {
 @ObjectType({ description: 'RGB++ Coin List' })
 export class RgbppCoinList {
   @Field(() => [RgbppCoin])
-  coins: RgbppBaseCoin[];
+  coins: RgbppCoin[];
 
   @Field(() => Int)
   total: number;

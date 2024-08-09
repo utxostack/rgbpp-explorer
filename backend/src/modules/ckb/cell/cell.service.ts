@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import * as CkbExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
-import { CkbBaseCell, CkbXUDTInfo } from './cell.model';
+import { CkbCell, CkbXUDTInfo } from './cell.model';
 import { BI, Script } from '@ckb-lumos/lumos';
 import { computeScriptHash } from '@ckb-lumos/lumos/utils';
 
 @Injectable()
 export class CkbCellService {
   public getXUDTInfoFromOutput(
-    cell: CkbBaseCell,
+    cell: CkbCell,
     output: CkbExplorer.DisplayOutput,
   ): CkbXUDTInfo | null {
     const info = output.xudt_info || output.omiga_inscription_info;
