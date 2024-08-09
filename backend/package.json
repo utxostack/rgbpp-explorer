@@ -31,6 +31,7 @@
     "@ckb-lumos/bi": "^0.23.0",
     "@ckb-lumos/lumos": "^0.23.0",
     "@ckb-lumos/rpc": "^0.23.0",
+    "@nestjs/axios": "^3.0.2",
     "@nestjs/bullmq": "^10.2.0",
     "@nestjs/cache-manager": "^2.2.2",
     "@nestjs/common": "^10.0.0",
