@@ -93,7 +93,7 @@ function useSearch() {
         return router.push(`/address/${search.ckbAddress}`)
       }
       if (search.ckbBlock) {
-        return router.push(`/block/btc/${search.ckbBlock}`)
+        return router.push(`/block/ckb/${search.ckbBlock}`)
       }
       if (search.btcBlock) {
         return router.push(`/block/btc/${search.btcBlock}`)
