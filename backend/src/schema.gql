@@ -166,22 +166,13 @@ type RgbppStatistic {
   latest24HoursL2TransactionsCount: Float!
 }
 
-"""Rgbpp Address"""
-type RgbppAddress {
-  address: String!
-  utxosCount: Float!
-  cellsCount: Float!
-  assets: [RgbppAsset!]!
-  balances: [CkbXUDTInfo!]!
-}
-
 """Bitcoin Address"""
 type BitcoinAddress {
   address: String!
   satoshi: Float!
   pendingSatoshi: Float!
   transactionsCount: Float
-  transactions(afterTxid: String): [BitcoinTransaction!]!
+  transactions(afterTxid: String): [BitcoinTransaction!]
   rgbppAddress: RgbppAddress!
 }
 
@@ -202,7 +193,7 @@ type BitcoinOutput {
   scriptpubkeyAddress: String
   value: Float!
   address: BitcoinAddress
-  status: BitcoinOutputStatus!
+  status: BitcoinOutputStatus
 }
 
 """Bitcoin Input"""
@@ -214,34 +205,6 @@ type BitcoinInput {
   scriptsigAsm: String!
   isCoinbase: Boolean!
   sequence: Float!
-}
-
-"""Fee Rate Range"""
-type FeeRateRange {
-  min: Float!
-  max: Float!
-}
-
-"""Bitcoin Block"""
-type BitcoinBlock {
-  id: String!
-  height: Float!
-  version: Int!
-  timestamp: Timestamp!
-  size: Float!
-  weight: Float!
-  bits: Float!
-  difficulty: Float!
-  miner: BitcoinAddress!
-  reward: Float!
-  totalFee: Float!
-  feeRateRange: FeeRateRange!
-  transactionsCount: Float!
-  transactions(
-    """For pagination, must be a multiplication of 25"""
-    startIndex: Float
-  ): [BitcoinTransaction!]!
-  confirmations: Float
 }
 
 """Bitcoin Transaction"""
@@ -260,9 +223,18 @@ type BitcoinTransaction {
   feeRate: Float!
   confirmed: Boolean!
   confirmations: Float!
-  transactionTime: Timestamp!
-  block: BitcoinBlock!
+  transactionTime: Timestamp
+  block: BitcoinBlock
   rgbppTransaction: RgbppTransaction
+}
+
+"""Rgbpp Address"""
+type RgbppAddress {
+  address: String!
+  utxosCount: Float!
+  cellsCount: Float!
+  assets: [RgbppAsset!]!
+  balances: [CkbXUDTInfo!]!
 }
 
 """Rgbpp Asset"""
@@ -270,6 +242,34 @@ type RgbppAsset {
   owner: String!
   cell: CkbCell!
   utxo: BitcoinOutput
+}
+
+"""Fee Rate Range"""
+type FeeRateRange {
+  min: Float!
+  max: Float!
+}
+
+"""Bitcoin Block"""
+type BitcoinBlock {
+  id: String!
+  height: Float!
+  version: Int!
+  timestamp: Timestamp!
+  size: Float!
+  weight: Float!
+  bits: Float!
+  difficulty: Float!
+  transactionsCount: Float!
+  miner: BitcoinAddress
+  reward: Float
+  totalFee: Float
+  feeRateRange: FeeRateRange
+  transactions(
+    """For pagination, must be a multiplication of 25"""
+    startIndex: Float
+  ): [BitcoinTransaction!]
+  confirmations: Float
 }
 
 """Bitcoin Fees"""
