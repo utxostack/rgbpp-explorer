@@ -66,7 +66,6 @@ import configModule from './config';
     CoreModule,
     ApiModule,
   ],
-  controllers: [],
   providers: [
     {
       provide: APP_INTERCEPTOR,
