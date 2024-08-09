@@ -22,6 +22,7 @@ import configModule from './config';
       useFactory: async (configService: ConfigService<Env>) => ({
         dsn: configService.get('SENTRY_DSN'),
         environment: configService.get('NODE_ENV'),
+        enableTracing: true,
         tracesSampleRate: 0.5,
         profilesSampleRate: 0.5,
         integrations: [nodeProfilingIntegration()],
