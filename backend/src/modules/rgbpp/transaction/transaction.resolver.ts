@@ -13,10 +13,15 @@ import {
 } from 'src/modules/bitcoin/transaction/transaction.dataloader';
 import { RgbppTransaction, RgbppLatestTransactionList, LeapDirection } from './transaction.model';
 import { RgbppTransactionLoader, RgbppTransactionLoaderType } from './transaction.dataloader';
+import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
+import { BI } from '@ckb-lumos/bi';
 
 @Resolver(() => RgbppTransaction)
 export class RgbppTransactionResolver {
-  constructor(private rgbppTransactionService: RgbppTransactionService) { }
+  constructor(
+    private rgbppTransactionService: RgbppTransactionService,
+    private bitcoinApiService: BitcoinApiService,
+  ) {}
 
   @Query(() => RgbppLatestTransactionList, { name: 'rgbppLatestTransactions' })
   public async getLatestTransactions(
@@ -40,6 +45,37 @@ export class RgbppTransactionResolver {
   ): Promise<RgbppTransaction | null> {
     const tx = await txLoader.load(txidOrTxHash);
     return tx || null;
+  }
+
+  @ResolveField(() => Date)
+  public async timestamp(
+    @Parent() tx: RgbppTransaction,
+    @Loader(BitcoinTransactionLoader) btcTxLoader: BitcoinTransactionLoaderType,
+    @Loader(CkbRpcTransactionLoader) ckbTxLoader: CkbRpcTransactionLoaderType,
+  ): Promise<Date | null> {
+    const { btcTxid } = tx;
+    if (btcTxid) {
+      const [txTime] = await this.bitcoinApiService.getTransactionTimes({ txids: [btcTxid] });
+      // get bitcoin transaction created time when pending
+      if (txTime) {
+        return new Date(txTime * 1000);
+      }
+
+      // get bitcoin transaction confirmed time when ckb transaction is pending
+      if (!tx.blockTime) {
+        const btcTx = await btcTxLoader.load(btcTxid);
+        const btcBlockTime = btcTx!.status.block_time;
+        if (btcBlockTime) {
+          return new Date(btcBlockTime * 1000);
+        }
+      }
+    }
+    // get ckb transaction created time when pending
+    if (!tx.blockTime) {
+      const ckbTx = await ckbTxLoader.load(tx.ckbTxHash);
+      return new Date(BI.from(ckbTx?.time_added_to_pool).toNumber());
+    }
+    return tx.blockTime;
   }
 
   @ResolveField(() => LeapDirection, { nullable: true })
