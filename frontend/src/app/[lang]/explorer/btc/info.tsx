@@ -50,19 +50,19 @@ export async function Info() {
           lineHeight="100%"
         >
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`Block Height`}</Text>
+            <Text color="text.third" fontSize="14px" lineHeight="24px">{t(i18n)`Block Height`}</Text>
             <Text>{formatNumber(btcChainInfo.tipBlockHeight)}</Text>
           </VStack>
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`L1 RGB++ Txns(24H)`}</Text>
+            <Text color="text.third" fontSize="14px" lineHeight="24px">{t(i18n)`L1 RGB++ Txns(24H)`}</Text>
             <Text color="text.third">{t(i18n)`Coming Soon`}</Text>
           </VStack>
           <VStack gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`RGB++ Assets Holders`}</Text>
+            <Text color="text.third" fontSize="14px" lineHeight="24px">{t(i18n)`RGB++ Assets Holders`}</Text>
             <Text color="text.third">{t(i18n)`Coming Soon`}</Text>
           </VStack>
         </Grid>
-        <Grid gridTemplateColumns="repeat(4, 1fr)" bg="bg.card.hover" px="20px" pb="25px" pt="30px" rounded="8px">
+        <Grid gridTemplateColumns="repeat(4, 1fr)" bg="bg.card.hover" px="20px" py="25px" rounded="8px">
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <HStack bg="danger.a10" px="10px" rounded="4px" color="danger" gap="4px" lineHeight="24px">
               <SpeedHighIcon w="20px" h="20px" />
