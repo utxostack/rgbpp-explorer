@@ -15,7 +15,7 @@ export function resolveCellDiff(tx?: Pick<CkbTransaction, 'inputs' | 'outputs'> 
   const decimal = xudtInfo.decimal ?? 1
   const lockScript = tx?.inputs?.[0].lock ? scriptToAddress(tx?.inputs?.[0].lock) : undefined
   const inputValue = tx?.inputs
-    .filter((input) => input.xudtInfo && input.xudtInfo.symbol === symbol)
+    ?.filter((input) => input.xudtInfo && input.xudtInfo.symbol === symbol)
     .reduce((acc, input) => acc.plus(input.xudtInfo!.amount), BigNumber(0))
   const outputValue = tx?.outputs
     .filter(

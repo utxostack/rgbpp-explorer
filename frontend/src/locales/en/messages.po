@@ -18,7 +18,7 @@ msgstr ""
 msgid "-"
 msgstr "-"
 
-#: src/components/ckb/ckb-outputs-sum.tsx:30
+#: src/components/ckb/ckb-outputs-sum.tsx:27
 msgid "{0} {1}"
 msgstr "{0} {1}"
 
@@ -27,7 +27,7 @@ msgstr "{0} {1}"
 msgid "{0} BTC"
 msgstr "{0} BTC"
 
-#: src/components/ckb/ckb-outputs-sum.tsx:46
+#: src/components/ckb/ckb-outputs-sum.tsx:43
 msgid "{0} CKB"
 msgstr "{0} CKB"
 
@@ -35,8 +35,8 @@ msgstr "{0} CKB"
 msgid "{0} confirmed"
 msgstr "{0} confirmed"
 
-#: src/components/ckb/ckb-diff-tags.tsx:75
-#: src/components/ckb/ckb-outputs-sum.tsx:53
+#: src/components/ckb/ckb-diff-tags.tsx:78
+#: src/components/ckb/ckb-outputs-sum.tsx:50
 msgid "{0} DOB"
 msgstr "{0} DOB"
 
@@ -44,11 +44,11 @@ msgstr "{0} DOB"
 msgid "{0} sats/VB ~ {1} sats/VB"
 msgstr "{0} sats/VB ~ {1} sats/VB"
 
-#: src/components/ckb/ckb-diff-tags.tsx:43
+#: src/components/ckb/ckb-diff-tags.tsx:46
 msgid "{0}{1} {2}"
 msgstr "{0}{1} {2}"
 
-#: src/components/ckb/ckb-diff-tags.tsx:65
+#: src/components/ckb/ckb-diff-tags.tsx:68
 msgid "{0}{1} CKB"
 msgstr "{0}{1} CKB"
 
@@ -140,8 +140,8 @@ msgstr "Block size"
 #: src/components/btc/btc-address-overview.tsx:34
 #: src/components/btc/btc-address-overview.tsx:42
 #: src/components/btc/btc-address-overview.tsx:49
-#: src/components/btc/btc-utxo-tables.tsx:153
-#: src/components/btc/btc-utxo-tables.tsx:228
+#: src/components/btc/btc-utxo-tables.tsx:137
+#: src/components/btc/btc-utxo-tables.tsx:212
 msgid "BTC"
 msgstr "BTC"
 
@@ -162,8 +162,8 @@ msgstr "bytes"
 
 #: src/app/[lang]/explorer/ckb/info.tsx:36
 #: src/components/ckb/ckb-address-overview.tsx:34
-#: src/components/ckb/ckb-block-overview.tsx:85
-#: src/components/ckb/ckb-cell-tables.tsx:114
+#: src/components/ckb/ckb-block-overview.tsx:89
+#: src/components/ckb/ckb-cell-tables.tsx:117
 #: src/components/ckb/ckb-transaction-overview.tsx:62
 #: src/components/footer.tsx:91
 #: src/components/navbar.tsx:60
@@ -183,8 +183,8 @@ msgstr "CKB Txn"
 msgid "Coin"
 msgstr "Coin"
 
-#: src/components/btc/btc-utxo-tables.tsx:113
-#: src/components/ckb/ckb-cell-tables.tsx:50
+#: src/components/btc/btc-utxo-tables.tsx:97
+#: src/components/ckb/ckb-cell-tables.tsx:53
 msgid "Coinbase"
 msgstr "Coinbase"
 
@@ -245,9 +245,9 @@ msgstr "Copy"
 msgid "Deploy Time"
 msgstr "Deploy Time"
 
-#: src/components/btc/btc-utxo-tables.tsx:170
-#: src/components/btc/btc-utxo-tables.tsx:245
-#: src/components/ckb/ckb-cell-tables.tsx:129
+#: src/components/btc/btc-utxo-tables.tsx:154
+#: src/components/btc/btc-utxo-tables.tsx:229
+#: src/components/ckb/ckb-cell-tables.tsx:132
 msgid "DOB"
 msgstr "DOB"
 
@@ -263,7 +263,7 @@ msgstr "Drop"
 #~ msgid "Explore the BTC Ecosystem"
 #~ msgstr "Explore the BTC Ecosystem"
 
-#: src/components/home-title.tsx:39
+#: src/components/home-title.tsx:40
 msgid "Explore the<0><1/></0>Ecosystem"
 msgstr "Explore the<0><1/></0>Ecosystem"
 
@@ -315,8 +315,8 @@ msgstr "High"
 msgid "Holders"
 msgstr "Holders"
 
-#: src/components/btc/btc-utxo-tables.tsx:55
-#: src/components/ckb/ckb-cell-tables.tsx:36
+#: src/components/btc/btc-utxo-tables.tsx:40
+#: src/components/ckb/ckb-cell-tables.tsx:39
 msgid "Inputs ({0})"
 msgstr "Inputs ({0})"
 
@@ -360,7 +360,7 @@ msgstr "L2 RGB++ Txns(24H)"
 msgid "Latest L1 RGB++ transaction"
 msgstr "Latest L1 RGB++ transaction"
 
-#: src/app/[lang]/explorer/ckb/page.tsx:66
+#: src/app/[lang]/explorer/ckb/page.tsx:101
 msgid "Latest L2 RGB++ transaction"
 msgstr "Latest L2 RGB++ transaction"
 
@@ -399,7 +399,7 @@ msgstr "Medium"
 msgid "Miner"
 msgstr "Miner"
 
-#: src/components/ckb/ckb-block-overview.tsx:83
+#: src/components/ckb/ckb-block-overview.tsx:87
 msgid "Miner Reward"
 msgstr "Miner Reward"
 
@@ -428,7 +428,7 @@ msgid "No Data"
 msgstr "No Data"
 
 #: src/app/[lang]/address/[address]/transactions/btc.tsx:101
-#: src/app/[lang]/address/[address]/transactions/ckb.tsx:112
+#: src/app/[lang]/address/[address]/transactions/ckb.tsx:114
 msgid "No Transaction"
 msgstr "No Transaction"
 
@@ -440,12 +440,12 @@ msgstr "Occupied"
 msgid "Oops! Your search did not match any record."
 msgstr "Oops! Your search did not match any record."
 
-#: src/components/btc/btc-utxo-tables.tsx:209
+#: src/components/btc/btc-utxo-tables.tsx:193
 msgid "OP_RETURN"
 msgstr "OP_RETURN"
 
-#: src/components/btc/btc-utxo-tables.tsx:76
-#: src/components/ckb/ckb-cell-tables.tsx:69
+#: src/components/btc/btc-utxo-tables.tsx:61
+#: src/components/ckb/ckb-cell-tables.tsx:72
 msgid "Outputs ({0})"
 msgstr "Outputs ({0})"
 
@@ -547,7 +547,7 @@ msgstr "SDK"
 msgid "Search by Address/Tx Hash/Block Hash/AssetID"
 msgstr "Search by Address/Tx Hash/Block Hash/AssetID"
 
-#: src/app/[lang]/address/[address]/transactions/ckb.tsx:132
+#: src/app/[lang]/address/[address]/transactions/ckb.tsx:134
 #: src/app/[lang]/block/ckb/[hashOrHeight]/transactions/page.tsx:127
 msgid "shannons"
 msgstr "shannons"
@@ -606,7 +606,7 @@ msgstr "Testnet"
 msgid "Time"
 msgstr "Time"
 
-#: src/app/[lang]/address/[address]/transactions/ckb.tsx:140
+#: src/app/[lang]/address/[address]/transactions/ckb.tsx:142
 #: src/app/[lang]/assets/coins/[typeHash]/transactions/page.tsx:200
 #: src/app/[lang]/assets/coins/page.tsx:93
 msgid "Total {0} Items"
