@@ -14,7 +14,7 @@ import { formatNumber } from '@/lib/string/format-number'
 
 export async function Info() {
   const i18n = getI18nFromHeaders()
-  const { btcChainInfo } = await graphQLClient.request(
+  const { btcChainInfo, rgbppStatistic } = await graphQLClient.request(
     graphql(`
       query BtcChainInfo {
         btcChainInfo {
@@ -29,6 +29,9 @@ export async function Info() {
             economy
             minimum
           }
+        }
+        rgbppStatistic {
+          latest24HoursL1TransactionsCount
         }
       }
     `),
@@ -55,7 +58,7 @@ export async function Info() {
           </VStack>
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <Text color="text.third" fontSize="14px" lineHeight="24px">{t(i18n)`L1 RGB++ Txns(24H)`}</Text>
-            <Text color="text.third">{t(i18n)`Coming Soon`}</Text>
+            <Text>{formatNumber(rgbppStatistic.latest24HoursL1TransactionsCount)}</Text>
           </VStack>
           <VStack gap="15px">
             <Text color="text.third" fontSize="14px" lineHeight="24px">{t(i18n)`RGB++ Assets Holders`}</Text>
