@@ -26,31 +26,6 @@ const queryRgbppLatestTransactions = graphql(`
         blockNumber
         timestamp
         ckbTransaction {
-          blockNumber
-          hash
-          fee
-          size
-          inputs {
-            status {
-              consumed
-              txHash
-              index
-            }
-            txHash
-            index
-            capacity
-            lock {
-              codeHash
-              hashType
-              args
-            }
-            cellType
-            xudtInfo {
-              symbol
-              amount
-              decimal
-            }
-          }
           outputs {
             txHash
             index
@@ -73,17 +48,6 @@ const queryRgbppLatestTransactions = graphql(`
             }
           }
         }
-        btcTransaction {
-          blockHeight
-          blockHash
-          txid
-          version
-          size
-          locktime
-          weight
-          fee
-          confirmed
-        }
       }
       total
       pageSize
@@ -103,12 +67,12 @@ export default async function Page() {
       <Info />
       <Box bg="bg.card" rounded="8px" whiteSpace="nowrap" pb="12px" gridColumn="1/3">
         <Heading fontSize="20px" fontWeight="semibold" p="30px">{t(i18n)`Latest L1 RGB++ transaction`}</Heading>
-        <Table.Root>
+        <Table.Root tableLayout="fixed">
           <Table.Body>
             {rgbppLatestTransactions.txs.map((tx) => {
               return (
                 <Table.Row key={tx.btcTxid} lineHeight="36px">
-                  <Table.Cell>
+                  <Table.Cell w="254px">
                     <Link
                       href={`/transaction/${tx.btcTxid}`}
                       display="flex"
@@ -119,13 +83,13 @@ export default async function Page() {
                       {truncateMiddle(tx.btcTxid ?? '', 10, 8)}
                     </Link>
                   </Table.Cell>
-                  <Table.Cell>
+                  <Table.Cell w="160px">
                     <LayerType type={resolveLayerTypeFromRGBppTransaction(tx as RgbppTransaction)} />
                   </Table.Cell>
-                  <Table.Cell w="165px">
+                  <Table.Cell w="160px">
                     <AgoTimeFormatter time={tx.timestamp} tooltip />
                   </Table.Cell>
-                  <Table.Cell textAlign="right">
+                  <Table.Cell textAlign="right" w="160px">
                     <Amount ckbTransaction={tx.ckbTransaction as CkbTransaction} />
                   </Table.Cell>
                 </Table.Row>

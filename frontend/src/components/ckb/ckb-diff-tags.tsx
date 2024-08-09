@@ -17,10 +17,13 @@ export const CkbDiffTags = memo(function CkbDiffTags({
   outputs = [],
   address,
 }: {
-  inputs?: CkbCell[]
-  outputs?: CkbCell[]
+  inputs?: CkbCell[] | null
+  outputs?: CkbCell[] | null
   address: string
 }) {
+  if (!inputs) inputs = []
+  if (!outputs) outputs = []
+
   // ckb
   const inputBalance = sum(inputs.filter((x) => scriptToAddress(x.lock) === address).map((x) => x.capacity))
   const outputBalanceWithoutThisAddress = sum(

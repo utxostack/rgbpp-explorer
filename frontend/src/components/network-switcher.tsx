@@ -3,7 +3,6 @@
 import { Trans } from '@lingui/macro'
 import { memo } from 'react'
 import { Box, Flex, VStack } from 'styled-system/jsx'
-import { useIsClient } from 'usehooks-ts'
 
 import ArrowDownIcon from '@/assets/arrow-down.svg'
 import MainnetSVG from '@/assets/mainnet.svg'
@@ -13,11 +12,6 @@ import Link from '@/components/ui/link'
 import { env } from '@/constants/env'
 
 export const NetworkSwitcher = memo(function NetworkSwitcher() {
-  const isClient = useIsClient()
-
-  if (!isClient) return null
-
-  const origin = window?.location?.origin
   const networks = [
     {
       icon: <MainnetSVG w="24px" h="24px" />,
@@ -30,7 +24,7 @@ export const NetworkSwitcher = memo(function NetworkSwitcher() {
       href: env.public.RGBPP_EXPLORER_TESTNET_URL,
     },
   ]
-  const network = networks.find((n) => n.href === origin) ?? networks[1]
+  const network = env.public.IS_MAINNET ? networks[0] : networks[1]
 
   return (
     <HoverCard.Root unmountOnExit openDelay={0} closeDelay={200}>

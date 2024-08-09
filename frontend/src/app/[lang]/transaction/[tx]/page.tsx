@@ -158,9 +158,7 @@ const btcTxQuery = graphql(`
       txid
       version
       size
-      block {
-        timestamp
-      }
+      transactionTime
       weight
       fee
       feeRate

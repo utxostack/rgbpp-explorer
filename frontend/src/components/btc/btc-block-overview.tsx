@@ -88,27 +88,31 @@ export function BtcBlockOverview({
           </VStack>
           <VStack gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Miner`}</Text>
-            <Tooltip.Root openDelay={0} closeDelay={0}>
-              <Tooltip.Trigger>
-                <Link
-                  href={`/address/${block.miner.address}`}
-                  color="brand"
-                  _hover={{
-                    textDecoration: 'underline',
-                  }}
-                >
-                  {truncateMiddle(block.miner.address, 5, 5)}
-                </Link>
-              </Tooltip.Trigger>
-              <Tooltip.Positioner>
-                <Tooltip.Arrow>
-                  <Tooltip.ArrowTip />
-                </Tooltip.Arrow>
-                <Tooltip.Content whiteSpace="nowrap" maxW="unset">
-                  {block.miner.address}
-                </Tooltip.Content>
-              </Tooltip.Positioner>
-            </Tooltip.Root>
+            {block.miner ? (
+              <Tooltip.Root openDelay={0} closeDelay={0}>
+                <Tooltip.Trigger>
+                  <Link
+                    href={`/address/${block.miner.address}`}
+                    color="brand"
+                    _hover={{
+                      textDecoration: 'underline',
+                    }}
+                  >
+                    {truncateMiddle(block.miner.address, 5, 5)}
+                  </Link>
+                </Tooltip.Trigger>
+                <Tooltip.Positioner>
+                  <Tooltip.Arrow>
+                    <Tooltip.ArrowTip />
+                  </Tooltip.Arrow>
+                  <Tooltip.Content whiteSpace="nowrap" maxW="unset">
+                    {block.miner.address}
+                  </Tooltip.Content>
+                </Tooltip.Positioner>
+              </Tooltip.Root>
+            ) : (
+              <Text color="text.third">-</Text>
+            )}
           </VStack>
         </Grid>
       </Grid>

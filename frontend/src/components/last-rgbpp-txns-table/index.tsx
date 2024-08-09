@@ -30,31 +30,6 @@ const query = graphql(`
         blockNumber
         timestamp
         ckbTransaction {
-          blockNumber
-          hash
-          fee
-          size
-          inputs {
-            status {
-              consumed
-              txHash
-              index
-            }
-            txHash
-            index
-            capacity
-            lock {
-              codeHash
-              hashType
-              args
-            }
-            cellType
-            xudtInfo {
-              symbol
-              amount
-              decimal
-            }
-          }
           outputs {
             txHash
             index
@@ -76,17 +51,6 @@ const query = graphql(`
               index
             }
           }
-        }
-        btcTransaction {
-          blockHeight
-          blockHash
-          txid
-          version
-          size
-          locktime
-          weight
-          fee
-          confirmed
         }
       }
       total

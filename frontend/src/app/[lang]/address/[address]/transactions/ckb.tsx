@@ -105,14 +105,16 @@ export async function CkbTransactionsByAddress({ address }: { address: string })
     return <FailedFallback />
   }
 
+  const total = ckbAddress?.transactionsCount ?? 0
+
   return (
     <>
-      {!ckbAddress.transactions.length ? (
+      {!ckbAddress.transactions?.length ? (
         <Center w="100%" bg="bg.card" pt="80px" pb="120px" rounded="8px">
           <NoData>{t(i18n)`No Transaction`}</NoData>
         </Center>
       ) : (
-        ckbAddress.transactions.map((tx) => {
+        ckbAddress.transactions?.map((tx) => {
           return (
             <VStack key={tx.hash} w="100%" gap={0} bg="bg.card" rounded="8px">
               <Flex w="100%" bg="bg.input" justifyContent="space-between" py="20px" px="30px" roundedTop="8px">
@@ -137,8 +139,8 @@ export async function CkbTransactionsByAddress({ address }: { address: string })
         })
       )}
       <HStack ml="auto" gap="16px" mt="auto" p="30px">
-        <Text fontSize="14px">{t(i18n)`Total ${formatNumber(ckbAddress.transactionsCount)} Items`}</Text>
-        <PaginationSearchParams count={ckbAddress.transactionsCount ?? 0} pageSize={pageSize} />
+        <Text fontSize="14px">{t(i18n)`Total ${formatNumber(total)} Items`}</Text>
+        <PaginationSearchParams count={total} pageSize={pageSize} />
       </HStack>
     </>
   )

@@ -13,7 +13,7 @@ import { formatNumber } from '@/lib/string/format-number'
 
 export async function Info() {
   const i18n = getI18nFromHeaders()
-  const { ckbChainInfo } = await graphQLClient.request(
+  const { ckbChainInfo, rgbppStatistic } = await graphQLClient.request(
     graphql(`
       query CkbChainInfo {
         ckbChainInfo {
@@ -24,6 +24,9 @@ export async function Info() {
             slow
             average
           }
+        }
+        rgbppStatistic {
+          latest24HoursL2TransactionsCount
         }
       }
     `),
@@ -46,19 +49,19 @@ export async function Info() {
           lineHeight="100%"
         >
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`Block Height`}</Text>
+            <Text color="text.third" fontSize="14px" lineHeight="24px">{t(i18n)`Block Height`}</Text>
             <Text>{formatNumber(ckbChainInfo.tipBlockNumber)}</Text>
           </VStack>
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`L2 RGB++ Txns(24H)`}</Text>
-            <Text color="text.third">{t(i18n)`Coming Soon`}</Text>
+            <Text color="text.third" fontSize="14px" lineHeight="24px">{t(i18n)`L2 RGB++ Txns(24H)`}</Text>
+            <Text>{formatNumber(rgbppStatistic.latest24HoursL2TransactionsCount)}</Text>
           </VStack>
           <VStack gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`RGB++ Assets Holders`}</Text>
+            <Text color="text.third" fontSize="14px" lineHeight="24px">{t(i18n)`RGB++ Assets Holders`}</Text>
             <Text color="text.third">{t(i18n)`Coming Soon`}</Text>
           </VStack>
         </Grid>
-        <Grid gridTemplateColumns="repeat(3, 1fr)" bg="bg.card.hover" px="20px" pb="25px" pt="30px" rounded="8px">
+        <Grid gridTemplateColumns="repeat(3, 1fr)" bg="bg.card.hover" px="20px" py="25px" rounded="8px">
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <HStack bg="danger.a10" px="10px" rounded="4px" color="danger" gap="4px" lineHeight="24px">
               <SpeedHighIcon w="20px" h="20px" />
