@@ -43,9 +43,9 @@ export function BtcUtxoTables({ txid, vin = [], vout = [], currentAddress, ckbCe
           const bindingCkbCell = ckbCell?.inputs?.find((cell) => {
             if (!isRgbppLockCell(cell)) return false
             const { btcTxid, outIndex } = parseRgbppLockArgs(cell.lock.args)
-            return !(btcTxid !== txid || outIndex !== i || !vin[outIndex])
+            return !(btcTxid !== input.txid || input.vout !== outIndex)
           })
-          return <UtxoInput txid={txid} vin={input} key={i} currentAddress={currentAddress} ckbCell={bindingCkbCell} />
+          return <UtxoInput vin={input} key={i} currentAddress={currentAddress} ckbCell={bindingCkbCell} />
         })}
       </VStack>
       <VStack gap={0}>
@@ -86,7 +86,6 @@ function UtxoInput({
   currentAddress,
   ckbCell: cell,
 }: {
-  txid?: string
   vin: BitcoinInput
   currentAddress?: string
   ckbCell?: CkbCell

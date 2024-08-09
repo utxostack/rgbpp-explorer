@@ -149,10 +149,10 @@ export enum CellType {
 export type CkbAddress = {
   __typename?: 'CkbAddress';
   address: Scalars['String']['output'];
-  balance: CkbAddressBalance;
-  shannon: Scalars['Float']['output'];
-  transactions: Array<CkbTransaction>;
-  transactionsCount: Scalars['Float']['output'];
+  balance?: Maybe<CkbAddressBalance>;
+  shannon?: Maybe<Scalars['Float']['output']>;
+  transactions?: Maybe<Array<CkbTransaction>>;
+  transactionsCount?: Maybe<Scalars['Float']['output']>;
 };
 
 
@@ -173,15 +173,15 @@ export type CkbAddressBalance = {
 /** CKB Block */
 export type CkbBlock = {
   __typename?: 'CkbBlock';
-  confirmations?: Maybe<Scalars['Float']['output']>;
+  confirmations: Scalars['Float']['output'];
   hash: Scalars['String']['output'];
-  miner: CkbAddress;
+  miner?: Maybe<CkbAddress>;
   number: Scalars['Int']['output'];
-  reward: Scalars['Float']['output'];
-  size?: Maybe<Scalars['Float']['output']>;
+  reward?: Maybe<Scalars['Float']['output']>;
+  size: Scalars['Float']['output'];
   timestamp: Scalars['Timestamp']['output'];
-  totalFee: Scalars['Float']['output'];
-  transactions: Array<CkbTransaction>;
+  totalFee?: Maybe<Scalars['Float']['output']>;
+  transactions?: Maybe<Array<CkbTransaction>>;
   transactionsCount: Scalars['Int']['output'];
   version: Scalars['Int']['output'];
 };
@@ -193,7 +193,7 @@ export type CkbCell = {
   cellType?: Maybe<CellType>;
   index: Scalars['Int']['output'];
   lock: CkbScript;
-  status: CkbCellStatus;
+  status?: Maybe<CkbCellStatus>;
   txHash: Scalars['String']['output'];
   type?: Maybe<CkbScript>;
   xudtInfo?: Maybe<CkbXudtInfo>;
@@ -247,14 +247,14 @@ export type CkbSearchKeyInput = {
 /** CKB Transaction */
 export type CkbTransaction = {
   __typename?: 'CkbTransaction';
-  block: CkbBlock;
+  block?: Maybe<CkbBlock>;
   blockNumber: Scalars['Float']['output'];
   confirmations: Scalars['Float']['output'];
   confirmed: Scalars['Boolean']['output'];
-  fee: Scalars['Float']['output'];
-  feeRate: Scalars['Float']['output'];
+  fee?: Maybe<Scalars['Float']['output']>;
+  feeRate?: Maybe<Scalars['Float']['output']>;
   hash: Scalars['String']['output'];
-  inputs: Array<CkbCell>;
+  inputs?: Maybe<Array<CkbCell>>;
   isCellbase: Scalars['Boolean']['output'];
   outputs: Array<CkbCell>;
   size: Scalars['Float']['output'];
@@ -301,6 +301,7 @@ export type Query = {
   rgbppAddress?: Maybe<RgbppAddress>;
   rgbppCoin?: Maybe<RgbppCoin>;
   rgbppCoins: RgbppCoinList;
+  rgbppLatestL2Transactions: RgbppLatestTransactionList;
   rgbppLatestTransactions: RgbppLatestTransactionList;
   rgbppStatistic: RgbppStatistic;
   rgbppTransaction?: Maybe<RgbppTransaction>;
@@ -361,6 +362,11 @@ export type QueryRgbppCoinsArgs = {
   page?: InputMaybe<Scalars['Int']['input']>;
   pageSize?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<TransactionListSortType>;
+};
+
+
+export type QueryRgbppLatestL2TransactionsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -439,10 +445,12 @@ export type RgbppLatestTransactionList = {
   txs: Array<RgbppTransaction>;
 };
 
-/** RGB++ Coin */
+/** RGB++ Statistic */
 export type RgbppStatistic = {
   __typename?: 'RgbppStatistic';
   holdersCount: Scalars['Float']['output'];
+  latest24HoursL1TransactionsCount: Scalars['Float']['output'];
+  latest24HoursL2TransactionsCount: Scalars['Float']['output'];
   transactionsCount: Scalars['Float']['output'];
 };
 
@@ -492,7 +500,7 @@ export type CkbAddressBaseQueryVariables = Exact<{
 }>;
 
 
-export type CkbAddressBaseQuery = { __typename?: 'Query', ckbAddress?: { __typename?: 'CkbAddress', address: string, shannon: number, transactionsCount: number } | null };
+export type CkbAddressBaseQuery = { __typename?: 'Query', ckbAddress?: { __typename?: 'CkbAddress', address: string, shannon?: number | null, transactionsCount?: number | null } | null };
 
 export type BtcTransactionByAddressQueryVariables = Exact<{
   address: Scalars['String']['input'];
@@ -509,7 +517,7 @@ export type CkbAddressQueryVariables = Exact<{
 }>;
 
 
-export type CkbAddressQuery = { __typename?: 'Query', ckbAddress?: { __typename?: 'CkbAddress', transactionsCount: number, transactions: Array<{ __typename?: 'CkbTransaction', isCellbase: boolean, blockNumber: number, hash: string, fee: number, size: number, feeRate: number, confirmations: number, inputs: Array<{ __typename?: 'CkbCell', cellType?: CellType | null, txHash: string, index: number, capacity: number, status: { __typename?: 'CkbCellStatus', consumed: boolean, txHash?: string | null, index?: number | null }, type?: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string } | null, lock: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string }, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number, typeHash: string } | null }>, outputs: Array<{ __typename?: 'CkbCell', txHash: string, cellType?: CellType | null, index: number, capacity: number, type?: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string } | null, lock: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string }, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number, typeHash: string } | null, status: { __typename?: 'CkbCellStatus', consumed: boolean, txHash?: string | null, index?: number | null } }>, block: { __typename?: 'CkbBlock', timestamp: any, number: number } }> } | null };
+export type CkbAddressQuery = { __typename?: 'Query', ckbAddress?: { __typename?: 'CkbAddress', transactionsCount?: number | null, transactions?: Array<{ __typename?: 'CkbTransaction', isCellbase: boolean, blockNumber: number, hash: string, fee?: number | null, size: number, feeRate?: number | null, confirmations: number, inputs?: Array<{ __typename?: 'CkbCell', cellType?: CellType | null, txHash: string, index: number, capacity: number, status?: { __typename?: 'CkbCellStatus', consumed: boolean, txHash?: string | null, index?: number | null } | null, type?: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string } | null, lock: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string }, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number, typeHash: string } | null }> | null, outputs: Array<{ __typename?: 'CkbCell', txHash: string, cellType?: CellType | null, index: number, capacity: number, type?: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string } | null, lock: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string }, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number, typeHash: string } | null, status?: { __typename?: 'CkbCellStatus', consumed: boolean, txHash?: string | null, index?: number | null } | null }>, block?: { __typename?: 'CkbBlock', timestamp: any, number: number } | null }> | null } | null };
 
 export type RgbppCoinQueryVariables = Exact<{
   typeHash: Scalars['String']['input'];
@@ -525,7 +533,7 @@ export type RgbppCoinTransactionsByTypeHashQueryVariables = Exact<{
 }>;
 
 
-export type RgbppCoinTransactionsByTypeHashQuery = { __typename?: 'Query', rgbppCoin?: { __typename?: 'RgbppCoin', transactionsCount?: number | null, transactions?: Array<{ __typename?: 'RgbppTransaction', ckbTxHash: string, btcTxid?: string | null, leapDirection?: LeapDirection | null, blockNumber: number, timestamp: any, ckbTransaction?: { __typename?: 'CkbTransaction', isCellbase: boolean, blockNumber: number, hash: string, fee: number, feeRate: number, size: number, confirmations: number, inputs: Array<{ __typename?: 'CkbCell', txHash: string, index: number, capacity: number, status: { __typename?: 'CkbCellStatus', consumed: boolean, txHash?: string | null, index?: number | null }, type?: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string } | null, lock: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string }, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number, typeHash: string } | null }>, outputs: Array<{ __typename?: 'CkbCell', txHash: string, index: number, capacity: number, status: { __typename?: 'CkbCellStatus', consumed: boolean, txHash?: string | null, index?: number | null }, type?: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string } | null, lock: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string }, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number, typeHash: string } | null }> } | null, btcTransaction?: { __typename?: 'BitcoinTransaction', blockHeight?: number | null, blockHash?: string | null, txid: string, version: number, size: number, locktime: number, weight: number, fee: number, feeRate: number, confirmed: boolean, confirmations: number, vin?: Array<{ __typename?: 'BitcoinInput', txid: string, vout: number, scriptsig: string, scriptsigAsm: string, isCoinbase: boolean, sequence: number, prevout?: { __typename?: 'BitcoinOutput', scriptpubkey: string, scriptpubkeyAsm: string, scriptpubkeyType: string, scriptpubkeyAddress?: string | null, value: number, status: { __typename?: 'BitcoinOutputStatus', spent: boolean, txid?: string | null, vin?: number | null }, address?: { __typename?: 'BitcoinAddress', address: string, satoshi: number, pendingSatoshi: number, transactionsCount?: number | null } | null } | null }> | null, vout: Array<{ __typename?: 'BitcoinOutput', scriptpubkey: string, scriptpubkeyAsm: string, scriptpubkeyType: string, scriptpubkeyAddress?: string | null, value: number, status: { __typename?: 'BitcoinOutputStatus', spent: boolean, txid?: string | null, vin?: number | null }, address?: { __typename?: 'BitcoinAddress', address: string, satoshi: number, pendingSatoshi: number, transactionsCount?: number | null } | null }> } | null }> | null } | null };
+export type RgbppCoinTransactionsByTypeHashQuery = { __typename?: 'Query', rgbppCoin?: { __typename?: 'RgbppCoin', transactionsCount?: number | null, transactions?: Array<{ __typename?: 'RgbppTransaction', ckbTxHash: string, btcTxid?: string | null, leapDirection?: LeapDirection | null, blockNumber: number, timestamp: any, ckbTransaction?: { __typename?: 'CkbTransaction', isCellbase: boolean, blockNumber: number, hash: string, fee?: number | null, feeRate?: number | null, size: number, confirmations: number, inputs?: Array<{ __typename?: 'CkbCell', txHash: string, index: number, capacity: number, status?: { __typename?: 'CkbCellStatus', consumed: boolean, txHash?: string | null, index?: number | null } | null, type?: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string } | null, lock: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string }, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number, typeHash: string } | null }> | null, outputs: Array<{ __typename?: 'CkbCell', txHash: string, index: number, capacity: number, status?: { __typename?: 'CkbCellStatus', consumed: boolean, txHash?: string | null, index?: number | null } | null, type?: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string } | null, lock: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string }, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number, typeHash: string } | null }> } | null, btcTransaction?: { __typename?: 'BitcoinTransaction', blockHeight?: number | null, blockHash?: string | null, txid: string, version: number, size: number, locktime: number, weight: number, fee: number, feeRate: number, confirmed: boolean, confirmations: number, vin?: Array<{ __typename?: 'BitcoinInput', txid: string, vout: number, scriptsig: string, scriptsigAsm: string, isCoinbase: boolean, sequence: number, prevout?: { __typename?: 'BitcoinOutput', scriptpubkey: string, scriptpubkeyAsm: string, scriptpubkeyType: string, scriptpubkeyAddress?: string | null, value: number, status: { __typename?: 'BitcoinOutputStatus', spent: boolean, txid?: string | null, vin?: number | null }, address?: { __typename?: 'BitcoinAddress', address: string, satoshi: number, pendingSatoshi: number, transactionsCount?: number | null } | null } | null }> | null, vout: Array<{ __typename?: 'BitcoinOutput', scriptpubkey: string, scriptpubkeyAsm: string, scriptpubkeyType: string, scriptpubkeyAddress?: string | null, value: number, status: { __typename?: 'BitcoinOutputStatus', spent: boolean, txid?: string | null, vin?: number | null }, address?: { __typename?: 'BitcoinAddress', address: string, satoshi: number, pendingSatoshi: number, transactionsCount?: number | null } | null }> } | null }> | null } | null };
 
 export type RgbppCoinsQueryVariables = Exact<{
   page: Scalars['Int']['input'];
@@ -554,14 +562,14 @@ export type CkbBlockQueryVariables = Exact<{
 }>;
 
 
-export type CkbBlockQuery = { __typename?: 'Query', ckbBlock?: { __typename?: 'CkbBlock', version: number, hash: string, number: number, timestamp: any, transactionsCount: number, totalFee: number, reward: number, size?: number | null, confirmations?: number | null, miner: { __typename?: 'CkbAddress', address: string, shannon: number, transactionsCount: number } } | null };
+export type CkbBlockQuery = { __typename?: 'Query', ckbBlock?: { __typename?: 'CkbBlock', version: number, hash: string, number: number, timestamp: any, transactionsCount: number, totalFee?: number | null, reward?: number | null, size: number, confirmations: number, miner?: { __typename?: 'CkbAddress', address: string, shannon?: number | null, transactionsCount?: number | null } | null } | null };
 
 export type CkbBlockTransactionsQueryVariables = Exact<{
   hashOrHeight: Scalars['String']['input'];
 }>;
 
 
-export type CkbBlockTransactionsQuery = { __typename?: 'Query', ckbBlock?: { __typename?: 'CkbBlock', timestamp: any, transactions: Array<{ __typename?: 'CkbTransaction', isCellbase: boolean, blockNumber: number, hash: string, fee: number, size: number, feeRate: number, confirmations: number, outputs: Array<{ __typename?: 'CkbCell', txHash: string, index: number, capacity: number, lock: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string }, type?: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string } | null, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number, typeHash: string } | null, status: { __typename?: 'CkbCellStatus', consumed: boolean, txHash?: string | null, index?: number | null } }>, inputs: Array<{ __typename?: 'CkbCell', txHash: string, index: number, capacity: number, status: { __typename?: 'CkbCellStatus', consumed: boolean, txHash?: string | null, index?: number | null }, lock: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string }, type?: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string } | null, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number, typeHash: string } | null }> }> } | null };
+export type CkbBlockTransactionsQuery = { __typename?: 'Query', ckbBlock?: { __typename?: 'CkbBlock', timestamp: any, transactions?: Array<{ __typename?: 'CkbTransaction', isCellbase: boolean, blockNumber: number, hash: string, fee?: number | null, size: number, feeRate?: number | null, confirmations: number, outputs: Array<{ __typename?: 'CkbCell', txHash: string, index: number, capacity: number, lock: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string }, type?: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string } | null, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number, typeHash: string } | null, status?: { __typename?: 'CkbCellStatus', consumed: boolean, txHash?: string | null, index?: number | null } | null }>, inputs?: Array<{ __typename?: 'CkbCell', txHash: string, index: number, capacity: number, status?: { __typename?: 'CkbCellStatus', consumed: boolean, txHash?: string | null, index?: number | null } | null, lock: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string }, type?: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string } | null, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number, typeHash: string } | null }> | null }> | null } | null };
 
 export type BtcChainInfoQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -574,7 +582,7 @@ export type RgbppLatestTransactionsQueryVariables = Exact<{
 }>;
 
 
-export type RgbppLatestTransactionsQuery = { __typename?: 'Query', rgbppLatestTransactions: { __typename?: 'RgbppLatestTransactionList', total: number, pageSize: number, txs: Array<{ __typename?: 'RgbppTransaction', ckbTxHash: string, btcTxid?: string | null, leapDirection?: LeapDirection | null, blockNumber: number, timestamp: any, ckbTransaction?: { __typename?: 'CkbTransaction', blockNumber: number, hash: string, fee: number, size: number, inputs: Array<{ __typename?: 'CkbCell', txHash: string, index: number, capacity: number, cellType?: CellType | null, status: { __typename?: 'CkbCellStatus', consumed: boolean, txHash?: string | null, index?: number | null }, lock: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string }, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number } | null }>, outputs: Array<{ __typename?: 'CkbCell', txHash: string, index: number, capacity: number, cellType?: CellType | null, lock: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string }, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number } | null, status: { __typename?: 'CkbCellStatus', consumed: boolean, txHash?: string | null, index?: number | null } }> } | null, btcTransaction?: { __typename?: 'BitcoinTransaction', blockHeight?: number | null, blockHash?: string | null, txid: string, version: number, size: number, locktime: number, weight: number, fee: number, confirmed: boolean } | null }> } };
+export type RgbppLatestTransactionsQuery = { __typename?: 'Query', rgbppLatestTransactions: { __typename?: 'RgbppLatestTransactionList', total: number, pageSize: number, txs: Array<{ __typename?: 'RgbppTransaction', ckbTxHash: string, btcTxid?: string | null, leapDirection?: LeapDirection | null, blockNumber: number, timestamp: any, ckbTransaction?: { __typename?: 'CkbTransaction', blockNumber: number, hash: string, fee?: number | null, size: number, inputs?: Array<{ __typename?: 'CkbCell', txHash: string, index: number, capacity: number, cellType?: CellType | null, status?: { __typename?: 'CkbCellStatus', consumed: boolean, txHash?: string | null, index?: number | null } | null, lock: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string }, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number } | null }> | null, outputs: Array<{ __typename?: 'CkbCell', txHash: string, index: number, capacity: number, cellType?: CellType | null, lock: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string }, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number } | null, status?: { __typename?: 'CkbCellStatus', consumed: boolean, txHash?: string | null, index?: number | null } | null }> } | null, btcTransaction?: { __typename?: 'BitcoinTransaction', blockHeight?: number | null, blockHash?: string | null, txid: string, version: number, size: number, locktime: number, weight: number, fee: number, confirmed: boolean } | null }> } };
 
 export type CkbChainInfoQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -584,14 +592,14 @@ export type CkbChainInfoQuery = { __typename?: 'Query', ckbChainInfo: { __typena
 export type RgbppL2LatestTransactionsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type RgbppL2LatestTransactionsQuery = { __typename?: 'Query', ckbTransactions: Array<{ __typename?: 'CkbTransaction', isCellbase: boolean, blockNumber: number, hash: string, fee: number, feeRate: number, size: number, block: { __typename?: 'CkbBlock', timestamp: any }, outputs: Array<{ __typename?: 'CkbCell', txHash: string, index: number, capacity: number, cellType?: CellType | null, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number, typeHash: string } | null }>, inputs: Array<{ __typename?: 'CkbCell', txHash: string, index: number, capacity: number, cellType?: CellType | null, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number, typeHash: string } | null }> }> };
+export type RgbppL2LatestTransactionsQuery = { __typename?: 'Query', ckbTransactions: Array<{ __typename?: 'CkbTransaction', isCellbase: boolean, blockNumber: number, hash: string, fee?: number | null, feeRate?: number | null, size: number, block?: { __typename?: 'CkbBlock', timestamp: any } | null, outputs: Array<{ __typename?: 'CkbCell', txHash: string, index: number, capacity: number, cellType?: CellType | null, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number, typeHash: string } | null }>, inputs?: Array<{ __typename?: 'CkbCell', txHash: string, index: number, capacity: number, cellType?: CellType | null, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number, typeHash: string } | null }> | null }> };
 
 export type RgbppTransactionQueryVariables = Exact<{
   txidOrTxHash: Scalars['String']['input'];
 }>;
 
 
-export type RgbppTransactionQuery = { __typename?: 'Query', rgbppTransaction?: { __typename?: 'RgbppTransaction', ckbTxHash: string, btcTxid?: string | null, leapDirection?: LeapDirection | null, blockNumber: number, timestamp: any, btcTransaction?: { __typename?: 'BitcoinTransaction', blockHeight?: number | null, blockHash?: string | null, txid: string, version: number, size: number, weight: number, fee: number, feeRate: number, confirmed: boolean, confirmations: number, block: { __typename?: 'BitcoinBlock', timestamp: any }, vin?: Array<{ __typename?: 'BitcoinInput', txid: string, vout: number, scriptsig: string, scriptsigAsm: string, isCoinbase: boolean, sequence: number, prevout?: { __typename?: 'BitcoinOutput', txid: string, vout: number, scriptpubkey: string, scriptpubkeyAsm: string, scriptpubkeyType: string, scriptpubkeyAddress?: string | null, value: number, address?: { __typename?: 'BitcoinAddress', address: string, satoshi: number, pendingSatoshi: number, transactionsCount?: number | null } | null, status: { __typename?: 'BitcoinOutputStatus', spent: boolean, txid?: string | null, vin?: number | null } } | null }> | null, vout: Array<{ __typename?: 'BitcoinOutput', txid: string, vout: number, scriptpubkey: string, scriptpubkeyAsm: string, scriptpubkeyType: string, scriptpubkeyAddress?: string | null, value: number, address?: { __typename?: 'BitcoinAddress', address: string, satoshi: number, pendingSatoshi: number, transactionsCount?: number | null } | null, status: { __typename?: 'BitcoinOutputStatus', spent: boolean, txid?: string | null, vin?: number | null } }> } | null, ckbTransaction?: { __typename?: 'CkbTransaction', isCellbase: boolean, blockNumber: number, hash: string, fee: number, feeRate: number, size: number, confirmed: boolean, confirmations: number, outputs: Array<{ __typename?: 'CkbCell', txHash: string, index: number, capacity: number, cellType?: CellType | null, type?: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string } | null, lock: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string }, status: { __typename?: 'CkbCellStatus', consumed: boolean, txHash?: string | null, index?: number | null }, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number, typeHash: string } | null }>, inputs: Array<{ __typename?: 'CkbCell', txHash: string, index: number, capacity: number, cellType?: CellType | null, type?: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string } | null, lock: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string }, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number, typeHash: string } | null, status: { __typename?: 'CkbCellStatus', consumed: boolean, txHash?: string | null, index?: number | null } }>, block: { __typename?: 'CkbBlock', timestamp: any, hash: string } } | null } | null };
+export type RgbppTransactionQuery = { __typename?: 'Query', rgbppTransaction?: { __typename?: 'RgbppTransaction', ckbTxHash: string, btcTxid?: string | null, leapDirection?: LeapDirection | null, blockNumber: number, timestamp: any, btcTransaction?: { __typename?: 'BitcoinTransaction', blockHeight?: number | null, blockHash?: string | null, txid: string, version: number, size: number, weight: number, fee: number, feeRate: number, confirmed: boolean, confirmations: number, block: { __typename?: 'BitcoinBlock', timestamp: any }, vin?: Array<{ __typename?: 'BitcoinInput', txid: string, vout: number, scriptsig: string, scriptsigAsm: string, isCoinbase: boolean, sequence: number, prevout?: { __typename?: 'BitcoinOutput', txid: string, vout: number, scriptpubkey: string, scriptpubkeyAsm: string, scriptpubkeyType: string, scriptpubkeyAddress?: string | null, value: number, address?: { __typename?: 'BitcoinAddress', address: string, satoshi: number, pendingSatoshi: number, transactionsCount?: number | null } | null, status: { __typename?: 'BitcoinOutputStatus', spent: boolean, txid?: string | null, vin?: number | null } } | null }> | null, vout: Array<{ __typename?: 'BitcoinOutput', txid: string, vout: number, scriptpubkey: string, scriptpubkeyAsm: string, scriptpubkeyType: string, scriptpubkeyAddress?: string | null, value: number, address?: { __typename?: 'BitcoinAddress', address: string, satoshi: number, pendingSatoshi: number, transactionsCount?: number | null } | null, status: { __typename?: 'BitcoinOutputStatus', spent: boolean, txid?: string | null, vin?: number | null } }> } | null, ckbTransaction?: { __typename?: 'CkbTransaction', isCellbase: boolean, blockNumber: number, hash: string, fee?: number | null, feeRate?: number | null, size: number, confirmed: boolean, confirmations: number, outputs: Array<{ __typename?: 'CkbCell', txHash: string, index: number, capacity: number, cellType?: CellType | null, type?: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string } | null, lock: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string }, status?: { __typename?: 'CkbCellStatus', consumed: boolean, txHash?: string | null, index?: number | null } | null, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number, typeHash: string } | null }>, inputs?: Array<{ __typename?: 'CkbCell', txHash: string, index: number, capacity: number, cellType?: CellType | null, type?: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string } | null, lock: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string }, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number, typeHash: string } | null, status?: { __typename?: 'CkbCellStatus', consumed: boolean, txHash?: string | null, index?: number | null } | null }> | null, block?: { __typename?: 'CkbBlock', timestamp: any, hash: string } | null } | null } | null };
 
 export type BtcTxQueryVariables = Exact<{
   txid: Scalars['String']['input'];
@@ -605,7 +613,7 @@ export type CkbTxQueryVariables = Exact<{
 }>;
 
 
-export type CkbTxQuery = { __typename?: 'Query', ckbTransaction?: { __typename?: 'CkbTransaction', isCellbase: boolean, blockNumber: number, hash: string, fee: number, feeRate: number, size: number, confirmed: boolean, confirmations: number, outputs: Array<{ __typename?: 'CkbCell', txHash: string, index: number, capacity: number, cellType?: CellType | null, type?: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string } | null, lock: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string }, status: { __typename?: 'CkbCellStatus', consumed: boolean, txHash?: string | null, index?: number | null }, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number, typeHash: string } | null }>, inputs: Array<{ __typename?: 'CkbCell', txHash: string, index: number, capacity: number, cellType?: CellType | null, type?: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string } | null, lock: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string }, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number, typeHash: string } | null, status: { __typename?: 'CkbCellStatus', consumed: boolean, txHash?: string | null, index?: number | null } }>, block: { __typename?: 'CkbBlock', timestamp: any, hash: string } } | null };
+export type CkbTxQuery = { __typename?: 'Query', ckbTransaction?: { __typename?: 'CkbTransaction', isCellbase: boolean, blockNumber: number, hash: string, fee?: number | null, feeRate?: number | null, size: number, confirmed: boolean, confirmations: number, outputs: Array<{ __typename?: 'CkbCell', txHash: string, index: number, capacity: number, cellType?: CellType | null, type?: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string } | null, lock: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string }, status?: { __typename?: 'CkbCellStatus', consumed: boolean, txHash?: string | null, index?: number | null } | null, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number, typeHash: string } | null }>, inputs?: Array<{ __typename?: 'CkbCell', txHash: string, index: number, capacity: number, cellType?: CellType | null, type?: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string } | null, lock: { __typename?: 'CkbScript', codeHash: string, hashType: string, args: string }, xudtInfo?: { __typename?: 'CkbXUDTInfo', symbol: string, amount: string, decimal: number, typeHash: string } | null, status?: { __typename?: 'CkbCellStatus', consumed: boolean, txHash?: string | null, index?: number | null } | null }> | null, block?: { __typename?: 'CkbBlock', timestamp: any, hash: string } | null } | null };
 
 export type RgbppStatisticQueryVariables = Exact<{ [key: string]: never; }>;
 
