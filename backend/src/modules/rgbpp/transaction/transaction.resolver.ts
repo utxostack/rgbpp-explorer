@@ -5,10 +5,7 @@ import {
   CkbRpcTransactionLoader,
   CkbRpcTransactionLoaderType,
 } from 'src/modules/ckb/transaction/transaction.dataloader';
-import {
-  BitcoinBaseTransaction,
-  BitcoinTransaction,
-} from 'src/modules/bitcoin/transaction/transaction.model';
+import { BitcoinTransaction } from 'src/modules/bitcoin/transaction/transaction.model';
 import { RgbppTransactionService } from './transaction.service';
 import {
   BitcoinTransactionLoader,
@@ -16,7 +13,6 @@ import {
 } from 'src/modules/bitcoin/transaction/transaction.dataloader';
 import { RgbppTransaction, RgbppLatestTransactionList, LeapDirection } from './transaction.model';
 import { RgbppTransactionLoader, RgbppTransactionLoaderType } from './transaction.dataloader';
-import { HashType, Output } from '@ckb-lumos/lumos';
 
 @Resolver(() => RgbppTransaction)
 export class RgbppTransactionResolver {
@@ -74,7 +70,7 @@ export class RgbppTransactionResolver {
   public async btcTransaction(
     @Parent() tx: RgbppTransaction,
     @Loader(BitcoinTransactionLoader) txLoader: BitcoinTransactionLoaderType,
-  ): Promise<BitcoinBaseTransaction | null> {
+  ): Promise<BitcoinTransaction | null> {
     if (!tx.btcTxid) {
       return null;
     }

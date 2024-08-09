@@ -1,5 +1,5 @@
 import { Parent, ResolveField, Resolver } from '@nestjs/graphql';
-import { BitcoinBaseOutput, BitcoinOutput } from 'src/modules/bitcoin/output/output.model';
+import { BitcoinOutput } from 'src/modules/bitcoin/output/output.model';
 import { RgbppAsset } from './asset.model';
 import {
   BitcoinTransactionLoader,
@@ -16,7 +16,7 @@ export class RgbppAssetResolver {
   public async utxo(
     @Parent() asset: RgbppAsset,
     @Loader(BitcoinTransactionLoader) txLoader: BitcoinTransactionLoaderType,
-  ): Promise<BitcoinBaseOutput | null> {
+  ): Promise<BitcoinOutput | null> {
     try {
       const { args } = asset.cell.lock;
       const { btcTxid, outIndex } = this.rgbppService.parseRgbppLockArgs(args);

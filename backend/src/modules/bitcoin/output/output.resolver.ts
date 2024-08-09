@@ -1,7 +1,7 @@
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Parent, ResolveField, Resolver } from '@nestjs/graphql';
-import { BitcoinAddress, BitcoinBaseAddress } from '../address/address.model';
-import { BitcoinBaseOutput, BitcoinOutput, BitcoinOutputStatus } from './output.model';
+import { BitcoinAddress } from '../address/address.model';
+import { BitcoinOutput, BitcoinOutputStatus } from './output.model';
 import {
   BitcoinTransactionOutSpendsLoader,
   BitcoinTransactionOutSpendsLoaderType,
@@ -10,7 +10,7 @@ import {
 @Resolver(() => BitcoinOutput)
 export class BitcoinOutputResolver {
   @ResolveField(() => BitcoinAddress, { nullable: true })
-  public async address(@Parent() output: BitcoinBaseOutput): Promise<BitcoinBaseAddress | null> {
+  public async address(@Parent() output: BitcoinOutput): Promise<BitcoinAddress | null> {
     // XXX: OP_RETURN outputs don't have address
     if (!output.scriptpubkeyAddress) {
       return null;
@@ -22,7 +22,7 @@ export class BitcoinOutputResolver {
 
   @ResolveField(() => BitcoinOutputStatus, { nullable: true })
   public async status(
-    @Parent() output: BitcoinBaseOutput,
+    @Parent() output: BitcoinOutput,
     @Loader(BitcoinTransactionOutSpendsLoader)
     outSpendsLoader: BitcoinTransactionOutSpendsLoaderType,
   ): Promise<BitcoinOutputStatus | null> {
