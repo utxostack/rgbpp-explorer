@@ -20,7 +20,7 @@ export class RgbppAddressResolver {
   constructor(
     private ckbExplorerService: CkbExplorerService,
     private rgbppAddressService: RgbppAddressService,
-  ) { }
+  ) {}
 
   @Query(() => RgbppAddress, { name: 'rgbppAddress', nullable: true })
   public async getBtcAddress(@Args('address') address: string): Promise<RgbppAddress> {

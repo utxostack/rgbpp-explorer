@@ -11,4 +11,4 @@ import { HttpModule } from '@nestjs/axios';
   providers: [HealthController],
   controllers: [HealthController],
 })
-export class HealthModule { }
+export class HealthModule {}

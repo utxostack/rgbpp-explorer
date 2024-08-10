@@ -3,7 +3,13 @@ import { Script } from '@ckb-lumos/lumos';
 import { bytes } from '@ckb-lumos/lumos/codec';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { getBtcTimeLockScript, getRgbppLockScript, isScriptEqual, remove0x, RGBPPLock } from '@rgbpp-sdk/ckb';
+import {
+  getBtcTimeLockScript,
+  getRgbppLockScript,
+  isScriptEqual,
+  remove0x,
+  RGBPPLock,
+} from '@rgbpp-sdk/ckb';
 import { ONE_MINUTE_MS } from 'src/common/date';
 import { BtcTestnetTypeMap, NetworkType } from 'src/constants';
 import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
@@ -18,7 +24,7 @@ export class RgbppService {
     private configService: ConfigService<Env>,
     private ckbExplorerService: CkbExplorerService,
     private ckbRpcService: CkbRpcWebsocketService,
-  ) { }
+  ) {}
 
   private get rgbppLockScript() {
     const network = this.configService.get('NETWORK');
