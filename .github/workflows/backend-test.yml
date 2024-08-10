@@ -64,4 +64,3 @@ jobs:
 
       - name: Docker Build Test
         run: docker compose build
-
