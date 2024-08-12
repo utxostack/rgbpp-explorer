@@ -58,7 +58,9 @@ export class RgbppStatisticService {
 
   public async collectLatest24HourRgbppTransactions() {
     const tipBlockNumber = await this.ckbRpcService.getTipBlockNumber();
-    this.logger.log(`Collect latest 24 hours RGB++ transactions, tip block number: ${tipBlockNumber}`);
+    this.logger.log(
+      `Collect latest 24 hours RGB++ transactions, tip block number: ${tipBlockNumber}`,
+    );
 
     const blocks = await Promise.all(
       Array.from({ length: CKB_24_HOURS_BLOCK_NUMBER }).map((_, index) => {

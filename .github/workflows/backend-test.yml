@@ -61,3 +61,6 @@ jobs:
           cat .env
           pnpm run test
         working-directory: backend
+
+      - name: Docker Build Test
+        run: docker compose build

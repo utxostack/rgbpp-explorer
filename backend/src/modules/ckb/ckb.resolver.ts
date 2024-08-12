@@ -12,7 +12,7 @@ export class CkbResolver {
     private ckbService: CkbService,
     private ckbRpcService: CkbRpcWebsocketService,
     private ckbExplorerService: CkbExplorerService,
-  ) { }
+  ) {}
 
   @Query(() => CkbChainInfo, { name: 'ckbChainInfo' })
   public async chainInfo(): Promise<CkbChainInfo> {

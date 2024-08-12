@@ -21,4 +21,4 @@ import { CkbScriptModule } from 'src/modules/ckb/script/script.module';
   providers: [RgbppTransactionResolver, RgbppTransactionService, RgbppTransactionLoader],
   exports: [RgbppTransactionLoader, RgbppTransactionService],
 })
-export class RgbppTransactionModule { }
+export class RgbppTransactionModule {}

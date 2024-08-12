@@ -104,9 +104,7 @@ export class BitcoinBlockResolver {
   }
 
   @ResolveField(() => Float, { nullable: true })
-  public async confirmations(
-    @Parent() block: BitcoinBlock,
-  ): Promise<number | null> {
+  public async confirmations(@Parent() block: BitcoinBlock): Promise<number | null> {
     const info = await this.bitcoinApiService.getBlockchainInfo();
     return info.blocks - block.height;
   }
