@@ -14,19 +14,17 @@ datasource db {
 }
 
 model Chain {
-  id               String   @id
-  name             String
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id        String   @id
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  blocks           Block[]
-  transactions     Transaction[]
-  cells            Cell[]
-  addresses        Address[]
-  udts             UDT[]
-  scripts          Script[]
-  statistic        Statistic?
-  indexerStatus    IndexerStatus?
+  statistic     Statistic?
+  indexerStatus IndexerStatus?
+  Block         Block[]
+  Transaction   Transaction[]
+  Address       Address[]
+  UDT           UDT[]
 }
 
 model Block {
@@ -37,78 +35,101 @@ model Block {
   timestamp         DateTime
   transactionsCount Int
   size              Int
-  miner             String
-  reward            BigInt
   totalFee          BigInt
+  minFee            BigInt
+  maxFee            BigInt
   difficulty        BigInt
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  transactions      Transaction[]
-  chain             Chain    @relation(fields: [chainId], references: [id])
+  transactions Transaction[]
+  chain        Chain         @relation(fields: [chainId], references: [id])
 
   @@unique([chainId, hash])
   @@unique([chainId, number])
 }
 
 model Transaction {
-  id            Int      @id @default(autoincrement())
-  chainId       String
-  hash          String
-  index         Int
-  blockNumber   Int
-  timestamp     DateTime
-  fee           BigInt
-  size          Int
-  isCellbase    Boolean @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  chainId     String
+  hash        String
+  index       Int
+  blockNumber Int
+  timestamp   DateTime
+  fee         BigInt
+  size        Int
+  isCellbase  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  outputs   Cell[]   @relation("CreatedCells")
-  inputs    Cell[]   @relation("ConsumedCells")
-  chain         Chain    @relation(fields: [chainId], references: [id])
-  block         Block    @relation(fields: [chainId, blockNumber], references: [chainId, number])
+  chain        Chain       @relation(fields: [chainId], references: [id])
+  block        Block       @relation(fields: [chainId, blockNumber], references: [chainId, number])
+  outputs      Output[]
+  LockScript   LockScript? @relation(fields: [lockScriptId], references: [id])
+  lockScriptId Int?
+  TypeScript   TypeScript? @relation(fields: [typeScriptId], references: [id])
+  typeScriptId Int?
 
   @@unique([chainId, hash])
 }
 
-model Cell {
-  id                Int         @id @default(autoincrement())
-  chainId           String
-  txHash         String
-  index             Int
-  consumedByTxHash        String?
-  consumedByIndex        Int?
-  capacity          BigInt
-  lockScriptId      Int
-  typeScriptId      Int?
-  data              String?
-  isLive            Boolean     @default(true)
-  cellbase          Boolean     @default(false)
-  createdAt         DateTime    @default(now())
-  updatedAt         DateTime    @updatedAt
-
-  chain             Chain       @relation(fields: [chainId], references: [id])
-  transaction       Transaction @relation(fields: [chainId, txHash], references: [chainId, hash])
-  lockScript        Script      @relation("LockScript", fields: [chainId, lockScriptId], references: [chainId, id])
-  typeScript        Script?     @relation("TypeScript", fields: [chainId, typeScriptId], references: [chainId, id])
-  consumedByTx      Transaction? @relation("ConsumedCells", fields: [chainId, consumedByTxHash], references: [chainId, id])
-
-  @@unique([chainId, createdByTxHash, index])
-}
-
-model Script {
+model Output {
   id               Int      @id @default(autoincrement())
   chainId          String
-  codeHash         String
-  hashType         String
-  args             String
+  txHash           String
+  index            Int
+  consumedByTxHash String?
+  consumedByIndex  Int?
+  capacity         BigInt
+  lockScriptId     Int
+  typeScriptId     Int?
+  data             String?
+  isLive           Boolean  @default(true)
+  cellbase         Boolean  @default(false)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  chain            Chain    @relation(fields: [chainId], references: [id])
+  transaction Transaction @relation(fields: [chainId, txHash], references: [chainId, hash])
+  lockScript  LockScript  @relation(fields: [chainId, lockScriptId], references: [chainId, id])
+  typeScript  TypeScript? @relation(fields: [chainId, typeScriptId], references: [chainId, id])
 
-  @@unique([chainId, codeHash, hashType, args])
+  @@unique([chainId, txHash, index])
+}
+
+model LockScript {
+  id         Int    @id @default(autoincrement())
+  chainId    String
+  codeHash   String @db.Char(64)
+  hashType   Int
+  args       String
+  scriptHash String @unique @db.Char(64)
+
+  createdTime DateTime @default(now())
+  updatedTime DateTime @updatedAt
+
+  transactions Transaction[]
+  Output       Output[]
+  Address      Address[]
+
+  @@unique([chainId, id])
+}
+
+model TypeScript {
+  id         Int    @id @default(autoincrement())
+  chainId    String
+  codeHash   String @db.Char(64)
+  hashType   Int
+  args       String
+  scriptHash String @unique @db.Char(64)
+
+  createdTime DateTime @default(now())
+  updatedTime DateTime @updatedAt
+
+  transactions Transaction[]
+  Output       Output[]
+  UDT          UDT[]
+
+  @@unique([chainId, id])
 }
 
 model Address {
@@ -122,8 +143,8 @@ model Address {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  chain            Chain    @relation(fields: [chainId], references: [id])
-  lockScript       Script   @relation(fields: [chainId, lockScriptId], references: [chainId, id])
+  chain      Chain      @relation(fields: [chainId], references: [id])
+  lockScript LockScript @relation(fields: [chainId, lockScriptId], references: [chainId, id])
 
   @@unique([chainId, address])
 }
@@ -143,36 +164,36 @@ model UDT {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  chain            Chain    @relation(fields: [chainId], references: [id])
-  typeScript       Script   @relation(fields: [chainId, typeScriptId], references: [chainId, id])
+  chain      Chain      @relation(fields: [chainId], references: [id])
+  typeScript TypeScript @relation(fields: [chainId, typeScriptId], references: [chainId, id])
 
   @@unique([chainId, typeHash])
 }
 
 model Statistic {
-  id                          Int      @id @default(autoincrement())
-  chainId                     String   @unique
-  chain                       Chain    @relation(fields: [chainId], references: [id])
-  tipBlockNumber              Int
-  tipBlockHash                String
-  totalTransactions           BigInt
-  totalCapacity               BigInt
-  totalAddresses              BigInt
-  averageBlockTime            Float
-  currentDifficulty           BigInt
-  createdAt                   DateTime @default(now())
-  updatedAt                   DateTime @updatedAt
+  id                Int      @id @default(autoincrement())
+  chainId           String   @unique
+  chain             Chain    @relation(fields: [chainId], references: [id])
+  tipBlockNumber    Int
+  tipBlockHash      String
+  totalTransactions BigInt
+  totalCapacity     BigInt
+  totalAddresses    BigInt
+  averageBlockTime  Float
+  currentDifficulty BigInt
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 model IndexerStatus {
-  id                Int      @id @default(autoincrement())
-  chainId           String   @unique
-  lastIndexedBlock  Int
-  lastIndexedTx     String
-  isIndexing        Boolean
-  lastIndexedAt     DateTime
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id               Int      @id @default(autoincrement())
+  chainId          String   @unique
+  lastIndexedBlock Int
+  lastIndexedTx    String
+  isIndexing       Boolean
+  lastIndexedAt    DateTime
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  chain             Chain    @relation(fields: [chainId], references: [id])
+  chain Chain @relation(fields: [chainId], references: [id])
 }
