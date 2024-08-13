@@ -50,25 +50,25 @@ model Block {
 }
 
 model Transaction {
-  id          Int      @id @default(autoincrement())
-  chainId     String
-  hash        String
-  index       Int
-  blockNumber Int
-  timestamp   DateTime
-  fee         BigInt
-  size        Int
-  isCellbase  Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  chain        Chain       @relation(fields: [chainId], references: [id])
-  block        Block       @relation(fields: [chainId, blockNumber], references: [chainId, number])
-  outputs      Output[]
-  LockScript   LockScript? @relation(fields: [lockScriptId], references: [id])
+  id           Int      @id @default(autoincrement())
+  chainId      String
+  hash         String
+  index        Int
+  blockNumber  Int
+  timestamp    DateTime
+  fee          BigInt
+  size         Int
   lockScriptId Int?
-  TypeScript   TypeScript? @relation(fields: [typeScriptId], references: [id])
   typeScriptId Int?
+  isCellbase   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  chain      Chain       @relation(fields: [chainId], references: [id])
+  block      Block       @relation(fields: [chainId, blockNumber], references: [chainId, number])
+  LockScript LockScript? @relation(fields: [lockScriptId], references: [id])
+  TypeScript TypeScript? @relation(fields: [typeScriptId], references: [id])
+  outputs    Output[]
 
   @@unique([chainId, hash])
 }
@@ -97,13 +97,12 @@ model Output {
 }
 
 model LockScript {
-  id         Int    @id @default(autoincrement())
-  chainId    String
-  codeHash   String @db.Char(64)
-  hashType   Int
-  args       String
-  scriptHash String @unique @db.Char(64)
-
+  id          Int      @id @default(autoincrement())
+  chainId     String
+  codeHash    String   @db.Char(64)
+  hashType    Int
+  args        String
+  scriptHash  String   @unique @db.Char(64)
   createdTime DateTime @default(now())
   updatedTime DateTime @updatedAt
 
@@ -115,13 +114,12 @@ model LockScript {
 }
 
 model TypeScript {
-  id         Int    @id @default(autoincrement())
-  chainId    String
-  codeHash   String @db.Char(64)
-  hashType   Int
-  args       String
-  scriptHash String @unique @db.Char(64)
-
+  id          Int      @id @default(autoincrement())
+  chainId     String
+  codeHash    String   @db.Char(64)
+  hashType    Int
+  args        String
+  scriptHash  String   @unique @db.Char(64)
   createdTime DateTime @default(now())
   updatedTime DateTime @updatedAt
 
@@ -173,7 +171,6 @@ model UDT {
 model Statistic {
   id                Int      @id @default(autoincrement())
   chainId           String   @unique
-  chain             Chain    @relation(fields: [chainId], references: [id])
   tipBlockNumber    Int
   tipBlockHash      String
   totalTransactions BigInt
@@ -183,6 +180,8 @@ model Statistic {
   currentDifficulty BigInt
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+
+  chain Chain @relation(fields: [chainId], references: [id])
 }
 
 model IndexerStatus {
