@@ -30,6 +30,10 @@ export const envSchema = z
     CKB_RPC_WEBSOCKET_URL: z.string(),
 
     SENTRY_DSN: z.string().optional(),
+
+    GIT_BRANCH: z.string().optional(),
+    GIT_COMMIT_HASH: z.string().optional(),
+    APP_VERSION: z.string().optional(),
   })
   .and(
     z.union([

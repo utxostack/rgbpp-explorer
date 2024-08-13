@@ -13,6 +13,7 @@ import { CacheableModule } from 'nestjs-cacheable';
 import { ScheduleModule } from '@nestjs/schedule';
 import { BullModule } from '@nestjs/bullmq';
 import configModule from './config';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ import configModule from './config';
     ApiModule,
   ],
   providers: [
+    AppController,
     {
       provide: APP_INTERCEPTOR,
       useFactory: () =>
@@ -81,5 +83,6 @@ import configModule from './config';
         }),
     },
   ],
+  controllers: [AppController],
 })
 export class AppModule {}

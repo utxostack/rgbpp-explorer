@@ -27,6 +27,7 @@ jobs:
             git fetch origin
             git checkout ${{ github.sha }}
             git status
+            source ./backend/scripts/export-env-vars.sh
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker compose ps
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker image prune -f
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker compose build
