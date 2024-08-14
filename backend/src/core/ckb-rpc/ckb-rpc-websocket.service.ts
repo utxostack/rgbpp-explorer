@@ -14,24 +14,67 @@ import {
 import { Cacheable } from 'src/decorators/cacheable.decorator';
 import { ONE_MONTH_MS } from 'src/common/date';
 import { CKB_MIN_SAFE_CONFIRMATIONS } from 'src/constants';
+import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
+
+class WebsocketError extends Error {}
 
 @Injectable()
 export class CkbRpcWebsocketService {
   private logger = new Logger(CkbRpcWebsocketService.name);
   private websocket: RpcWebsocketsClient;
   private websocketReady: Promise<void>;
+  private reconnectAttempts = 0;
+  private maxReconnectAttempts = 5;
+  private reconnectInterval = 5000;
 
-  constructor(private configService: ConfigService<Env>) {
+  constructor(
+    private configService: ConfigService<Env>,
+    @InjectSentry() private sentryService: SentryService,
+  ) {
+    this.initializeWebSocket();
+  }
+
+  private initializeWebSocket() {
     this.websocket = new RpcWebsocketsClient(this.configService.get('CKB_RPC_WEBSOCKET_URL'));
 
     this.websocketReady = new Promise((resolve) => {
       this.websocket.on('open', () => {
-        this.websocket.on('error', (error) => {
-          this.logger.error(error.message);
-        });
+        this.logger.log('WebSocket connection established');
+        this.reconnectAttempts = 0;
         resolve();
       });
+
+      this.websocket.on('error', (error) => {
+        this.logger.error(error.message);
+        const webSocketError = new WebsocketError(error.message);
+        webSocketError.stack = error.stack;
+        this.websocketReady = Promise.reject(webSocketError);
+        this.sentryService.instance().captureException(webSocketError);
+      });
+
+      this.websocket.on('close', () => {
+        const error = new WebsocketError('WebSocket connection closed');
+        this.logger.warn(error.message);
+        this.websocketReady = Promise.reject(error);
+        this.handleReconnection();
+      });
     });
+  }
+
+  private handleReconnection() {
+    if (this.reconnectAttempts < this.maxReconnectAttempts) {
+      this.reconnectAttempts++;
+      this.logger.log(
+        `Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})`,
+      );
+      setTimeout(() => this.initializeWebSocket(), this.reconnectInterval);
+    } else {
+      const error = new WebsocketError('Max reconnection attempts reached');
+      this.logger.error(error.message);
+      this.sentryService
+        .instance()
+        .captureException(error);
+    }
   }
 
   private async isSafeConfirmations(blockNumber: string): Promise<boolean> {

@@ -96,12 +96,12 @@ export async function BtcTransactionsByAddress({ address }: { address: string })
 
   return (
     <>
-      {!btcAddress.transactions.length ? (
+      {!btcAddress.transactions?.length ? (
         <Center w="100%" bg="bg.card" pt="80px" pb="120px" rounded="8px">
           <NoData>{t(i18n)`No Transaction`}</NoData>
         </Center>
       ) : (
-        btcAddress.transactions.map((tx) => {
+        btcAddress.transactions?.map((tx) => {
           return <BtcTransactionCardInAddress address={address} tx={tx as BitcoinTransaction} key={tx.txid} />
         })
       )}

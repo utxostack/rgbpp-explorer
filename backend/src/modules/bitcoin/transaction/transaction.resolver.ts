@@ -13,7 +13,7 @@ import { BitcoinBlockLoader, BitcoinBlockLoaderType } from '../block/dataloader/
 
 @Resolver(() => BitcoinTransaction)
 export class BitcoinTransactionResolver {
-  constructor(private bitcoinApiService: BitcoinApiService) { }
+  constructor(private bitcoinApiService: BitcoinApiService) {}
 
   @Query(() => BitcoinTransaction, { name: 'btcTransaction', nullable: true })
   public async getTransaction(

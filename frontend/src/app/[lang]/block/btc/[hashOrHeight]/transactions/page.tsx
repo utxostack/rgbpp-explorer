@@ -87,7 +87,7 @@ export default async function Page({ params: { hashOrHeight } }: { params: { has
 
   return (
     <VStack w="100%" gap="30px">
-      {data.btcBlock?.transactions.map((transaction) => {
+      {data.btcBlock?.transactions?.map((transaction) => {
         return (
           <VStack w="100%" gap={0} bg="bg.card" rounded="8px" key={transaction.txid}>
             <Flex w="100%" bg="bg.input" justifyContent="space-between" py="20px" px="30px" roundedTop="8px">

@@ -43,8 +43,7 @@ export interface BitcoinAddressTransactionsLoaderParams {
 
 @Injectable()
 export class BitcoinAddressTransactionsLoader
-  implements
-    NestDataLoader<BitcoinAddressTransactionsLoaderParams, BitcoinTransaction[] | null>
+  implements NestDataLoader<BitcoinAddressTransactionsLoaderParams, BitcoinTransaction[] | null>
 {
   private logger = new Logger(BitcoinAddressTransactionsLoader.name);
 

@@ -68,18 +68,18 @@ export function BtcBlockOverview({
                 <Text whiteSpace="nowrap">
                   {t(
                     i18n,
-                  )`${formatNumber(block.feeRateRange.min)} sats/VB ~ ${formatNumber(BigNumber(block.feeRateRange.max))} sats/VB`}
+                  )`${formatNumber(block.feeRateRange?.min ?? 0)} sats/VB ~ ${formatNumber(BigNumber(block.feeRateRange?.max ?? 0))} sats/VB`}
                 </Text>
               }
               contentProps={{ maxW: 'unset' }}
             >
               <Text whiteSpace="nowrap" maxW="250px" truncate>
-                {formatNumber(block.feeRateRange.min)}
+                {formatNumber(block.feeRateRange?.min ?? 0)}
                 <Text as="span" fontSize="14px" ml="4px">
                   {t(i18n)`sats/VB`}
                 </Text>
                 {' ~ '}
-                {formatNumber(BigNumber(block.feeRateRange.max))}{' '}
+                {formatNumber(BigNumber(block.feeRateRange?.max ?? 0))}{' '}
                 <Text as="span" fontSize="14px">
                   {t(i18n)`sats/VB`}
                 </Text>

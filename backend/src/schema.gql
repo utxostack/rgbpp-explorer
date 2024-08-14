@@ -114,6 +114,7 @@ type RgbppTransaction {
   ckbTxHash: String!
   btcTxid: String
   blockNumber: Int!
+  blockTime: Timestamp
   timestamp: Timestamp!
   leapDirection: LeapDirection
   ckbTransaction: CkbTransaction

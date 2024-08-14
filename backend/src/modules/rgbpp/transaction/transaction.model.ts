@@ -23,15 +23,15 @@ export class RgbppTransaction {
   @Field(() => Int)
   blockNumber: number;
 
-  @Field(() => Date)
-  timestamp: Date;
+  @Field(() => Date, { nullable: true })
+  blockTime: Date | null;
 
   public static from(tx: CkbExplorer.RgbppTransaction) {
     return {
       ckbTxHash: tx.tx_hash,
       btcTxid: tx.rgb_txid,
       blockNumber: tx.block_number,
-      timestamp: new Date(tx.block_timestamp),
+      blockTime: tx.block_timestamp ? new Date(tx.block_timestamp) : null,
     };
   }
 
@@ -40,7 +40,7 @@ export class RgbppTransaction {
       ckbTxHash: tx.transaction_hash,
       btcTxid: tx.is_rgb_transaction ? tx.rgb_txid : null,
       blockNumber: toNumber(tx.block_number),
-      timestamp: new Date(toNumber(tx.create_timestamp)),
+      blockTime: tx.block_timestamp ? new Date(toNumber(tx.block_timestamp)) : null,
     };
   }
 }

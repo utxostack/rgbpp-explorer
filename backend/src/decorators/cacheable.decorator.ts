@@ -24,14 +24,14 @@ const logger = new Logger('Cacheable');
 export function Cacheable(options: CustomCacheableRegisterOptions): MethodDecorator {
   const injectCacheService = Inject(CACHE_MANAGER);
 
-  return function(target, propertyKey, descriptor) {
+  return function (target, propertyKey, descriptor) {
     // eslint-disable-next-line @typescript-eslint/ban-types
     const originalMethod = descriptor.value as unknown as Function;
 
     injectCacheService(target, '__cacheManager');
     return {
       ...descriptor,
-      value: async function(...args: any[]) {
+      value: async function (...args: any[]) {
         const cacheManager = this.__cacheManager as Cache;
         if (!cacheManager) return originalMethod.apply(this, args);
         const composeOptions: Parameters<typeof generateComposedKey>[0] = {
@@ -48,9 +48,7 @@ export function Cacheable(options: CustomCacheableRegisterOptions): MethodDecora
         );
 
         // Remove the cache if shouldCache returns false
-        const shouldCache = options.shouldCache
-          ? await options.shouldCache(returnVal, this)
-          : true;
+        const shouldCache = options.shouldCache ? await options.shouldCache(returnVal, this) : true;
         if (!shouldCache) {
           logger.debug(`Removing cache for key: ${key}`);
           await cacheManager.del(key);

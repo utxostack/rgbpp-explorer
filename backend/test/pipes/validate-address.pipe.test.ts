@@ -1,7 +1,12 @@
 import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 import configModule from 'src/config';
-import { TryValidateBtcAddressPipe, TryValidateCkbAddressPipe, ValidateBtcAddressPipe, ValidateCkbAddressPipe } from 'src/pipes/validate-address.pipe';
+import {
+  TryValidateBtcAddressPipe,
+  TryValidateCkbAddressPipe,
+  ValidateBtcAddressPipe,
+  ValidateCkbAddressPipe,
+} from 'src/pipes/validate-address.pipe';
 
 const validCkbAddress =
   'ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqtyy4lspd4k86v8vz06n03dpjrdx5gzp7cxulwv8';

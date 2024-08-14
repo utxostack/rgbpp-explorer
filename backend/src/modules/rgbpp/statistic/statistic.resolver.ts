@@ -4,7 +4,7 @@ import { RgbppStatisticService } from './statistic.service';
 
 @Resolver(() => RgbppStatistic)
 export class RgbppStatisticResolver {
-  constructor(private rgbppStatisticService: RgbppStatisticService) { }
+  constructor(private rgbppStatisticService: RgbppStatisticService) {}
 
   @Query(() => RgbppStatistic, { name: 'rgbppStatistic' })
   public async getRgbppStatistic(): Promise<RgbppStatistic> {
