@@ -17,6 +17,9 @@ jobs:
     steps:
       - name: Deploy to testnet
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          # GIT_BRANCH is used as a part of cache key prefix
+          GIT_BRANCH: 'develop'
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}

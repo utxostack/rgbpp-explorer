@@ -4,6 +4,8 @@ services:
       - redis
     build:
       context: .
+      args:
+        - GIT_BRANCH=${GIT_BRANCH}
     ports:
       - '3000:3000'
     env_file:

@@ -1,8 +1,10 @@
 // eslint-disable-next-line no-restricted-imports
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { CacheableRegisterOptions, Cacheable as _Cacheable } from 'nestjs-cacheable';
 import { cacheableHandle, generateComposedKey } from 'nestjs-cacheable/dist/cacheable.helper';
+import { Env } from 'src/env';
 
 export interface CustomCacheableRegisterOptions extends CacheableRegisterOptions {
   shouldCache?: (result: any, target: any) => boolean | Promise<boolean>;
@@ -23,12 +25,14 @@ const logger = new Logger('Cacheable');
  */
 export function Cacheable(options: CustomCacheableRegisterOptions): MethodDecorator {
   const injectCacheService = Inject(CACHE_MANAGER);
+  const injectConfigService = Inject(ConfigService);
 
   return function (target, propertyKey, descriptor) {
     // eslint-disable-next-line @typescript-eslint/ban-types
     const originalMethod = descriptor.value as unknown as Function;
 
     injectCacheService(target, '__cacheManager');
+    injectConfigService(target, '__configService');
     return {
       ...descriptor,
       value: async function (...args: any[]) {
@@ -41,8 +45,13 @@ export function Cacheable(options: CustomCacheableRegisterOptions): MethodDecora
           args,
         };
         const [key] = generateComposedKey(composeOptions);
+
+        const configService = this.__configService as ConfigService<Env>;
+        const branch = configService.get('GIT_BRANCH') || 'unknown';
+        const prefix = configService.get('CACHE_KEY_PREFIX');
+
         const returnVal = await cacheableHandle(
-          `@utxo-stack-explorer@v0.0.1/${key}`,
+          `${prefix}-${branch}/${key}`,
           () => originalMethod.apply(this, args),
           options.ttl,
         );

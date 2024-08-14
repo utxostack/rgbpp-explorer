@@ -30,6 +30,10 @@ export const envSchema = z
     CKB_RPC_WEBSOCKET_URL: z.string(),
 
     SENTRY_DSN: z.string().optional(),
+
+    CACHE_KEY_PREFIX: z.string().default('rgbpp-explorer@v1'),
+
+    GIT_BRANCH: z.string().optional(),
   })
   .and(
     z.union([
