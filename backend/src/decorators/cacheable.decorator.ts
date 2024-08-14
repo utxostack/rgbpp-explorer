@@ -47,12 +47,11 @@ export function Cacheable(options: CustomCacheableRegisterOptions): MethodDecora
         const [key] = generateComposedKey(composeOptions);
 
         const configService = this.__configService as ConfigService<Env>;
-        const branch = configService.get('GIT_BRANCH') ?? 'unknown';
-        const version = configService.get('APP_VERSION') ?? '0.0.0';
-        const prefix = `@rgbpp-explorer@v${version}/${branch}`;
+        const branch = configService.get('GIT_BRANCH') || 'unknown';
+        const prefix = configService.get('CACHE_KEY_PREFIX');
 
         const returnVal = await cacheableHandle(
-          `${prefix}/${key}`,
+          `${prefix}-${branch}/${key}`,
           () => originalMethod.apply(this, args),
           options.ttl,
         );
