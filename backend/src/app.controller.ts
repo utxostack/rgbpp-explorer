@@ -30,7 +30,7 @@ export class AppController {
 
   @Get('version')
   version() {
-    const sematicVer = this.configService.get('APP_VERSION') ?? version;
-    return `v${sematicVer} (${this.commitHash})`
+    const sematicVer = version || '0.0.0';
+    return `v${sematicVer} (${this.commitHash})`;
   }
 }
