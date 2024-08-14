@@ -124,7 +124,7 @@ function UtxoInput({
     >
       <HStack gap="8px">
         <SubTractIcon
-          color={vin.isCoinbase || vin.prevout?.status.spent ? 'text.third' : 'success.unspent'}
+          color={vin.isCoinbase || vin.prevout?.status?.spent ? 'text.third' : 'success.unspent'}
           w="16px"
           h="16px"
         />
@@ -184,7 +184,7 @@ function UtxoOutput({
       <HStack gap="8px">
         <SubTractIcon
           color={
-            vout.status.spent || vout.scriptpubkeyType === ScriptpubkeyType.OpReturn ? 'text.third' : 'success.unspent'
+            vout.status?.spent || vout.scriptpubkeyType === ScriptpubkeyType.OpReturn ? 'text.third' : 'success.unspent'
           }
           w="16px"
           h="16px"

@@ -84,7 +84,6 @@ const query = graphql(`
         }
         block {
           timestamp
-          number
         }
       }
     }
