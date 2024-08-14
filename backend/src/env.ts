@@ -34,7 +34,6 @@ export const envSchema = z
     CACHE_KEY_PREFIX: z.string().default('rgbpp-explorer@v1'),
 
     GIT_BRANCH: z.string().optional(),
-    GIT_COMMIT_HASH: z.string().optional(),
     APP_VERSION: z.string().optional(),
   })
   .and(

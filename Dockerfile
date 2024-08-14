@@ -1,7 +1,6 @@
 ARG NODE_VERSION=20
 
 FROM node:${NODE_VERSION}-slim AS base
-ARG GIT_COMMIT_HASH
 ARG GIT_BRANCH
 ARG APP_VERSION
 
@@ -22,18 +21,14 @@ RUN pnpm run --filter backend build
 
 FROM base
 ENV NODE_ENV production
-ENV GIT_COMMIT_HASH=${GIT_COMMIT_HASH}
 ENV GIT_BRANCH=${GIT_BRANCH}
 ENV APP_VERSION=${APP_VERSION}
 
-RUN echo "Building with GIT_COMMIT_HASH: $GIT_COMMIT_HASH"
 COPY --from=prod-deps /app/node_modules node_modules
 COPY --from=prod-deps /app/package*.json .
 COPY --from=prod-deps /app/backend/node_modules ./backend/node_modules
 COPY --from=prod-deps /app/backend/package*.json ./backend
 COPY --from=build /app/backend/dist ./backend/dist
-
-LABEL org.opencontainers.image.revision=${GIT_COMMIT_HASH}
 
 EXPOSE 3000
 CMD ["node", "backend/dist/main.js"]

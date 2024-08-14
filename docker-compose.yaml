@@ -5,7 +5,6 @@ services:
     build:
       context: .
       args:
-        - GIT_COMMIT_HASH=${GIT_COMMIT_HASH}
         - GIT_BRANCH=${GIT_BRANCH}
         - APP_VERSION=${APP_VERSION}
     ports:
