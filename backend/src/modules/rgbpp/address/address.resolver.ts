@@ -5,7 +5,7 @@ import { RgbppAddressService } from './address.service';
 import { ParentField } from 'src/decorators/parent-field.decorator';
 import { RgbppAsset } from '../asset/asset.model';
 import { CkbXUDTInfo } from 'src/modules/ckb/cell/cell.model';
-import * as pLimit from 'p-limit';
+import pLimit from 'p-limit';
 import { Loader } from '@applifting-io/nestjs-dataloader';
 import {
   CkbExplorerTransactionLoader,
