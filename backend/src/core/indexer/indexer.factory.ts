@@ -4,8 +4,8 @@ import { PrismaService } from '../database/prisma/prisma.service';
 import { IndexerService } from './indexer.service';
 import { BlockchainServiceFactory } from '../blockchain/blockchain.factory';
 import { InjectQueue } from '@nestjs/bullmq';
-import { INDEXER_QUEUE_NAME } from './indexer.processor';
 import { Queue } from 'bullmq';
+import { INDEXER_BLOCK_QUEUE } from './processors/block.processor';
 
 export class IndexerServiceFactoryError extends Error {
   constructor(message: string) {
@@ -21,7 +21,7 @@ export class IndexerServiceFactory implements OnModuleDestroy {
   constructor(
     private prismaService: PrismaService,
     private blockchainServiceFactory: BlockchainServiceFactory,
-    @InjectQueue(INDEXER_QUEUE_NAME) private readonly indexerQueue: Queue,
+    @InjectQueue(INDEXER_BLOCK_QUEUE) private readonly indexerQueue: Queue,
     @InjectSentry() private sentryService: SentryService,
   ) {}
 

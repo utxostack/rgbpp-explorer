@@ -5,6 +5,7 @@ import { envSchema } from './env';
 import { BootstrapService } from './boostrap.service';
 import { LogLevel } from '@nestjs/common';
 import { AppClusterService } from './app-cluster.service';
+import cluster from 'node:cluster';
 
 const env = envSchema.parse(process.env);
 const LOGGER_LEVELS: LogLevel[] = ['verbose', 'debug', 'log', 'warn', 'error'];
@@ -32,6 +33,9 @@ async function bootstrap() {
       credentials: true,
     });
   }
-  await app.listen(3000, '0.0.0.0');
+
+  if (cluster.isPrimary) {
+    await app.listen(3000, '0.0.0.0');
+  }
 }
 (new AppClusterService()).clusterize(bootstrap);

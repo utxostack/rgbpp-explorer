@@ -2,7 +2,7 @@ import { Logger } from '@nestjs/common';
 import cluster from 'node:cluster';
 import os from 'node:os';
 
-const numCPUs = Math.min(os.cpus().length, 2);
+const numCPUs = os.cpus().length;
 
 export class AppClusterService {
   private logger = new Logger(AppClusterService.name);

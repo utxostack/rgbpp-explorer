@@ -60,7 +60,7 @@ export class BootstrapService {
       await indexerService.indexBlocks(currentBlockNumber, endBlock);
       // add a delay to avoid overwhelming the node
       await new Promise((resolve) => setTimeout(resolve, 100));
-      await this.indexBlocksRecursively(chainId, endBlock + 1, tipBlockNumber);
+      // await this.indexBlocksRecursively(chainId, endBlock + 1, tipBlockNumber);
     } catch (error) {
       this.logger.error(
         `Error indexing blocks from ${currentBlockNumber} to ${endBlock} for chain ${chainId}:`,

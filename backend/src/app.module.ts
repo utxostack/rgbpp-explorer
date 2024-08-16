@@ -67,7 +67,7 @@ import { BootstrapService } from './boostrap.service';
     }),
     ScheduleModule.forRoot(),
     CoreModule,
-    // ApiModule,
+    ApiModule,
   ],
   providers: [
     AppController,
