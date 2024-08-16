@@ -123,13 +123,13 @@ export class RgbppTransactionService {
 
   @Cacheable({
     namespace: 'RgbppTransactionService',
-    key: (tx: CkbRpcInterface.TransactionWithStatusResponse) =>
-      `getLeapDirectionByCkbTx:${tx.transaction.hash}`,
+    key: (tx: CkbRpcInterface.Transaction) =>
+      `getLeapDirectionByCkbTx:${tx.hash}`,
     ttl: ONE_MONTH_MS,
   })
-  public async getLeapDirectionByCkbTx(ckbTx: CkbRpcInterface.TransactionWithStatusResponse) {
+  public async getLeapDirectionByCkbTx(ckbTx: CkbRpcInterface.Transaction) {
     const inputCells = await Promise.all(
-      ckbTx.transaction.inputs.map(async (input) => {
+      ckbTx.inputs.map(async (input) => {
         const inputTx = await this.ckbRpcService.getTransaction(input.previous_output.tx_hash);
         const index = BI.from(input.previous_output.index).toNumber();
         return inputTx?.transaction.outputs?.[index] ?? null;
@@ -144,7 +144,7 @@ export class RgbppTransactionService {
           args: cell.lock.args,
         }),
     );
-    const hasRgbppLockOuput = ckbTx.transaction.outputs.some(
+    const hasRgbppLockOuput = ckbTx.outputs.some(
       (output) =>
         output?.lock &&
         this.rgbppService.isRgbppLockScript({
@@ -153,7 +153,7 @@ export class RgbppTransactionService {
           args: output.lock.args,
         }),
     );
-    const hasBtcTimeLockOutput = ckbTx.transaction.outputs.some(
+    const hasBtcTimeLockOutput = ckbTx.outputs.some(
       (output) =>
         output.lock &&
         this.rgbppService.isBtcTimeLockScript({

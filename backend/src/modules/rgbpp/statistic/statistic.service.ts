@@ -9,6 +9,8 @@ import { CellType } from 'src/modules/ckb/script/script.model';
 import { isScriptEqual } from '@rgbpp-sdk/ckb';
 import { HashType, Script } from '@ckb-lumos/lumos';
 import { RgbppService } from '../rgbpp.service';
+import { RgbppTransactionService } from '../transaction/transaction.service';
+import { LeapDirection } from '../transaction/transaction.model';
 
 // TODO: refactor the `Average Block Time` constant
 // CKB testnet: ~8s, see https://pudge.explorer.nervos.org/charts/average-block-time
@@ -22,6 +24,7 @@ export class RgbppStatisticService {
   private logger = new Logger(RgbppStatisticService.name);
   private latest24L1TransactionsCacheKey = 'RgbppStatisticService:latest24L1Transactions';
   private latest24L2TransactionsCacheKey = 'RgbppStatisticService:latest24L2Transactions';
+  private transactionLeapDirectionCachePrefix = 'RgbppStatisticService:leapDirection';
 
   private rgbppAssetsTypeScripts = RGBPP_ASSETS_CELL_TYPE.map((type) => {
     const service = this.ckbScriptService.getServiceByCellType(type);
@@ -32,6 +35,7 @@ export class RgbppStatisticService {
   constructor(
     private ckbRpcService: CkbRpcWebsocketService,
     private ckbScriptService: CkbScriptService,
+    private rgbppTransactionService: RgbppTransactionService,
     private rgbppService: RgbppService,
     @Inject(CACHE_MANAGER) protected cacheManager: Cache,
   ) {
@@ -43,8 +47,7 @@ export class RgbppStatisticService {
     if (txids) {
       return txids as string[];
     }
-    const { btcTxIds } = await this.collectLatest24HourRgbppTransactions();
-    return btcTxIds;
+    return null;
   }
 
   public async getLatest24L2Transactions() {
@@ -52,8 +55,14 @@ export class RgbppStatisticService {
     if (txhashes) {
       return txhashes as string[];
     }
-    const { ckbTxHashes } = await this.collectLatest24HourRgbppTransactions();
-    return ckbTxHashes;
+    return null;
+  }
+
+  public async getLeapDirectionByBtcTxid(btcTxid: string) {
+    const leapDirection = await this.cacheManager.get(
+      `${this.transactionLeapDirectionCachePrefix}:${btcTxid}`,
+    );
+    return leapDirection;
   }
 
   public async collectLatest24HourRgbppTransactions() {
@@ -73,10 +82,22 @@ export class RgbppStatisticService {
     const ckbTxHashes = blocks.flatMap((block) => block.ckbTxHashes);
     await this.cacheManager.set(this.latest24L1TransactionsCacheKey, btcTxIds, ONE_DAY_MS);
     await this.cacheManager.set(this.latest24L2TransactionsCacheKey, ckbTxHashes, ONE_DAY_MS);
+
+    const leapDirections = blocks.flatMap((block) => Array.from(block.leapDirectionMap.entries()));
+    await Promise.all(
+      leapDirections.map(async ([btcTxid, leapDirection]) => {
+        await this.cacheManager.set(
+          `${this.transactionLeapDirectionCachePrefix}:${btcTxid}`,
+          leapDirection,
+          ONE_DAY_MS,
+        );
+      }),
+    );
     this.logger.log(`Collect latest 24 hours RGB++ transactions done`);
     return {
       btcTxIds,
       ckbTxHashes,
+      leapDirectionMap: leapDirections,
     };
   }
 
@@ -84,6 +105,7 @@ export class RgbppStatisticService {
     const block = await this.ckbRpcService.getBlockByNumber(blockNumber);
     const rgbppL1TxIds: string[] = [];
     const rgbppL2Txhashes: string[] = [];
+    const leapDirectionMap = new Map<string, LeapDirection>();
 
     for (const tx of block.transactions) {
       const rgbppCell = tx.outputs.find((output) => {
@@ -100,7 +122,15 @@ export class RgbppStatisticService {
         try {
           const { btcTxid } = this.rgbppService.parseRgbppLockArgs(rgbppCell.lock.args);
           rgbppL1TxIds.push(btcTxid);
-        } catch {}
+
+          // Get leap direction and cache it
+          const leapDirection = await this.rgbppTransactionService.getLeapDirectionByCkbTx(tx);
+          if (leapDirection) {
+            leapDirectionMap.set(btcTxid, leapDirection);
+          }
+        } catch (err) {
+          this.logger.error(err);
+        }
         continue;
       }
 
@@ -125,6 +155,7 @@ export class RgbppStatisticService {
       ...block,
       btcTxIds: rgbppL1TxIds,
       ckbTxHashes: rgbppL2Txhashes,
+      leapDirectionMap,
     };
   }
 }

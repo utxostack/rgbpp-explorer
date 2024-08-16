@@ -103,7 +103,7 @@ export class RgbppTransactionResolver {
     if (!ckbTx) {
       return null;
     }
-    return this.rgbppTransactionService.getLeapDirectionByCkbTx(ckbTx);
+    return this.rgbppTransactionService.getLeapDirectionByCkbTx(ckbTx.transaction);
   }
 
   @ResolveField(() => CkbTransaction, { nullable: true })
