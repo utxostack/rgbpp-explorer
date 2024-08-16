@@ -84,7 +84,7 @@ export class RgbppTransactionService {
 
     return {
       txs: rgbppL2Txs.slice(0, limit),
-      total: 0,
+      total: limit,
       pageSize: limit,
     };
   }
