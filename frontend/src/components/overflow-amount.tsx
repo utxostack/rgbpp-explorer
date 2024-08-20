@@ -7,7 +7,7 @@ export function OverflowAmount({ amount, symbol }: { amount: string; symbol: Rea
   return (
     <>
       {int}
-      <Text as="span" fontSize="14px">
+      <Text as="span" fontSize="14px" whiteSpace="nowrap">
         {float ? `.${float}` : null}
         <Text as="span" fontSize="14px" ml="4px">
           {symbol}
