@@ -7,6 +7,7 @@ import { IndexerServiceFactory } from './core/indexer/indexer.factory';
 import { IndexerUtil } from './core/indexer/indexer.utils';
 import cluster from 'node:cluster';
 import os from 'node:os';
+import EventEmitter from 'node:events';
 
 interface IndexerWorkerMessage {
   chainId: number;
@@ -14,10 +15,8 @@ interface IndexerWorkerMessage {
   endBlockNumber: number;
 }
 
-const now = performance.now();
-
 @Injectable()
-export class BootstrapService {
+export class BootstrapService extends EventEmitter {
   private readonly logger = new Logger(BootstrapService.name);
   private readonly batchSize: number;
 
@@ -27,6 +26,8 @@ export class BootstrapService {
   private nextBlockNumbers: { [chainId: number]: number } = {};
   private activeWorkers = 0;
 
+  public bootstraped: Promise<void>;
+
   constructor(
     private configService: ConfigService,
     private prismaService: PrismaService,
@@ -34,7 +35,21 @@ export class BootstrapService {
     private indexerServiceFactory: IndexerServiceFactory,
     private indexerUtil: IndexerUtil,
   ) {
+    super();
     this.batchSize = this.configService.get<number>('BOOTSTRAP_BATCH_SIZE', 1000);
+
+    this.bootstraped = new Promise((resolve) => {
+      this.on('bootstrap:complete', () => {
+        const checkQueue = async () => {
+          if (await this.indexerServiceFactory.isIndexerQueueEmpty()) {
+            resolve();
+          } else {
+            setTimeout(checkQueue, 1000);
+          }
+        };
+        checkQueue();
+      });
+    });
   }
 
   public async bootstrap(): Promise<void> {
@@ -58,7 +73,8 @@ export class BootstrapService {
     this.chains = await this.prismaService.chain.findMany();
     for (const chain of this.chains) {
       const blockchainService = await this.blockchainServiceFactory.getService(chain.id);
-      this.tipBlockNumbers[chain.id] = await blockchainService.getTipBlockNumber();
+      // this.tipBlockNumbers[chain.id] = await blockchainService.getTipBlockNumber();
+      this.tipBlockNumbers[chain.id] = 10000;
       this.nextBlockNumbers[chain.id] = await this.indexerUtil.getIndexStartBlockNumber(chain);
     }
 
@@ -88,7 +104,9 @@ export class BootstrapService {
 
   private async startNextWorker(): Promise<void> {
     if (this.currentChainIndex >= this.chains.length) {
-      this.logger.log(`All chains processed, bootstrap took ${performance.now() - now}ms`);
+      if (this.activeWorkers === 0) {
+        this.emit('bootstrap:complete');
+      }
       return;
     }
 
