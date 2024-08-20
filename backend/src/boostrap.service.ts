@@ -4,70 +4,128 @@ import { BlockchainServiceFactory } from './core/blockchain/blockchain.factory';
 import { Chain } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import { IndexerServiceFactory } from './core/indexer/indexer.factory';
+import { IndexerUtil } from './core/indexer/indexer.utils';
 import cluster from 'node:cluster';
+import os from 'node:os';
+
+interface IndexerWorkerMessage {
+  chainId: number;
+  startBlockNumber: number;
+  endBlockNumber: number;
+}
+
+const now = performance.now();
 
 @Injectable()
 export class BootstrapService {
   private readonly logger = new Logger(BootstrapService.name);
   private readonly batchSize: number;
 
+  private chains: Chain[] = [];
+  private currentChainIndex = 0;
+  private tipBlockNumbers: { [chainId: number]: number } = {};
+  private nextBlockNumbers: { [chainId: number]: number } = {};
+  private activeWorkers = 0;
+
   constructor(
     private configService: ConfigService,
     private prismaService: PrismaService,
     private blockchainServiceFactory: BlockchainServiceFactory,
     private indexerServiceFactory: IndexerServiceFactory,
+    private indexerUtil: IndexerUtil,
   ) {
-    this.batchSize = this.configService.get<number>('BOOTSTRAP_BATCH_SIZE', 100);
+    this.batchSize = this.configService.get<number>('BOOTSTRAP_BATCH_SIZE', 1000);
   }
 
   public async bootstrap(): Promise<void> {
-    this.logger.log('Indexer service is bootstrapping');
-    const chains = await this.prismaService.chain.findMany();
     if (cluster.isPrimary) {
-      await Promise.all(chains.map((chain) => this.bootstrapChain(chain)));
+      await this.runMaster();
+    } else {
+      await this.runWorker();
     }
   }
 
-  private async bootstrapChain(chain: Chain): Promise<void> {
-    const blockchainService = await this.blockchainServiceFactory.getService(chain.id);
-    const tipBlockNumber = await blockchainService.getTipBlockNumber();
-    const latestIndexedBlock = await this.prismaService.block.findFirst({
-      where: { chainId: chain.id },
-      orderBy: { number: 'desc' },
-    });
-
-    let startBlockNumber = latestIndexedBlock ? latestIndexedBlock.number + 1 : chain.startBlock;
-    this.logger.log(
-      `Bootstrapping chain ${chain.id}, tip: ${tipBlockNumber}, start: ${startBlockNumber}`,
-    );
-    await this.indexBlocksRecursively(chain.id, startBlockNumber, tipBlockNumber);
+  public workerReady() {
+    if (cluster.isPrimary) {
+      return;
+    }
+    this.logger.log(`Indexer Worker ${process.pid} is ready`);
+    cluster.worker!.send({ ready: true });
   }
 
-  private async indexBlocksRecursively(
-    chainId: number,
-    currentBlockNumber: number,
-    tipBlockNumber: number,
-  ): Promise<void> {
-    if (currentBlockNumber > tipBlockNumber) {
-      this.logger.log(`Finished indexing chain ${chainId}`);
+  private async runMaster() {
+    this.logger.log(`Indexer Master ${process.pid} is running`);
+    this.chains = await this.prismaService.chain.findMany();
+    for (const chain of this.chains) {
+      const blockchainService = await this.blockchainServiceFactory.getService(chain.id);
+      this.tipBlockNumbers[chain.id] = await blockchainService.getTipBlockNumber();
+      this.nextBlockNumbers[chain.id] = await this.indexerUtil.getIndexStartBlockNumber(chain);
+    }
+
+    cluster.on('exit', (worker) => {
+      this.logger.log(`Worker ${worker.process.pid} finished`);
+      this.activeWorkers--;
+      this.startNextWorker();
+    });
+
+    for (let i = 0; i < os.cpus().length; i += 1) {
+      this.startNextWorker();
+    }
+  }
+
+  private async runWorker() {
+    this.logger.log(`Indexer Worker ${process.pid} is running`);
+
+    process.on('message', async (msg: IndexerWorkerMessage) => {
+      const { chainId, startBlockNumber, endBlockNumber } = msg;
+      this.logger.log(
+        `Worker ${process.pid} processing blocks ${startBlockNumber} to ${endBlockNumber}`,
+      );
+      await this.processBlocks(chainId, startBlockNumber, endBlockNumber);
+      process.exit(0);
+    });
+  }
+
+  private async startNextWorker(): Promise<void> {
+    if (this.currentChainIndex >= this.chains.length) {
+      this.logger.log(`All chains processed, bootstrap took ${performance.now() - now}ms`);
       return;
     }
 
-    const indexerService = await this.indexerServiceFactory.getService(chainId);
-    const endBlock = Math.min(currentBlockNumber + this.batchSize - 1, tipBlockNumber);
+    const chain = this.chains[this.currentChainIndex];
+    const startBlockNumber = this.nextBlockNumbers[chain.id];
+    const endBlockNumber = Math.min(
+      startBlockNumber + this.batchSize - 1,
+      this.tipBlockNumbers[chain.id],
+    );
 
-    try {
-      await indexerService.indexBlocks(currentBlockNumber, endBlock);
-      // add a delay to avoid overwhelming the node
-      await new Promise((resolve) => setTimeout(resolve, 100));
-      // await this.indexBlocksRecursively(chainId, endBlock + 1, tipBlockNumber);
-    } catch (error) {
-      this.logger.error(
-        `Error indexing blocks from ${currentBlockNumber} to ${endBlock} for chain ${chainId}:`,
-        error,
-      );
-      // TODO: handle error and retry
-      throw error;
+    if (startBlockNumber > this.tipBlockNumbers[chain.id]) {
+      this.currentChainIndex++;
+      this.startNextWorker();
+      return;
     }
+
+    const worker = cluster.fork();
+    this.activeWorkers++;
+
+    cluster.on('message', (sender, message) => {
+      if (message.ready && worker.process.pid === sender.process.pid) {
+        worker.send({ chainId: chain.id, startBlockNumber, endBlockNumber });
+      }
+    });
+
+    this.nextBlockNumbers[chain.id] = endBlockNumber + 1;
+    this.logger.log(
+      `Started worker for chain ${chain.id}, blocks ${startBlockNumber} to ${endBlockNumber}`,
+    );
+  }
+
+  private async processBlocks(
+    chainId: number,
+    startBlockNumber: number,
+    endBlockNumber: number,
+  ): Promise<void> {
+    const indexerService = await this.indexerServiceFactory.getService(chainId);
+    await indexerService.indexBlocks(startBlockNumber, endBlockNumber);
   }
 }

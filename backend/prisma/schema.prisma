@@ -13,6 +13,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum LeapDirection {
+  LeapIn
+  LeapOut
+  Within
+}
+
 model Chain {
   id         Int      @id @default(autoincrement())
   name       String
@@ -44,7 +50,7 @@ model Block {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  transactions Transaction[]
+  // transactions Transaction[]
   chain        Chain         @relation(fields: [chainId], references: [id])
 
   @@unique([chainId, hash])
@@ -60,16 +66,14 @@ model Transaction {
   timestamp    DateTime
   fee          BigInt
   size         Int
-  lockScriptId Int?
-  typeScriptId Int?
   isCellbase   Boolean  @default(false)
+  isRgbpp      Boolean  @default(false)
+  leapDirection LeapDirection?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   chain      Chain       @relation(fields: [chainId], references: [id])
-  block      Block       @relation(fields: [chainId, blockNumber], references: [chainId, number])
-  LockScript LockScript? @relation(fields: [lockScriptId], references: [id])
-  TypeScript TypeScript? @relation(fields: [typeScriptId], references: [id])
+  // block      Block       @relation(fields: [chainId, blockNumber], references: [chainId, number])
   outputs    Output[]
 
   @@unique([chainId, hash])
@@ -105,10 +109,11 @@ model LockScript {
   hashType    Int
   args        String
   scriptHash  String   @unique @db.Char(64)
+  isRgbppLock Boolean  @default(false)
+  isBtcTimeLock Boolean  @default(false)
   createdTime DateTime @default(now())
   updatedTime DateTime @updatedAt
 
-  transactions Transaction[]
   Output       Output[]
   Address      Address[]
 
@@ -125,7 +130,6 @@ model TypeScript {
   createdTime DateTime @default(now())
   updatedTime DateTime @updatedAt
 
-  transactions Transaction[]
   Output       Output[]
   UDT          UDT[]
 

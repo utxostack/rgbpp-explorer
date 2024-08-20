@@ -1,12 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
-import { RgbppService } from '../rgbpp.service';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { TEN_MINUTES_MS } from 'src/common/date';
 import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
 import * as BitcoinApi from 'src/core/bitcoin-api/bitcoin-api.interface';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
+import { RgbppCoreService } from 'src/core/rgbpp/rgbpp.service';
+import { RgbppService } from '../rgbpp.service';
 
 @Injectable()
 export class RgbppAddressService {
@@ -15,6 +16,7 @@ export class RgbppAddressService {
   constructor(
     private bitcoinApiService: BitcoinApiService,
     private rgbppService: RgbppService,
+    private rgbppCoreService: RgbppCoreService,
     @Inject(CACHE_MANAGER) protected cacheManager: Cache,
     @InjectQueue('rgbpp-address') private readonly queue: Queue,
   ) {}
@@ -66,7 +68,7 @@ export class RgbppAddressService {
     return cells.filter((cell) => {
       try {
         const { args } = cell.output.lock;
-        const { btcTxid, outIndex } = this.rgbppService.parseRgbppLockArgs(args);
+        const { btcTxid, outIndex } = this.rgbppCoreService.parseRgbppLockArgs(args);
         const tx = addressTxsMap.has(btcTxid);
         if (!tx) {
           return false;

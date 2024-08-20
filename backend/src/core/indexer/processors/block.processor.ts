@@ -1,12 +1,13 @@
-import { Job } from 'bullmq';
-import { Processor, WorkerHost } from '@nestjs/bullmq';
+import { Job, Queue } from 'bullmq';
+import { InjectQueue, Processor, WorkerHost } from '@nestjs/bullmq';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import * as BlockchainInterface from '../../blockchain/blockchain.interface';
 import { BI } from '@ckb-lumos/bi';
 import { Logger } from '@nestjs/common';
 import { Chain } from '@prisma/client';
-import { BlockchainServiceFactory } from 'src/core/blockchain/blockchain.factory';
 import { compactToDifficulty } from 'src/common/ckb/difficulty';
+import { INDEXER_TRANSACTION_QUEUE } from './transaction.processor';
+import { IndexerUtil } from '../indexer.utils';
 
 export const INDEXER_BLOCK_QUEUE = 'indexer-block-queue';
 
@@ -23,23 +24,41 @@ export class IndexerBlockProcessor extends WorkerHost {
 
   constructor(
     private prismaService: PrismaService,
-    private blockchainServiceFactory: BlockchainServiceFactory,
+    private indexerUtil: IndexerUtil,
+    @InjectQueue(INDEXER_TRANSACTION_QUEUE) private indexerTransactionQueue: Queue,
   ) {
     super();
   }
 
   public async process(job: Job<IndexerBlockJobData>): Promise<any> {
     const { chain, block } = job.data;
-    this.logger.log(`Processing block ${block.header.number} for chain ${chain.name}`);
-
     const number = BI.from(block.header.number).toNumber();
     // TODO: reorg handling
+
+    await Promise.all(
+      block.transactions.map(async (transaction, index) => {
+        await this.indexerTransactionQueue.add(
+          transaction.hash,
+          {
+            chain,
+            block,
+            index,
+          },
+          {
+            jobId: transaction.hash,
+            // the priorities go from 1 to 2 097 152
+            // where a lower number is always a higher priority than higher numbers.
+            priority: (BI.from(block.header.number).toNumber() % 2097152) + 1,
+          },
+        );
+      }),
+    );
 
     const { totalFee, minFee, maxFee } = await this.calculateBlockFees(chain, block);
     const difficulty = compactToDifficulty(block.header.compact_target).toBigInt();
     const timestamp = new Date(BI.from(block.header.timestamp).toNumber());
 
-    const newBlock = await this.prismaService.block.create({
+    await this.prismaService.block.create({
       data: {
         chainId: chain.id,
         number,
@@ -54,8 +73,7 @@ export class IndexerBlockProcessor extends WorkerHost {
         size: 0,
       },
     });
-    this.logger.log(`Block ${block.header.number} for chain ${chain.name} processed`);
-    return newBlock;
+    this.logger.log(`Block ${block.header.number} for chain ${chain.name} processed successfully`);
   }
 
   public async calculateBlockFees(
@@ -67,7 +85,9 @@ export class IndexerBlockProcessor extends WorkerHost {
     maxFee: number;
   }> {
     const [_, ...txs] = block.transactions;
-    const fees = await Promise.all(txs.map((tx) => this.calculateTransactionFee(chain, tx)));
+    const fees = await Promise.all(
+      txs.map((tx) => this.indexerUtil.calculateTransactionFee(chain, tx)),
+    );
 
     let totalFee = 0;
     let minFee = Number.MAX_SAFE_INTEGER;
@@ -82,26 +102,5 @@ export class IndexerBlockProcessor extends WorkerHost {
       minFee,
       maxFee,
     };
-  }
-
-  public async calculateTransactionFee(
-    chain: Chain,
-    tx: BlockchainInterface.Transaction,
-  ): Promise<number> {
-    let inputCapacity = BI.from(0);
-    let outputCapacity = BI.from(0);
-
-    const blockchainService = await this.blockchainServiceFactory.getService(chain.id);
-    for (const input of tx.inputs) {
-      const previousTx = await blockchainService.getTransaction(input.previous_output.tx_hash);
-      const ouputIndex = BI.from(input.previous_output.index).toNumber();
-      const output = previousTx.transaction.outputs[ouputIndex];
-      inputCapacity = inputCapacity.add(BI.from(output.capacity));
-    }
-    for (const output of tx.outputs) {
-      outputCapacity = outputCapacity.add(BI.from(output.capacity));
-    }
-
-    return inputCapacity.sub(outputCapacity).toNumber();
   }
 }

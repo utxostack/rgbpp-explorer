@@ -21,7 +21,7 @@ export class IndexerServiceFactory implements OnModuleDestroy {
   constructor(
     private prismaService: PrismaService,
     private blockchainServiceFactory: BlockchainServiceFactory,
-    @InjectQueue(INDEXER_BLOCK_QUEUE) private readonly indexerQueue: Queue,
+    @InjectQueue(INDEXER_BLOCK_QUEUE) private indexerQueue: Queue,
     @InjectSentry() private sentryService: SentryService,
   ) {}
 

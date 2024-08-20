@@ -5,12 +5,12 @@ import {
   BitcoinTransactionLoader,
   BitcoinTransactionLoaderType,
 } from 'src/modules/bitcoin/transaction/transaction.dataloader';
-import { RgbppService } from '../rgbpp.service';
 import { Loader } from '@applifting-io/nestjs-dataloader';
+import { RgbppCoreService } from 'src/core/rgbpp/rgbpp.service';
 
 @Resolver(() => RgbppAsset)
 export class RgbppAssetResolver {
-  constructor(private rgbppService: RgbppService) {}
+  constructor(private rgbppCoreService: RgbppCoreService) { }
 
   @ResolveField(() => BitcoinOutput, { nullable: true })
   public async utxo(
@@ -19,7 +19,7 @@ export class RgbppAssetResolver {
   ): Promise<BitcoinOutput | null> {
     try {
       const { args } = asset.cell.lock;
-      const { btcTxid, outIndex } = this.rgbppService.parseRgbppLockArgs(args);
+      const { btcTxid, outIndex } = this.rgbppCoreService.parseRgbppLockArgs(args);
       const tx = await txLoader.load(btcTxid);
       if (!tx) {
         return null;

@@ -4,7 +4,6 @@ import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify
 import { envSchema } from './env';
 import { BootstrapService } from './boostrap.service';
 import { LogLevel } from '@nestjs/common';
-import { AppClusterService } from './app-cluster.service';
 import cluster from 'node:cluster';
 
 const env = envSchema.parse(process.env);
@@ -36,6 +35,9 @@ async function bootstrap() {
 
   if (cluster.isPrimary) {
     await app.listen(3000, '0.0.0.0');
+  } else {
+    bootstrapService.workerReady();
   }
 }
-(new AppClusterService()).clusterize(bootstrap);
+bootstrap();
+

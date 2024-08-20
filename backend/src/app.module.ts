@@ -15,6 +15,7 @@ import { BullModule } from '@nestjs/bullmq';
 import configModule from './config';
 import { AppController } from './app.controller';
 import { BootstrapService } from './boostrap.service';
+import cluster from 'cluster';
 
 @Module({
   imports: [
@@ -67,7 +68,7 @@ import { BootstrapService } from './boostrap.service';
     }),
     ScheduleModule.forRoot(),
     CoreModule,
-    ApiModule,
+    ...(cluster.isPrimary ? [ApiModule] : []),
   ],
   providers: [
     AppController,

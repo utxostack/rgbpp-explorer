@@ -6,6 +6,7 @@ import { CkbRpcModule } from './ckb-rpc/ckb-rpc.module';
 import { HealthModule } from './health/health.module';
 import { IndexerModule } from './indexer/indexer.module';
 import { BlockchainModule } from './blockchain/blockchain.module';
+import { RgbppCoreModule } from './rgbpp/rgbpp.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { BlockchainModule } from './blockchain/blockchain.module';
     HealthModule,
     IndexerModule,
     BlockchainModule,
+    RgbppCoreModule,
   ],
 })
 export class CoreModule { }

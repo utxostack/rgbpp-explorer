@@ -1,3 +1,6 @@
+-- CreateEnum
+CREATE TYPE "LeapDirection" AS ENUM ('LeapIn', 'LeapOut', 'Within');
+
 -- CreateTable
 CREATE TABLE "Chain" (
     "id" SERIAL NOT NULL,
@@ -39,9 +42,9 @@ CREATE TABLE "Transaction" (
     "timestamp" TIMESTAMP(3) NOT NULL,
     "fee" BIGINT NOT NULL,
     "size" INTEGER NOT NULL,
-    "lockScriptId" INTEGER,
-    "typeScriptId" INTEGER,
     "isCellbase" BOOLEAN NOT NULL DEFAULT false,
+    "isRgbpp" BOOLEAN NOT NULL DEFAULT false,
+    "leapDirection" "LeapDirection",
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -76,6 +79,8 @@ CREATE TABLE "LockScript" (
     "hashType" INTEGER NOT NULL,
     "args" TEXT NOT NULL,
     "scriptHash" CHAR(64) NOT NULL,
+    "isRgbppLock" BOOLEAN NOT NULL DEFAULT false,
+    "isBtcTimeLock" BOOLEAN NOT NULL DEFAULT false,
     "createdTime" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedTime" TIMESTAMP(3) NOT NULL,
 
@@ -202,15 +207,6 @@ ALTER TABLE "Block" ADD CONSTRAINT "Block_chainId_fkey" FOREIGN KEY ("chainId") 
 
 -- AddForeignKey
 ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_chainId_fkey" FOREIGN KEY ("chainId") REFERENCES "Chain"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_chainId_blockNumber_fkey" FOREIGN KEY ("chainId", "blockNumber") REFERENCES "Block"("chainId", "number") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_lockScriptId_fkey" FOREIGN KEY ("lockScriptId") REFERENCES "LockScript"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_typeScriptId_fkey" FOREIGN KEY ("typeScriptId") REFERENCES "TypeScript"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Output" ADD CONSTRAINT "Output_chainId_txHash_fkey" FOREIGN KEY ("chainId", "txHash") REFERENCES "Transaction"("chainId", "hash") ON DELETE RESTRICT ON UPDATE CASCADE;

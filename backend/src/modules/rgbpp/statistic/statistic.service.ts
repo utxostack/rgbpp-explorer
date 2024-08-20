@@ -8,7 +8,7 @@ import { CkbScriptService } from 'src/modules/ckb/script/script.service';
 import { CellType } from 'src/modules/ckb/script/script.model';
 import { isScriptEqual } from '@rgbpp-sdk/ckb';
 import { HashType, Script } from '@ckb-lumos/lumos';
-import { RgbppService } from '../rgbpp.service';
+import { RgbppCoreService } from 'src/core/rgbpp/rgbpp.service';
 
 // TODO: refactor the `Average Block Time` constant
 // CKB testnet: ~8s, see https://pudge.explorer.nervos.org/charts/average-block-time
@@ -32,9 +32,9 @@ export class RgbppStatisticService {
   constructor(
     private ckbRpcService: CkbRpcWebsocketService,
     private ckbScriptService: CkbScriptService,
-    private rgbppService: RgbppService,
+    private rgbppCoreService: RgbppCoreService,
     @Inject(CACHE_MANAGER) protected cacheManager: Cache,
-  ) {}
+  ) { }
 
   public async getLatest24L1Transactions() {
     const txids = await this.cacheManager.get(this.latest24L1TransactionsCacheKey);
@@ -91,14 +91,15 @@ export class RgbppStatisticService {
           args: output.lock.args,
         };
         return (
-          this.rgbppService.isRgbppLockScript(lock) || this.rgbppService.isBtcTimeLockScript(lock)
+          this.rgbppCoreService.isRgbppLockScript(lock) ||
+          this.rgbppCoreService.isBtcTimeLockScript(lock)
         );
       });
       if (rgbppCell) {
         try {
-          const { btcTxid } = this.rgbppService.parseRgbppLockArgs(rgbppCell.lock.args);
+          const { btcTxid } = this.rgbppCoreService.parseRgbppLockArgs(rgbppCell.lock.args);
           rgbppL1TxIds.push(btcTxid);
-        } catch {}
+        } catch { }
         continue;
       }
 

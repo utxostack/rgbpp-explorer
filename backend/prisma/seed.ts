@@ -9,7 +9,7 @@ async function main() {
       id: 1,
       name: 'CKB',
       ws: 'https://cota-testnet.nervina.dev/wsckbnode',
-      startBlock: 13764300,
+      startBlock: 0,
     },
   });
 }

@@ -1,12 +1,7 @@
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { toNumber } from 'lodash';
 import * as CkbExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
-
-export enum LeapDirection {
-  LeapIn = 'leap_in',
-  LeapOut = 'leap_out',
-  Within = 'within',
-}
+import { LeapDirection } from 'src/core/rgbpp/rgbpp.service';
 
 registerEnumType(LeapDirection, {
   name: 'LeapDirection',
