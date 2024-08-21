@@ -1,5 +1,3 @@
-import * as process from 'node:process'
-
 import { z } from 'zod'
 
 const internalEnvSchema = z.object({})
