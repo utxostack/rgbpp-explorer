@@ -40,6 +40,7 @@ export function NetworkCards() {
           query CkbAndBtcChainInfo {
             ckbChainInfo {
               tipBlockNumber
+              transactionsCountIn24Hours
             }
             btcChainInfo {
               tipBlockHeight
@@ -115,11 +116,7 @@ export function NetworkCards() {
             },
             {
               label: <Trans>Txns(24H)</Trans>,
-              value: (
-                <Text opacity={0.6}>
-                  <Trans>Coming Soon</Trans>
-                </Text>
-              ),
+              value: formatNumber(data?.ckbChainInfo?.transactionsCountIn24Hours),
             },
           ]}
         />
