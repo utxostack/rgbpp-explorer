@@ -6,4 +6,4 @@ import { BlockchainServiceFactory } from './blockchain.factory';
   providers: [BlockchainServiceFactory],
   exports: [BlockchainServiceFactory],
 })
-export class BlockchainModule { }
+export class BlockchainModule {}

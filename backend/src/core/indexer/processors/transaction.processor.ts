@@ -25,7 +25,7 @@ export interface IndexerTransactionJobData {
 }
 
 @Processor(INDEXER_TRANSACTION_QUEUE, {
-  concurrency: 10,
+  concurrency: 100,
 })
 export class IndexerTransactionProcessor extends WorkerHost {
   private logger = new Logger(IndexerTransactionProcessor.name);
@@ -54,30 +54,20 @@ export class IndexerTransactionProcessor extends WorkerHost {
     if (!transaction) {
       throw new Error(`Transaction not found at index ${index}, block ${block.header.hash}`);
     }
+    this.logger.log(`Processing transaction ${transaction.hash} for chain ${chain.name}`);
 
-    // if (!this.isCellbase(transaction)) {
-    //   const { inputs } = transaction;
-    //   const previousOutPoints = inputs.map((input) => ({
-    //     txHash: input.previous_output.tx_hash,
-    //     index: BI.from(input.previous_output.index).toNumber(),
-    //   }));
-    //   const txHashSet = new Set(previousOutPoints.map((outPoint) => outPoint.txHash));
-
-    //   for await (const txHash of txHashSet) {
-    //     const tx = await this.prismaService.transaction.findUnique({
-    //       where: {
-    //         chainId_hash: {
-    //           chainId: chain.id,
-    //           hash: txHash,
-    //         },
-    //       },
-    //     });
-    //     if (!tx) {
-    //       this.logger.error(`Transaction ${txHash} not found`);
-    //       // await job.moveToDelayed(new Date(Date.now() + 100).getTime(), token);
-    //     }
-    //   }
-    // }
+    const existingTransaction = await this.prismaService.transaction.findUnique({
+      where: {
+        chainId_hash: {
+          chainId: chain.id,
+          hash: transaction.hash
+        }
+      },
+    });
+    if (existingTransaction) {
+      this.logger.warn(`Transaction ${transaction.hash} already exists in the database, skipping`);
+      return;
+    }
 
     const blockchainService = await this.blockchainServiceFactory.getService(chain.id);
     const blockNumber = BI.from(block.header.number).toNumber();

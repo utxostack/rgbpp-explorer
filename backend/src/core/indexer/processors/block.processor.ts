@@ -17,7 +17,7 @@ export interface IndexerBlockJobData {
 }
 
 @Processor(INDEXER_BLOCK_QUEUE, {
-  concurrency: 10,
+  concurrency: 100,
 })
 export class IndexerBlockProcessor extends WorkerHost {
   private logger = new Logger(IndexerBlockProcessor.name);
@@ -33,6 +33,8 @@ export class IndexerBlockProcessor extends WorkerHost {
   public async process(job: Job<IndexerBlockJobData>): Promise<any> {
     const { chain, block } = job.data;
     const number = BI.from(block.header.number).toNumber();
+    this.logger.log(`Processing block ${number} for chain ${chain.name}`);
+
     // TODO: reorg handling
 
     await Promise.all(

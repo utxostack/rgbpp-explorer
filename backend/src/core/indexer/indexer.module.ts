@@ -7,6 +7,7 @@ import {
   IndexerTransactionProcessor,
 } from './processors/transaction.processor';
 import { IndexerUtil } from './indexer.utils';
+import cluster from 'cluster';
 
 @Global()
 @Module({
@@ -34,4 +35,4 @@ import { IndexerUtil } from './indexer.utils';
   ],
   exports: [IndexerServiceFactory, IndexerUtil],
 })
-export class IndexerModule { }
+export class IndexerModule {}

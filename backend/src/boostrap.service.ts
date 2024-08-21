@@ -5,7 +5,7 @@ import { Chain } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import { IndexerServiceFactory } from './core/indexer/indexer.factory';
 import { IndexerUtil } from './core/indexer/indexer.utils';
-import cluster from 'node:cluster';
+import cluster, { Worker } from 'node:cluster';
 import os from 'node:os';
 import EventEmitter from 'node:events';
 
@@ -14,6 +14,9 @@ interface IndexerWorkerMessage {
   startBlockNumber: number;
   endBlockNumber: number;
 }
+
+// const WORKER_NUM = os.cpus().length;
+const WORKER_NUM = 1;
 
 @Injectable()
 export class BootstrapService extends EventEmitter {
@@ -36,7 +39,7 @@ export class BootstrapService extends EventEmitter {
     private indexerUtil: IndexerUtil,
   ) {
     super();
-    this.batchSize = this.configService.get<number>('BOOTSTRAP_BATCH_SIZE', 1000);
+    this.batchSize = this.configService.get<number>('BOOTSTRAP_BATCH_SIZE', 100);
 
     this.bootstraped = new Promise((resolve) => {
       this.on('bootstrap:complete', () => {
@@ -54,6 +57,7 @@ export class BootstrapService extends EventEmitter {
 
   public async bootstrap(): Promise<void> {
     if (cluster.isPrimary) {
+      await this.indexerServiceFactory.cleanIndexerQueueJobs();
       await this.runMaster();
     } else {
       await this.runWorker();
@@ -74,18 +78,45 @@ export class BootstrapService extends EventEmitter {
     for (const chain of this.chains) {
       const blockchainService = await this.blockchainServiceFactory.getService(chain.id);
       // this.tipBlockNumbers[chain.id] = await blockchainService.getTipBlockNumber();
-      this.tipBlockNumbers[chain.id] = 10000;
+      this.tipBlockNumbers[chain.id] = 500000;
       this.nextBlockNumbers[chain.id] = await this.indexerUtil.getIndexStartBlockNumber(chain);
     }
 
     cluster.on('exit', (worker) => {
       this.logger.log(`Worker ${worker.process.pid} finished`);
       this.activeWorkers--;
-      this.startNextWorker();
+      if (this.activeWorkers === 0 && this.currentChainIndex >= this.chains.length) {
+        this.emit('bootstrap:complete');
+      }
     });
 
-    for (let i = 0; i < os.cpus().length; i += 1) {
-      this.startNextWorker();
+    cluster.on('message', async (worker, message) => {
+      if (message.ready || message.completed) {
+        // Worker is ready or completed work, try to assign more work to it
+        const checkQueueAndAssignWork = async () => {
+          const counts = await this.indexerServiceFactory.getIndexerQueueJobCounts();
+          const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
+          this.logger.error(counts);
+
+          // Check every second if the queue jobs are less than the number of workers * batch size
+          // So that we can assign work to the worker and avoid overloading the queue
+          // (too many unprocessed jobs when causing js heap out of memory)
+          if (total < this.batchSize * WORKER_NUM) {
+            this.logger.log(`Queue has ${total} jobs, assigning work to worker ${worker.id}`);
+            await this.assignWorkToWorker(worker);
+          } else {
+            this.logger.log(`Queue has ${total} jobs, waiting for worker ${worker.id}`);
+            setTimeout(checkQueueAndAssignWork, total);
+          }
+        };
+        checkQueueAndAssignWork();
+        return;
+      }
+    });
+
+    for (let i = 0; i < WORKER_NUM; i += 1) {
+      cluster.fork();
+      this.activeWorkers++;
     }
   }
 
@@ -98,15 +129,13 @@ export class BootstrapService extends EventEmitter {
         `Worker ${process.pid} processing blocks ${startBlockNumber} to ${endBlockNumber}`,
       );
       await this.processBlocks(chainId, startBlockNumber, endBlockNumber);
-      process.exit(0);
+      process.send!({ completed: true });
     });
   }
 
-  private async startNextWorker(): Promise<void> {
+  private async assignWorkToWorker(worker: Worker): Promise<void> {
     if (this.currentChainIndex >= this.chains.length) {
-      if (this.activeWorkers === 0) {
-        this.emit('bootstrap:complete');
-      }
+      worker.disconnect();
       return;
     }
 
@@ -119,22 +148,15 @@ export class BootstrapService extends EventEmitter {
 
     if (startBlockNumber > this.tipBlockNumbers[chain.id]) {
       this.currentChainIndex++;
-      this.startNextWorker();
+      this.assignWorkToWorker(worker);
       return;
     }
 
-    const worker = cluster.fork();
-    this.activeWorkers++;
-
-    cluster.on('message', (sender, message) => {
-      if (message.ready && worker.process.pid === sender.process.pid) {
-        worker.send({ chainId: chain.id, startBlockNumber, endBlockNumber });
-      }
-    });
+    worker.send({ chainId: chain.id, startBlockNumber, endBlockNumber });
 
     this.nextBlockNumbers[chain.id] = endBlockNumber + 1;
     this.logger.log(
-      `Started worker for chain ${chain.id}, blocks ${startBlockNumber} to ${endBlockNumber}`,
+      `Assigned work to worker ${worker.id} for chain ${chain.id}, blocks ${startBlockNumber} to ${endBlockNumber}`,
     );
   }
 

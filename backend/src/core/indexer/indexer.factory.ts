@@ -1,4 +1,4 @@
-import { Injectable, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { IndexerService } from './indexer.service';
@@ -17,6 +17,7 @@ export class IndexerServiceFactoryError extends Error {
 
 @Injectable()
 export class IndexerServiceFactory implements OnModuleDestroy {
+  private logger = new Logger(IndexerServiceFactory.name);
   private services: Map<number, IndexerService> = new Map();
 
   constructor(
@@ -42,17 +43,57 @@ export class IndexerServiceFactory implements OnModuleDestroy {
     }
     if (!this.services.has(chain.id)) {
       const blockchainService = await this.blockchainServiceFactory.getService(chain.id);
-      this.services.set(chainId, new IndexerService(chain, blockchainService, this.indexerBlockQueue));
+      this.services.set(
+        chainId,
+        new IndexerService(chain, blockchainService, this.indexerBlockQueue),
+      );
     }
     return this.services.get(chainId)!;
   }
 
-  public async isIndexerQueueEmpty(): Promise<boolean> {
-    const blockQueueCount = await this.indexerBlockQueue.getJobCounts();
-    const transactionQueueCount = await this.indexerTransactionQueue.getJobCounts();
-    const waiting = blockQueueCount.waiting + transactionQueueCount.waiting;
-    const active = blockQueueCount.active + transactionQueueCount.active;
+  public async cleanIndexerQueueJobs() {
+    const blockQueueCounts = await this.indexerBlockQueue.getJobCounts();
+    const totalBlockJobs = Object.values(blockQueueCounts).reduce((sum, count) => sum + count, 0);
+    if (totalBlockJobs > 0) {
+      this.logger.log(`Cleaning ${totalBlockJobs} block jobs from the indexer queue`);
+      await this.indexerBlockQueue.clean(0, totalBlockJobs);
+    }
 
-    return waiting === 0 && active === 0;
+    const transactionQueueCounts = await this.indexerTransactionQueue.getJobCounts();
+    const totalTransactionJobs = Object.values(transactionQueueCounts).reduce(
+      (sum, count) => sum + count,
+      0,
+    );
+    if (totalTransactionJobs > 0) {
+      this.logger.log(`Cleaning ${totalTransactionJobs} transaction jobs from the indexer queue`);
+      await this.indexerTransactionQueue.clean(0, totalTransactionJobs);
+    }
+  }
+
+  public async getIndexerQueueJobCounts() {
+    const blockQueueCounts = await this.indexerBlockQueue.getJobCounts();
+    const transactionQueueCounts = await this.indexerTransactionQueue.getJobCounts();
+
+    const counts = [blockQueueCounts, transactionQueueCounts].reduce(
+      (sum, counts) => {
+        const keys = Object.keys(counts);
+        keys.forEach((key) => {
+          if (sum[key] === undefined) {
+            sum[key] = counts[key];
+          } else {
+            sum[key] += counts[key];
+          }
+        });
+        return sum;
+      },
+      {} as { [key: string]: number },
+    );
+
+    return counts;
+  }
+
+  public async isIndexerQueueEmpty(): Promise<boolean> {
+    const counts = await this.getIndexerQueueJobCounts();
+    return Object.values(counts).every((count) => count === 0);
   }
 }
