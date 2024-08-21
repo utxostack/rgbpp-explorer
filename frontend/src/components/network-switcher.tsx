@@ -12,16 +12,20 @@ import Link from '@/components/ui/link'
 import { env } from '@/constants/env'
 
 export const NetworkSwitcher = memo(function NetworkSwitcher() {
+  const domain = env.public.RGBPP_DOMAINS.split(',').find(
+    (x) => x == (typeof window !== 'undefined' ? window.location : undefined)?.host,
+  )
+
   const networks = [
     {
       icon: <MainnetSVG w="24px" h="24px" />,
       label: <Trans>Mainnet</Trans>,
-      href: env.public.RGBPP_EXPLORER_MAINNET_URL,
+      href: `https://${domain}` ?? env.public.RGBPP_EXPLORER_MAINNET_URL,
     },
     {
       icon: <TestnetSVG w="24px" h="24px" />,
       label: <Trans>Testnet</Trans>,
-      href: env.public.RGBPP_EXPLORER_TESTNET_URL,
+      href: `https://testnet.${domain}` ?? env.public.RGBPP_EXPLORER_TESTNET_URL,
     },
   ]
   const network = env.public.IS_MAINNET ? networks[0] : networks[1]
