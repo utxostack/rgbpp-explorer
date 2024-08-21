@@ -18,7 +18,6 @@ export async function Info() {
       query CkbChainInfo {
         ckbChainInfo {
           tipBlockNumber
-          transactionsCountIn24Hours
           fees {
             fast
             slow

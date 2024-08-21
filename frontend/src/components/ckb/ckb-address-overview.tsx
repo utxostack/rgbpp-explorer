@@ -31,16 +31,23 @@ export function CkbAddressOverview({ ckbAddress }: { ckbAddress: CkbAddressBaseQ
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`CKB Balance`}</Text>
             <Text>
-              <OverflowAmount amount={formatNumber(shannonToCKB(ckbAddress.shannon))} symbol={t(i18n)`CKB`} />
+              <OverflowAmount amount={formatNumber(shannonToCKB(ckbAddress.balance?.total))} symbol={t(i18n)`CKB`} />
             </Text>
           </VStack>
           <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Available`}</Text>
-            <Text color="text.third">{t(i18n)`Coming Soon`}</Text>
+            <Text>
+              <OverflowAmount
+                amount={formatNumber(shannonToCKB(ckbAddress.balance?.available))}
+                symbol={t(i18n)`CKB`}
+              />
+            </Text>
           </VStack>
           <VStack gap="15px">
             <Text color="text.third" fontSize="14px">{t(i18n)`Occupied`}</Text>
-            <Text color="text.third">{t(i18n)`Coming Soon`}</Text>
+            <Text>
+              <OverflowAmount amount={formatNumber(shannonToCKB(ckbAddress.balance?.occupied))} symbol={t(i18n)`CKB`} />
+            </Text>
           </VStack>
         </Grid>
         <Grid
