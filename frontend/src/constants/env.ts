@@ -24,6 +24,7 @@ const publicEnvSchema = z.object({
   UTXO_STACK_MEDIUM_URL: z.string().default('https://medium.com/@utxostack'),
   RGBPP_EXPLORER_TESTNET_URL: z.string().default('https://testnet.explorer.utxostack.network'),
   RGBPP_EXPLORER_MAINNET_URL: z.string().default('https://explorer.utxostack.network'),
+  RGBPP_DOMAINS: z.string().default('explorer.utxostack.network,explorer.rgbpp.io'),
 })
 
 const sharedEnvSchema = z.object({
