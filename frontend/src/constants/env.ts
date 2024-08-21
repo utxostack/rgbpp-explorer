@@ -1,3 +1,5 @@
+import * as process from 'node:process'
+
 import { z } from 'zod'
 
 const internalEnvSchema = z.object({})
@@ -24,7 +26,11 @@ const publicEnvSchema = z.object({
   UTXO_STACK_MEDIUM_URL: z.string().default('https://medium.com/@utxostack'),
   RGBPP_EXPLORER_TESTNET_URL: z.string().default('https://testnet.explorer.utxostack.network'),
   RGBPP_EXPLORER_MAINNET_URL: z.string().default('https://explorer.utxostack.network'),
-  RGBPP_DOMAINS: z.string().default('explorer.utxostack.network,explorer.rgbpp.io'),
+  RGBPP_DOMAINS: z
+    .string()
+    .default(
+      'explorer.utxostack.network,testnet.explorer.utxostack.network,explorer.rgbpp.io,testnet.explorer.rgbpp.io',
+    ),
 })
 
 const sharedEnvSchema = z.object({
@@ -47,5 +53,6 @@ export const env = {
     RGBPP_WHITE_PAPER_URL: process.env.NEXT_PUBLIC_RGBPP_WHITE_PAPER_URL,
     RGBPP_SCRIPT_URL: process.env.NEXT_PUBLIC_RGBPP_SCRIPT_URL,
     RGBPP_SDK_URL: process.env.NEXT_PUBLIC_RGBPP_SDK_URL,
+    RGBPP_DOMAINS: process.env.NEXT_PUBLIC_RGBPP_DOMAINS,
   }),
 }

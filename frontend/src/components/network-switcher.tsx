@@ -11,6 +11,18 @@ import { HoverCard, Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { env } from '@/constants/env'
 
+const TESTNET_SYMBOL = 'testnet'
+
+function resolveDomain(fallback: string, domain?: string, isMainnet = false) {
+  if (domain) {
+    if (domain.startsWith(TESTNET_SYMBOL) && isMainnet) {
+      return `https://${domain.substring(TESTNET_SYMBOL.length)}`
+    }
+    return `https://testnet.${domain}`
+  }
+  return fallback
+}
+
 export const NetworkSwitcher = memo(function NetworkSwitcher() {
   const domain = env.public.RGBPP_DOMAINS.split(',').find(
     (x) => x === (typeof window !== 'undefined' ? window.location : undefined)?.host,
@@ -20,12 +32,12 @@ export const NetworkSwitcher = memo(function NetworkSwitcher() {
     {
       icon: <MainnetSVG w="24px" h="24px" />,
       label: <Trans>Mainnet</Trans>,
-      href: domain ? `https://${domain}` : env.public.RGBPP_EXPLORER_MAINNET_URL,
+      href: resolveDomain(env.public.RGBPP_EXPLORER_MAINNET_URL, domain, true),
     },
     {
       icon: <TestnetSVG w="24px" h="24px" />,
       label: <Trans>Testnet</Trans>,
-      href: domain ? `https://testnet.${domain}` : env.public.RGBPP_EXPLORER_TESTNET_URL,
+      href: resolveDomain(env.public.RGBPP_EXPLORER_TESTNET_URL, domain, false),
     },
   ]
 
