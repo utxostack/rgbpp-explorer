@@ -13,7 +13,7 @@ import { env } from '@/constants/env'
 
 export const NetworkSwitcher = memo(function NetworkSwitcher() {
   const domain = env.public.RGBPP_DOMAINS.split(',').find(
-    (x) => x == (typeof window !== 'undefined' ? window.location : undefined)?.host,
+    (x) => x === (typeof window !== 'undefined' ? window.location : undefined)?.host,
   )
 
   const networks = [
