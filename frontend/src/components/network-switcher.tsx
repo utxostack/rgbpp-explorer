@@ -11,14 +11,17 @@ import { HoverCard, Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { env } from '@/constants/env'
 
-const TESTNET_SYMBOL = 'testnet'
+const TESTNET_SYMBOL = 'testnet.'
 
 function resolveDomain(fallback: string, domain?: string, isMainnet = false) {
   if (domain) {
-    if (domain.startsWith(TESTNET_SYMBOL) && isMainnet) {
-      return `https://${domain.substring(TESTNET_SYMBOL.length)}`
+    if (isMainnet) {
+      if (domain.startsWith(TESTNET_SYMBOL)) {
+        return `https://${domain.substring(TESTNET_SYMBOL.length)}`
+      }
+      return `https://${domain}`
     }
-    return `https://testnet.${domain}`
+    return domain.startsWith(TESTNET_SYMBOL) ? `https://${domain}` : `https://${TESTNET_SYMBOL}${domain}`
   }
   return fallback
 }
