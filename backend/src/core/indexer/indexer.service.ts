@@ -10,33 +10,37 @@ export class IndexerService {
   constructor(
     private chain: Chain,
     private blockchainService: BlockchainService,
-    private indexerQueue: Queue,
-  ) { }
+    private indexerBlockQueue: Queue,
+  ) {}
 
   public async indexBlocks(startBlock: number, endBlock: number) {
     this.logger.log(
       `Indexing blocks for chain ${this.chain.id}, from ${startBlock} to ${endBlock}`,
     );
-    await Promise.all(
+    const jobs = await Promise.all(
       Array.from({ length: endBlock - startBlock + 1 }, async (_, i) => {
         const block = await this.blockchainService.getBlockByNumber(
           BI.from(startBlock + i).toHexString(),
         );
-        await this.indexerQueue.add(
-          block.header.hash,
-          {
+        const blockNumber = BI.from(block.header.number).toNumber();
+
+        return {
+          name: block.header.hash,
+          data: {
             block,
             chain: this.chain,
           },
-          {
+          opts: {
             jobId: block.header.hash,
             // the priorities go from 1 to 2 097 152
             // where a lower number is always a higher priority than higher numbers.
-            priority: (BI.from(block.header.number).toNumber() % 2097152) + 1,
+            priority: Math.max(1, 2097152 - (blockNumber % 2097152)),
+            delay: (i / endBlock) * 1000,
           },
-        );
+        };
       }),
     );
+    await this.indexerBlockQueue.addBulk(jobs);
   }
 
   public async close() {

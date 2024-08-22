@@ -11,6 +11,7 @@ import { CELLBASE_TX_HASH, LeapDirection, RgbppCoreService } from 'src/core/rgbp
 import { BlockchainServiceFactory } from 'src/core/blockchain/blockchain.factory';
 import { Env } from 'src/env';
 import { ConfigService } from '@nestjs/config';
+import { createWorkerConfig } from '../indexer.config';
 
 export const INDEXER_TRANSACTION_QUEUE = 'indexer-transaction-queue';
 
@@ -22,7 +23,8 @@ const DBLeapDirectionMap: Record<LeapDirection, DBLeapDirection> = {
 
 export interface IndexerTransactionJobData {
   chain: Chain;
-  block: BlockchainInterface.Block;
+  block: Omit<BlockchainInterface.Block, 'transactions'>;
+  transaction: BlockchainInterface.Transaction;
   index: string;
 }
 
@@ -41,7 +43,12 @@ export class IndexerTransactionProcessor extends WorkerHost implements OnModuleI
   }
 
   public async onModuleInit() {
-    this.worker.concurrency = 100 * this.configService.get('INDEXER_WORKER_NUM')!;
+    const { concurrency, stalledInterval, useWorkerThreads } = createWorkerConfig(
+      this.configService,
+    );
+    this.worker.concurrency = concurrency;
+    this.worker.opts.stalledInterval = stalledInterval;
+    this.worker.opts.useWorkerThreads = useWorkerThreads;
   }
 
   private isCellbase(transaction: BlockchainInterface.Transaction) {
@@ -51,21 +58,24 @@ export class IndexerTransactionProcessor extends WorkerHost implements OnModuleI
     );
   }
 
-  public async process(job: Job<IndexerTransactionJobData>, token?: string): Promise<any> {
-    const { chain, block } = job.data;
-    const index = BI.from(job.data.index).toNumber();
-    const transaction = block.transactions[index];
-    if (!transaction) {
-      throw new Error(`Transaction not found at index ${index}, block ${block.header.hash}`);
-    }
-    const existingTransaction = await this.prismaService.transaction.findUnique({
+  private async getTransactionByHash(chain: Chain, hash: string) {
+    return this.prismaService.transaction.findUnique({
       where: {
         chainId_hash: {
           chainId: chain.id,
-          hash: transaction.hash
-        }
+          hash,
+        },
       },
     });
+  }
+
+  public async process(job: Job<IndexerTransactionJobData>, token?: string): Promise<any> {
+    const { chain, block, transaction } = job.data;
+    const index = BI.from(job.data.index).toNumber();
+    if (!transaction) {
+      throw new Error(`Transaction not found at index ${index}, block ${block.header.hash}`);
+    }
+    const existingTransaction = await this.getTransactionByHash(chain, transaction.hash);
     if (existingTransaction) {
       this.logger.warn(`Transaction ${transaction.hash} already exists in the database, skipping`);
       return;
@@ -92,9 +102,9 @@ export class IndexerTransactionProcessor extends WorkerHost implements OnModuleI
     const leapDirection = isCellbase
       ? null
       : await this.rgbppCoreService.getRgbppTxLeapDirection(transaction, async (txhash) => {
-        const tx = await blockchainService.getTransaction(txhash);
-        return tx.transaction;
-      });
+          const tx = await blockchainService.getTransaction(txhash);
+          return tx.transaction;
+        });
 
     await this.prismaService.transaction.create({
       data: {
@@ -110,13 +120,33 @@ export class IndexerTransactionProcessor extends WorkerHost implements OnModuleI
         leapDirection: leapDirection ? DBLeapDirectionMap[leapDirection] : null,
       },
     });
-    this.logger.log(
-      `Transaction ${transaction.hash} for chain ${chain.name} processed successfully`,
-    );
+  }
+
+  @OnWorkerEvent('active')
+  onActive(job: Job<IndexerTransactionJobData>) {
+    const { chain, transaction } = job.data;
+    this.logger.debug(`Processing transaction ${transaction.hash} for chain ${chain.name}`);
   }
 
   @OnWorkerEvent('failed')
   onFailed(job: Job<IndexerTransactionJobData>, error: Error) {
+    const { chain, transaction } = job.data;
+    this.logger.error(
+      `Job ${job.id} failed for transaction ${transaction.hash} for chain ${chain.name}: ${error.message}`,
+    );
     this.logger.error(error.stack);
+  }
+
+  @OnWorkerEvent('stalled')
+  onStalled(jobId: string) {
+    this.logger.error(`Job ${jobId} stalled`);
+  }
+
+  @OnWorkerEvent('completed')
+  onCompleted(job: Job<IndexerTransactionJobData>) {
+    const { chain, transaction } = job.data;
+    this.logger.log(
+      `Transaction ${transaction.hash} for chain ${chain.name} processed successfully`,
+    );
   }
 }

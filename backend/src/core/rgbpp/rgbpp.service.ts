@@ -11,7 +11,10 @@ import {
 } from '@rgbpp-sdk/ckb';
 import * as BlockchainInterface from '../blockchain/blockchain.interface';
 import { BtcTestnetTypeMap, NetworkType } from 'src/constants';
+import pLimit from 'p-limit';
 import { Env } from 'src/env';
+
+const limit = pLimit(100);
 
 export enum LeapDirection {
   LeapIn = 'leap_in',
@@ -24,7 +27,7 @@ export const CELLBASE_TX_HASH =
 
 @Injectable()
 export class RgbppCoreService {
-  constructor(private configService: ConfigService<Env>) { }
+  constructor(private configService: ConfigService<Env>) {}
 
   public get rgbppLockScript() {
     const network = this.configService.get('NETWORK');
@@ -77,13 +80,17 @@ export class RgbppCoreService {
     tx: BlockchainInterface.Transaction,
     fetchTx: (txid: string) => Promise<BlockchainInterface.Transaction>,
   ): Promise<LeapDirection | null> {
-    const inputCells = await Promise.all(
-      tx.inputs.map(async (input) => {
-        const inputTx = await fetchTx(input.previous_output.tx_hash);
-        const index = BI.from(input.previous_output.index).toNumber();
-        return inputTx.outputs?.[index] ?? null;
-      }),
+    const inputTxhashes = Array.from(
+      new Set(tx.inputs.map((input) => input.previous_output.tx_hash)),
     );
+    const inputTxs = await Promise.all(inputTxhashes.map((txid) => limit(() => fetchTx(txid))));
+    const inputTxsMap = new Map(inputTxs.map((tx) => [tx.hash, tx]));
+
+    const inputCells = tx.inputs.map((input) => {
+      const inputTx = inputTxsMap.get(input.previous_output.tx_hash);
+      const index = BI.from(input.previous_output.index).toNumber();
+      return inputTx!.outputs?.[index] ?? null;
+    });
     const hasRgbppLockInput = inputCells.some(
       (cell) =>
         cell?.lock &&

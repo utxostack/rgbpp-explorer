@@ -10,8 +10,14 @@ import {
   TransactionWithStatusResponse,
 } from './blockchain.interface';
 import { SentryService } from '@ntegral/nestjs-sentry';
+import pLimit from 'p-limit';
+import { Cacheable } from 'src/decorators/cacheable.decorator';
+import { ONE_MONTH_MS } from 'src/common/date';
+import { CKB_MIN_SAFE_CONFIRMATIONS } from 'src/constants';
 
-class WebsocketError extends Error { }
+class WebsocketError extends Error {}
+
+const limit = pLimit(100);
 
 export class BlockchainService {
   private logger = new Logger(BlockchainService.name);
@@ -32,6 +38,11 @@ export class BlockchainService {
 
   private createConnection() {
     this.websocket = new RpcWebsocketsClient(this.wsUrl);
+
+    const originalCall = this.websocket.call.bind(this.websocket);
+    this.websocket.call = async (method: string, params: any[]) => {
+      return limit(() => originalCall(method, params));
+    };
 
     this.websocketReady = new Promise((resolve) => {
       this.websocket.on('open', () => {
@@ -77,6 +88,22 @@ export class BlockchainService {
     }
   }
 
+  private async isSafeConfirmations(blockNumber: string): Promise<boolean> {
+    const tipBlockNumber = await this.getTipBlockNumber();
+    return BI.from(blockNumber).lt(BI.from(tipBlockNumber).sub(CKB_MIN_SAFE_CONFIRMATIONS));
+  }
+
+  @Cacheable({
+    namespace: 'CkbRpcWebsocketService',
+    key: (txHash: string) => `getTransaction:${txHash}`,
+    ttl: ONE_MONTH_MS,
+    shouldCache: async (tx: TransactionWithStatusResponse, that: BlockchainService) => {
+      if (tx.tx_status.status !== 'committed' || !tx.tx_status.block_number) {
+        return false;
+      }
+      return that.isSafeConfirmations(tx.tx_status.block_number);
+    },
+  })
   public async getTransaction(txHash: string): Promise<TransactionWithStatusResponse> {
     await this.websocketReady;
     this.logger.debug(`get_transaction - txHash: ${txHash}`);

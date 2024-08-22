@@ -4,13 +4,16 @@ import { PrismaService } from '../database/prisma/prisma.service';
 import * as BlockchainInterface from '../blockchain/blockchain.interface';
 import { BlockchainServiceFactory } from '../blockchain/blockchain.factory';
 import { BI } from '@ckb-lumos/bi';
+import pLimit from 'p-limit';
+
+const limit = pLimit(100);
 
 @Injectable()
 export class IndexerUtil {
   constructor(
     private prismaService: PrismaService,
     private blockchainServiceFactory: BlockchainServiceFactory,
-  ) { }
+  ) {}
 
   public async getIndexStartBlockNumber(chain: Chain) {
     const latestIndexedBlock = await this.prismaService.block.findFirst({
@@ -18,7 +21,7 @@ export class IndexerUtil {
       orderBy: { number: 'desc' },
     });
 
-    let startBlockNumber = latestIndexedBlock ? latestIndexedBlock.number + 1 : chain.startBlock;
+    const startBlockNumber = latestIndexedBlock ? latestIndexedBlock.number + 1 : chain.startBlock;
     return startBlockNumber;
   }
 
@@ -30,10 +33,19 @@ export class IndexerUtil {
     let outputCapacity = BI.from(0);
 
     const blockchainService = await this.blockchainServiceFactory.getService(chain.id);
+
+    const inputTxHashes = Array.from(
+      new Set(tx.inputs.map((input) => input.previous_output.tx_hash)),
+    );
+    const inputTxs = await Promise.all(
+      inputTxHashes.map((txHash) => limit(() => blockchainService.getTransaction(txHash))),
+    );
+    const inputTxsMap = new Map(inputTxs.map((tx) => [tx.transaction.hash, tx]));
+
     for (const input of tx.inputs) {
-      const previousTx = await blockchainService.getTransaction(input.previous_output.tx_hash);
+      const previousTx = inputTxsMap.get(input.previous_output.tx_hash);
       const ouputIndex = BI.from(input.previous_output.index).toNumber();
-      const output = previousTx.transaction.outputs[ouputIndex];
+      const output = previousTx!.transaction.outputs[ouputIndex];
       inputCapacity = inputCapacity.add(BI.from(output.capacity));
     }
     for (const output of tx.outputs) {

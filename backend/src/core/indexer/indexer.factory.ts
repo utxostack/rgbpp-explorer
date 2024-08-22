@@ -26,7 +26,7 @@ export class IndexerServiceFactory implements OnModuleDestroy {
     @InjectQueue(INDEXER_BLOCK_QUEUE) private indexerBlockQueue: Queue,
     @InjectQueue(INDEXER_TRANSACTION_QUEUE) private indexerTransactionQueue: Queue,
     @InjectSentry() private sentryService: SentryService,
-  ) { }
+  ) {}
 
   public async onModuleDestroy() {
     for (const service of this.services.values()) {
@@ -51,22 +51,16 @@ export class IndexerServiceFactory implements OnModuleDestroy {
     return this.services.get(chainId)!;
   }
 
-  public async cleanIndexerQueueJobs() {
-    const blockQueueCounts = await this.indexerBlockQueue.getJobCounts();
-    const totalBlockJobs = Object.values(blockQueueCounts).reduce((sum, count) => sum + count, 0);
-    if (totalBlockJobs > 0) {
-      this.logger.log(`Cleaning ${totalBlockJobs} block jobs from the indexer queue`);
-      await this.indexerBlockQueue.clean(0, totalBlockJobs);
+  public async processLegacyIndexerQueueJobs() {
+    const blockQueueActiveJobs = await this.indexerBlockQueue.getActive();
+    const delayedTime = Date.now() + 10000;
+    for (const job of blockQueueActiveJobs) {
+      await job.moveToDelayed(delayedTime);
     }
 
-    const transactionQueueCounts = await this.indexerTransactionQueue.getJobCounts();
-    const totalTransactionJobs = Object.values(transactionQueueCounts).reduce(
-      (sum, count) => sum + count,
-      0,
-    );
-    if (totalTransactionJobs > 0) {
-      this.logger.log(`Cleaning ${totalTransactionJobs} transaction jobs from the indexer queue`);
-      await this.indexerTransactionQueue.clean(0, totalTransactionJobs);
+    const transactionQueueActiveJobs = await this.indexerTransactionQueue.getActive();
+    for (const job of transactionQueueActiveJobs) {
+      await job.moveToDelayed(delayedTime);
     }
   }
 
@@ -92,23 +86,40 @@ export class IndexerServiceFactory implements OnModuleDestroy {
     return counts;
   }
 
-  public async isIndexerQueueEmpty(): Promise<boolean> {
-    const counts = await this.getIndexerQueueJobCounts();
-    this.logger.error(counts);
-    return Object.values(counts).every((count) => count === 0);
-  }
-
-  public async waitUntilIndexerQueueEmpty() {
+  public async waitUntilBlockQueueEmpty() {
     await new Promise((resolve) => {
       const check = async () => {
-        const isQueueEmpty = await this.isIndexerQueueEmpty();
+        const blockQueueCounts = await this.indexerBlockQueue.getJobCounts();
+        const isQueueEmpty = Object.values(blockQueueCounts).every((count) => count === 0);
         if (isQueueEmpty) {
           resolve(undefined);
         } else {
-          setTimeout(check, 1000);
+          setTimeout(check, 200);
         }
       };
       check();
-    })
+    });
+  }
+
+  public async waitUntilTransactionQueueEmpty() {
+    await new Promise((resolve) => {
+      const check = async () => {
+        const transactionQueueCounts = await this.indexerTransactionQueue.getJobCounts();
+        const isQueueEmpty = Object.values(transactionQueueCounts).every((count) => count === 0);
+        if (isQueueEmpty) {
+          resolve(undefined);
+        } else {
+          setTimeout(check, 200);
+        }
+      };
+      check();
+    });
+  }
+
+  public async waitUntilIndexerQueueEmpty() {
+    await Promise.all([
+      this.waitUntilBlockQueueEmpty(),
+      this.waitUntilTransactionQueueEmpty(),
+    ]);
   }
 }

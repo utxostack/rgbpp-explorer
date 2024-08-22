@@ -15,11 +15,13 @@ interface IndexerWorkerMessage {
   endBlockNumber: number;
 }
 
+const MAX_MEMORY_USAGE = 90;
+
 @Injectable()
 export class BootstrapService extends EventEmitter {
   private readonly logger = new Logger(BootstrapService.name);
-  private readonly batchSize: number;
   private readonly workerNum: number;
+  private batchSize: number;
 
   private chains: Chain[] = [];
   private currentChainIndex = 0;
@@ -52,7 +54,7 @@ export class BootstrapService extends EventEmitter {
         this.logger.warn(`Bootstrap complete in ${performance.now() - now}ms`);
       });
       // clean the indexer queue jobs before bootstrap to avoid duplicate jobs
-      await this.indexerServiceFactory.cleanIndexerQueueJobs();
+      await this.indexerServiceFactory.processLegacyIndexerQueueJobs();
       await this.runMaster();
     } else {
       await this.runWorker();
@@ -95,9 +97,12 @@ export class BootstrapService extends EventEmitter {
 
     cluster.on('message', async (worker, message) => {
       if (message.ready || message.completed) {
+        if (message.completed) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+
         // check memory usage before assigning work to worker to avoid OOM
         if (!this.checkMemoryUsage()) {
-          this.logger.warn('Memory usage is high, waiting for memory to free up');
           setTimeout(() => this.checkQueueAndAssignWork(worker), 5000);
           return;
         }
@@ -167,7 +172,28 @@ export class BootstrapService extends EventEmitter {
   private checkMemoryUsage(): boolean {
     const memoryUsage = process.memoryUsage();
     const usedMemoryPercentage = (memoryUsage.heapUsed / memoryUsage.heapTotal) * 100;
-    return usedMemoryPercentage < 90;
+    this.logger.error(`Memory usage: ${usedMemoryPercentage.toFixed(2)}%`);
+
+    if (usedMemoryPercentage > MAX_MEMORY_USAGE) {
+      // Force garbage collection if available
+      // only available in node.js with --expose-gc flag
+      if (global.gc) {
+        this.logger.warn('Memory usage is high, running garbage collection');
+        global.gc();
+      }
+      // Reduce batch size if memory usage is high
+      this.batchSize = Math.max(Math.round(this.batchSize / 2) - 1, 1);
+      this.logger.warn(`Memory usage is high, reducing batch size to ${this.batchSize}`);
+    } else if (this.batchSize < this.configService.get('INDEXER_BATCH_SIZE')!) {
+      // Increase batch size if memory usage is low
+      this.batchSize = Math.min(
+        Math.round(this.batchSize * 2),
+        this.configService.get('INDEXER_BATCH_SIZE')!,
+      );
+      this.logger.warn(`Memory usage is low, increasing batch size to ${this.batchSize}`);
+    }
+
+    return usedMemoryPercentage < MAX_MEMORY_USAGE;
   }
 
   /**
@@ -178,6 +204,7 @@ export class BootstrapService extends EventEmitter {
   private async checkQueueAndAssignWork(worker: Worker) {
     const counts = await this.indexerServiceFactory.getIndexerQueueJobCounts();
     const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
+    this.logger.error(counts);
     if (total < this.batchSize * this.workerNum) {
       await this.assignWorkToWorker(worker);
     } else {
