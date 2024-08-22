@@ -6,8 +6,8 @@ import { ConfigService } from '@nestjs/config';
 import { IndexerServiceFactory } from './core/indexer/indexer.factory';
 import { IndexerUtil } from './core/indexer/indexer.utils';
 import cluster, { Worker } from 'node:cluster';
-import os from 'node:os';
 import EventEmitter from 'node:events';
+import { Env } from './env';
 
 interface IndexerWorkerMessage {
   chainId: number;
@@ -15,13 +15,11 @@ interface IndexerWorkerMessage {
   endBlockNumber: number;
 }
 
-// const WORKER_NUM = os.cpus().length;
-const WORKER_NUM = 1;
-
 @Injectable()
 export class BootstrapService extends EventEmitter {
   private readonly logger = new Logger(BootstrapService.name);
   private readonly batchSize: number;
+  private readonly workerNum: number;
 
   private chains: Chain[] = [];
   private currentChainIndex = 0;
@@ -29,34 +27,30 @@ export class BootstrapService extends EventEmitter {
   private nextBlockNumbers: { [chainId: number]: number } = {};
   private activeWorkers = 0;
 
-  public bootstraped: Promise<void>;
+  public bootstraped = new Promise((resolve) => {
+    this.on('bootstrap:complete', () => {
+      resolve(undefined);
+    });
+  });
 
   constructor(
-    private configService: ConfigService,
+    private configService: ConfigService<Env>,
     private prismaService: PrismaService,
     private blockchainServiceFactory: BlockchainServiceFactory,
     private indexerServiceFactory: IndexerServiceFactory,
     private indexerUtil: IndexerUtil,
   ) {
     super();
-    this.batchSize = this.configService.get<number>('BOOTSTRAP_BATCH_SIZE', 100);
-
-    this.bootstraped = new Promise((resolve) => {
-      this.on('bootstrap:complete', () => {
-        const checkQueue = async () => {
-          if (await this.indexerServiceFactory.isIndexerQueueEmpty()) {
-            resolve();
-          } else {
-            setTimeout(checkQueue, 1000);
-          }
-        };
-        checkQueue();
-      });
-    });
+    this.batchSize = this.configService.get('INDEXER_BATCH_SIZE')!;
+    this.workerNum = this.configService.get('INDEXER_WORKER_NUM')!;
   }
 
   public async bootstrap(): Promise<void> {
     if (cluster.isPrimary) {
+      const now = performance.now();
+      this.bootstraped.then(() => {
+        this.logger.warn(`Bootstrap complete in ${performance.now() - now}ms`);
+      });
       await this.indexerServiceFactory.cleanIndexerQueueJobs();
       await this.runMaster();
     } else {
@@ -78,34 +72,38 @@ export class BootstrapService extends EventEmitter {
     for (const chain of this.chains) {
       const blockchainService = await this.blockchainServiceFactory.getService(chain.id);
       // this.tipBlockNumbers[chain.id] = await blockchainService.getTipBlockNumber();
-      this.tipBlockNumbers[chain.id] = 500000;
+      this.tipBlockNumbers[chain.id] = 100000;
       this.nextBlockNumbers[chain.id] = await this.indexerUtil.getIndexStartBlockNumber(chain);
     }
 
-    cluster.on('exit', (worker) => {
-      this.logger.log(`Worker ${worker.process.pid} finished`);
+    cluster.on('exit', () => {
       this.activeWorkers--;
-      if (this.activeWorkers === 0 && this.currentChainIndex >= this.chains.length) {
+      if (this.activeWorkers === 0) {
+        this.logger.warn('All workers finished, bootstrap complete');
         this.emit('bootstrap:complete');
       }
     });
 
     cluster.on('message', async (worker, message) => {
       if (message.ready || message.completed) {
+        if (message.completed) {
+          await new Promise((resolve) => {
+            setTimeout(resolve, 0);
+          });
+        }
+
         // Worker is ready or completed work, try to assign more work to it
         const checkQueueAndAssignWork = async () => {
           const counts = await this.indexerServiceFactory.getIndexerQueueJobCounts();
           const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
-          this.logger.error(counts);
 
-          // Check every second if the queue jobs are less than the number of workers * batch size
+          // Check every second if the queue jobs are less than the half of the number of workers * batch size
           // So that we can assign work to the worker and avoid overloading the queue
           // (too many unprocessed jobs when causing js heap out of memory)
-          if (total < this.batchSize * WORKER_NUM) {
-            this.logger.log(`Queue has ${total} jobs, assigning work to worker ${worker.id}`);
+          if (total < this.batchSize * this.workerNum) {
             await this.assignWorkToWorker(worker);
           } else {
-            this.logger.log(`Queue has ${total} jobs, waiting for worker ${worker.id}`);
+            this.logger.warn(`Queue has ${total} jobs, waiting for worker ${worker.id}`);
             setTimeout(checkQueueAndAssignWork, total);
           }
         };
@@ -114,7 +112,8 @@ export class BootstrapService extends EventEmitter {
       }
     });
 
-    for (let i = 0; i < WORKER_NUM; i += 1) {
+    this.logger.warn(`Starting ${this.workerNum} workers`);
+    for (let i = 0; i < this.workerNum; i += 1) {
       cluster.fork();
       this.activeWorkers++;
     }
@@ -125,7 +124,7 @@ export class BootstrapService extends EventEmitter {
 
     process.on('message', async (msg: IndexerWorkerMessage) => {
       const { chainId, startBlockNumber, endBlockNumber } = msg;
-      this.logger.log(
+      this.logger.warn(
         `Worker ${process.pid} processing blocks ${startBlockNumber} to ${endBlockNumber}`,
       );
       await this.processBlocks(chainId, startBlockNumber, endBlockNumber);
@@ -135,7 +134,8 @@ export class BootstrapService extends EventEmitter {
 
   private async assignWorkToWorker(worker: Worker): Promise<void> {
     if (this.currentChainIndex >= this.chains.length) {
-      worker.disconnect();
+      await this.indexerServiceFactory.waitUntilIndexerQueueEmpty();
+      worker.kill();
       return;
     }
 

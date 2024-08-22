@@ -7,7 +7,6 @@ import {
   IndexerTransactionProcessor,
 } from './processors/transaction.processor';
 import { IndexerUtil } from './indexer.utils';
-import cluster from 'cluster';
 
 @Global()
 @Module({
@@ -16,14 +15,12 @@ import cluster from 'cluster';
       name: INDEXER_BLOCK_QUEUE,
       defaultJobOptions: {
         removeOnComplete: true,
-        removeOnFail: true,
       },
     }),
     BullModule.registerQueue({
       name: INDEXER_TRANSACTION_QUEUE,
       defaultJobOptions: {
         removeOnComplete: true,
-        removeOnFail: true,
       },
     }),
   ],

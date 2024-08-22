@@ -26,7 +26,7 @@ export class IndexerServiceFactory implements OnModuleDestroy {
     @InjectQueue(INDEXER_BLOCK_QUEUE) private indexerBlockQueue: Queue,
     @InjectQueue(INDEXER_TRANSACTION_QUEUE) private indexerTransactionQueue: Queue,
     @InjectSentry() private sentryService: SentryService,
-  ) {}
+  ) { }
 
   public async onModuleDestroy() {
     for (const service of this.services.values()) {
@@ -94,6 +94,21 @@ export class IndexerServiceFactory implements OnModuleDestroy {
 
   public async isIndexerQueueEmpty(): Promise<boolean> {
     const counts = await this.getIndexerQueueJobCounts();
+    this.logger.error(counts);
     return Object.values(counts).every((count) => count === 0);
+  }
+
+  public async waitUntilIndexerQueueEmpty() {
+    await new Promise((resolve) => {
+      const check = async () => {
+        const isQueueEmpty = await this.isIndexerQueueEmpty();
+        if (isQueueEmpty) {
+          resolve(undefined);
+        } else {
+          setTimeout(check, 1000);
+        }
+      };
+      check();
+    })
   }
 }

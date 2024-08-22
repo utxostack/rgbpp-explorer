@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { envSchema } from './env';
 import { BootstrapService } from './boostrap.service';
-import { Logger, LogLevel } from '@nestjs/common';
+import { LogLevel } from '@nestjs/common';
 import cluster from 'node:cluster';
 
 const env = envSchema.parse(process.env);
@@ -16,10 +16,6 @@ function getLoggerOptions() {
   }
   return LOGGER_LEVELS.slice(index);
 }
-
-const now = Date.now();
-
-const logger = new Logger('App Bootstrap');
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), {
@@ -38,9 +34,6 @@ async function bootstrap() {
   }
 
   if (cluster.isPrimary) {
-    bootstrapService.bootstraped.then(() => {
-      logger.log(`Bootstrap took ${Date.now() - now}ms`);
-    });
     await app.listen(3000, '0.0.0.0');
   } else {
     bootstrapService.workerReady();

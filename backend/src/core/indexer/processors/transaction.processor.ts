@@ -1,14 +1,16 @@
-import { Job, Queue } from 'bullmq';
-import { InjectQueue, OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
+import { Job } from 'bullmq';
+import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import * as BlockchainInterface from '../../blockchain/blockchain.interface';
-import { Logger } from '@nestjs/common';
+import { Logger, OnModuleInit } from '@nestjs/common';
 import { Chain, LeapDirection as DBLeapDirection } from '@prisma/client';
 import { BI } from '@ckb-lumos/bi';
 import { IndexerUtil } from '../indexer.utils';
 import { HashType, Script } from '@ckb-lumos/lumos';
 import { CELLBASE_TX_HASH, LeapDirection, RgbppCoreService } from 'src/core/rgbpp/rgbpp.service';
 import { BlockchainServiceFactory } from 'src/core/blockchain/blockchain.factory';
+import { Env } from 'src/env';
+import { ConfigService } from '@nestjs/config';
 
 export const INDEXER_TRANSACTION_QUEUE = 'indexer-transaction-queue';
 
@@ -24,20 +26,22 @@ export interface IndexerTransactionJobData {
   index: string;
 }
 
-@Processor(INDEXER_TRANSACTION_QUEUE, {
-  concurrency: 100,
-})
-export class IndexerTransactionProcessor extends WorkerHost {
+@Processor(INDEXER_TRANSACTION_QUEUE)
+export class IndexerTransactionProcessor extends WorkerHost implements OnModuleInit {
   private logger = new Logger(IndexerTransactionProcessor.name);
 
   constructor(
+    private configService: ConfigService<Env>,
     private prismaService: PrismaService,
     private indexerUtil: IndexerUtil,
     private blockchainServiceFactory: BlockchainServiceFactory,
     private rgbppCoreService: RgbppCoreService,
-    @InjectQueue(INDEXER_TRANSACTION_QUEUE) private queue: Queue,
   ) {
     super();
+  }
+
+  public async onModuleInit() {
+    this.worker.concurrency = 100 * this.configService.get('INDEXER_WORKER_NUM')!;
   }
 
   private isCellbase(transaction: BlockchainInterface.Transaction) {
@@ -54,8 +58,6 @@ export class IndexerTransactionProcessor extends WorkerHost {
     if (!transaction) {
       throw new Error(`Transaction not found at index ${index}, block ${block.header.hash}`);
     }
-    this.logger.log(`Processing transaction ${transaction.hash} for chain ${chain.name}`);
-
     const existingTransaction = await this.prismaService.transaction.findUnique({
       where: {
         chainId_hash: {

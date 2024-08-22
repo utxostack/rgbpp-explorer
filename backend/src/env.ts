@@ -1,5 +1,6 @@
 import z from 'zod';
 import { NetworkType } from './constants';
+import os from 'node:os';
 
 export const envSchema = z
   .object({
@@ -29,6 +30,9 @@ export const envSchema = z
 
     CKB_EXPLORER_API_URL: z.string(),
     CKB_RPC_WEBSOCKET_URL: z.string(),
+
+    INDEXER_BATCH_SIZE: z.coerce.number().default(100),
+    INDEXER_WORKER_NUM: z.coerce.number().default(os.cpus().length),
 
     SENTRY_DSN: z.string().optional(),
 

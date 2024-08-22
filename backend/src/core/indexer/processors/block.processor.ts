@@ -33,7 +33,6 @@ export class IndexerBlockProcessor extends WorkerHost {
   public async process(job: Job<IndexerBlockJobData>): Promise<any> {
     const { chain, block } = job.data;
     const number = BI.from(block.header.number).toNumber();
-    this.logger.log(`Processing block ${number} for chain ${chain.name}`);
 
     // TODO: reorg handling
 
