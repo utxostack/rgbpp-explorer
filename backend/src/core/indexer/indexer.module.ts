@@ -14,12 +14,22 @@ import { IndexerUtil } from './indexer.utils';
     BullModule.registerQueue({
       name: INDEXER_BLOCK_QUEUE,
       defaultJobOptions: {
+        attempts: 5,
+        backoff: {
+          type: 'exponential',
+          delay: 1000,
+        },
         removeOnComplete: true,
       },
     }),
     BullModule.registerQueue({
       name: INDEXER_TRANSACTION_QUEUE,
       defaultJobOptions: {
+        attempts: 5,
+        backoff: {
+          type: 'exponential',
+          delay: 1000,
+        },
         removeOnComplete: true,
       },
     }),

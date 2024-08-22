@@ -70,9 +70,9 @@ export class BootstrapService extends EventEmitter {
     this.logger.log(`Indexer Master ${process.pid} is running`);
     this.chains = await this.prismaService.chain.findMany();
     for (const chain of this.chains) {
-      const blockchainService = await this.blockchainServiceFactory.getService(chain.id);
+      // const blockchainService = await this.blockchainServiceFactory.getService(chain.id);
       // this.tipBlockNumbers[chain.id] = await blockchainService.getTipBlockNumber();
-      this.tipBlockNumbers[chain.id] = 100000;
+      this.tipBlockNumbers[chain.id] = 200000;
       this.nextBlockNumbers[chain.id] = await this.indexerUtil.getIndexStartBlockNumber(chain);
     }
 
@@ -86,28 +86,12 @@ export class BootstrapService extends EventEmitter {
 
     cluster.on('message', async (worker, message) => {
       if (message.ready || message.completed) {
-        if (message.completed) {
-          await new Promise((resolve) => {
-            setTimeout(resolve, 0);
-          });
+        if (!this.checkMemoryUsage()) {
+          this.logger.warn('High memory usage detected, pausing task allocation');
+          setTimeout(() => this.checkQueueAndAssignWork(worker), 5000);
+          return;
         }
-
-        // Worker is ready or completed work, try to assign more work to it
-        const checkQueueAndAssignWork = async () => {
-          const counts = await this.indexerServiceFactory.getIndexerQueueJobCounts();
-          const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
-
-          // Check every second if the queue jobs are less than the half of the number of workers * batch size
-          // So that we can assign work to the worker and avoid overloading the queue
-          // (too many unprocessed jobs when causing js heap out of memory)
-          if (total < this.batchSize * this.workerNum) {
-            await this.assignWorkToWorker(worker);
-          } else {
-            this.logger.warn(`Queue has ${total} jobs, waiting for worker ${worker.id}`);
-            setTimeout(checkQueueAndAssignWork, total);
-          }
-        };
-        checkQueueAndAssignWork();
+        this.checkQueueAndAssignWork(worker);
         return;
       }
     });
@@ -116,6 +100,25 @@ export class BootstrapService extends EventEmitter {
     for (let i = 0; i < this.workerNum; i += 1) {
       cluster.fork();
       this.activeWorkers++;
+    }
+  }
+
+  private checkMemoryUsage(): boolean {
+    const memoryUsage = process.memoryUsage();
+    const usedMemoryPercentage = (memoryUsage.heapUsed / memoryUsage.heapTotal) * 100;
+    return usedMemoryPercentage < 90;
+  }
+
+  private async checkQueueAndAssignWork(worker: Worker) {
+    const counts = await this.indexerServiceFactory.getIndexerQueueJobCounts();
+    const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
+    this.logger.warn(counts);
+
+    if (total < this.batchSize * this.workerNum) {
+      await this.assignWorkToWorker(worker);
+    } else {
+      this.logger.warn(`Queue has ${total} jobs, waiting for worker ${worker.id}`);
+      setTimeout(() => this.checkQueueAndAssignWork(worker), total);
     }
   }
 
