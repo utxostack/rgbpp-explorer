@@ -14,15 +14,13 @@ import { env } from '@/constants/env'
 const TESTNET_SYMBOL = 'testnet.'
 
 function resolveDomain(fallback: string, domain?: string, isMainnet = false) {
-  if (domain) {
-    if (isMainnet) {
-      return domain.startsWith(TESTNET_SYMBOL)
-        ? `https://${domain.substring(TESTNET_SYMBOL.length)}`
-        : `https://${domain}`
-    }
-    return domain.startsWith(TESTNET_SYMBOL) ? `https://${domain}` : `https://${TESTNET_SYMBOL}${domain}`
+  if (!domain) return fallback
+  if (isMainnet) {
+    return domain.startsWith(TESTNET_SYMBOL)
+      ? `https://${domain.substring(TESTNET_SYMBOL.length)}`
+      : `https://${domain}`
   }
-  return fallback
+  return domain.startsWith(TESTNET_SYMBOL) ? `https://${domain}` : `https://${TESTNET_SYMBOL}${domain}`
 }
 
 export const NetworkSwitcher = memo(function NetworkSwitcher() {
