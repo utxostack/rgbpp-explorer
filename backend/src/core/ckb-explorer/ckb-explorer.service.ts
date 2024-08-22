@@ -92,8 +92,12 @@ export class CkbExplorerService {
   }
 
   private async isSafeConfirmations(blockNumber: string): Promise<boolean> {
-    const tipBlockNumber = await this.ckbRpcService.getTipBlockNumber();
-    return BI.from(blockNumber).lt(BI.from(tipBlockNumber).sub(CKB_MIN_SAFE_CONFIRMATIONS));
+    try {
+      const tipBlockNumber = await this.ckbRpcService.getTipBlockNumber();
+      return BI.from(blockNumber).lt(BI.from(tipBlockNumber).sub(CKB_MIN_SAFE_CONFIRMATIONS));
+    } catch {
+      return false;
+    }
   }
 
   // https://github.com/nervosnetwork/ckb-explorer-frontend/blob/b9dd537f836e8c827f1d4741e07c84484170d671/src/pages/Address/AddressPage.tsx#L50-L54
