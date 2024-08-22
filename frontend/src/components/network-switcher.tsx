@@ -16,10 +16,9 @@ const TESTNET_SYMBOL = 'testnet.'
 function resolveDomain(fallback: string, domain?: string, isMainnet = false) {
   if (domain) {
     if (isMainnet) {
-      if (domain.startsWith(TESTNET_SYMBOL)) {
-        return `https://${domain.substring(TESTNET_SYMBOL.length)}`
-      }
-      return `https://${domain}`
+      return domain.startsWith(TESTNET_SYMBOL)
+        ? `https://${domain.substring(TESTNET_SYMBOL.length)}`
+        : `https://${domain}`
     }
     return domain.startsWith(TESTNET_SYMBOL) ? `https://${domain}` : `https://${TESTNET_SYMBOL}${domain}`
   }
