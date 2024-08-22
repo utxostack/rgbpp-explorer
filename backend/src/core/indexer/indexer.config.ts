@@ -1,6 +1,7 @@
 import { QueueOptions } from 'bullmq';
 import { ConfigService } from '@nestjs/config';
 import cluster from 'cluster';
+import { Env } from 'src/env';
 
 export function createCommonQueueConfig(): Omit<QueueOptions, 'connection'> {
   return {
@@ -15,10 +16,9 @@ export function createCommonQueueConfig(): Omit<QueueOptions, 'connection'> {
   };
 }
 
-export function createWorkerConfig(configService: ConfigService) {
+export function createWorkerConfig(configService: ConfigService<Env>) {
   return {
-    concurrency: 100 * configService.get('INDEXER_WORKER_NUM')!,
-    stalledInterval: 10 * 60 * 1000,
+    concurrency: configService.get('INDEXER_BATCH_SIZE') * configService.get('INDEXER_WORKER_NUM')!,
     useWorkerThreads: cluster.isWorker,
   };
 }

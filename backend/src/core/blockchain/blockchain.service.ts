@@ -14,13 +14,19 @@ import pLimit from 'p-limit';
 import { Cacheable } from 'src/decorators/cacheable.decorator';
 import { ONE_MONTH_MS } from 'src/common/date';
 import { CKB_MIN_SAFE_CONFIRMATIONS } from 'src/constants';
+import { Env } from 'src/env';
+import { ConfigService } from '@nestjs/config';
 
-class WebsocketError extends Error {}
-
-const limit = pLimit(100);
+class WebsocketError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'WebsocketError';
+  }
+}
 
 export class BlockchainService {
   private logger = new Logger(BlockchainService.name);
+  private limit: pLimit.Limit;
 
   private websocket: RpcWebsocketsClient;
   private websocketReady: Promise<void>;
@@ -31,8 +37,10 @@ export class BlockchainService {
   constructor(
     public chainId: number,
     private wsUrl: string,
+    private configService: ConfigService<Env>,
     private sentryService: SentryService,
   ) {
+    this.limit = pLimit(this.configService.get('INDEXER_BATCH_SIZE')!);
     this.createConnection();
   }
 
@@ -41,7 +49,7 @@ export class BlockchainService {
 
     const originalCall = this.websocket.call.bind(this.websocket);
     this.websocket.call = async (method: string, params: any[]) => {
-      return limit(() => originalCall(method, params));
+      return this.limit(() => originalCall(method, params));
     };
 
     this.websocketReady = new Promise((resolve) => {
@@ -114,7 +122,7 @@ export class BlockchainService {
   public async getBlock(blockHash: string): Promise<Block> {
     await this.websocketReady;
     this.logger.debug(`get_block - blockHash: ${blockHash}`);
-    let block = await this.websocket.call('get_block', [blockHash]);
+    const block = await this.websocket.call('get_block', [blockHash]);
     return block as Block;
   }
 

@@ -1,4 +1,4 @@
-import { Job } from 'bullmq';
+import { DelayedError, Job } from 'bullmq';
 import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import * as BlockchainInterface from '../../blockchain/blockchain.interface';
@@ -12,6 +12,7 @@ import { BlockchainServiceFactory } from 'src/core/blockchain/blockchain.factory
 import { Env } from 'src/env';
 import { ConfigService } from '@nestjs/config';
 import { createWorkerConfig } from '../indexer.config';
+import { BlockchainService } from 'src/core/blockchain/blockchain.service';
 
 export const INDEXER_TRANSACTION_QUEUE = 'indexer-transaction-queue';
 
@@ -43,51 +44,103 @@ export class IndexerTransactionProcessor extends WorkerHost implements OnModuleI
   }
 
   public async onModuleInit() {
-    const { concurrency, stalledInterval, useWorkerThreads } = createWorkerConfig(
-      this.configService,
-    );
+    const { concurrency, useWorkerThreads } = createWorkerConfig(this.configService);
     this.worker.concurrency = concurrency;
-    this.worker.opts.stalledInterval = stalledInterval;
     this.worker.opts.useWorkerThreads = useWorkerThreads;
   }
 
-  private isCellbase(transaction: BlockchainInterface.Transaction) {
+  public async process(job: Job<IndexerTransactionJobData>, token?: string): Promise<void> {
+    const { chain, block, transaction, index } = job.data;
+    if (!transaction) {
+      throw new Error(`Transaction not found at index ${index}, block ${block.header.hash}`);
+    }
+    if (await this.isTransactionAlreadyProcessed(chain, transaction.hash)) {
+      return;
+    }
+
+    const inputTxs = await this.getInputTransactions(chain, transaction, token, job);
+    const blockchainService = await this.blockchainServiceFactory.getService(chain.id);
+    const transactionData = await this.prepareTransactionData(
+      chain,
+      block,
+      transaction,
+      inputTxs,
+      blockchainService,
+    );
+    await this.saveTransaction(transactionData);
+  }
+
+  private async isTransactionAlreadyProcessed(chain: Chain, hash: string): Promise<boolean> {
+    const existingTransaction = await this.getTransactionByHash(chain, hash);
+    if (existingTransaction) {
+      this.logger.warn(`Transaction ${hash} already exists in the database, skipping`);
+      return true;
+    }
+    return false;
+  }
+
+  private async getInputTransactions(
+    chain: Chain,
+    transaction: BlockchainInterface.Transaction,
+    token: string | undefined,
+    job: Job<IndexerTransactionJobData>,
+  ) {
+    const inputTxHashes = new Set(
+      transaction.inputs
+        .map((input) => input.previous_output.tx_hash)
+        .filter((txhash) => txhash !== CELLBASE_TX_HASH),
+    );
+    const inputTxs = await Promise.all(
+      Array.from(inputTxHashes).map((txhash) => this.getTransactionByHash(chain, txhash)),
+    );
+    if (inputTxs.some((tx) => !tx)) {
+      await job.moveToDelayed(Date.now() + 1000, token);
+      throw new DelayedError();
+    }
+    return inputTxs;
+  }
+
+  private async prepareTransactionData(
+    chain: Chain,
+    block: Omit<BlockchainInterface.Block, 'transactions'>,
+    transaction: BlockchainInterface.Transaction,
+    inputTxs: BlockchainInterface.Transaction[],
+    blockchainService: BlockchainService,
+  ) {
+    const blockNumber = BI.from(block.header.number).toNumber();
+    const timestamp = new Date(BI.from(block.header.timestamp).toNumber());
+    const isCellbase = this.isCellbase(transaction);
+    const fee = isCellbase ? 0 : await this.indexerUtil.calculateTransactionFee(chain, transaction);
+    const isRgbpp = this.isRgbppTransaction(transaction);
+    const leapDirection = await this.getLeapDirection(isCellbase, transaction, blockchainService);
+
+    return {
+      chainId: chain.id,
+      hash: transaction.hash,
+      index: BI.from(block.header.number).toNumber(),
+      blockNumber,
+      timestamp,
+      fee,
+      size: 0, // TODO: implement transaction size calculation
+      isCellbase,
+      isRgbpp,
+      leapDirection: leapDirection ? DBLeapDirectionMap[leapDirection] : null,
+    };
+  }
+
+  private async saveTransaction(transactionData: any) {
+    await this.prismaService.transaction.create({ data: transactionData });
+  }
+
+  private isCellbase(transaction: BlockchainInterface.Transaction): boolean {
     return (
       transaction.inputs.length === 1 &&
       transaction.inputs[0].previous_output.tx_hash === CELLBASE_TX_HASH
     );
   }
 
-  private async getTransactionByHash(chain: Chain, hash: string) {
-    return this.prismaService.transaction.findUnique({
-      where: {
-        chainId_hash: {
-          chainId: chain.id,
-          hash,
-        },
-      },
-    });
-  }
-
-  public async process(job: Job<IndexerTransactionJobData>, token?: string): Promise<any> {
-    const { chain, block, transaction } = job.data;
-    const index = BI.from(job.data.index).toNumber();
-    if (!transaction) {
-      throw new Error(`Transaction not found at index ${index}, block ${block.header.hash}`);
-    }
-    const existingTransaction = await this.getTransactionByHash(chain, transaction.hash);
-    if (existingTransaction) {
-      this.logger.warn(`Transaction ${transaction.hash} already exists in the database, skipping`);
-      return;
-    }
-
-    const blockchainService = await this.blockchainServiceFactory.getService(chain.id);
-    const blockNumber = BI.from(block.header.number).toNumber();
-    const timestamp = new Date(BI.from(block.header.timestamp).toNumber());
-    const isCellbase = this.isCellbase(transaction);
-    const fee = isCellbase ? 0 : await this.indexerUtil.calculateTransactionFee(chain, transaction);
-
-    const isRgbpp = transaction.outputs.some((output) => {
+  private isRgbppTransaction(transaction: BlockchainInterface.Transaction): boolean {
+    return transaction.outputs.some((output) => {
       const script: Script = {
         codeHash: output.lock.code_hash,
         hashType: output.lock.hash_type as HashType,
@@ -98,26 +151,29 @@ export class IndexerTransactionProcessor extends WorkerHost implements OnModuleI
         this.rgbppCoreService.isBtcTimeLockScript(script)
       );
     });
+  }
 
-    const leapDirection = isCellbase
-      ? null
-      : await this.rgbppCoreService.getRgbppTxLeapDirection(transaction, async (txhash) => {
-          const tx = await blockchainService.getTransaction(txhash);
-          return tx.transaction;
-        });
+  private async getLeapDirection(
+    isCellbase: boolean,
+    transaction: BlockchainInterface.Transaction,
+    blockchainService: any,
+  ): Promise<LeapDirection | null> {
+    if (isCellbase) {
+      return null;
+    }
+    return await this.rgbppCoreService.getRgbppTxLeapDirection(transaction, async (txhash) => {
+      const tx = await blockchainService.getTransaction(txhash);
+      return tx.transaction;
+    });
+  }
 
-    await this.prismaService.transaction.create({
-      data: {
-        chainId: chain.id,
-        hash: transaction.hash,
-        index,
-        blockNumber,
-        timestamp,
-        fee,
-        size: 0, // TODO: implement transaction size calculation
-        isCellbase,
-        isRgbpp,
-        leapDirection: leapDirection ? DBLeapDirectionMap[leapDirection] : null,
+  private async getTransactionByHash(chain: Chain, hash: string) {
+    return this.prismaService.transaction.findUnique({
+      where: {
+        chainId_hash: {
+          chainId: chain.id,
+          hash,
+        },
       },
     });
   }

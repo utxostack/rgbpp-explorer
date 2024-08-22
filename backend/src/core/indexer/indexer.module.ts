@@ -8,6 +8,7 @@ import {
 } from './processors/transaction.processor';
 import { IndexerUtil } from './indexer.utils';
 import { createCommonQueueConfig } from './indexer.config';
+import { IndexerQueueService } from './indexer.queue';
 
 @Global()
 @Module({
@@ -24,6 +25,7 @@ import { createCommonQueueConfig } from './indexer.config';
   providers: [
     IndexerUtil,
     IndexerServiceFactory,
+    IndexerQueueService,
     IndexerBlockProcessor,
     IndexerTransactionProcessor,
   ],

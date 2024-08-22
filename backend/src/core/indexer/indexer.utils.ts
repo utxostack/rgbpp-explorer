@@ -5,15 +5,20 @@ import * as BlockchainInterface from '../blockchain/blockchain.interface';
 import { BlockchainServiceFactory } from '../blockchain/blockchain.factory';
 import { BI } from '@ckb-lumos/bi';
 import pLimit from 'p-limit';
-
-const limit = pLimit(100);
+import { ConfigService } from '@nestjs/config';
+import { Env } from 'src/env';
 
 @Injectable()
 export class IndexerUtil {
+  private limit: pLimit.Limit;
+
   constructor(
     private prismaService: PrismaService,
+    private configService: ConfigService<Env>,
     private blockchainServiceFactory: BlockchainServiceFactory,
-  ) {}
+  ) {
+    this.limit = pLimit(this.configService.get('INDEXER_BATCH_SIZE')!);
+  }
 
   public async getIndexStartBlockNumber(chain: Chain) {
     const latestIndexedBlock = await this.prismaService.block.findFirst({
@@ -38,7 +43,7 @@ export class IndexerUtil {
       new Set(tx.inputs.map((input) => input.previous_output.tx_hash)),
     );
     const inputTxs = await Promise.all(
-      inputTxHashes.map((txHash) => limit(() => blockchainService.getTransaction(txHash))),
+      inputTxHashes.map((txHash) => this.limit(() => blockchainService.getTransaction(txHash))),
     );
     const inputTxsMap = new Map(inputTxs.map((tx) => [tx.transaction.hash, tx]));
 

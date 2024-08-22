@@ -3,17 +3,16 @@ import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { IndexerService } from './indexer.service';
 import { BlockchainServiceFactory } from '../blockchain/blockchain.factory';
-import { InjectQueue } from '@nestjs/bullmq';
-import { Queue } from 'bullmq';
-import { INDEXER_BLOCK_QUEUE } from './processors/block.processor';
-import { INDEXER_TRANSACTION_QUEUE } from './processors/transaction.processor';
+import { IndexerQueueService } from './indexer.queue';
 
 export class IndexerServiceFactoryError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'BlockchainServiceFactoryError';
+    this.name = 'IndexerServiceFactoryError';
   }
 }
+
+type JobCounts = { [key: string]: number };
 
 @Injectable()
 export class IndexerServiceFactory implements OnModuleDestroy {
@@ -23,8 +22,7 @@ export class IndexerServiceFactory implements OnModuleDestroy {
   constructor(
     private prismaService: PrismaService,
     private blockchainServiceFactory: BlockchainServiceFactory,
-    @InjectQueue(INDEXER_BLOCK_QUEUE) private indexerBlockQueue: Queue,
-    @InjectQueue(INDEXER_TRANSACTION_QUEUE) private indexerTransactionQueue: Queue,
+    private queueService: IndexerQueueService,
     @InjectSentry() private sentryService: SentryService,
   ) {}
 
@@ -35,91 +33,55 @@ export class IndexerServiceFactory implements OnModuleDestroy {
   }
 
   public async getService(chainId: number): Promise<IndexerService> {
+    const chain = await this.getChain(chainId);
+    if (!this.services.has(chain.id)) {
+      this.services.set(chain.id, await this.createIndexerService(chain));
+    }
+    return this.services.get(chain.id)!;
+  }
+
+  public async processLegacyIndexerQueueJobs() {
+    await this.queueService.delayActiveJobs();
+  }
+
+  public async getIndexerQueueJobCounts(): Promise<JobCounts> {
+    const counts = await this.queueService.getJobCounts();
+    // FIXME: Remove this log statement after debugging
+    this.logger.warn(`Indexer queue counts: ${JSON.stringify(counts, null, 2)}`);
+    return counts;
+  }
+
+  public async waitUntilIndexerQueueEmpty() {
+    await this.pollQueueUntilEmpty();
+  }
+
+  private async getChain(chainId: number) {
     const chain = await this.prismaService.chain.findUnique({
       where: { id: chainId },
     });
     if (!chain) {
       throw new IndexerServiceFactoryError(`Chain with ID ${chainId} not found`);
     }
-    if (!this.services.has(chain.id)) {
-      const blockchainService = await this.blockchainServiceFactory.getService(chain.id);
-      this.services.set(
-        chainId,
-        new IndexerService(chain, blockchainService, this.indexerBlockQueue),
-      );
-    }
-    return this.services.get(chainId)!;
+    return chain;
   }
 
-  public async processLegacyIndexerQueueJobs() {
-    const blockQueueActiveJobs = await this.indexerBlockQueue.getActive();
-    const delayedTime = Date.now() + 10000;
-    for (const job of blockQueueActiveJobs) {
-      await job.moveToDelayed(delayedTime);
-    }
-
-    const transactionQueueActiveJobs = await this.indexerTransactionQueue.getActive();
-    for (const job of transactionQueueActiveJobs) {
-      await job.moveToDelayed(delayedTime);
-    }
+  private async createIndexerService(chain: any): Promise<IndexerService> {
+    const blockchainService = await this.blockchainServiceFactory.getService(chain.id);
+    return new IndexerService(chain, blockchainService, this.queueService.getBlockQueue());
   }
 
-  public async getIndexerQueueJobCounts() {
-    const blockQueueCounts = await this.indexerBlockQueue.getJobCounts();
-    const transactionQueueCounts = await this.indexerTransactionQueue.getJobCounts();
-
-    const counts = [blockQueueCounts, transactionQueueCounts].reduce(
-      (sum, counts) => {
-        const keys = Object.keys(counts);
-        keys.forEach((key) => {
-          if (sum[key] === undefined) {
-            sum[key] = counts[key];
-          } else {
-            sum[key] += counts[key];
-          }
-        });
-        return sum;
-      },
-      {} as { [key: string]: number },
-    );
-
-    return counts;
-  }
-
-  public async waitUntilBlockQueueEmpty() {
-    await new Promise((resolve) => {
+  private async pollQueueUntilEmpty() {
+    return new Promise<void>((resolve) => {
       const check = async () => {
-        const blockQueueCounts = await this.indexerBlockQueue.getJobCounts();
-        const isQueueEmpty = Object.values(blockQueueCounts).every((count) => count === 0);
+        const counts = await this.getIndexerQueueJobCounts();
+        const isQueueEmpty = Object.values(counts).every((count) => count === 0);
         if (isQueueEmpty) {
-          resolve(undefined);
+          resolve();
         } else {
-          setTimeout(check, 200);
+          setTimeout(check, 1000);
         }
       };
       check();
     });
-  }
-
-  public async waitUntilTransactionQueueEmpty() {
-    await new Promise((resolve) => {
-      const check = async () => {
-        const transactionQueueCounts = await this.indexerTransactionQueue.getJobCounts();
-        const isQueueEmpty = Object.values(transactionQueueCounts).every((count) => count === 0);
-        if (isQueueEmpty) {
-          resolve(undefined);
-        } else {
-          setTimeout(check, 200);
-        }
-      };
-      check();
-    });
-  }
-
-  public async waitUntilIndexerQueueEmpty() {
-    await Promise.all([
-      this.waitUntilBlockQueueEmpty(),
-      this.waitUntilTransactionQueueEmpty(),
-    ]);
   }
 }

@@ -33,6 +33,7 @@ export const envSchema = z
 
     INDEXER_BATCH_SIZE: z.coerce.number().default(100),
     INDEXER_WORKER_NUM: z.coerce.number().default(os.cpus().length),
+    INDEXER_MEMORY_USAGE_THRESHOLD: z.coerce.number().default(90),
 
     SENTRY_DSN: z.string().optional(),
 
