@@ -17,8 +17,8 @@ import { truncateMiddle } from '@/lib/string/truncate-middle'
 export const revalidate = 5
 
 const queryRgbppLatestTransactions = graphql(`
-  query RgbppLatestTransactions($page: Int!, $pageSize: Int!) {
-    rgbppLatestTransactions(page: $page, pageSize: $pageSize) {
+  query RgbppLatestL1Transactions($page: Int!, $pageSize: Int!) {
+    rgbppLatestL1Transactions(page: $page, pageSize: $pageSize) {
       txs {
         ckbTxHash
         btcTxid
@@ -57,7 +57,7 @@ const queryRgbppLatestTransactions = graphql(`
 
 export default async function Page() {
   const i18n = getI18nFromHeaders()
-  const { rgbppLatestTransactions } = await graphQLClient.request(queryRgbppLatestTransactions, {
+  const { rgbppLatestL1Transactions } = await graphQLClient.request(queryRgbppLatestTransactions, {
     page: 1,
     pageSize: 10,
   })
@@ -69,7 +69,7 @@ export default async function Page() {
         <Heading fontSize="20px" fontWeight="semibold" p="30px">{t(i18n)`Latest L1 RGB++ transaction`}</Heading>
         <Table.Root tableLayout="fixed">
           <Table.Body>
-            {rgbppLatestTransactions.txs.map((tx) => {
+            {rgbppLatestL1Transactions.txs.map((tx) => {
               return (
                 <Table.Row key={tx.btcTxid} lineHeight="36px">
                   <Table.Cell w="254px">

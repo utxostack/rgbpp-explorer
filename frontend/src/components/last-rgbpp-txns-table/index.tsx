@@ -21,8 +21,8 @@ import { resolveRGBppTxHash } from '@/lib/resolve-rgbpp-tx-hash'
 import { truncateMiddle } from '@/lib/string/truncate-middle'
 
 const query = graphql(`
-  query RgbppLatestTransactions($page: Int!, $pageSize: Int!) {
-    rgbppLatestTransactions(page: $page, pageSize: $pageSize) {
+  query RgbppLatestTransactions($limit: Int!) {
+    rgbppLatestTransactions(limit: $limit) {
       txs {
         ckbTxHash
         btcTxid
@@ -64,8 +64,7 @@ export function LastRgbppTxnsTable() {
     queryKey: [QueryKey.LastRgbppTxns],
     async queryFn() {
       return graphQLClient.request(query, {
-        page: 1,
-        pageSize: 10,
+        limit: 10,
       })
     },
     refetchInterval: 10000,

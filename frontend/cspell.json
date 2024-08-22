@@ -1,7 +1,7 @@
 {
   "version": "0.1",
   "language": "en",
-  "words": ["utxo", "rgbpp", "nervos", "nums", "xudt", "bignumber", "pageable", "locktime"],
+  "words": ["utxo", "rgbpp", "nervos", "nums", "xudt", "bignumber", "pageable", "locktime", "utxostack"],
   "ignoreWords": [
     "lingui",
     "pandacss",

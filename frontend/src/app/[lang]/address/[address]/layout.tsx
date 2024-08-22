@@ -31,6 +31,11 @@ const ckbAddressQuery = graphql(`
     ckbAddress(address: $address) {
       address
       shannon
+      balance {
+        total
+        available
+        occupied
+      }
       transactionsCount
     }
   }

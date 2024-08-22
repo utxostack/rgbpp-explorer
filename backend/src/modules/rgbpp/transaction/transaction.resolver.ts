@@ -21,14 +21,30 @@ export class RgbppTransactionResolver {
   constructor(
     private rgbppTransactionService: RgbppTransactionService,
     private bitcoinApiService: BitcoinApiService,
-  ) {}
+  ) { }
 
   @Query(() => RgbppLatestTransactionList, { name: 'rgbppLatestTransactions' })
-  public async getLatestTransactions(
+  public async getRecentTransactions(
+    @Args('limit', { type: () => Int, nullable: true }) limit: number = 10,
+  ): Promise<RgbppLatestTransactionList> {
+    const { txs: l1Txs } = await this.rgbppTransactionService.getLatestTransactions(1, limit);
+    const l2Txs = await this.rgbppTransactionService.getLatestL2Transactions(limit);
+    const txs = [...l1Txs, ...l2Txs.txs].sort((a, b) => b.blockNumber - a.blockNumber);
+
+    return {
+      txs: txs.slice(0, limit),
+      total: txs.length,
+      pageSize: limit,
+    };
+  }
+
+  @Query(() => RgbppLatestTransactionList, { name: 'rgbppLatestL1Transactions' })
+  public async getLatestL1Transactions(
     @Args('page', { type: () => Int, nullable: true }) page: number = 1,
     @Args('pageSize', { type: () => Int, nullable: true }) pageSize: number = 10,
   ): Promise<RgbppLatestTransactionList> {
-    return await this.rgbppTransactionService.getLatestTransactions(page, pageSize);
+    const txs = await this.rgbppTransactionService.getLatestTransactions(page, pageSize);
+    return txs;
   }
 
   @Query(() => RgbppLatestTransactionList, { name: 'rgbppLatestL2Transactions' })
@@ -87,7 +103,7 @@ export class RgbppTransactionResolver {
     if (!ckbTx) {
       return null;
     }
-    return this.rgbppTransactionService.getLeapDirectionByCkbTx(ckbTx);
+    return this.rgbppTransactionService.getLeapDirectionByCkbTx(ckbTx.transaction);
   }
 
   @ResolveField(() => CkbTransaction, { nullable: true })
