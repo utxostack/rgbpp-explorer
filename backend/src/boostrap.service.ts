@@ -51,6 +51,7 @@ export class BootstrapService extends EventEmitter {
       this.bootstraped.then(() => {
         this.logger.warn(`Bootstrap complete in ${performance.now() - now}ms`);
       });
+      // clean the indexer queue jobs before bootstrap to avoid duplicate jobs
       await this.indexerServiceFactory.cleanIndexerQueueJobs();
       await this.runMaster();
     } else {
@@ -58,6 +59,9 @@ export class BootstrapService extends EventEmitter {
     }
   }
 
+  /**
+   * notify the master process that the worker is ready, it should be called when nestjs app process is ready
+   */
   public workerReady() {
     if (cluster.isPrimary) {
       return;
@@ -66,6 +70,11 @@ export class BootstrapService extends EventEmitter {
     cluster.worker!.send({ ready: true });
   }
 
+  /**
+   * Start the worker to index the blocks, the worker will keep running until all the blocks are indexed
+   * when the worker is done, it will send a message to the master process and get new work
+   * emit bootstrap:complete event when all the workers are done
+   */
   private async runMaster() {
     this.logger.log(`Indexer Master ${process.pid} is running`);
     this.chains = await this.prismaService.chain.findMany();
@@ -86,8 +95,9 @@ export class BootstrapService extends EventEmitter {
 
     cluster.on('message', async (worker, message) => {
       if (message.ready || message.completed) {
+        // check memory usage before assigning work to worker to avoid OOM
         if (!this.checkMemoryUsage()) {
-          this.logger.warn('High memory usage detected, pausing task allocation');
+          this.logger.warn('Memory usage is high, waiting for memory to free up');
           setTimeout(() => this.checkQueueAndAssignWork(worker), 5000);
           return;
         }
@@ -103,25 +113,10 @@ export class BootstrapService extends EventEmitter {
     }
   }
 
-  private checkMemoryUsage(): boolean {
-    const memoryUsage = process.memoryUsage();
-    const usedMemoryPercentage = (memoryUsage.heapUsed / memoryUsage.heapTotal) * 100;
-    return usedMemoryPercentage < 90;
-  }
-
-  private async checkQueueAndAssignWork(worker: Worker) {
-    const counts = await this.indexerServiceFactory.getIndexerQueueJobCounts();
-    const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
-    this.logger.warn(counts);
-
-    if (total < this.batchSize * this.workerNum) {
-      await this.assignWorkToWorker(worker);
-    } else {
-      this.logger.warn(`Queue has ${total} jobs, waiting for worker ${worker.id}`);
-      setTimeout(() => this.checkQueueAndAssignWork(worker), total);
-    }
-  }
-
+  /**
+   * Run the worker to index the blocks, send a message to the master process when the worker is done
+   * after the worker is done, it will get new work from the master process
+   */
   private async runWorker() {
     this.logger.log(`Indexer Worker ${process.pid} is running`);
 
@@ -135,6 +130,9 @@ export class BootstrapService extends EventEmitter {
     });
   }
 
+  /**
+   * Assign work to worker, the worker will index the blocks from startBlockNumber to endBlockNumber
+   */
   private async assignWorkToWorker(worker: Worker): Promise<void> {
     if (this.currentChainIndex >= this.chains.length) {
       await this.indexerServiceFactory.waitUntilIndexerQueueEmpty();
@@ -163,6 +161,34 @@ export class BootstrapService extends EventEmitter {
     );
   }
 
+  /**
+   * Check if memory usage is below 90%, if not wait for memory to free up
+   */
+  private checkMemoryUsage(): boolean {
+    const memoryUsage = process.memoryUsage();
+    const usedMemoryPercentage = (memoryUsage.heapUsed / memoryUsage.heapTotal) * 100;
+    return usedMemoryPercentage < 90;
+  }
+
+  /**
+   * Check the queue and assign work to worker
+   * if the total number of jobs in the queue is less than the number of workers * batchSize, assign work to worker
+   * otherwise, wait for the worker to finish the current job
+   */
+  private async checkQueueAndAssignWork(worker: Worker) {
+    const counts = await this.indexerServiceFactory.getIndexerQueueJobCounts();
+    const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
+    if (total < this.batchSize * this.workerNum) {
+      await this.assignWorkToWorker(worker);
+    } else {
+      this.logger.warn(`Queue has ${total} jobs, waiting for worker ${worker.id}`);
+      setTimeout(() => this.checkQueueAndAssignWork(worker), total);
+    }
+  }
+
+  /**
+   * Process the blocks from startBlockNumber to endBlockNumber
+   */
   private async processBlocks(
     chainId: number,
     startBlockNumber: number,
