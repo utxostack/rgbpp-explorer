@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react'
 import { Box, Flex } from 'styled-system/jsx'
 import Typed from 'typed.js'
 
-import { Heading } from '@/components/ui'
+import { Heading, Text } from '@/components/ui'
 
 export function HomeTitle() {
   const el = useRef<HTMLDivElement>(null)
@@ -30,19 +30,33 @@ export function HomeTitle() {
   return (
     <Heading
       mt="10%"
-      mb="54px"
-      fontSize="62px"
+      fontSize={{ base: '30px', sm: '54px', xl: '62px' }}
       fontWeight="semibold"
-      lineHeight="100px"
+      lineHeight={{ base: '32px', sm: '62px', xl: '100px' }}
       display="flex"
       alignItems="center"
+      flexWrap="wrap"
+      textAlign="center"
+      justifyContent="center"
+      whiteSpace="nowrap"
     >
       <Trans>
-        Explore the
-        <Flex display="flex" alignItems="center" w="240px" mx="20px" h="100px" justify="center">
-          <Box ref={el} display="inline-block" h="100px" />
+        <Flex alignItems="center">
+          Explore the
+          <Flex
+            display="flex"
+            alignItems="center"
+            w={{ base: '100px', sm: '200px', xl: '240px' }}
+            mx="20px"
+            h={{ base: '32px', sm: '62px', xl: '100px' }}
+            justify="center"
+          >
+            <Box ref={el} display="inline-block" h={{ base: '32px', sm: '62px', xl: '100px' }} />
+          </Flex>
         </Flex>
-        Ecosystem
+        <Text as="span" display="block" w={{ base: '100%', md: 'auto' }}>
+          Ecosystem
+        </Text>
       </Trans>
     </Heading>
   )

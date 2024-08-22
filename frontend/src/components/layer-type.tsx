@@ -1,21 +1,21 @@
 'use client'
 
 import { Trans } from '@lingui/macro'
-import { Box, HStack } from 'styled-system/jsx'
+import { Box, BoxProps, HStack } from 'styled-system/jsx'
 
 import ArrowIcon from '@/assets/arrow-2.svg'
 import BtcIcon from '@/assets/chains/btc.svg'
 import CkbIcon from '@/assets/chains/ckb.svg'
 import { iife } from '@/lib/iife'
 
-export interface LayerTypeProps {
+export interface LayerTypeProps extends BoxProps {
   type?: 'l1' | 'l2' | 'l1-l2' | 'l2-l1'
 }
 
-export function LayerType({ type }: LayerTypeProps) {
+export function LayerType({ type, ...props }: LayerTypeProps) {
   if (!type) return null
   return (
-    <HStack gap="6px" fontSize="14px">
+    <HStack gap="6px" fontSize="14px" {...props}>
       {iife(() => {
         switch (type) {
           case 'l1':

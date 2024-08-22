@@ -26,25 +26,35 @@ export async function HomeQuickInfo() {
       rounded="200px"
       border="1px solid rgba(255, 255, 255, 0.6)"
       gridTemplateColumns="1fr 1fr"
-      p="20px"
+      px="20px"
+      py={{ base: '8px', md: '16px', xl: '20px' }}
       backdropFilter="blur(16.5px)"
       bg="rgba(0, 0, 0, 0.4)"
-      w="580px"
+      w={{ base: '275px', md: '400px', xl: '580px' }}
+      fontSize={{ base: '20px', md: '30px', xl: '36px' }}
+      lineHeight={{ base: '30px', md: '38px', xl: '100%' }}
+      fontWeight="bold"
     >
       <VStack gap="2px" borderRight="2px solid" borderColor="rgba(255, 255, 255, 0.1)">
-        <Box fontSize="36px" lineHeight="100%" fontWeight="bold">
-          {formatNumber(rgbppStatistic.transactionsCount)}
-        </Box>
-        <Box fontSize="sm" lineHeight="20px" color="text.third" fontWeight="semibold">
+        <Box>{formatNumber(rgbppStatistic.transactionsCount)}</Box>
+        <Box
+          fontSize={{ base: '12px', md: '14px' }}
+          lineHeight={{ base: '16px', md: '20px' }}
+          color="text.third"
+          fontWeight={{ base: 'medium', xl: 'semibold' }}
+        >
           {t(i18n)`RGB++ Txns`}
         </Box>
       </VStack>
       <VStack gap="2px">
-        <Box fontSize="36px" lineHeight="100%" fontWeight="bold">
-          {formatNumber(rgbppStatistic.holdersCount)}
-        </Box>
-        <Box fontSize="sm" lineHeight="20px" color="text.third" fontWeight="semibold">
-          {t(i18n)`RGB++ Assets Holders`}
+        <Box>{formatNumber(rgbppStatistic.holdersCount)}</Box>
+        <Box
+          fontSize={{ base: '12px', md: '14px' }}
+          lineHeight={{ base: '16px', md: '20px' }}
+          color="text.third"
+          fontWeight={{ base: 'medium', xl: 'semibold' }}
+        >
+          {t(i18n)`RGB++ Holders`}
         </Box>
       </VStack>
     </Grid>

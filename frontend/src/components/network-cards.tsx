@@ -54,7 +54,7 @@ export function NetworkCards() {
   })
 
   return (
-    <Grid w="100%" gridTemplateColumns="repeat(3, 1fr)">
+    <Grid w="100%" gridTemplateColumns={{ base: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }}>
       <Link
         href="/explorer/btc"
         display="flex"
@@ -121,7 +121,15 @@ export function NetworkCards() {
           ]}
         />
       </Link>
-      <VStack gap="40px" bg="bg.card" rounded="8px" p="30px" opacity={0.5} fontSize="14px">
+      <VStack
+        gap="40px"
+        bg="bg.card"
+        rounded="8px"
+        p="30px"
+        opacity={0.5}
+        fontSize="14px"
+        gridColumn={{ base: 'auto', sm: '1/3', lg: 'auto' }}
+      >
         <HStack gap="24px" fontWeight="semibold" w="100%" justify="center">
           <HStack>
             <BsvIcon w="32px" h="32px" />
@@ -131,7 +139,7 @@ export function NetworkCards() {
             <BchIcon w="32px" h="32px" />
             <Text>BCH</Text>
           </HStack>
-          <HStack>
+          <HStack whiteSpace="nowrap">
             <UtxoStackIcon w="32px" h="32px" />
             <Text>UTXO Stack</Text>
           </HStack>

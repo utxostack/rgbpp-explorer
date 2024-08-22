@@ -23,7 +23,7 @@ export const CkbOutputsSum = memo(function CkbDiffTags({ outputs = [] }: { outpu
       .reduce((acc, x) => acc.plus(x.xudtInfo?.amount || 0), BigNumber(0))
 
     return !balance.isZero() ? (
-      <Flex align="center" bg="brand" py="8px" px="16px" rounded="4px">
+      <Flex align="center" py="8px" fontSize="14px" lineHeight="16px" px="16px" rounded="4px" bg="brand">
         <Trans>
           {formatNumber(balance, xudt?.decimal)} {xudt?.symbol}
         </Trans>
@@ -39,14 +39,14 @@ export const CkbOutputsSum = memo(function CkbDiffTags({ outputs = [] }: { outpu
   return (
     <>
       {!ckbDiff.isZero() ? (
-        <Flex align="center" bg="brand" py="8px" px="16px" rounded="4px">
+        <Flex align="center" py="8px" fontSize="14px" lineHeight="16px" px="16px" rounded="4px" bg="brand">
           <Trans>{formatNumber(ckbDiff)} CKB</Trans>
           <MoneyIcon w="16px" h="16px" ml="6px" />
         </Flex>
       ) : null}
       {xudtTags}
       {!dobDiff.isZero() ? (
-        <Flex align="center" bg="brand" py="8px" px="16px" rounded="4px">
+        <Flex align="center" py="8px" fontSize="14px" lineHeight="16px" px="16px" rounded="4px" bg="brand">
           <Trans>{formatNumber(dobDiff)} DOB</Trans>
           <MoneyIcon w="16px" h="16px" ml="6px" />
         </Flex>

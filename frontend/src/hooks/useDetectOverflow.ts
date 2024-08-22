@@ -5,6 +5,7 @@ export function useDetectOverflow<T extends HTMLDivElement>(): [overflow: boolea
   const resizeObserver = useRef<ResizeObserver | null>(null)
   const ref = useCallback((element: T | null) => {
     if (!element) return
+    setIsOverflow(element.offsetWidth !== element.scrollWidth)
     resizeObserver.current?.disconnect()
     resizeObserver.current = new ResizeObserver(() => {
       setIsOverflow(element.offsetWidth !== element.scrollWidth)

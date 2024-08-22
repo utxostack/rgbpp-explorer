@@ -15,7 +15,7 @@ export function BtcOutputsSum({ vout = [] }: { vout?: BitcoinOutput[] }) {
   const diff = satsToBtc(BigNumber(balance))
 
   return !diff.isZero() ? (
-    <Flex align="center" bg="brand" py="8px" px="16px" rounded="4px">
+    <Flex align="center" bg="brand" py="8px" fontSize="14px" lineHeight="16px" px="16px" rounded="4px">
       <Trans>{formatNumber(diff)} BTC</Trans>
       <MoneyIcon w="16px" h="16px" ml="6px" />
     </Flex>

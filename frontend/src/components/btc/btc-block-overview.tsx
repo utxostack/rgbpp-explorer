@@ -1,9 +1,10 @@
 import { t } from '@lingui/macro'
 import BigNumber from 'bignumber.js'
-import { Grid, HStack, VStack } from 'styled-system/jsx'
+import { Box, Grid, HStack, VStack } from 'styled-system/jsx'
 
 import OverviewSVG from '@/assets/overview.svg'
 import { OverflowAmount } from '@/components/overflow-amount'
+import { OverviewInfo, OverviewInfoItem } from '@/components/overview-info'
 import { TextOverflowTooltip } from '@/components/text-overflow-tooltip'
 import { TimeFormatter } from '@/components/time-formatter'
 import { Heading, Text, Tooltip } from '@/components/ui'
@@ -24,45 +25,40 @@ export function BtcBlockOverview({
 }) {
   if (!block) return null
   const i18n = getI18nFromHeaders()
+  console.log(block.feeRateRange)
   return (
     <VStack gap={0} w="100%" bg="bg.card" rounded="8px">
-      <HStack w="100%" px="30px" py="16px" gap="12px" borderBottom="1px solid" borderBottomColor="border.primary">
+      <HStack
+        w="100%"
+        px={{ base: '20px', xl: '30px' }}
+        py="16px"
+        gap="12px"
+        borderBottom="1px solid"
+        borderBottomColor="border.primary"
+      >
         <OverviewSVG w="24px" />
         <Heading fontSize="16px" fontWeight="semibold">{t(i18n)`Overview`}</Heading>
-        {block.timestamp ? <TimeFormatter timestamp={resolveBtcTime(block.timestamp)} /> : null}
+        {block.timestamp ? <TimeFormatter timestamp={resolveBtcTime(block.timestamp)} ml="auto" /> : null}
       </HStack>
-      <Grid w="100%" gridTemplateColumns="repeat(2, 1fr)" gap="30px" pt="20px" pb="30px" px="30px" textAlign="center">
-        <Grid
-          gridTemplateColumns="repeat(2, 1fr)"
-          px="20px"
-          py="25px"
-          bg="bg.card.hover"
-          rounded="8px"
-          fontSize="20px"
-          lineHeight="100%"
-        >
-          <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`Block size`}</Text>
-            <Text>
-              <OverflowAmount amount={formatNumber(block.size)} symbol={t(i18n)`bytes`} />
-            </Text>
-          </VStack>
-          <VStack gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`Transaction`}</Text>
-            <Text>{formatNumber(block.transactionsCount)} </Text>
-          </VStack>
-        </Grid>
-        <Grid
-          gridTemplateColumns="repeat(2, 1fr)"
-          px="20px"
-          py="25px"
-          bg="bg.card.hover"
-          rounded="8px"
-          fontSize="20px"
-          lineHeight="100%"
-        >
-          <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`Fee rate span`}</Text>
+      <Grid
+        w="100%"
+        gridTemplateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }}
+        gap={{ base: '20px', md: '30px' }}
+        pt="20px"
+        pb={{ base: '20px', md: '30px' }}
+        px={{ base: '20px', xl: '30px' }}
+        textAlign="center"
+      >
+        <OverviewInfo>
+          <OverviewInfoItem label={t(i18n)`Block size`}>
+            <OverflowAmount amount={formatNumber(block.size)} symbol={t(i18n)`bytes`} />
+          </OverviewInfoItem>
+          <OverviewInfoItem label={t(i18n)`Transaction`} formatNumber>
+            {block.transactionsCount}
+          </OverviewInfoItem>
+        </OverviewInfo>
+        <OverviewInfo>
+          <OverviewInfoItem label={t(i18n)`Fee rate span`}>
             <TextOverflowTooltip
               label={
                 <Text whiteSpace="nowrap">
@@ -72,8 +68,17 @@ export function BtcBlockOverview({
                 </Text>
               }
               contentProps={{ maxW: 'unset' }}
+              positioning={{ placement: 'top' }}
             >
-              <Text whiteSpace="nowrap" maxW="250px" truncate>
+              <Box
+                whiteSpace="nowrap"
+                minW="0"
+                maxW={{ base: '130px', sm: 'unset', md: '250px' }}
+                textAlign={{ base: 'right', md: 'center' }}
+                truncate
+                flex={1}
+                ml="auto"
+              >
                 {formatNumber(block.feeRateRange?.min ?? 0)}
                 <Text as="span" fontSize="14px" ml="4px">
                   {t(i18n)`sats/VB`}
@@ -83,17 +88,17 @@ export function BtcBlockOverview({
                 <Text as="span" fontSize="14px">
                   {t(i18n)`sats/VB`}
                 </Text>
-              </Text>
+              </Box>
             </TextOverflowTooltip>
-          </VStack>
-          <VStack gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`Miner`}</Text>
+          </OverviewInfoItem>
+          <OverviewInfoItem label={t(i18n)`Miner`} formatNumber>
             {block.miner ? (
               <Tooltip.Root openDelay={0} closeDelay={0}>
-                <Tooltip.Trigger>
+                <Tooltip.Trigger asChild>
                   <Link
                     href={`/address/${block.miner.address}`}
                     color="brand"
+                    textAlign={{ base: 'right', md: 'center' }}
                     _hover={{
                       textDecoration: 'underline',
                     }}
@@ -113,8 +118,8 @@ export function BtcBlockOverview({
             ) : (
               <Text color="text.third">-</Text>
             )}
-          </VStack>
-        </Grid>
+          </OverviewInfoItem>
+        </OverviewInfo>
       </Grid>
     </VStack>
   )

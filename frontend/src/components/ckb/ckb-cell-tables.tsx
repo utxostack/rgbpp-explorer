@@ -5,6 +5,7 @@ import { Box, Flex, Grid, HStack, VStack } from 'styled-system/jsx'
 
 import SubTractIcon from '@/assets/subtract.svg'
 import { Copier } from '@/components/copier'
+import { IfBreakpoint } from '@/components/if-breakpoint'
 import { Heading, Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { CellType, CkbCell } from '@/gql/graphql'
@@ -25,7 +26,14 @@ export function CkbCellTables({ inputs = [], outputs = [], isCellbase, address }
   if (!outputs) outputs = []
 
   return (
-    <Grid w="100%" gridTemplateColumns="repeat(2, 1fr)" gap="38px" pt="10px" pb="20px" px="30px">
+    <Grid
+      w="100%"
+      gridTemplateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }}
+      gap={{ base: '20px', lg: '38px' }}
+      pt="10px"
+      pb="20px"
+      px={{ base: '20px', md: '30px' }}
+    >
       <VStack gap={0} w="100%">
         <Heading
           fontSize="14px"
@@ -81,6 +89,11 @@ export function CkbCellTables({ inputs = [], outputs = [], isCellbase, address }
 
 function Cell({ cell, address: currentAddress }: { cell: CkbCell; address?: string }) {
   const address = scriptToAddress(cell.lock)
+  const formattedAddress = (
+    <IfBreakpoint breakpoint="sm" fallback={truncateMiddle(address, 6, 6)}>
+      {truncateMiddle(address, 10, 10)}
+    </IfBreakpoint>
+  )
   return (
     <Flex
       justifyContent="space-between"
@@ -101,17 +114,17 @@ function Cell({ cell, address: currentAddress }: { cell: CkbCell; address?: stri
               cursor="pointer"
               _hover={{ textDecoration: 'underline' }}
             >
-              {truncateMiddle(address, 10, 10)}
+              {formattedAddress}
             </Link>
           ) : (
             <Text fontSize="14px" color="text.primary">
-              {truncateMiddle(address, 10, 10)}
+              {formattedAddress}
             </Text>
           )}
         </Copier>
       </HStack>
       <VStack gap={0} alignItems="flex-end">
-        <Box>
+        <Box fontSize={{ base: '14px', md: '16px' }} textAlign="right">
           {formatNumber(shannonToCKB(cell.capacity))}{' '}
           <Text as="span" fontSize="12px" color="text.third">
             <Trans>CKB</Trans>

@@ -19,8 +19,9 @@ export function UtxoOrCellFooter({
   btcUtxo,
   feeUnit,
   address,
+  children,
 }: {
-  address: string
+  address?: string
   fee?: number | null
   feeRate?: number | null
   confirmations?: number
@@ -30,18 +31,22 @@ export function UtxoOrCellFooter({
     vout?: BitcoinOutput[]
   }
   feeUnit?: ReactNode
+  children?: ReactNode
 }) {
   return (
     <Flex
-      h="72px"
-      px="30px"
+      minH="72px"
+      py="20px"
+      px={{ base: '20px', xl: '30px' }}
+      gap={{ base: '20px', lg: '10px' }}
       w="100%"
-      alignItems="center"
-      justifyContent="space-between"
+      flexDirection={{ base: 'column', lg: 'row' }}
+      alignItems={{ base: 'start', lg: 'center' }}
+      justifyContent={{ base: 'center', lg: 'space-between' }}
       borderTop="1px solid"
       borderTopColor="border.primary"
     >
-      <HStack gap="32px">
+      <Flex gap={{ base: '16px', lg: '32px' }} flexWrap="wrap" justify="start">
         {isNumber(fee) ? (
           <Text as="span" fontSize="14px" color="text.third">
             <Trans>
@@ -60,20 +65,23 @@ export function UtxoOrCellFooter({
               <Text as="span" color="text.primary" fontWeight="semibold" mx="4px">
                 {formatNumber(feeRate)}
               </Text>
-              {feeUnit}
+              {feeUnit}/vB
             </Trans>
           </Text>
         ) : null}
-      </HStack>
-      <HStack gap="16px" ml="auto" flexWrap="wrap" justify="right" py="12px">
-        {isNumber(confirmations) ? (
-          <Box bg="brand" py="8px" px="16px" rounded="4px">
-            <Trans>{formatNumber(confirmations)} confirmed</Trans>
-          </Box>
-        ) : null}
-        {ckbCell ? <CkbDiffTags {...ckbCell} address={address} /> : null}
-        {btcUtxo ? <BtcDiffTags {...btcUtxo} address={address} /> : null}
-      </HStack>
+      </Flex>
+      {isNumber(confirmations) || btcUtxo || ckbCell || address ? (
+        <HStack gap="16px" flexWrap="wrap" justify={{ base: 'start', lg: 'end' }}>
+          {isNumber(confirmations) ? (
+            <Box bg="brand" py="8px" fontSize="14px" lineHeight="16px" px="16px" rounded="4px">
+              <Trans>{formatNumber(confirmations)} confirmed</Trans>
+            </Box>
+          ) : null}
+          {ckbCell && address ? <CkbDiffTags {...ckbCell} address={address} /> : null}
+          {btcUtxo && address ? <BtcDiffTags {...btcUtxo} address={address} /> : null}
+        </HStack>
+      ) : null}
+      {children}
     </Flex>
   )
 }

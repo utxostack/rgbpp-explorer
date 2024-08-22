@@ -1,18 +1,15 @@
 import { t } from '@lingui/macro'
 import { notFound } from 'next/navigation'
-import { Flex, HStack, VStack } from 'styled-system/jsx'
+import { HStack, VStack } from 'styled-system/jsx'
 
 import { BtcOutputsSum } from '@/components/btc/btc-outputs-sum'
 import { BtcUtxoTables } from '@/components/btc/btc-utxo-tables'
-import { TimeFormatter } from '@/components/time-formatter'
-import { Text } from '@/components/ui'
-import Link from '@/components/ui/link'
+import { TransactionHeaderInAddress } from '@/components/transaction-header-in-address'
+import { UtxoOrCellFooter } from '@/components/utxo-or-cell-footer'
 import { graphql } from '@/gql'
 import { BitcoinInput, BitcoinOutput } from '@/gql/graphql'
-import { resolveBtcTime } from '@/lib/btc/resolve-btc-time'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { graphQLClient } from '@/lib/graphql'
-import { formatNumber } from '@/lib/string/format-number'
 
 const query = graphql(`
   query BtcBlockTransaction($hashOrHeight: String!) {
@@ -87,49 +84,16 @@ export default async function Page({ params: { hashOrHeight } }: { params: { has
 
   return (
     <VStack w="100%" gap="30px">
-      {data.btcBlock?.transactions?.map((transaction) => {
+      {data.btcBlock?.transactions?.map((tx) => {
         return (
-          <VStack w="100%" gap={0} bg="bg.card" rounded="8px" key={transaction.txid}>
-            <Flex w="100%" bg="bg.input" justifyContent="space-between" py="20px" px="30px" roundedTop="8px">
-              <Link href={`/transaction/${transaction.txid}`} fontSize="14px" fontWeight="medium" color="brand">
-                {transaction.txid}
-              </Link>
-              {transaction.transactionTime ? (
-                <TimeFormatter timestamp={resolveBtcTime(transaction.transactionTime)} />
-              ) : null}
-            </Flex>
-            <BtcUtxoTables
-              txid={transaction.txid}
-              vin={transaction.vin as BitcoinInput[]}
-              vout={transaction.vout as BitcoinOutput[]}
-            />
-            <Flex
-              h="72px"
-              gap="32px"
-              px="30px"
-              w="100%"
-              alignItems="center"
-              borderTop="1px solid"
-              borderTopColor="border.primary"
-            >
-              <Text as="span" fontSize="14px" color="text.third">
-                {t(i18n)`Txn fee: `}
-                <Text as="span" color="text.primary" fontWeight="semibold" ml="4px">
-                  {formatNumber(transaction.fee)}{' '}
-                </Text>
-                {t(i18n)`sats`}
-              </Text>
-              <Text as="span" fontSize="14px" color="text.third">
-                {t(i18n)`Fee rate: `}
-                <Text as="span" color="text.primary" fontWeight="semibold" ml="4px">
-                  {formatNumber(transaction.feeRate)}{' '}
-                </Text>
-                {t(i18n)`sats/vB`}
-              </Text>
-              <HStack ml="auto" gap="16px">
-                <BtcOutputsSum vout={transaction.vout as BitcoinOutput[]} />
+          <VStack w="100%" gap={0} bg="bg.card" rounded="8px" key={tx.txid}>
+            <TransactionHeaderInAddress time={tx.transactionTime} txid={tx.txid} btcTime />
+            <BtcUtxoTables txid={tx.txid} vin={tx.vin as BitcoinInput[]} vout={tx.vout as BitcoinOutput[]} />
+            <UtxoOrCellFooter fee={tx.fee} feeRate={tx.feeRate} feeUnit={t(i18n)`sats`}>
+              <HStack gap="16px" flexWrap="wrap" justify={{ base: 'start', lg: 'end' }}>
+                <BtcOutputsSum vout={tx.vout as BitcoinOutput[]} />
               </HStack>
-            </Flex>
+            </UtxoOrCellFooter>
           </VStack>
         )
       })}
