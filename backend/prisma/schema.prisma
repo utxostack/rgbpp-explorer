@@ -50,7 +50,7 @@ model Block {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  // transactions Transaction[]
+  transactions Transaction[]
   chain        Chain         @relation(fields: [chainId], references: [id])
 
   @@unique([chainId, hash])
@@ -58,23 +58,23 @@ model Block {
 }
 
 model Transaction {
-  id           Int      @id @default(autoincrement())
-  chainId      Int
-  hash         String
-  index        Int
-  blockNumber  Int
-  timestamp    DateTime
-  fee          BigInt
-  size         Int
-  isCellbase   Boolean  @default(false)
-  isRgbpp      Boolean  @default(false)
+  id            Int            @id @default(autoincrement())
+  chainId       Int
+  hash          String
+  index         String
+  blockNumber   Int
+  timestamp     DateTime
+  fee           BigInt
+  size          Int
+  isCellbase    Boolean        @default(false)
+  isRgbpp       Boolean        @default(false)
   leapDirection LeapDirection?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 
-  chain      Chain       @relation(fields: [chainId], references: [id])
-  // block      Block       @relation(fields: [chainId, blockNumber], references: [chainId, number])
-  outputs    Output[]
+  chain   Chain    @relation(fields: [chainId], references: [id])
+  block   Block    @relation(fields: [chainId, blockNumber], references: [chainId, number])
+  outputs Output[]
 
   @@unique([chainId, hash])
 }
@@ -83,57 +83,60 @@ model Output {
   id               Int      @id @default(autoincrement())
   chainId          Int
   txHash           String
-  index            Int
+  index            String
   consumedByTxHash String?
-  consumedByIndex  Int?
+  consumedByIndex  String?
   capacity         BigInt
-  lockScriptId     Int
-  typeScriptId     Int?
-  data             String?
+  lockScriptHash   String   @db.Char(66)
+  typeScriptHash   String?  @db.Char(66)
   isLive           Boolean  @default(true)
-  cellbase         Boolean  @default(false)
+  rgbppBound       Boolean  @default(false)
+  boundBtcTxId     String?
+  boundBtcTxIndex  Int?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
   transaction Transaction @relation(fields: [chainId, txHash], references: [chainId, hash])
-  lockScript  LockScript  @relation(fields: [chainId, lockScriptId], references: [chainId, id])
-  typeScript  TypeScript? @relation(fields: [chainId, typeScriptId], references: [chainId, id])
+  lockScript  LockScript  @relation(fields: [chainId, lockScriptHash], references: [chainId, scriptHash])
+  typeScript  TypeScript? @relation(fields: [chainId, typeScriptHash], references: [chainId, scriptHash])
 
   @@unique([chainId, txHash, index])
 }
 
 model LockScript {
-  id          Int      @id @default(autoincrement())
-  chainId     Int
-  codeHash    String   @db.Char(64)
-  hashType    Int
-  args        String
-  scriptHash  String   @unique @db.Char(64)
-  isRgbppLock Boolean  @default(false)
+  id            Int      @id @default(autoincrement())
+  chainId       Int
+  codeHash      String   @db.Char(66)
+  hashType      String
+  args          String   @db.Text
+  scriptHash    String   @unique @db.Char(66)
+  isRgbppLock   Boolean  @default(false)
   isBtcTimeLock Boolean  @default(false)
-  createdTime DateTime @default(now())
-  updatedTime DateTime @updatedAt
+  createdTime   DateTime @default(now())
+  updatedTime   DateTime @updatedAt
 
-  Output       Output[]
-  Address      Address[]
+  Output  Output[]
+  Address Address[]
 
   @@unique([chainId, id])
+  @@unique([chainId, scriptHash])
 }
 
 model TypeScript {
   id          Int      @id @default(autoincrement())
   chainId     Int
-  codeHash    String   @db.Char(64)
-  hashType    Int
-  args        String
-  scriptHash  String   @unique @db.Char(64)
+  codeHash    String   @db.Char(66)
+  hashType    String
+  args        String   @db.Text
+  scriptHash  String   @unique @db.Char(66)
   createdTime DateTime @default(now())
   updatedTime DateTime @updatedAt
 
-  Output       Output[]
-  UDT          UDT[]
+  Output Output[]
+  UDT    UDT[]
 
   @@unique([chainId, id])
+  @@unique([chainId, scriptHash])
 }
 
 model Address {

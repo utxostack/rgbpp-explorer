@@ -11,7 +11,7 @@ export function createCommonQueueConfig(): Omit<QueueOptions, 'connection'> {
         type: 'fixed',
         delay: 5000,
       },
-      removeOnComplete: true,
+      // removeOnComplete: 8000,
     },
   };
 }

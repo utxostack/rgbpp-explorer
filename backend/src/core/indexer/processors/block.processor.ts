@@ -1,37 +1,33 @@
-import { Job, Queue } from 'bullmq';
-import { InjectQueue, OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
+import { Job } from 'bullmq';
+import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import { PrismaService } from '../../database/prisma/prisma.service';
 import * as BlockchainInterface from '../../blockchain/blockchain.interface';
 import { BI } from '@ckb-lumos/bi';
 import { Logger, OnModuleInit } from '@nestjs/common';
 import { Chain } from '@prisma/client';
 import { compactToDifficulty } from 'src/common/ckb/difficulty';
-import { INDEXER_TRANSACTION_QUEUE } from './transaction.processor';
-import { IndexerUtil } from '../indexer.utils';
+import { IndexerTransactionJobData } from './transaction.processor';
+import { IndexerUtilService } from '../indexer.utils';
 import { cloneDeep } from 'lodash';
 import { Env } from 'src/env';
 import { ConfigService } from '@nestjs/config';
 import { createWorkerConfig } from '../indexer.config';
-import { BlockchainServiceFactory } from 'src/core/blockchain/blockchain.factory';
-
-export const INDEXER_BLOCK_QUEUE = 'indexer-block-queue';
+import { IndexerQueueService, QueueJobPriority, QueueType } from '../indexer.queue';
 
 export interface IndexerBlockJobData {
   chain: Chain;
   block: BlockchainInterface.Block;
 }
 
-@Processor(INDEXER_BLOCK_QUEUE)
+@Processor(QueueType.Block)
 export class IndexerBlockProcessor extends WorkerHost implements OnModuleInit {
   private logger = new Logger(IndexerBlockProcessor.name);
 
   constructor(
     private prismaService: PrismaService,
-    private indexerUtil: IndexerUtil,
+    private indexerQueueService: IndexerQueueService,
+    private indexerUtilService: IndexerUtilService,
     private configService: ConfigService<Env>,
-    private blockchainServiceFactory: BlockchainServiceFactory,
-    @InjectQueue(INDEXER_BLOCK_QUEUE) private indexerBlockQueue: Queue,
-    @InjectQueue(INDEXER_TRANSACTION_QUEUE) private indexerTransactionQueue: Queue,
   ) {
     super();
   }
@@ -63,8 +59,9 @@ export class IndexerBlockProcessor extends WorkerHost implements OnModuleInit {
   }
 
   private async processTransactions(chain: Chain, block: BlockchainInterface.Block): Promise<void> {
-    const transactionJobs = this.createTransactionJobs(chain, block);
-    await this.indexerTransactionQueue.addBulk(transactionJobs);
+    const transactionQueue = this.indexerQueueService.getTransactionQueue();
+    const jobs = this.createTransactionJobs(chain, block);
+    await transactionQueue.addBulk(jobs);
   }
 
   private async saveBlockData(
@@ -108,21 +105,22 @@ export class IndexerBlockProcessor extends WorkerHost implements OnModuleInit {
       const blockClone = cloneDeep(block);
       blockClone.transactions = [];
       const transactionClone = cloneDeep(transaction);
-      const blockNumber = BI.from(block.header.number).toNumber();
+      const txHash = transaction.hash;
 
-      return {
-        name: transaction.hash,
+      const txJob = {
+        name: txHash,
         data: {
           chain,
           block: blockClone,
           transaction: transactionClone,
-          index,
-        },
+          index: BI.from(index).toHexString(),
+        } satisfies IndexerTransactionJobData,
         opts: {
           jobId: transaction.hash,
-          priority: Math.max(1, 2097152 - (blockNumber % 2097152)),
+          priority: QueueJobPriority.Transaction,
         },
       };
+      return txJob;
     });
   }
 
@@ -130,22 +128,21 @@ export class IndexerBlockProcessor extends WorkerHost implements OnModuleInit {
     chain: Chain,
     block: BlockchainInterface.Block,
   ): Promise<{
-    totalFee: number;
-    minFee: number;
-    maxFee: number;
+    totalFee: bigint;
+    minFee: bigint;
+    maxFee: bigint;
   }> {
     const [, ...txs] = block.transactions;
     const fees = await Promise.all(
-      txs.map((tx) => this.indexerUtil.calculateTransactionFee(chain, tx)),
+      txs.map((tx) => this.indexerUtilService.calculateTransactionFee(chain, tx)),
     );
-
     return fees.reduce(
       (acc, fee) => ({
         totalFee: acc.totalFee + fee,
-        minFee: Math.min(acc.minFee, fee),
-        maxFee: Math.max(acc.maxFee, fee),
+        minFee: BI.from(fee).lt(acc.minFee) ? fee : acc.minFee,
+        maxFee: BI.from(fee).gt(acc.maxFee) ? fee : acc.maxFee,
       }),
-      { totalFee: 0, minFee: Number.MAX_SAFE_INTEGER, maxFee: 0 },
+      { totalFee: 0n, minFee: BigInt(Number.MAX_SAFE_INTEGER), maxFee: 0n },
     );
   }
 

@@ -1,31 +1,110 @@
 import { Injectable } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
-import { Queue } from 'bullmq';
-import { INDEXER_BLOCK_QUEUE } from './processors/block.processor';
-import { INDEXER_TRANSACTION_QUEUE } from './processors/transaction.processor';
+import { Queue, QueueEvents } from 'bullmq';
+import EventEmitter from 'node:events';
+
+export enum QueueType {
+  Block = 'indexer-block',
+  Transaction = 'indexer-transaction',
+  Output = 'indexer-output',
+  LockScript = 'indexer-lock-script',
+  TypeScript = 'indexer-type-script',
+}
+
+export const QUEUES = [
+  QueueType.Block,
+  QueueType.Transaction,
+  QueueType.Output,
+  QueueType.LockScript,
+  QueueType.TypeScript,
+];
+
+EventEmitter.defaultMaxListeners = 0;
+
+export enum QueueJobPriority {
+  LockScript = 1,
+  TypeScript = 1,
+  Output = 2,
+  Transaction = 3,
+  Block = 4,
+}
+
+interface GetJobCountsOpts {
+  exclude?: string[];
+}
 
 @Injectable()
 export class IndexerQueueService {
+  private IndexerQueues: Queue[];
+  private queueEventsMap = new Map<QueueType, QueueEvents>();
+
   constructor(
-    @InjectQueue(INDEXER_BLOCK_QUEUE) private indexerBlockQueue: Queue,
-    @InjectQueue(INDEXER_TRANSACTION_QUEUE) private indexerTransactionQueue: Queue,
-  ) {}
+    @InjectQueue(QueueType.Block) private indexerBlockQueue: Queue,
+    @InjectQueue(QueueType.Transaction) private indexerTransactionQueue: Queue,
+    @InjectQueue(QueueType.Output) private indexerOutputQueue: Queue,
+    @InjectQueue(QueueType.LockScript) private indexerLockScriptQueue: Queue,
+    @InjectQueue(QueueType.TypeScript) private indexerTypeScriptQueue: Queue,
+  ) {
+    this.IndexerQueues = [
+      this.indexerBlockQueue,
+      this.indexerTransactionQueue,
+      this.indexerOutputQueue,
+      this.indexerLockScriptQueue,
+      this.indexerTypeScriptQueue,
+    ];
+    QUEUES.forEach((queueType) => {
+      this.queueEventsMap.set(queueType, new QueueEvents(queueType));
+    });
+  }
 
   public getBlockQueue(): Queue {
     return this.indexerBlockQueue;
   }
 
-  public async delayActiveJobs(delayTime: number = 10000): Promise<void> {
-    const delayedTime = Date.now() + delayTime;
-    await this.delayQueueJobs(this.indexerBlockQueue, delayedTime);
-    await this.delayQueueJobs(this.indexerTransactionQueue, delayedTime);
+  public getTransactionQueue(): Queue {
+    return this.indexerTransactionQueue;
   }
 
-  public async getJobCounts(): Promise<{ [key: string]: number }> {
-    const blockQueueCounts = await this.indexerBlockQueue.getJobCounts();
-    const transactionQueueCounts = await this.indexerTransactionQueue.getJobCounts();
+  public getOutputQueue(): Queue {
+    return this.indexerOutputQueue;
+  }
 
-    return this.mergeJobCounts(blockQueueCounts, transactionQueueCounts);
+  public getLockScriptQueue(): Queue {
+    return this.indexerLockScriptQueue;
+  }
+
+  public getTypeScriptQueue(): Queue {
+    return this.indexerTypeScriptQueue;
+  }
+
+  public getQueueEvents(queueType: QueueType): QueueEvents {
+    return this.queueEventsMap.get(queueType)!;
+  }
+
+  public async delayActiveJobs(delayTime: number = 10000): Promise<void> {
+    const delayedTime = Date.now() + delayTime;
+    for (const queue of this.IndexerQueues) {
+      await this.delayQueueJobs(queue, delayedTime);
+    }
+  }
+
+  public async getJobCounts(options: GetJobCountsOpts): Promise<{ [key: string]: number }> {
+    const queueCounts: { [index: string]: number }[] = [];
+    for (const queue of this.IndexerQueues) {
+      const counts = await queue.getJobCounts();
+      queueCounts.push(counts);
+    }
+
+    const excludes = options.exclude || [];
+    return queueCounts.reduce((sum, counts) => {
+      Object.entries(counts).forEach(([key, value]) => {
+        if (excludes.includes(key)) {
+          return;
+        }
+        sum[key] = (sum[key] || 0) + value;
+      });
+      return sum;
+    }, {});
   }
 
   private async delayQueueJobs(queue: Queue, delayedTime: number): Promise<void> {
@@ -33,14 +112,5 @@ export class IndexerQueueService {
     for (const job of activeJobs) {
       await job.moveToDelayed(delayedTime);
     }
-  }
-
-  private mergeJobCounts(...queueCounts: { [key: string]: number }[]): { [key: string]: number } {
-    return queueCounts.reduce((sum, counts) => {
-      Object.entries(counts).forEach(([key, value]) => {
-        sum[key] = (sum[key] || 0) + value;
-      });
-      return sum;
-    }, {});
   }
 }

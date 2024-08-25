@@ -4,7 +4,7 @@ import { BlockchainServiceFactory } from './core/blockchain/blockchain.factory';
 import { Chain } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import { IndexerServiceFactory } from './core/indexer/indexer.factory';
-import { IndexerUtil } from './core/indexer/indexer.utils';
+import { IndexerUtilService } from './core/indexer/indexer.utils';
 import cluster, { Worker } from 'node:cluster';
 import EventEmitter from 'node:events';
 import { Env } from './env';
@@ -26,22 +26,15 @@ export class BootstrapService extends EventEmitter {
   public bootstrapCompleted: Promise<void>;
 
   constructor(
-    private configService: ConfigService<Env>,
-    private prismaService: PrismaService,
-    private blockchainServiceFactory: BlockchainServiceFactory,
-    private indexerServiceFactory: IndexerServiceFactory,
-    private indexerUtil: IndexerUtil,
+    public configService: ConfigService<Env>,
+    public prismaService: PrismaService,
+    public blockchainServiceFactory: BlockchainServiceFactory,
+    public indexerServiceFactory: IndexerServiceFactory,
+    public indexerUtil: IndexerUtilService,
   ) {
     super();
-    this.masterProcess = new MasterProcess(
-      this,
-      configService,
-      prismaService,
-      blockchainServiceFactory,
-      indexerServiceFactory,
-      indexerUtil,
-    );
-    this.workerProcess = new WorkerProcess(this, indexerServiceFactory);
+    this.masterProcess = new MasterProcess(this);
+    this.workerProcess = new WorkerProcess(this);
 
     this.bootstrapCompleted = new Promise((resolve) => {
       this.on('bootstrap:complete', () => {
@@ -78,16 +71,9 @@ class MasterProcess {
   private nextBlockNumbers: BlockNumberMap = {};
   private activeWorkers = 0;
 
-  constructor(
-    private bootstrapService: BootstrapService,
-    private configService: ConfigService<Env>,
-    private prismaService: PrismaService,
-    private blockchainServiceFactory: BlockchainServiceFactory,
-    private indexerServiceFactory: IndexerServiceFactory,
-    private indexerUtil: IndexerUtil,
-  ) {
-    this.batchSize = this.configService.get('INDEXER_BATCH_SIZE')!;
-    this.workerNum = this.configService.get('INDEXER_WORKER_NUM')!;
+  constructor(private service: BootstrapService) {
+    this.batchSize = this.service.configService.get('INDEXER_BATCH_SIZE')!;
+    this.workerNum = this.service.configService.get('INDEXER_WORKER_NUM')!;
   }
 
   public async run(): Promise<void> {
@@ -98,12 +84,16 @@ class MasterProcess {
   }
 
   private async initializeChainData(): Promise<void> {
-    await this.indexerServiceFactory.processLegacyIndexerQueueJobs();
-    this.chains = await this.prismaService.chain.findMany();
+    await this.service.indexerServiceFactory.processLegacyIndexerQueueJobs();
+    this.chains = await this.service.prismaService.chain.findMany();
     for (const chain of this.chains) {
-      const blockchainService = await this.blockchainServiceFactory.getService(chain.id);
-      this.tipBlockNumbers[chain.id] = await blockchainService.getTipBlockNumber();
-      this.nextBlockNumbers[chain.id] = await this.indexerUtil.getIndexStartBlockNumber(chain);
+      // const blockchainService = await this.service.blockchainServiceFactory.getService(
+      //   chain.id,
+      // );
+      // this.tipBlockNumbers[chain.id] = await blockchainService.getTipBlockNumber();
+      this.tipBlockNumbers[chain.id] = 100000;
+      this.nextBlockNumbers[chain.id] =
+        await this.service.indexerUtil.getIndexStartBlockNumber(chain);
     }
   }
 
@@ -124,7 +114,7 @@ class MasterProcess {
     this.activeWorkers--;
     if (this.activeWorkers === 0) {
       this.logger.warn('All workers finished, bootstrap complete');
-      this.bootstrapService.emit('bootstrap:complete');
+      this.service.emit('bootstrap:complete');
     }
   }
 
@@ -143,7 +133,7 @@ class MasterProcess {
   }
 
   private checkMemoryUsage(): boolean {
-    const memoryUsageThreshold = this.configService.get('INDEXER_MEMORY_USAGE_THRESHOLD')!;
+    const memoryUsageThreshold = this.service.configService.get('INDEXER_MEMORY_USAGE_THRESHOLD')!;
     const memoryUsage = process.memoryUsage();
     const usedMemoryPercentage = (memoryUsage.heapUsed / memoryUsage.heapTotal) * 100;
     this.logger.error(`Memory usage: ${usedMemoryPercentage.toFixed(2)}%`);
@@ -155,10 +145,10 @@ class MasterProcess {
       }
       this.batchSize = Math.max(Math.round(this.batchSize / 2) - 1, 1);
       this.logger.warn(`Memory usage is high, reducing batch size to ${this.batchSize}`);
-    } else if (this.batchSize < this.configService.get('INDEXER_BATCH_SIZE')!) {
+    } else if (this.batchSize < this.service.configService.get('INDEXER_BATCH_SIZE')!) {
       this.batchSize = Math.min(
         Math.round(this.batchSize * 2),
-        this.configService.get('INDEXER_BATCH_SIZE')!,
+        this.service.configService.get('INDEXER_BATCH_SIZE')!,
       );
       this.logger.warn(`Memory usage is low, increasing batch size to ${this.batchSize}`);
     }
@@ -167,20 +157,20 @@ class MasterProcess {
   }
 
   private async checkQueueAndAssignWork(worker: Worker): Promise<void> {
-    const counts = await this.indexerServiceFactory.getIndexerQueueJobCounts();
+    const counts = await this.service.indexerServiceFactory.getIndexerQueueJobCounts();
     const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
 
     if (total < this.batchSize * this.workerNum) {
       await this.assignWorkToWorker(worker);
     } else {
       this.logger.warn(`Queue has ${total} jobs, waiting for worker ${worker.id}`);
-      setTimeout(() => this.checkQueueAndAssignWork(worker), total);
+      setTimeout(() => this.checkQueueAndAssignWork(worker), Math.max(total, 1000));
     }
   }
 
   private async assignWorkToWorker(worker: Worker): Promise<void> {
     if (this.currentChainIndex >= this.chains.length) {
-      await this.indexerServiceFactory.waitUntilIndexerQueueEmpty();
+      await this.service.indexerServiceFactory.waitUntilIndexerQueueEmpty();
       worker.kill();
       return;
     }
@@ -210,10 +200,7 @@ class MasterProcess {
 class WorkerProcess {
   private readonly logger = new Logger(WorkerProcess.name);
 
-  constructor(
-    private bootstrapService: BootstrapService,
-    private indexerServiceFactory: IndexerServiceFactory,
-  ) {}
+  constructor(private service: BootstrapService) { }
 
   public async run(): Promise<void> {
     this.logger.log(`Indexer Worker ${process.pid} is running`);
@@ -240,7 +227,7 @@ class WorkerProcess {
     startBlockNumber: number,
     endBlockNumber: number,
   ): Promise<void> {
-    const indexerService = await this.indexerServiceFactory.getService(chainId);
+    const indexerService = await this.service.indexerServiceFactory.getService(chainId);
     await indexerService.indexBlocks(startBlockNumber, endBlockNumber);
   }
 }

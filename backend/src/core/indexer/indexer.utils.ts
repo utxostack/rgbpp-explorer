@@ -7,9 +7,10 @@ import { BI } from '@ckb-lumos/bi';
 import pLimit from 'p-limit';
 import { ConfigService } from '@nestjs/config';
 import { Env } from 'src/env';
+import { CELLBASE_TX_HASH } from '../rgbpp/rgbpp.service';
 
 @Injectable()
-export class IndexerUtil {
+export class IndexerUtilService {
   private limit: pLimit.Limit;
 
   constructor(
@@ -30,10 +31,17 @@ export class IndexerUtil {
     return startBlockNumber;
   }
 
+  public isCellbase(transaction: BlockchainInterface.Transaction): boolean {
+    return (
+      transaction.inputs.length === 1 &&
+      transaction.inputs[0].previous_output.tx_hash === CELLBASE_TX_HASH
+    );
+  }
+
   public async calculateTransactionFee(
     chain: Chain,
     tx: BlockchainInterface.Transaction,
-  ): Promise<number> {
+  ): Promise<bigint> {
     let inputCapacity = BI.from(0);
     let outputCapacity = BI.from(0);
 
@@ -57,6 +65,6 @@ export class IndexerUtil {
       outputCapacity = outputCapacity.add(BI.from(output.capacity));
     }
 
-    return inputCapacity.sub(outputCapacity).toNumber();
+    return inputCapacity.sub(outputCapacity).toBigInt();
   }
 }

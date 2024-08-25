@@ -37,7 +37,7 @@ CREATE TABLE "Transaction" (
     "id" SERIAL NOT NULL,
     "chainId" INTEGER NOT NULL,
     "hash" TEXT NOT NULL,
-    "index" INTEGER NOT NULL,
+    "index" TEXT NOT NULL,
     "blockNumber" INTEGER NOT NULL,
     "timestamp" TIMESTAMP(3) NOT NULL,
     "fee" BIGINT NOT NULL,
@@ -56,15 +56,16 @@ CREATE TABLE "Output" (
     "id" SERIAL NOT NULL,
     "chainId" INTEGER NOT NULL,
     "txHash" TEXT NOT NULL,
-    "index" INTEGER NOT NULL,
+    "index" TEXT NOT NULL,
     "consumedByTxHash" TEXT,
-    "consumedByIndex" INTEGER,
+    "consumedByIndex" TEXT,
     "capacity" BIGINT NOT NULL,
-    "lockScriptId" INTEGER NOT NULL,
-    "typeScriptId" INTEGER,
-    "data" TEXT,
+    "lockScriptHash" CHAR(66) NOT NULL,
+    "typeScriptHash" CHAR(66),
     "isLive" BOOLEAN NOT NULL DEFAULT true,
-    "cellbase" BOOLEAN NOT NULL DEFAULT false,
+    "rgbppBound" BOOLEAN NOT NULL DEFAULT false,
+    "boundBtcTxId" TEXT,
+    "boundBtcTxIndex" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -75,10 +76,10 @@ CREATE TABLE "Output" (
 CREATE TABLE "LockScript" (
     "id" SERIAL NOT NULL,
     "chainId" INTEGER NOT NULL,
-    "codeHash" CHAR(64) NOT NULL,
-    "hashType" INTEGER NOT NULL,
+    "codeHash" CHAR(66) NOT NULL,
+    "hashType" TEXT NOT NULL,
     "args" TEXT NOT NULL,
-    "scriptHash" CHAR(64) NOT NULL,
+    "scriptHash" CHAR(66) NOT NULL,
     "isRgbppLock" BOOLEAN NOT NULL DEFAULT false,
     "isBtcTimeLock" BOOLEAN NOT NULL DEFAULT false,
     "createdTime" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -91,10 +92,10 @@ CREATE TABLE "LockScript" (
 CREATE TABLE "TypeScript" (
     "id" SERIAL NOT NULL,
     "chainId" INTEGER NOT NULL,
-    "codeHash" CHAR(64) NOT NULL,
-    "hashType" INTEGER NOT NULL,
+    "codeHash" CHAR(66) NOT NULL,
+    "hashType" TEXT NOT NULL,
     "args" TEXT NOT NULL,
-    "scriptHash" CHAR(64) NOT NULL,
+    "scriptHash" CHAR(66) NOT NULL,
     "createdTime" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedTime" TIMESTAMP(3) NOT NULL,
 
@@ -185,10 +186,16 @@ CREATE UNIQUE INDEX "LockScript_scriptHash_key" ON "LockScript"("scriptHash");
 CREATE UNIQUE INDEX "LockScript_chainId_id_key" ON "LockScript"("chainId", "id");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "LockScript_chainId_scriptHash_key" ON "LockScript"("chainId", "scriptHash");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "TypeScript_scriptHash_key" ON "TypeScript"("scriptHash");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "TypeScript_chainId_id_key" ON "TypeScript"("chainId", "id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "TypeScript_chainId_scriptHash_key" ON "TypeScript"("chainId", "scriptHash");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Address_chainId_address_key" ON "Address"("chainId", "address");
@@ -209,13 +216,16 @@ ALTER TABLE "Block" ADD CONSTRAINT "Block_chainId_fkey" FOREIGN KEY ("chainId") 
 ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_chainId_fkey" FOREIGN KEY ("chainId") REFERENCES "Chain"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_chainId_blockNumber_fkey" FOREIGN KEY ("chainId", "blockNumber") REFERENCES "Block"("chainId", "number") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Output" ADD CONSTRAINT "Output_chainId_txHash_fkey" FOREIGN KEY ("chainId", "txHash") REFERENCES "Transaction"("chainId", "hash") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Output" ADD CONSTRAINT "Output_chainId_lockScriptId_fkey" FOREIGN KEY ("chainId", "lockScriptId") REFERENCES "LockScript"("chainId", "id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Output" ADD CONSTRAINT "Output_chainId_lockScriptHash_fkey" FOREIGN KEY ("chainId", "lockScriptHash") REFERENCES "LockScript"("chainId", "scriptHash") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Output" ADD CONSTRAINT "Output_chainId_typeScriptId_fkey" FOREIGN KEY ("chainId", "typeScriptId") REFERENCES "TypeScript"("chainId", "id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Output" ADD CONSTRAINT "Output_chainId_typeScriptHash_fkey" FOREIGN KEY ("chainId", "typeScriptHash") REFERENCES "TypeScript"("chainId", "scriptHash") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Address" ADD CONSTRAINT "Address_chainId_fkey" FOREIGN KEY ("chainId") REFERENCES "Chain"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

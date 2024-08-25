@@ -1,5 +1,4 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { IndexerService } from './indexer.service';
 import { BlockchainServiceFactory } from '../blockchain/blockchain.factory';
@@ -23,7 +22,6 @@ export class IndexerServiceFactory implements OnModuleDestroy {
     private prismaService: PrismaService,
     private blockchainServiceFactory: BlockchainServiceFactory,
     private queueService: IndexerQueueService,
-    @InjectSentry() private sentryService: SentryService,
   ) {}
 
   public async onModuleDestroy() {
@@ -45,7 +43,9 @@ export class IndexerServiceFactory implements OnModuleDestroy {
   }
 
   public async getIndexerQueueJobCounts(): Promise<JobCounts> {
-    const counts = await this.queueService.getJobCounts();
+    const counts = await this.queueService.getJobCounts({
+      exclude: ['completed', 'failed'],
+    });
     // FIXME: Remove this log statement after debugging
     this.logger.warn(`Indexer queue counts: ${JSON.stringify(counts, null, 2)}`);
     return counts;
@@ -78,7 +78,7 @@ export class IndexerServiceFactory implements OnModuleDestroy {
         if (isQueueEmpty) {
           resolve();
         } else {
-          setTimeout(check, 1000);
+          setTimeout(check, 2000);
         }
       };
       check();
