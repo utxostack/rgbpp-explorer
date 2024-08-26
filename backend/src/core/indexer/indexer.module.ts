@@ -1,35 +1,36 @@
 import { Global, Module } from '@nestjs/common';
 import { IndexerServiceFactory } from './indexer.factory';
 import { BullModule } from '@nestjs/bullmq';
-import { IndexerBlockProcessor } from './processors/block.processor';
-import { IndexerTransactionProcessor } from './processors/transaction.processor';
-import { IndexerUtilService } from './indexer.utils';
-import { createCommonQueueConfig } from './indexer.config';
-import { IndexerQueueService, QUEUES } from './indexer.queue';
-import { IndexerOutputProcessor } from './processors/output.processor';
-import { IndexerLockScriptProcessor } from './processors/lock.processor';
-import { IndexerTypeScriptProcessor } from './processors/type.processor';
+import { INDEXER_PROCESSOR_QUEUE, IndexerProcessor } from './indexer.processor';
+import { BlockProcessor } from './processor/block.processor';
+import { TransactionProcessor } from './processor/transaction.processor';
+import { LockScriptProcessor } from './processor/lock.processor';
+import { TypeScriptProcessor } from './processor/type.processor';
+import { OutputProcessor } from './processor/output.processor';
 
 @Global()
 @Module({
   imports: [
-    ...QUEUES.map((queueType) => {
-      return BullModule.registerQueue({
-        name: queueType,
-        ...createCommonQueueConfig(),
-      });
+    BullModule.registerQueue({
+      name: INDEXER_PROCESSOR_QUEUE,
+      defaultJobOptions: {
+        attempts: 10,
+        backoff: {
+          type: 'fixed',
+          delay: 5000,
+        },
+      },
     }),
   ],
   providers: [
-    IndexerUtilService,
     IndexerServiceFactory,
-    IndexerQueueService,
-    IndexerBlockProcessor,
-    IndexerTransactionProcessor,
-    IndexerOutputProcessor,
-    IndexerLockScriptProcessor,
-    IndexerTypeScriptProcessor,
+    IndexerProcessor,
+    BlockProcessor,
+    TransactionProcessor,
+    OutputProcessor,
+    LockScriptProcessor,
+    TypeScriptProcessor,
   ],
-  exports: [IndexerServiceFactory, IndexerUtilService],
+  exports: [IndexerServiceFactory],
 })
 export class IndexerModule { }

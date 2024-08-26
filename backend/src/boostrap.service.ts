@@ -4,7 +4,6 @@ import { BlockchainServiceFactory } from './core/blockchain/blockchain.factory';
 import { Chain } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import { IndexerServiceFactory } from './core/indexer/indexer.factory';
-import { IndexerUtilService } from './core/indexer/indexer.utils';
 import cluster, { Worker } from 'node:cluster';
 import EventEmitter from 'node:events';
 import { Env } from './env';
@@ -30,7 +29,6 @@ export class BootstrapService extends EventEmitter {
     public prismaService: PrismaService,
     public blockchainServiceFactory: BlockchainServiceFactory,
     public indexerServiceFactory: IndexerServiceFactory,
-    public indexerUtil: IndexerUtilService,
   ) {
     super();
     this.masterProcess = new MasterProcess(this);
@@ -87,13 +85,20 @@ class MasterProcess {
     await this.service.indexerServiceFactory.processLegacyIndexerQueueJobs();
     this.chains = await this.service.prismaService.chain.findMany();
     for (const chain of this.chains) {
+      const latestIndexedBlock = await this.service.prismaService.block.findFirst({
+        where: { chainId: chain.id },
+        orderBy: { number: 'desc' },
+      });
+
+      this.nextBlockNumbers[chain.id] = latestIndexedBlock
+        ? latestIndexedBlock.number + 1
+        : chain.startBlock;
+
       // const blockchainService = await this.service.blockchainServiceFactory.getService(
       //   chain.id,
       // );
       // this.tipBlockNumbers[chain.id] = await blockchainService.getTipBlockNumber();
-      this.tipBlockNumbers[chain.id] = 100000;
-      this.nextBlockNumbers[chain.id] =
-        await this.service.indexerUtil.getIndexStartBlockNumber(chain);
+      this.tipBlockNumbers[chain.id] = 200000;
     }
   }
 
@@ -140,8 +145,12 @@ class MasterProcess {
 
     if (usedMemoryPercentage > memoryUsageThreshold) {
       if (global.gc) {
-        this.logger.warn('Memory usage is high, running garbage collection');
         global.gc();
+        this.logger.warn('Memory usage is high, running garbage collection');
+      } else {
+        // Allocate a buffer to trigger garbage collection
+        Buffer.alloc((memoryUsage.heapTotal - memoryUsage.heapUsed) / 2);
+        this.logger.warn('Memory usage is high, allocating buffer to trigger garbage collection');
       }
       this.batchSize = Math.max(Math.round(this.batchSize / 2) - 1, 1);
       this.logger.warn(`Memory usage is high, reducing batch size to ${this.batchSize}`);
@@ -160,11 +169,12 @@ class MasterProcess {
     const counts = await this.service.indexerServiceFactory.getIndexerQueueJobCounts();
     const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
 
-    if (total < this.batchSize * this.workerNum) {
+    const defaultBatchSize = this.service.configService.get('INDEXER_BATCH_SIZE')!;
+    if (total < defaultBatchSize * this.workerNum) {
       await this.assignWorkToWorker(worker);
     } else {
-      this.logger.warn(`Queue has ${total} jobs, waiting for worker ${worker.id}`);
-      setTimeout(() => this.checkQueueAndAssignWork(worker), Math.max(total, 1000));
+      this.logger.warn(`Queue has ${total} jobs, waiting for workers to finish`);
+      setTimeout(() => this.checkQueueAndAssignWork(worker), 5000);
     }
   }
 

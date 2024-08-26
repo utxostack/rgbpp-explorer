@@ -12,7 +12,7 @@ export class IndexerService {
   constructor(
     private chain: Chain,
     private blockchainService: BlockchainService,
-    private indexerBlockQueue: Queue,
+    private indexerQueue: Queue,
   ) {}
 
   public async close() {
@@ -29,7 +29,7 @@ export class IndexerService {
         return this.createJobForBlock(blockNumber);
       }),
     );
-    await this.indexerBlockQueue.addBulk(jobs);
+    await this.indexerQueue.addBulk(jobs);
   }
 
   private async createJobForBlock(blockNumber: number) {

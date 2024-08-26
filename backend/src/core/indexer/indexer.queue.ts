@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue, QueueEvents } from 'bullmq';
 import EventEmitter from 'node:events';
@@ -35,6 +35,7 @@ interface GetJobCountsOpts {
 
 @Injectable()
 export class IndexerQueueService {
+  private logger = new Logger(IndexerQueueService.name);
   private IndexerQueues: Queue[];
   private queueEventsMap = new Map<QueueType, QueueEvents>();
 
@@ -92,6 +93,7 @@ export class IndexerQueueService {
     const queueCounts: { [index: string]: number }[] = [];
     for (const queue of this.IndexerQueues) {
       const counts = await queue.getJobCounts();
+      this.logger.debug(`Queue ${queue.name} counts: ${JSON.stringify(counts)}`);
       queueCounts.push(counts);
     }
 

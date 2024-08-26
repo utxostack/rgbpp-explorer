@@ -45,6 +45,8 @@ CREATE TABLE "Transaction" (
     "isCellbase" BOOLEAN NOT NULL DEFAULT false,
     "isRgbpp" BOOLEAN NOT NULL DEFAULT false,
     "leapDirection" "LeapDirection",
+    "inputCount" INTEGER NOT NULL,
+    "outputCount" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
