@@ -44,8 +44,12 @@ export class BootstrapService extends EventEmitter {
   public async bootstrap(): Promise<void> {
     if (cluster.isPrimary) {
       const now = performance.now();
-      this.bootstrapCompleted.then(() => {
+      this.bootstrapCompleted.then(async () => {
         this.logger.warn(`Bootstrap complete in ${performance.now() - now}ms`);
+        const valid = await this.indexerServiceFactory.validateIndexerData();
+        if (!valid) {
+          process.exit(1);
+        }
       });
       await this.masterProcess.run();
     } else {

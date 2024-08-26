@@ -45,21 +45,24 @@ export class TransactionProcessor extends BaseProcessor<IndexerTransactionData> 
 
     // Update consumedByTxHash and consumedByIndex for inputs
     await Promise.all(
-      transaction.inputs.map((input) => {
-        return this.prismaService.output.update({
-          where: {
-            chainId_txHash_index: {
-              chainId: chain.id,
-              txHash: input.previous_output.tx_hash,
-              index: input.previous_output.index,
+      transaction.inputs
+        .filter((input) => input.previous_output.tx_hash !== CELLBASE_TX_HASH)
+        .map((input) => {
+          this.logger.error(input.previous_output);
+          return this.prismaService.output.update({
+            where: {
+              chainId_txHash_index: {
+                chainId: chain.id,
+                txHash: input.previous_output.tx_hash,
+                index: input.previous_output.index,
+              },
             },
-          },
-          data: {
-            consumedByTxHash: transaction.hash,
-            consumedByIndex: index,
-          },
-        });
-      }),
+            data: {
+              consumedByTxHash: transaction.hash,
+              consumedByIndex: index,
+            },
+          });
+        }),
     );
 
     await this.prismaService.transaction.create({

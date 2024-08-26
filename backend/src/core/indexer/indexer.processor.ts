@@ -83,7 +83,7 @@ export class IndexerProcessor extends WorkerHost implements OnModuleInit {
             return this.outputProcessor.process({
               chain,
               txHash: transaction.hash,
-              index: index.toString(),
+              index: BI.from(index).toHexString(),
               output,
             });
           }),
@@ -207,8 +207,15 @@ export class IndexerProcessor extends WorkerHost implements OnModuleInit {
           in: Array.from(dependenciesTxHashes),
         },
       },
+      include: {
+        outputs: true,
+      },
     });
-    return txs.length === dependenciesTxHashes.size;
+    if (txs.length < dependenciesTxHashes.size) {
+      return false;
+    }
+
+    return txs.every((tx) => tx.outputs.length === tx.outputCount);
   }
 
   @OnWorkerEvent('failed')

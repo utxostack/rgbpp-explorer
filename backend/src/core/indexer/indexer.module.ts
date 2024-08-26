@@ -7,6 +7,7 @@ import { TransactionProcessor } from './processor/transaction.processor';
 import { LockScriptProcessor } from './processor/lock.processor';
 import { TypeScriptProcessor } from './processor/type.processor';
 import { OutputProcessor } from './processor/output.processor';
+import { IndexerValidator } from './indexer.validator';
 
 @Global()
 @Module({
@@ -24,6 +25,7 @@ import { OutputProcessor } from './processor/output.processor';
   ],
   providers: [
     IndexerServiceFactory,
+    IndexerValidator,
     IndexerProcessor,
     BlockProcessor,
     TransactionProcessor,

@@ -5,6 +5,7 @@ import { BlockchainServiceFactory } from '../blockchain/blockchain.factory';
 import { InjectQueue } from '@nestjs/bullmq';
 import { INDEXER_PROCESSOR_QUEUE } from './indexer.processor';
 import { Queue } from 'bullmq';
+import { IndexerValidator } from './indexer.validator';
 
 export class IndexerServiceFactoryError extends Error {
   constructor(message: string) {
@@ -23,6 +24,7 @@ export class IndexerServiceFactory implements OnModuleDestroy {
   constructor(
     private prismaService: PrismaService,
     private blockchainServiceFactory: BlockchainServiceFactory,
+    private indexerValidator: IndexerValidator,
     @InjectQueue(INDEXER_PROCESSOR_QUEUE) private indexerQueue: Queue,
   ) { }
 
@@ -78,5 +80,10 @@ export class IndexerServiceFactory implements OnModuleDestroy {
       };
       check();
     });
+  }
+
+  public async validateIndexerData() {
+    const valid = await this.indexerValidator.validate();
+    return valid;
   }
 }
