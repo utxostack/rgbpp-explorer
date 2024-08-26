@@ -29,12 +29,13 @@ services:
       [
         'sh',
         '-c',
-        'cd /app/backend && npx prisma migrate deploy && npx prisma db seed',
+        'cd /app/backend && pnpm install && npx prisma migrate deploy && npx prisma generate && npx prisma db seed',
       ]
     env_file:
       - ./backend/.env
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     volumes:
       - ./backend:/app/backend
     networks:

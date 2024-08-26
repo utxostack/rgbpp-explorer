@@ -15,12 +15,12 @@ FROM base AS prod-deps
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile --ignore-scripts
 RUN pnpm run --filter backend postinstall
 
-FROM base AS prisma
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
-
-FROM base as build
+FROM base AS build
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm run --filter backend build
+
+FROM base AS prisma
+RUN pnpm install --frozen-lockfile
 
 FROM base
 ENV NODE_ENV production
