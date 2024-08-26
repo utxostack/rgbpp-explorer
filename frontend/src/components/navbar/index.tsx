@@ -100,8 +100,9 @@ export function Navbar() {
           >
             <HoverCard.Root unmountOnExit openDelay={0} closeDelay={200}>
               <HoverCard.Trigger asChild>
-                <Flex
-                  align="center"
+                <styled.button
+                  display="flex"
+                  alignItems="center"
                   gap="12px"
                   cursor="default"
                   color={pathname.startsWith(`/${locale}/explorer`) ? 'brand' : 'text.primary'}
@@ -109,7 +110,7 @@ export function Navbar() {
                 >
                   <Trans>Explorer</Trans>
                   <ArrowDownIcon w="16px" h="16px" />
-                </Flex>
+                </styled.button>
               </HoverCard.Trigger>
 
               <HoverCard.Positioner>
