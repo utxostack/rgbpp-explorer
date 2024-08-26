@@ -54,17 +54,17 @@ export class IndexerProcessor extends WorkerHost implements OnModuleInit {
 
   public async process(job: Job<IndexerJobData>): Promise<void> {
     const { chain, block } = job.data;
-    if (await this.isBlockAlreadyProcessed(chain, block.header.hash)) {
-      return;
-    }
     if (!(await this.isPreviousProcessFinished(chain, block))) {
       job.moveToDelayed(Date.now() + 1000);
-      this.logger.warn(
+      this.logger.debug(
         `Previous process not finished for block ${block.header.hash} for chain ${chain.name}`,
       );
       throw new DelayedError('Previous process not finished');
     }
-    await this.blockProcessor.process({ chain, block });
+
+    if (!(await this.isBlockAlreadyProcessed(chain, block.header.hash))) {
+      await this.blockProcessor.process({ chain, block });
+    }
 
     await this.processTypeScripts({ chain, block });
     await this.processLockScripts({ chain, block });
@@ -221,20 +221,19 @@ export class IndexerProcessor extends WorkerHost implements OnModuleInit {
   @OnWorkerEvent('failed')
   onFailed(job: Job<IndexerJobData>, error: Error) {
     const { chain, block } = job.data;
+    const blockNumber = BI.from(block.header.number).toNumber();
     this.logger.error(
-      `Job ${job.id} failed for block ${block.header.hash} for chain ${chain.name}: ${error.message}`,
+      `Block ${block.header.hash}(${blockNumber}) for chain ${chain.name}: ${error.message} processing failed`,
     );
     this.logger.error(error.stack);
-  }
-
-  @OnWorkerEvent('stalled')
-  onStalled(jobId: string) {
-    this.logger.warn(`Job ${jobId} stalled`);
   }
 
   @OnWorkerEvent('completed')
   onCompleted(job: Job<IndexerJobData>) {
     const { chain, block } = job.data;
-    this.logger.log(`Block ${block.header.hash} for chain ${chain.name} processed successfully`);
+    const blockNumber = BI.from(block.header.number).toNumber();
+    this.logger.log(
+      `Block ${block.header.hash}(${blockNumber}) for chain ${chain.name} processed successfully`,
+    );
   }
 }

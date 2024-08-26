@@ -51,7 +51,6 @@ export class IndexerServiceFactory implements OnModuleDestroy {
 
   public async getIndexerQueueJobCounts(): Promise<JobCounts> {
     const jobCounts = await this.indexerQueue.getJobCounts();
-    this.logger.warn(`Indexer queue job counts: ${JSON.stringify(jobCounts)}`);
     return Object.entries(jobCounts).reduce((acc, [key, value]) => {
       if (key === 'completed' || key === 'failed') {
         return acc;

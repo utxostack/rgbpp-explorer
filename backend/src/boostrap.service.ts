@@ -142,7 +142,6 @@ class MasterProcess {
     const memoryUsageThreshold = this.service.configService.get('INDEXER_MEMORY_USAGE_THRESHOLD')!;
     const memoryUsage = process.memoryUsage();
     const usedMemoryPercentage = (memoryUsage.heapUsed / memoryUsage.heapTotal) * 100;
-    this.logger.error(`Memory usage: ${usedMemoryPercentage.toFixed(2)}%`);
 
     if (usedMemoryPercentage > memoryUsageThreshold) {
       if (global.gc) {
@@ -174,7 +173,7 @@ class MasterProcess {
     if (total < defaultBatchSize * this.workerNum) {
       await this.assignWorkToWorker(worker);
     } else {
-      this.logger.warn(`Queue has ${total} jobs, waiting for workers to finish`);
+      this.logger.debug(`Queue has ${total} jobs, waiting for workers to finish`);
       setTimeout(() => this.checkQueueAndAssignWork(worker), 5000);
     }
   }

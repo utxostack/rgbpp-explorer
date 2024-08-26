@@ -48,7 +48,6 @@ export class TransactionProcessor extends BaseProcessor<IndexerTransactionData> 
       transaction.inputs
         .filter((input) => input.previous_output.tx_hash !== CELLBASE_TX_HASH)
         .map((input) => {
-          this.logger.error(input.previous_output);
           return this.prismaService.output.update({
             where: {
               chainId_txHash_index: {

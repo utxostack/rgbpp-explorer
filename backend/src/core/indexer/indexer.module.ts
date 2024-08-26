@@ -17,9 +17,10 @@ import { IndexerValidator } from './indexer.validator';
       defaultJobOptions: {
         attempts: 10,
         backoff: {
-          type: 'fixed',
-          delay: 5000,
+          type: 'exponential',
+          delay: 1000,
         },
+        removeOnComplete: true,
       },
     }),
   ],
