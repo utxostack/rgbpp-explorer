@@ -11,16 +11,16 @@ import { Popover, Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { env } from '@/constants/env'
 
-const TESTNET_SYMBOL = 'testnet'
+const TESTNET_SYMBOL = 'testnet.'
 
 function resolveDomain(fallback: string, domain?: string, isMainnet = false) {
-  if (domain) {
-    if (domain.startsWith(TESTNET_SYMBOL) && isMainnet) {
-      return `https://${domain.substring(TESTNET_SYMBOL.length)}`
-    }
-    return `https://testnet.${domain}`
+  if (!domain) return fallback
+  if (isMainnet) {
+    return domain.startsWith(TESTNET_SYMBOL)
+      ? `https://${domain.substring(TESTNET_SYMBOL.length)}`
+      : `https://${domain}`
   }
-  return fallback
+  return domain.startsWith(TESTNET_SYMBOL) ? `https://${domain}` : `https://${TESTNET_SYMBOL}${domain}`
 }
 
 export const NetworkSwitcher = memo(function NetworkSwitcher() {
