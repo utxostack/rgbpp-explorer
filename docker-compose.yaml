@@ -1,26 +1,77 @@
 services:
   explorer-backend:
-    depends_on:
-      - redis
     build:
       context: .
       args:
         - GIT_BRANCH=${GIT_BRANCH}
     ports:
       - '3000:3000'
+    depends_on:
+      prisma-migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_started
+      postgres:
+        condition: service_healthy
     env_file:
       - ./backend/.env
+    networks:
+      - internal
+
+  prisma-migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: prisma
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/explorer
+    command:
+      [
+        'sh',
+        '-c',
+        'cd /app/backend && npx prisma migrate deploy && npx prisma db seed',
+      ]
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - postgres
+    volumes:
+      - ./backend:/app/backend
+    networks:
+      - internal
 
   redis:
     # https://github.com/docker-library/redis/blob/b77450d/7.4/alpine/Dockerfile
     image: redis:7-alpine
-    ports:
-      - '127.0.0.1:6379:6379'
+    command: /usr/local/etc/redis/redis.conf
     volumes:
       # Redis' WORKDIR is /data
       - redis-data:/data
       - ./backend/redis.conf:/usr/local/etc/redis/redis.conf:ro
-    command: /usr/local/etc/redis/redis.conf
+    networks:
+      - internal
+
+  postgres:
+    container_name: postgres
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: explorer
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+    networks:
+      - internal
 
 volumes:
   redis-data:
+  postgres_volume:
+
+networks:
+  internal:
+    driver: bridge
