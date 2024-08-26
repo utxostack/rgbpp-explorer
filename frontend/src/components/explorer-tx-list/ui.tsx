@@ -5,6 +5,7 @@ import { Box, Flex, VStack } from 'styled-system/jsx'
 import { AgoTimeFormatter } from '@/components/ago-time-formatter'
 import { Amount } from '@/components/latest-tx-list/amount'
 import { LayerType } from '@/components/layer-type'
+import { TextOverflowTooltip } from '@/components/text-overflow-tooltip'
 import { Table } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { CkbTransaction, RgbppTransaction } from '@/gql/graphql'
@@ -21,10 +22,13 @@ export function ExplorerTxListUI<
 
   if (!isMd) {
     return txs.map(({ txid, ...tx }) => {
+      const amount = <Amount ckbTransaction={tx.ckbTransaction as CkbTransaction} />
       return (
         <Link
           href={`/transaction/${txid}`}
-          display="flex"
+          display="grid"
+          gridTemplateColumns="repeat(2, calc(50% - 4px))"
+          gap="8px"
           key={txid}
           w="100%"
           justifyContent="space-between"
@@ -38,15 +42,17 @@ export function ExplorerTxListUI<
           }}
         >
           <VStack fontSize="14px" alignItems="start" gap="4px">
-            <Box color="text.link">{truncateMiddle(txid ?? '', 10, 8)}</Box>
+            <Box color="text.link">{truncateMiddle(txid ?? '', 6, 6)}</Box>
             <Box fontWeight="medium" color="text.secondary">
               <AgoTimeFormatter time={tx.timestamp} tooltip />
             </Box>
           </VStack>
           <Flex flexDir="column" alignItems="end" justifyContent="center">
-            <Box>
-              <Amount ckbTransaction={tx.ckbTransaction as CkbTransaction} />
-            </Box>
+            <TextOverflowTooltip label={amount}>
+              <Box truncate w="100%" textAlign="right">
+                {amount}
+              </Box>
+            </TextOverflowTooltip>
           </Flex>
         </Link>
       )

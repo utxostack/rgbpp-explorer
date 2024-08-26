@@ -98,7 +98,8 @@ function Cell({ cell, address: currentAddress }: { cell: CkbCell; address?: stri
     <Flex
       justifyContent="space-between"
       w="100%"
-      h="60px"
+      minH="60px"
+      py="8px"
       alignItems="center"
       borderBottom="1px solid"
       borderBottomColor="border.primary"
@@ -123,8 +124,8 @@ function Cell({ cell, address: currentAddress }: { cell: CkbCell; address?: stri
           )}
         </Copier>
       </HStack>
-      <VStack gap={0} alignItems="flex-end">
-        <Box fontSize={{ base: '14px', md: '16px' }} textAlign="right">
+      <VStack gap={0} alignItems="flex-end" fontSize={{ base: '14px', md: '16px' }} textAlign="right">
+        <Box>
           {formatNumber(shannonToCKB(cell.capacity))}{' '}
           <Text as="span" fontSize="12px" color="text.third">
             <Trans>CKB</Trans>
