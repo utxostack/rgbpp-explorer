@@ -98,11 +98,8 @@ class MasterProcess {
         ? latestIndexedBlock.number + 1
         : chain.startBlock;
 
-      // const blockchainService = await this.service.blockchainServiceFactory.getService(
-      //   chain.id,
-      // );
-      // this.tipBlockNumbers[chain.id] = await blockchainService.getTipBlockNumber();
-      this.tipBlockNumbers[chain.id] = 200000;
+      const blockchainService = await this.service.blockchainServiceFactory.getService(chain.id);
+      this.tipBlockNumbers[chain.id] = await blockchainService.getTipBlockNumber();
     }
   }
 

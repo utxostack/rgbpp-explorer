@@ -1,10 +1,8 @@
 import { Logger } from '@nestjs/common';
 import { Chain } from '@prisma/client';
 import { BI } from '@ckb-lumos/bi';
-import * as BlockchainInterface from '../blockchain/blockchain.interface';
 import { BlockchainService } from '../blockchain/blockchain.service';
-import { JobsOptions, Queue } from 'bullmq';
-import { QueueJobPriority } from './indexer.queue';
+import { Queue } from 'bullmq';
 
 export class IndexerService {
   private readonly logger = new Logger(IndexerService.name);
@@ -13,7 +11,7 @@ export class IndexerService {
     private chain: Chain,
     private blockchainService: BlockchainService,
     private indexerQueue: Queue,
-  ) {}
+  ) { }
 
   public async close() {
     await this.blockchainService.close();
@@ -37,20 +35,9 @@ export class IndexerService {
     return {
       name: block.header.hash,
       data: { block, chain: this.chain },
-      opts: this.createJobOptions(block),
+      opts: {
+        jobId: block.header.hash,
+      },
     };
-  }
-
-  private createJobOptions(block: BlockchainInterface.Block): JobsOptions {
-    const blockNumber = BI.from(block.header.number).toNumber();
-    return {
-      jobId: block.header.hash,
-      priority: this.calculatePriority(blockNumber),
-    };
-  }
-
-  private calculatePriority(blockNumber: number): number {
-    const MAX_PRIORITY = 2097152;
-    return Math.max(QueueJobPriority.Block, MAX_PRIORITY - (blockNumber % MAX_PRIORITY));
   }
 }
