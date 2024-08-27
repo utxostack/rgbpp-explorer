@@ -108,11 +108,12 @@ class MasterProcess {
     cluster.on('message', this.handleWorkerMessage.bind(this));
   }
 
-  private startWorkers(): void {
+  private async startWorkers(): Promise<void> {
     this.logger.warn(`Starting ${this.workerNum} workers`);
     for (let i = 0; i < this.workerNum; i += 1) {
       cluster.fork();
       this.activeWorkers++;
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   }
 

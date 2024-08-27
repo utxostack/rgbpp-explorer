@@ -22,7 +22,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: prisma
+      target: base
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/explorer
     command:

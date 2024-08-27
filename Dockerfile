@@ -19,9 +19,6 @@ FROM base AS build
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm run --filter backend build
 
-FROM base AS prisma
-RUN pnpm install --frozen-lockfile
-
 FROM base
 ENV NODE_ENV production
 ENV GIT_BRANCH=${GIT_BRANCH}
