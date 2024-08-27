@@ -6,6 +6,17 @@ import { Text } from '@/components/ui'
 import { Icon } from '@/components/ui/primitives/icon'
 import { formatNumber as formatNumberFn } from '@/lib/string/format-number'
 
+export const splitLineBefore = {
+  content: { base: 'none', md: '" "' },
+  pos: 'absolute',
+  top: '50%',
+  right: '0',
+  w: '1px',
+  h: '40px',
+  bg: 'border.primary',
+  transform: 'translateY(-50%)',
+}
+
 export function OverviewInfo({ children, ...props }: FlexProps) {
   return (
     <Flex
@@ -59,16 +70,7 @@ export function OverviewInfoItem({
       textAlign="center"
       fontSize={{ base: '14px', md: '20px' }}
       pos="relative"
-      _before={{
-        content: { base: 'none', md: '" "' },
-        pos: 'absolute',
-        top: '50%',
-        right: '0',
-        w: '1px',
-        h: '40px',
-        bg: 'border.primary',
-        transform: 'translateY(-50%)',
-      }}
+      _before={splitLineBefore}
       _last={{
         _before: {
           content: 'none',

@@ -6,7 +6,13 @@ import SpeedDropIcon from '@/assets/speed/drop.svg'
 import SpeedHighIcon from '@/assets/speed/high.svg'
 import SpeedLowIcon from '@/assets/speed/low.svg'
 import SpeedMediumIcon from '@/assets/speed/medium.svg'
-import { OverviewInfo, OverviewInfoGrid, OverviewInfoItem, OverviewInfoTagLabel } from '@/components/overview-info'
+import {
+  OverviewInfo,
+  OverviewInfoGrid,
+  OverviewInfoItem,
+  OverviewInfoTagLabel,
+  splitLineBefore,
+} from '@/components/overview-info'
 import { Heading } from '@/components/ui'
 import { graphql } from '@/gql'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
@@ -59,28 +65,13 @@ export async function Info() {
           css={{
             '& > div:not(:last-child)': {
               pos: 'relative',
-              _before: {
-                content: '" "',
-                pos: 'absolute',
-                top: '50%',
-                right: '0',
-                w: '1px',
-                h: '40px',
-                bg: 'border.primary',
-                transform: 'translateY(-50%)',
-              },
+              _before: { ...splitLineBefore, content: '" "' },
             },
             '& > div:nth-child(even):not(:last-child)': {
               pos: 'relative',
               _before: {
+                ...splitLineBefore,
                 content: { base: 'unset', md: '" "' },
-                pos: 'absolute',
-                top: '50%',
-                right: '0',
-                w: '1px',
-                h: '40px',
-                bg: 'border.primary',
-                transform: 'translateY(-50%)',
               },
             },
           }}
