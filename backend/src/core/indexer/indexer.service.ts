@@ -4,6 +4,8 @@ import { BI } from '@ckb-lumos/bi';
 import { BlockchainService } from '../blockchain/blockchain.service';
 import { Queue } from 'bullmq';
 
+const MAX_BULLMQ_JOB_PRIORITY = 2097152;
+
 export class IndexerService {
   private readonly logger = new Logger(IndexerService.name);
 
@@ -11,7 +13,7 @@ export class IndexerService {
     private chain: Chain,
     private blockchainService: BlockchainService,
     private indexerQueue: Queue,
-  ) { }
+  ) {}
 
   public async close() {
     await this.blockchainService.close();
@@ -37,7 +39,14 @@ export class IndexerService {
       data: { block, chain: this.chain },
       opts: {
         jobId: block.header.hash,
+        priority: this.getBlockJobPriority(blockNumber),
       },
     };
+  }
+
+  private getBlockJobPriority(blockNumber: number) {
+    // We use the block number as the priority, so that the jobs are processed in order
+    // bullmq only supports 32-bit signed integers as priority, so we need to wrap around
+    return (blockNumber + 1) % MAX_BULLMQ_JOB_PRIORITY;
   }
 }

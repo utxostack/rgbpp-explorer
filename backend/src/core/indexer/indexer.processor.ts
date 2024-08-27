@@ -5,7 +5,6 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../database/prisma/prisma.service';
 import * as BlockchainInterface from '../blockchain/blockchain.interface';
 import { TEN_MINUTES_MS } from 'src/common/date';
-import cluster from 'node:cluster';
 import { Chain } from '@prisma/client';
 import { Env } from 'src/env';
 import { BI } from '@ckb-lumos/bi';
@@ -49,7 +48,6 @@ export class IndexerProcessor extends WorkerHost implements OnModuleInit {
     this.worker.concurrency = this.batchSize * this.workerNumber;
     this.worker.opts.stalledInterval = TEN_MINUTES_MS;
     this.worker.opts.maxStalledCount = 5;
-    this.worker.opts.useWorkerThreads = cluster.isWorker;
   }
 
   public async process(job: Job<IndexerJobData>): Promise<void> {
@@ -59,7 +57,7 @@ export class IndexerProcessor extends WorkerHost implements OnModuleInit {
       this.logger.debug(
         `Previous process not finished for block ${block.header.hash} for chain ${chain.name}`,
       );
-      throw new DelayedError('Previous process not finished');
+      throw new DelayedError();
     }
 
     await this.blockProcessor.process({ chain, block });
