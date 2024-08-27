@@ -239,7 +239,7 @@ class MasterProcess {
     const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
 
     const defaultBatchSize = this.service.configService.get('INDEXER_BATCH_SIZE')!;
-    if (total < defaultBatchSize * this.workerNum) {
+    if (total < defaultBatchSize * this.workerNum * 10) {
       await this.assignWorkToWorker(worker);
     } else {
       this.logger.debug(`Queue has ${total} jobs, waiting for workers to finish`);
@@ -251,6 +251,7 @@ class MasterProcess {
     const missingBlocks = this.missingBlocksMap.get(this.chains[this.currentChainIndex].id) ?? [];
     if (missingBlocks.length > 0) {
       const { chainId, startBlockNumber, endBlockNumber } = missingBlocks.shift()!;
+      this.missingBlocksMap.set(chainId, missingBlocks);
       worker.send({ chainId, startBlockNumber, endBlockNumber });
       this.logger.warn(
         `Assigned missing block work to worker ${worker.id} for chain ${chainId}, blocks ${startBlockNumber} to ${endBlockNumber}`,
@@ -275,7 +276,8 @@ class MasterProcess {
     if (
       startBlockNumber > this.tipBlockNumbers[chain.id] ||
       // If there are more delayed jobs than active jobs, meaning the queue is stuck
-      jobCounts['active'] / jobCounts['delayed'] < 0.2
+      (jobCounts['active'] / jobCounts['delayed'] < 0.2 &&
+        (this.missingBlocksMap.get(chain.id) ?? []).length === 0)
     ) {
       await this.validateAndQueueMissingBlocks();
       const missingBlocks = this.missingBlocksMap.get(chain.id) ?? [];
