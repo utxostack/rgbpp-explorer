@@ -7,6 +7,7 @@ import { Box, Flex, Grid, HStack, VStack } from 'styled-system/jsx'
 import SubTractIcon from '@/assets/subtract.svg'
 import { parseRgbppLockArgs } from '@/components/ckb/parse-rgbpp-lock-args'
 import { Copier } from '@/components/copier'
+import { IfBreakpoint } from '@/components/if-breakpoint'
 import { Heading, Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { BitcoinInput, BitcoinOutput, CellType, CkbCell, CkbTransaction } from '@/gql/graphql'
@@ -26,7 +27,14 @@ export interface BtcUtxoTablesProps {
 
 export function BtcUtxoTables({ txid, vin = [], vout = [], currentAddress, ckbCell }: BtcUtxoTablesProps) {
   return (
-    <Grid w="100%" gridTemplateColumns="repeat(2, 1fr)" gap="38px" pt="10px" pb="20px" px="30px">
+    <Grid
+      w="100%"
+      gridTemplateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }}
+      gap={{ base: '20px', lg: '38px' }}
+      pt="10px"
+      pb="20px"
+      px={{ base: '20px', xl: '30px' }}
+    >
       <VStack gap={0} w="100%">
         <Heading
           fontSize="14px"
@@ -98,15 +106,20 @@ function UtxoInput({
         </Text>
       )
     if (!vin.prevout) return null
+    const formattedAddress = (
+      <IfBreakpoint breakpoint="sm" fallback={truncateMiddle(vin.prevout.address?.address ?? '', 6, 6)}>
+        {truncateMiddle(vin.prevout.address?.address ?? '', 10, 10)}
+      </IfBreakpoint>
+    )
     return (
       <Copier onlyIcon value={vin.prevout.address?.address}>
         {currentAddress === vin.prevout.address?.address ? (
           <Text as="span" color="text.primary">
-            {truncateMiddle(currentAddress, 10, 10)}
+            {formattedAddress}
           </Text>
         ) : (
           <Link href={`/address/${vin.prevout.address?.address}`} color="brand" fontSize="14px">
-            {truncateMiddle(vin.prevout.address?.address, 10, 10)}
+            {formattedAddress}
           </Link>
         )}
       </Copier>
@@ -172,6 +185,11 @@ function UtxoOutput({
   currentAddress?: string
   ckbOutputs?: CkbTransaction['outputs']
 }) {
+  const formattedAddress = (
+    <IfBreakpoint breakpoint="sm" fallback={truncateMiddle(vout.address?.address ?? '', 6, 6)}>
+      {truncateMiddle(vout.address?.address ?? '', 10, 10)}
+    </IfBreakpoint>
+  )
   return (
     <Flex
       justifyContent="space-between"
@@ -195,11 +213,11 @@ function UtxoOutput({
           <Copier onlyIcon value={vout.address?.address}>
             {currentAddress === vout.address?.address ? (
               <Text as="span" color="text.primary">
-                {truncateMiddle(currentAddress, 10, 10)}
+                {formattedAddress}
               </Text>
             ) : (
               <Link href={`/address/${vout.address?.address}`} color="brand" fontSize="14px">
-                {truncateMiddle(vout.address?.address, 10, 10)}
+                {formattedAddress}
               </Link>
             )}
           </Copier>

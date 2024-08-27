@@ -1,12 +1,13 @@
 import { t } from '@lingui/macro'
 import { notFound } from 'next/navigation'
 import type { PropsWithChildren, ReactNode } from 'react'
-import { HStack, VStack } from 'styled-system/jsx'
+import { Flex, HStack, VStack } from 'styled-system/jsx'
 
 import { BtcAddressOverview } from '@/components/btc/btc-address-overview'
 import { BtcAddressType } from '@/components/btc/btc-address-type'
 import { CkbAddressOverview } from '@/components/ckb/ckb-address-overview'
 import { Copier } from '@/components/copier'
+import { IfBreakpoint } from '@/components/if-breakpoint'
 import { LinkTabs } from '@/components/link-tabs'
 import { Heading, Text } from '@/components/ui'
 import { graphql } from '@/gql'
@@ -67,20 +68,30 @@ export default async function Layout({
   if (!overflow) notFound()
 
   return (
-    <VStack w="100%" maxW="content" p="30px" gap="30px">
-      <HStack w="100%" gap="24px" p="30px" bg="bg.card" rounded="8px">
-        <Heading fontSize="20px" fontWeight="semibold">
+    <VStack w="100%" maxW="content" p={{ base: '20px', xl: '30px' }} gap={{ base: '20px', xl: '30px' }}>
+      <Flex
+        flexDirection={{ base: 'column', lg: 'row' }}
+        w="100%"
+        gap={{ base: '8px', lg: '24px' }}
+        p="30px"
+        bg="bg.card"
+        rounded="8px"
+      >
+        <Heading display="flex" alignItems="center" gap="16px" fontSize="20px" lineHeight="24px" fontWeight="semibold">
           {t(i18n)`Address`}
+          <IfBreakpoint breakpoint="lg" fallback={<BtcAddressType address={address} />} />
         </Heading>
         <Copier value={address}>
           <HStack maxW="calc(1160px - 100px - 24px)" truncate>
             <Text as="span" wordBreak="break-all" whiteSpace="wrap" textAlign="left">
               {address}
             </Text>
-            <BtcAddressType address={address} />
+            <IfBreakpoint breakpoint="lg">
+              <BtcAddressType address={address} />
+            </IfBreakpoint>
           </HStack>
         </Copier>
-      </HStack>
+      </Flex>
       {overflow}
       <LinkTabs
         w="100%"

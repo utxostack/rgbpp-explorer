@@ -5,6 +5,7 @@ import { button } from '@/configs/ui-preset/button'
 import { hoverCard } from '@/configs/ui-preset/hover-card'
 import { iconButton } from '@/configs/ui-preset/icon-button'
 import { pagination } from '@/configs/ui-preset/pagination'
+import { popover } from '@/configs/ui-preset/popover'
 import { table } from '@/configs/ui-preset/table'
 import { tabs } from '@/configs/ui-preset/tabs'
 import { tooltip } from '@/configs/ui-preset/tooltip'
@@ -14,7 +15,7 @@ const globalCss = defineGlobalStyles({
     color: 'text.primary',
     background: 'bg.default',
     '--colors-bg-default': 'var(--colors-bg-primary)',
-    minW: '1280px',
+    minW: '360px',
     fontFamily: 'var(--font-montserrat)',
     fontWeight: 'medium',
     minH: '100svh',
@@ -59,6 +60,7 @@ export default defineConfig({
         pagination,
         tabs,
         hoverCard,
+        popover,
       },
       tokens: {
         sizes: {
