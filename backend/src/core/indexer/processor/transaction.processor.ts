@@ -64,8 +64,15 @@ export class TransactionProcessor extends BaseProcessor<IndexerTransactionData> 
         }),
     );
 
-    await this.prismaService.transaction.create({
-      data: {
+    await this.prismaService.transaction.upsert({
+      where: {
+        chainId_hash: {
+          chainId: chain.id,
+          hash: transaction.hash,
+        },
+      },
+      update: {},
+      create: {
         chainId: chain.id,
         hash: transaction.hash,
         index,

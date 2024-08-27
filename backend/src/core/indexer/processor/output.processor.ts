@@ -63,8 +63,16 @@ export class OutputProcessor extends BaseProcessor<IndexerOutputData> {
       }
     }
 
-    await this.prismaService.output.create({
-      data: {
+    await this.prismaService.output.upsert({
+      where: {
+        chainId_txHash_index: {
+          chainId: chain.id,
+          txHash,
+          index,
+        },
+      },
+      update: {},
+      create: {
         chainId: chain.id,
         txHash,
         index,

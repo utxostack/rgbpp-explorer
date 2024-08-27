@@ -62,10 +62,7 @@ export class IndexerProcessor extends WorkerHost implements OnModuleInit {
       throw new DelayedError('Previous process not finished');
     }
 
-    if (!(await this.isBlockAlreadyProcessed(chain, block.header.hash))) {
-      await this.blockProcessor.process({ chain, block });
-    }
-
+    await this.blockProcessor.process({ chain, block });
     await this.processTypeScripts({ chain, block });
     await this.processLockScripts({ chain, block });
 
@@ -163,22 +160,6 @@ export class IndexerProcessor extends WorkerHost implements OnModuleInit {
         });
       }),
     );
-  }
-
-  private async isBlockAlreadyProcessed(chain: Chain, hash: string): Promise<boolean> {
-    const existingBlock = await this.prismaService.block.findUnique({
-      where: {
-        chainId_hash: {
-          chainId: chain.id,
-          hash,
-        },
-      },
-    });
-    if (existingBlock) {
-      this.logger.warn(`Block ${hash} for chain ${chain.name} already exists`);
-      return true;
-    }
-    return false;
   }
 
   private async isPreviousProcessFinished(chain: Chain, block: BlockchainInterface.Block) {

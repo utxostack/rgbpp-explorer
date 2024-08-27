@@ -29,8 +29,15 @@ export class BlockProcessor extends BaseProcessor<IndexerBlockJobData> {
     const difficulty = compactToDifficulty(block.header.compact_target).toBigInt();
     const timestamp = new Date(BI.from(block.header.timestamp).toNumber());
 
-    await this.prismaService.block.create({
-      data: {
+    await this.prismaService.block.upsert({
+      where: {
+        chainId_hash: {
+          chainId: chain.id,
+          hash: block.header.hash,
+        }
+      },
+      update: {},
+      create: {
         chainId: chain.id,
         number,
         hash: block.header.hash,
