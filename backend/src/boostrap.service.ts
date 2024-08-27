@@ -107,7 +107,7 @@ class MasterProcess {
   }
 
   private async initializeChainData(): Promise<void> {
-    await this.service.indexerServiceFactory.processLegacyIndexerQueueJobs();
+    await this.service.indexerServiceFactory.cleanLegacyIndexerQueueJobs();
     this.chains = await this.service.prismaService.chain.findMany();
     for (const chain of this.chains) {
       const latestIndexedBlock = await this.service.prismaService.block.findFirst({

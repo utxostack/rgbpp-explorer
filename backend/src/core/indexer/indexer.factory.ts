@@ -17,6 +17,7 @@ type JobCounts = { [key: string]: number };
 
 @Injectable()
 export class IndexerServiceFactory implements OnModuleDestroy {
+  private logger = new Logger(IndexerServiceFactory.name);
   private services: Map<number, IndexerService> = new Map();
 
   constructor(
@@ -56,11 +57,14 @@ export class IndexerServiceFactory implements OnModuleDestroy {
     }, {} as JobCounts);
   }
 
-  public async processLegacyIndexerQueueJobs() {
-    const activeJobs = await this.indexerQueue.getActive();
-    for (const job of activeJobs) {
-      await job.moveToDelayed(Date.now());
-    }
+  public async cleanLegacyIndexerQueueJobs() {
+    const jobCounts = await this.getIndexerQueueJobCounts();
+    await Promise.all(Object.entries(jobCounts).map(async ([key, count]) => {
+      if (count > 0) {
+        await this.indexerQueue.clean(0, count, key as any);
+      }
+    }));
+    this.logger.warn('Cleaned legacy indexer queue jobs');
   }
 
   public async waitUntilIndexerQueueEmpty() {
