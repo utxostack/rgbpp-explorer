@@ -23,40 +23,38 @@ export class TypeScriptProcessor extends BaseProcessor<IndexerTypeScriptData> {
     const { chain, script, scriptHash } = data;
     this.logger.debug(`Processing type script ${scriptHash} for chain ${chain.name}`);
 
-    await this.prismaService.$transaction(async (tx) => {
-      const existTypeScript = await tx.typeScript.findUnique({
+    const existTypeScript = await this.prismaService.typeScript.findUnique({
+      where: {
+        chainId_scriptHash: {
+          chainId: chain.id,
+          scriptHash,
+        },
+      },
+    });
+    if (existTypeScript) {
+      return;
+    }
+
+    try {
+      await this.prismaService.typeScript.upsert({
         where: {
           chainId_scriptHash: {
             chainId: chain.id,
             scriptHash,
           },
         },
+        update: {},
+        create: {
+          chainId: chain.id,
+          codeHash: script.codeHash,
+          hashType: script.hashType,
+          args: script.args,
+          scriptHash,
+        },
       });
-      if (existTypeScript) {
-        return;
-      }
-
-      try {
-        await tx.typeScript.upsert({
-          where: {
-            chainId_scriptHash: {
-              chainId: chain.id,
-              scriptHash,
-            },
-          },
-          update: {},
-          create: {
-            chainId: chain.id,
-            codeHash: script.codeHash,
-            hashType: script.hashType,
-            args: script.args,
-            scriptHash,
-          },
-        });
-      } catch (err) {
-        this.logger.error(`Error processing type script ${scriptHash} for chain ${chain.name}`);
-        this.logger.error(err);
-      }
-    });
+    } catch (err) {
+      this.logger.error(`Error processing type script ${scriptHash} for chain ${chain.name}`);
+      this.logger.error(err);
+    }
   }
 }

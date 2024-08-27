@@ -26,44 +26,42 @@ export class LockScriptProcessor extends BaseProcessor<IndexerLockScriptData> {
     const { chain, script, scriptHash } = data;
     this.logger.debug(`Processing lock script ${scriptHash} for chain ${chain.name}`);
 
-    await this.prismaService.$transaction(async (tx) => {
-      const existLockScript = await tx.lockScript.findUnique({
+    const existLockScript = await this.prismaService.lockScript.findUnique({
+      where: {
+        chainId_scriptHash: {
+          chainId: chain.id,
+          scriptHash,
+        },
+      },
+    });
+    if (existLockScript) {
+      return;
+    }
+
+    const isRgbppLock = this.rgbppCoreService.isRgbppLockScript(script);
+    const isBtcTimeLock = this.rgbppCoreService.isBtcTimeLockScript(script);
+    try {
+      await this.prismaService.lockScript.upsert({
         where: {
           chainId_scriptHash: {
             chainId: chain.id,
             scriptHash,
           },
         },
+        update: {},
+        create: {
+          chainId: chain.id,
+          codeHash: script.codeHash,
+          hashType: script.hashType,
+          args: script.args,
+          scriptHash,
+          isRgbppLock,
+          isBtcTimeLock,
+        },
       });
-      if (existLockScript) {
-        return;
-      }
-
-      const isRgbppLock = this.rgbppCoreService.isRgbppLockScript(script);
-      const isBtcTimeLock = this.rgbppCoreService.isBtcTimeLockScript(script);
-      try {
-        await tx.lockScript.upsert({
-          where: {
-            chainId_scriptHash: {
-              chainId: chain.id,
-              scriptHash,
-            },
-          },
-          update: {},
-          create: {
-            chainId: chain.id,
-            codeHash: script.codeHash,
-            hashType: script.hashType,
-            args: script.args,
-            scriptHash,
-            isRgbppLock,
-            isBtcTimeLock,
-          },
-        });
-      } catch (err) {
-        this.logger.error(`Failed to upsert lockScript: ${scriptHash} for chain ${chain.name}`);
-        this.logger.error(err);
-      }
-    });
+    } catch (err) {
+      this.logger.error(`Failed to upsert lockScript: ${scriptHash} for chain ${chain.name}`);
+      this.logger.error(err);
+    }
   }
 }
