@@ -57,7 +57,7 @@ export class IndexerProcessor extends WorkerHost implements OnModuleInit {
       this.logger.debug(
         `Previous process not finished for block ${block.header.hash} for chain ${chain.name}`,
       );
-      job.moveToDelayed(Date.now() + 1000);
+      job.moveToDelayed(Date.now() + 5000);
       throw new DelayedError();
     }
 
