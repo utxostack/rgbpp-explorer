@@ -25,19 +25,19 @@ export default async function checkTransactionInputCounts(prismaService: PrismaS
     )
     SELECT
       t."chainId",
-      t."hash" as transactionHash,
+      t."hash" as "transactionHash",
       t."blockNumber",
-      t."inputCount" as expectedCount,
+      t."inputCount" as "expectedCount",
       CASE
         WHEN t."isCellbase" THEN COALESCE(aic.actual_count, 0) + 1
         ELSE COALESCE(aic.actual_count, 0)
-      END as adjustedActualCount,
+      END as "adjustedActualCount",
       t."inputCount" - (
         CASE
           WHEN t."isCellbase" THEN COALESCE(aic.actual_count, 0) + 1
           ELSE COALESCE(aic.actual_count, 0)
         END
-      ) as countDifference
+      ) as "countDifference"
     FROM
       "Transaction" t
     LEFT JOIN

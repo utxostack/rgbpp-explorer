@@ -25,9 +25,9 @@ export default async function checkBlockTransactionCounts(prismaService: PrismaS
       b."chainId",
       b."number" as "blockNumber",
       b."hash" as "blockHash",
-      b."transactionsCount" as expectedCount,
-      tc.actual_count as actualCount,
-      b."transactionsCount" - tc.actual_count as countDifference
+      b."transactionsCount" as "expectedCount",
+      tc.actual_count as "actualCount",
+      b."transactionsCount" - tc.actual_count as "countDifference"
     FROM
       "Block" b
     JOIN

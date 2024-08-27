@@ -23,11 +23,11 @@ export default async function checkTransactionOutputCounts(prismaService: Prisma
     )
     SELECT
       t."chainId",
-      t."hash" as transactionHash,
+      t."hash" as "transactionHash",
       t."blockNumber",
-      t."outputCount" as expectedCount,
-      COALESCE(aoc.actual_count, 0) as actualCount,
-      t."outputCount" - COALESCE(aoc.actual_count, 0) as countDifference
+      t."outputCount" as "expectedCount",
+      COALESCE(aoc.actual_count, 0) as "actualCount",
+      t."outputCount" - COALESCE(aoc.actual_count, 0) as "countDifference"
     FROM
       "Transaction" t
     LEFT JOIN

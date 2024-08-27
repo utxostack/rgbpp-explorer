@@ -7,7 +7,7 @@ import { IndexerServiceFactory } from './core/indexer/indexer.factory';
 import cluster, { Worker } from 'node:cluster';
 import EventEmitter from 'node:events';
 import { Env } from './env';
-import { IndexerValidator } from './core/indexer/indexer.validator';
+import { IndexerValidationResult, IndexerValidator } from './core/indexer/indexer.validator';
 
 type BlockNumberMap = { [chainId: number]: number };
 
@@ -71,8 +71,7 @@ class MasterProcess {
   private nextBlockNumbers: BlockNumberMap = {};
   private activeWorkers = 0;
 
-  private missingBlocks: { chainId: number; startBlockNumber: number; endBlockNumber: number }[] =
-    [];
+  private missingBlocksMap = new Map<number, IndexerWorkerMessage[]>();
 
   constructor(private service: BootstrapService) {
     this.batchSize = this.service.configService.get('INDEXER_BATCH_SIZE')!;
@@ -92,18 +91,73 @@ class MasterProcess {
 
     if (!valid) {
       this.logger.warn('Validation failed. Queueing missing blocks...');
-      if (result.blockNumberContinuity.length > 0) {
-        for (const row of result.blockNumberContinuity) {
-          this.missingBlocks.push({
-            chainId: row.chainId,
-            startBlockNumber: row.previousBlockNumber,
-            endBlockNumber: row.currentBlockNumber,
-          });
-        }
-      }
+      const blockNumberMap = this.collectMissingBlocks(result);
+      blockNumberMap.forEach((blockNumbers, chainId) => {
+        const mergedIntervals = this.mergeIntervals(Array.from(blockNumbers));
+        this.missingBlocksMap.set(chainId, mergedIntervals);
+      });
     } else {
       this.logger.log('Validation passed. No missing blocks found.');
     }
+  }
+
+  private collectMissingBlocks(result: IndexerValidationResult): Map<number, Set<number>> {
+    const {
+      blockNumberContinuity,
+      blockTransactionCounts,
+      transactionInputCounts,
+      transactionOutputCounts,
+    } = result;
+    const blockNumberMap = new Map<number, Set<number>>();
+    const addBlockToMap = (chainId: number, blockNumber: number) => {
+      const set = blockNumberMap.get(chainId) || new Set<number>();
+      set.add(blockNumber);
+      blockNumberMap.set(chainId, set);
+    };
+    for (const row of blockNumberContinuity) {
+      for (let i = row.previousBlockNumber; i <= row.currentBlockNumber; i++) {
+        addBlockToMap(row.chainId, i);
+      }
+    }
+    const otherResults = [
+      ...blockTransactionCounts,
+      ...transactionInputCounts,
+      ...transactionOutputCounts,
+    ];
+    for (const row of otherResults) {
+      addBlockToMap(row.chainId, row.blockNumber);
+    }
+    return blockNumberMap;
+  }
+
+  private mergeIntervals(blockNumbers: number[]): IndexerWorkerMessage[] {
+    const sortedBlockNumbers = Array.from(blockNumbers).sort((a, b) => a - b);
+
+    const mergedIntervals: IndexerWorkerMessage[] = [];
+    let start = sortedBlockNumbers[0];
+    let end = sortedBlockNumbers[0];
+
+    for (let i = 1; i < sortedBlockNumbers.length; i++) {
+      if (sortedBlockNumbers[i] === end + 1) {
+        end = sortedBlockNumbers[i];
+      } else {
+        mergedIntervals.push({
+          chainId: this.chains[this.currentChainIndex].id,
+          startBlockNumber: start,
+          endBlockNumber: end,
+        });
+        start = sortedBlockNumbers[i];
+        end = sortedBlockNumbers[i];
+      }
+    }
+
+    mergedIntervals.push({
+      chainId: this.chains[this.currentChainIndex].id,
+      startBlockNumber: start,
+      endBlockNumber: end,
+    });
+
+    return mergedIntervals;
   }
 
   private async initializeChainData(): Promise<void> {
@@ -119,9 +173,8 @@ class MasterProcess {
         ? latestIndexedBlock.number + 1
         : chain.startBlock;
 
-      // const blockchainService = await this.service.blockchainServiceFactory.getService(chain.id);
-      // this.tipBlockNumbers[chain.id] = await blockchainService.getTipBlockNumber();
-      this.tipBlockNumbers[chain.id] = 20000;
+      const blockchainService = await this.service.blockchainServiceFactory.getService(chain.id);
+      this.tipBlockNumbers[chain.id] = await blockchainService.getTipBlockNumber();
     }
   }
 
@@ -148,10 +201,6 @@ class MasterProcess {
 
   private async handleWorkerMessage(worker: Worker, message: any): Promise<void> {
     if (message.ready || message.completed) {
-      if (message.completed) {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-      }
-
       if (!this.checkMemoryUsage()) {
         setTimeout(() => this.checkQueueAndAssignWork(worker), 10000);
         return;
@@ -168,11 +217,9 @@ class MasterProcess {
     if (usedMemoryPercentage > memoryUsageThreshold) {
       if (global.gc) {
         global.gc();
-        this.logger.warn('Memory usage is high, running garbage collection');
       } else {
         // Allocate a buffer to trigger garbage collection
         Buffer.alloc((memoryUsage.heapTotal - memoryUsage.heapUsed) / 2);
-        this.logger.warn('Memory usage is high, allocating buffer to trigger garbage collection');
       }
       this.batchSize = Math.max(Math.round(this.batchSize / 2) - 1, 1);
       this.logger.warn(`Memory usage is high, reducing batch size to ${this.batchSize}`);
@@ -196,41 +243,49 @@ class MasterProcess {
       await this.assignWorkToWorker(worker);
     } else {
       this.logger.debug(`Queue has ${total} jobs, waiting for workers to finish`);
-      setTimeout(() => this.checkQueueAndAssignWork(worker), 5000);
+      setTimeout(() => this.checkQueueAndAssignWork(worker), 1000);
     }
   }
 
   private async assignWorkToWorker(worker: Worker): Promise<void> {
-    if (this.missingBlocks.length > 0) {
-      const { chainId, startBlockNumber, endBlockNumber } = this.missingBlocks.shift()!;
+    const missingBlocks = this.missingBlocksMap.get(this.chains[this.currentChainIndex].id) ?? [];
+    if (missingBlocks.length > 0) {
+      const { chainId, startBlockNumber, endBlockNumber } = missingBlocks.shift()!;
       worker.send({ chainId, startBlockNumber, endBlockNumber });
       this.logger.warn(
-        `Assigned missing block to worker ${worker.id} for chain ${chainId}, blocks ${startBlockNumber} to ${endBlockNumber}`,
+        `Assigned missing block work to worker ${worker.id} for chain ${chainId}, blocks ${startBlockNumber} to ${endBlockNumber}`,
       );
       return;
     }
 
-    if (this.currentChainIndex >= this.chains.length) {
+    const chain = this.chains[this.currentChainIndex];
+    if (!chain) {
       await this.service.indexerServiceFactory.waitUntilIndexerQueueEmpty();
       worker.kill();
       return;
     }
 
-    const chain = this.chains[this.currentChainIndex];
     const startBlockNumber = this.nextBlockNumbers[chain.id];
     const endBlockNumber = Math.min(
       startBlockNumber + this.batchSize - 1,
       this.tipBlockNumbers[chain.id],
     );
 
-    if (startBlockNumber > this.tipBlockNumbers[chain.id]) {
-      // No more blocks to index for this chain but there are missing blocks
+    const jobCounts = await this.service.indexerServiceFactory.getIndexerQueueJobCounts();
+    if (
+      startBlockNumber > this.tipBlockNumbers[chain.id] ||
+      // If there are more delayed jobs than active jobs, meaning the queue is stuck
+      jobCounts['active'] / jobCounts['delayed'] < 0.2
+    ) {
       await this.validateAndQueueMissingBlocks();
-      if (this.missingBlocks.length > 0) {
+      const missingBlocks = this.missingBlocksMap.get(chain.id) ?? [];
+      if (missingBlocks.length > 0) {
         this.assignWorkToWorker(worker);
         return;
       }
+    }
 
+    if (startBlockNumber > this.tipBlockNumbers[chain.id]) {
       this.currentChainIndex++;
       this.assignWorkToWorker(worker);
       return;
@@ -239,7 +294,7 @@ class MasterProcess {
     worker.send({ chainId: chain.id, startBlockNumber, endBlockNumber });
 
     this.nextBlockNumbers[chain.id] = endBlockNumber + 1;
-    this.logger.log(
+    this.logger.warn(
       `Assigned work to worker ${worker.id} for chain ${chain.id}, blocks ${startBlockNumber} to ${endBlockNumber}`,
     );
   }
@@ -248,7 +303,7 @@ class MasterProcess {
 class WorkerProcess {
   private readonly logger = new Logger(WorkerProcess.name);
 
-  constructor(private service: BootstrapService) { }
+  constructor(private service: BootstrapService) {}
 
   public async run(): Promise<void> {
     this.logger.log(`Indexer Worker ${process.pid} is running`);

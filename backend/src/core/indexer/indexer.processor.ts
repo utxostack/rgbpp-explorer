@@ -48,15 +48,16 @@ export class IndexerProcessor extends WorkerHost implements OnModuleInit {
     this.worker.concurrency = this.batchSize * this.workerNumber;
     this.worker.opts.stalledInterval = TEN_MINUTES_MS;
     this.worker.opts.maxStalledCount = 5;
+    this.worker.opts.useWorkerThreads = true;
   }
 
   public async process(job: Job<IndexerJobData>): Promise<void> {
     const { chain, block } = job.data;
     if (!(await this.isPreviousProcessFinished(chain, block))) {
-      job.moveToDelayed(Date.now() + 1000);
       this.logger.debug(
         `Previous process not finished for block ${block.header.hash} for chain ${chain.name}`,
       );
+      job.moveToDelayed(Date.now() + 1000);
       throw new DelayedError();
     }
 
