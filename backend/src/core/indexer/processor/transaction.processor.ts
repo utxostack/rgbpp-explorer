@@ -44,25 +44,25 @@ export class TransactionProcessor extends BaseProcessor<IndexerTransactionData> 
     const fee = isCellbase ? 0n : await this.calculateTransactionFee(inputs, transaction.outputs);
 
     // Update consumedByTxHash and consumedByIndex for inputs
-    await Promise.all(
-      transaction.inputs
-        .filter((input) => input.previous_output.tx_hash !== CELLBASE_TX_HASH)
-        .map((input) => {
-          return this.prismaService.output.update({
-            where: {
-              chainId_txHash_index: {
-                chainId: chain.id,
-                txHash: input.previous_output.tx_hash,
-                index: input.previous_output.index,
-              },
-            },
-            data: {
-              consumedByTxHash: transaction.hash,
-              consumedByIndex: index,
-            },
-          });
-        }),
-    );
+    // await Promise.all(
+    //   transaction.inputs
+    //     .filter((input) => input.previous_output.tx_hash !== CELLBASE_TX_HASH)
+    //     .map((input) => {
+    //       return this.prismaService.output.update({
+    //         where: {
+    //           chainId_txHash_index: {
+    //             chainId: chain.id,
+    //             txHash: input.previous_output.tx_hash,
+    //             index: input.previous_output.index,
+    //           },
+    //         },
+    //         data: {
+    //           consumedByTxHash: transaction.hash,
+    //           consumedByIndex: index,
+    //         },
+    //       });
+    //     }),
+    // );
 
     await this.prismaService.transaction.upsert({
       where: {

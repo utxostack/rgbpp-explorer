@@ -53,13 +53,13 @@ export class IndexerProcessor extends WorkerHost implements OnModuleInit {
 
   public async process(job: Job<IndexerJobData>): Promise<void> {
     const { chain, block } = job.data;
-    if (!(await this.isPreviousProcessFinished(chain, block))) {
-      this.logger.debug(
-        `Previous process not finished for block ${block.header.hash} for chain ${chain.name}`,
-      );
-      job.moveToDelayed(Date.now() + 5000);
-      throw new DelayedError();
-    }
+    // if (!(await this.isPreviousProcessFinished(chain, block))) {
+    //   this.logger.debug(
+    //     `Previous process not finished for block ${block.header.hash} for chain ${chain.name}`,
+    //   );
+    //   job.moveToDelayed(Date.now() + 5000);
+    //   throw new DelayedError();
+    // }
 
     await this.blockProcessor.process({ chain, block });
     await this.processTypeScripts({ chain, block });

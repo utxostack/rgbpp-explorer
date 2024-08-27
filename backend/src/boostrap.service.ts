@@ -105,7 +105,7 @@ class MasterProcess {
     const {
       blockNumberContinuity,
       blockTransactionCounts,
-      transactionInputCounts,
+      // transactionInputCounts,
       transactionOutputCounts,
     } = result;
     const blockNumberMap = new Map<number, Set<number>>();
@@ -121,7 +121,7 @@ class MasterProcess {
     }
     const otherResults = [
       ...blockTransactionCounts,
-      ...transactionInputCounts,
+      // ...transactionInputCounts,
       ...transactionOutputCounts,
     ];
     for (const row of otherResults) {
@@ -272,22 +272,14 @@ class MasterProcess {
       this.tipBlockNumbers[chain.id],
     );
 
-    const jobCounts = await this.service.indexerServiceFactory.getIndexerQueueJobCounts();
-    if (
-      startBlockNumber > this.tipBlockNumbers[chain.id] ||
-      // If there are more delayed jobs than active jobs, meaning the queue is stuck
-      (jobCounts['active'] / jobCounts['delayed'] < 0.2 &&
-        (this.missingBlocksMap.get(chain.id) ?? []).length === 0)
-    ) {
+    if (startBlockNumber > this.tipBlockNumbers[chain.id]) {
       await this.validateAndQueueMissingBlocks();
       const missingBlocks = this.missingBlocksMap.get(chain.id) ?? [];
       if (missingBlocks.length > 0) {
         this.assignWorkToWorker(worker);
         return;
       }
-    }
 
-    if (startBlockNumber > this.tipBlockNumbers[chain.id]) {
       this.currentChainIndex++;
       this.assignWorkToWorker(worker);
       return;

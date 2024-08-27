@@ -3,12 +3,12 @@ import { PrismaService } from '../database/prisma/prisma.service';
 import checkBlockNumberContinuity from './checker/block-number-continuity';
 import checkBlockTransactionCounts from './checker/block-transaction-counts';
 import checkTransactionOutputCounts from './checker/transaction-output-counts';
-import checkTransactionInputCounts from './checker/transaction-input-counts';
+// import checkTransactionInputCounts from './checker/transaction-input-counts';
 
 export interface IndexerValidationResult {
   blockNumberContinuity: any[];
   blockTransactionCounts: any[];
-  transactionInputCounts: any[];
+  // transactionInputCounts: any[];
   transactionOutputCounts: any[];
 }
 
@@ -19,13 +19,13 @@ export class IndexerValidator {
   public async validate(): Promise<{ valid: boolean; result: IndexerValidationResult }> {
     const blockNumberContinuity = await checkBlockNumberContinuity(this.prismaService);
     const blockTransactionCounts = await checkBlockTransactionCounts(this.prismaService);
-    const transactionInputCounts = await checkTransactionInputCounts(this.prismaService);
+    // const transactionInputCounts = await checkTransactionInputCounts(this.prismaService);
     const transactionOutputCounts = await checkTransactionOutputCounts(this.prismaService);
 
     const result = {
       blockNumberContinuity,
       blockTransactionCounts,
-      transactionInputCounts,
+      // transactionInputCounts,
       transactionOutputCounts,
     };
     const valid = Object.values(result).every((rows) => rows.length === 0);
