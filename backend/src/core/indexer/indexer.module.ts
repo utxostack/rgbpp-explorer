@@ -34,6 +34,6 @@ import { IndexerValidator } from './indexer.validator';
     LockScriptProcessor,
     TypeScriptProcessor,
   ],
-  exports: [IndexerServiceFactory],
+  exports: [IndexerServiceFactory, IndexerValidator],
 })
 export class IndexerModule { }

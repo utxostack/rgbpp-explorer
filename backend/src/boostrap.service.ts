@@ -7,6 +7,7 @@ import { IndexerServiceFactory } from './core/indexer/indexer.factory';
 import cluster, { Worker } from 'node:cluster';
 import EventEmitter from 'node:events';
 import { Env } from './env';
+import { IndexerValidator } from './core/indexer/indexer.validator';
 
 type BlockNumberMap = { [chainId: number]: number };
 
@@ -29,6 +30,7 @@ export class BootstrapService extends EventEmitter {
     public prismaService: PrismaService,
     public blockchainServiceFactory: BlockchainServiceFactory,
     public indexerServiceFactory: IndexerServiceFactory,
+    public indexerValidator: IndexerValidator,
   ) {
     super();
     this.masterProcess = new MasterProcess(this);
@@ -46,10 +48,6 @@ export class BootstrapService extends EventEmitter {
       const now = performance.now();
       this.bootstrapCompleted.then(async () => {
         this.logger.warn(`Bootstrap complete in ${performance.now() - now}ms`);
-        const valid = await this.indexerServiceFactory.validateIndexerData();
-        if (!valid) {
-          process.exit(1);
-        }
       });
       await this.masterProcess.run();
     } else {
@@ -73,6 +71,9 @@ class MasterProcess {
   private nextBlockNumbers: BlockNumberMap = {};
   private activeWorkers = 0;
 
+  private missingBlocks: { chainId: number; startBlockNumber: number; endBlockNumber: number }[] =
+    [];
+
   constructor(private service: BootstrapService) {
     this.batchSize = this.service.configService.get('INDEXER_BATCH_SIZE')!;
     this.workerNum = this.service.configService.get('INDEXER_WORKER_NUM')!;
@@ -81,8 +82,28 @@ class MasterProcess {
   public async run(): Promise<void> {
     this.logger.log(`Indexer Master ${process.pid} is running`);
     await this.initializeChainData();
+    await this.validateAndQueueMissingBlocks();
     this.setupClusterEvents();
     this.startWorkers();
+  }
+
+  private async validateAndQueueMissingBlocks(): Promise<void> {
+    const { valid, result } = await this.service.indexerValidator.validate();
+
+    if (!valid) {
+      this.logger.warn('Validation failed. Queueing missing blocks...');
+      if (result.blockNumberContinuity.length > 0) {
+        for (const row of result.blockNumberContinuity) {
+          this.missingBlocks.push({
+            chainId: row.chainId,
+            startBlockNumber: row.previousBlockNumber,
+            endBlockNumber: row.currentBlockNumber,
+          });
+        }
+      }
+    } else {
+      this.logger.log('Validation passed. No missing blocks found.');
+    }
   }
 
   private async initializeChainData(): Promise<void> {
@@ -98,8 +119,9 @@ class MasterProcess {
         ? latestIndexedBlock.number + 1
         : chain.startBlock;
 
-      const blockchainService = await this.service.blockchainServiceFactory.getService(chain.id);
-      this.tipBlockNumbers[chain.id] = await blockchainService.getTipBlockNumber();
+      // const blockchainService = await this.service.blockchainServiceFactory.getService(chain.id);
+      // this.tipBlockNumbers[chain.id] = await blockchainService.getTipBlockNumber();
+      this.tipBlockNumbers[chain.id] = 20000;
     }
   }
 
@@ -113,11 +135,10 @@ class MasterProcess {
     for (let i = 0; i < this.workerNum; i += 1) {
       cluster.fork();
       this.activeWorkers++;
-      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   }
 
-  private handleWorkerExit(): void {
+  private async handleWorkerExit(): Promise<void> {
     this.activeWorkers--;
     if (this.activeWorkers === 0) {
       this.logger.warn('All workers finished, bootstrap complete');
@@ -180,6 +201,15 @@ class MasterProcess {
   }
 
   private async assignWorkToWorker(worker: Worker): Promise<void> {
+    if (this.missingBlocks.length > 0) {
+      const { chainId, startBlockNumber, endBlockNumber } = this.missingBlocks.shift()!;
+      worker.send({ chainId, startBlockNumber, endBlockNumber });
+      this.logger.warn(
+        `Assigned missing block to worker ${worker.id} for chain ${chainId}, blocks ${startBlockNumber} to ${endBlockNumber}`,
+      );
+      return;
+    }
+
     if (this.currentChainIndex >= this.chains.length) {
       await this.service.indexerServiceFactory.waitUntilIndexerQueueEmpty();
       worker.kill();
@@ -194,6 +224,13 @@ class MasterProcess {
     );
 
     if (startBlockNumber > this.tipBlockNumbers[chain.id]) {
+      // No more blocks to index for this chain but there are missing blocks
+      await this.validateAndQueueMissingBlocks();
+      if (this.missingBlocks.length > 0) {
+        this.assignWorkToWorker(worker);
+        return;
+      }
+
       this.currentChainIndex++;
       this.assignWorkToWorker(worker);
       return;

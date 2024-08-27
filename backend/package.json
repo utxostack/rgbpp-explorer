@@ -71,6 +71,7 @@
     "reflect-metadata": "^0.2.0",
     "rpc-websockets": "^7.11.2",
     "rxjs": "^7.8.1",
+    "sql-template-tag": "^5.2.1",
     "taskforce-connector": "^1.31.4",
     "ws": "^8.18.0",
     "zod": "^3.23.8"

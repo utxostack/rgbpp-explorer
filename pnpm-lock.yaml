@@ -136,6 +136,9 @@ importers:
       rxjs:
         specifier: ^7.8.1
         version: 7.8.1
+      sql-template-tag:
+        specifier: ^5.2.1
+        version: 5.2.1
       taskforce-connector:
         specifier: ^1.31.4
         version: 1.31.4(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -7652,6 +7655,10 @@ packages:
 
   sprintf-js@1.0.3:
     resolution: {integrity: sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g==}
+
+  sql-template-tag@5.2.1:
+    resolution: {integrity: sha512-lFdvXCOqWhV40A7w4oQVDyuaNFb5yO+dhsHStZzOdtDJWCBWYv4+hhATK5nPpY5v/T1OMVcLMPeN4519qIyb9Q==}
+    engines: {node: '>=14'}
 
   stack-utils@2.0.6:
     resolution: {integrity: sha512-XlkWvfIm6RmsWtNJx+uqtKLS8eqFbxUg0ZzLXqY0caEy9l7hruX8IpiDnjsLavoBgqCCR71TqWO8MaXYheJ3RQ==}
@@ -17984,6 +17991,8 @@ snapshots:
       tslib: 2.6.3
 
   sprintf-js@1.0.3: {}
+
+  sql-template-tag@5.2.1: {}
 
   stack-utils@2.0.6:
     dependencies:
