@@ -54,7 +54,7 @@ export function NetworkCards() {
   })
 
   return (
-    <Grid w="100%" gridTemplateColumns={{ base: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }}>
+    <Grid w="100%" gridTemplateColumns={{ base: '100%', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }}>
       <Link
         href="/explorer/btc"
         display="flex"
@@ -66,7 +66,7 @@ export function NetworkCards() {
         _hover={{ bg: 'bg.card.hover' }}
         transition="200ms"
         rounded="8px"
-        p="30px"
+        p={{ base: '20px', xl: '30px' }}
       >
         <HStack gap="16px" w="100%">
           <BtcIcon w="48px" />
@@ -99,7 +99,7 @@ export function NetworkCards() {
         _hover={{ bg: 'bg.card.hover' }}
         transition="200ms"
         rounded="8px"
-        p="30px"
+        p={{ base: '20px', xl: '30px' }}
       >
         <HStack gap="16px" w="100%">
           <CkbIcon w="48px" />
