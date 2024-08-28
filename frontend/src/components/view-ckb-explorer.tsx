@@ -20,6 +20,7 @@ export function ViewCkbExplorer({ txHash }: { txHash: string }) {
       px="16px"
       rounded="4px"
       bg="bg.primary"
+      w="fit-content"
     >
       <CkbIcon h="18px" w="18px" />
       <Text fontSize="14px" fontWeight="semibold">

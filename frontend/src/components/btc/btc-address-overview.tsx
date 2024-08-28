@@ -3,7 +3,8 @@ import { Grid, HStack, VStack } from 'styled-system/jsx'
 
 import OverviewSVG from '@/assets/overview.svg'
 import { OverflowAmount } from '@/components/overflow-amount'
-import { Heading, Text } from '@/components/ui'
+import { OverviewInfo, OverviewInfoItem } from '@/components/overview-info'
+import { Heading } from '@/components/ui'
 import { BtcAddressBaseQuery } from '@/gql/graphql'
 import { satsToBtc } from '@/lib/btc/sats-to-btc'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
@@ -18,56 +19,35 @@ export function BtcAddressOverview({ btcAddress }: { btcAddress: BtcAddressBaseQ
         <OverviewSVG w="24px" />
         <Heading fontSize="16px" fontWeight="semibold">{t(i18n)`Overview`}</Heading>
       </HStack>
-      <Grid w="100%" gridTemplateColumns="repeat(2, 1fr)" gap="30px" pt="20px" pb="30px" px="30px" textAlign="center">
-        <Grid
-          gridTemplateColumns="repeat(3, 1fr)"
-          px="20px"
-          py="25px"
-          bg="bg.card.hover"
-          rounded="8px"
-          fontSize="20px"
-          lineHeight="100%"
-        >
-          <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`BTC Balance`}</Text>
-            <Text>
-              <OverflowAmount amount={formatNumber(satsToBtc(btcAddress.satoshi))} symbol={t(i18n)`BTC`} />
-            </Text>
-          </VStack>
-          <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`Confirmed`}</Text>
-            <Text>
-              <OverflowAmount
-                amount={formatNumber(satsToBtc(btcAddress.satoshi).minus(btcAddress.pendingSatoshi))}
-                symbol={t(i18n)`BTC`}
-              />
-            </Text>
-          </VStack>
-          <VStack gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`Unconfirmed`}</Text>
-            <Text>
-              <OverflowAmount amount={formatNumber(satsToBtc(btcAddress.pendingSatoshi))} symbol={t(i18n)`BTC`} />
-            </Text>
-          </VStack>
-        </Grid>
-        <Grid
-          gridTemplateColumns="repeat(2, 1fr)"
-          px="20px"
-          py="25px"
-          bg="bg.card.hover"
-          rounded="8px"
-          fontSize="20px"
-          lineHeight="100%"
-        >
-          <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`Txns`}</Text>
-            <Text>{formatNumber(btcAddress.transactionsCount ?? undefined)}</Text>
-          </VStack>
-          <VStack gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`L1 RGB++ Assets`}</Text>
-            <Text color="text.third">{t(i18n)`Coming Soon`}</Text>
-          </VStack>
-        </Grid>
+      <Grid
+        w="100%"
+        gridTemplateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }}
+        gap={{ base: '20px', xl: '30px' }}
+        pt="20px"
+        pb={{ base: '20px', xl: '30px' }}
+        px={{ base: '20px', xl: '30px' }}
+        textAlign="center"
+      >
+        <OverviewInfo>
+          <OverviewInfoItem label={t(i18n)`BTC Balance`}>
+            <OverflowAmount amount={formatNumber(satsToBtc(btcAddress.satoshi))} symbol={t(i18n)`BTC`} />
+          </OverviewInfoItem>
+          <OverviewInfoItem label={t(i18n)`Confirmed`}>
+            <OverflowAmount
+              amount={formatNumber(satsToBtc(btcAddress.satoshi).minus(btcAddress.pendingSatoshi))}
+              symbol={t(i18n)`BTC`}
+            />
+          </OverviewInfoItem>
+          <OverviewInfoItem label={t(i18n)`Unconfirmed`}>
+            <OverflowAmount amount={formatNumber(satsToBtc(btcAddress.pendingSatoshi))} symbol={t(i18n)`BTC`} />
+          </OverviewInfoItem>
+        </OverviewInfo>
+        <OverviewInfo>
+          <OverviewInfoItem label={t(i18n)`Txns`} formatNumber>
+            {btcAddress.transactionsCount}
+          </OverviewInfoItem>
+          <OverviewInfoItem label={t(i18n)`L1 RGB++ Assets`} unsupported />
+        </OverviewInfo>
       </Grid>
     </VStack>
   )

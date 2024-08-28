@@ -7,7 +7,7 @@ export const pagination = defineSlotRecipe({
   base: {
     root: {
       display: 'flex',
-      gap: '2.5',
+      gap: '8px',
     },
     item: {
       fontVariantNumeric: 'tabular-nums',

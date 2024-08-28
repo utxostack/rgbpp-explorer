@@ -42,7 +42,15 @@ export const CkbDiffTags = memo(function CkbDiffTags({
       .reduce((acc, x) => acc.plus(x.xudtInfo?.amount || 0), BigNumber(0))
     const diff = BigNumber(xudtBalanceWithoutThisAddress).minus(BigNumber(balance))
     return !diff.isZero() ? (
-      <Flex align="center" py="8px" px="16px" rounded="4px" bg={diff.isGreaterThan(0) ? 'success' : 'danger'}>
+      <Flex
+        align="center"
+        py="8px"
+        fontSize="14px"
+        lineHeight="16px"
+        px="16px"
+        rounded="4px"
+        bg={diff.isGreaterThan(0) ? 'success' : 'danger'}
+      >
         <Trans>
           {diff.isGreaterThan(0) ? '+' : ''}
           {formatNumber(diff, xudt?.decimal)} {xudt?.symbol}
@@ -64,7 +72,15 @@ export const CkbDiffTags = memo(function CkbDiffTags({
   return (
     <>
       {!ckbDiff.isZero() ? (
-        <Flex align="center" py="8px" px="16px" rounded="4px" bg={ckbDiff.isGreaterThan(0) ? 'success' : 'danger'}>
+        <Flex
+          align="center"
+          py="8px"
+          fontSize="14px"
+          lineHeight="16px"
+          px="16px"
+          rounded="4px"
+          bg={ckbDiff.isGreaterThan(0) ? 'success' : 'danger'}
+        >
           <Trans>
             {ckbDiff.isGreaterThan(0) ? '+' : ''}
             {formatNumber(ckbDiff)} CKB
@@ -74,7 +90,7 @@ export const CkbDiffTags = memo(function CkbDiffTags({
       ) : null}
       {xudtTags}
       {!dobDiff.isZero() ? (
-        <Flex align="center" bg="brand" py="8px" px="16px" rounded="4px">
+        <Flex align="center" bg="brand" py="8px" fontSize="14px" lineHeight="16px" px="16px" rounded="4px">
           <Trans>{formatNumber(dobDiff)} DOB</Trans>
           <MoneyIcon w="16px" h="16px" ml="6px" />
         </Flex>

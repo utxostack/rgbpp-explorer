@@ -2,7 +2,7 @@
 
 import { Trans } from '@lingui/macro'
 import { useMutation } from '@tanstack/react-query'
-import { type BoxProps, HStack } from 'styled-system/jsx'
+import { Box, type BoxProps, HStack } from 'styled-system/jsx'
 import { useCopyToClipboard } from 'usehooks-ts'
 
 import CopyIcon from '@/assets/copy.svg'
@@ -80,8 +80,8 @@ export function Copier({ value = '', children, onlyIcon = false, ...props }: Cop
           cursor="pointer"
           {...props}
         >
-          <Text>{children ?? value}</Text>
-          <CopyIcon w="16px" h="16px" />
+          <Box>{children ?? value}</Box>
+          <CopyIcon w="16px" h="16px" flexShrink={0} />
         </HStack>
       </HoverCard.Trigger>
       <HoverCard.Positioner>
