@@ -39,7 +39,7 @@ export class RgbppStatisticService {
     private rgbppService: RgbppService,
     @Inject(CACHE_MANAGER) protected cacheManager: Cache,
   ) {
-    this.collectLatest24HourRgbppTransactions();
+    // this.collectLatest24HourRgbppTransactions();
   }
 
   public async getLatest24L1Transactions() {

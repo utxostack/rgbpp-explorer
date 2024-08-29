@@ -14,6 +14,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { BullModule } from '@nestjs/bullmq';
 import configModule from './config';
 import { AppController } from './app.controller';
+import { BootstrapService } from './bootstrap.service';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { AppController } from './app.controller';
   ],
   providers: [
     AppController,
+    BootstrapService,
     {
       provide: APP_INTERCEPTOR,
       useFactory: () =>
