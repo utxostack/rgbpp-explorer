@@ -3,7 +3,7 @@ import * as Sentry from '@sentry/node';
 import { FeesMempoolBlocks } from '@cell-studio/mempool.js/lib/interfaces/bitcoin/fees';
 import { Block, OutSpend, RecommendedFees, Transaction, UTXO } from '../bitcoin-api.schema';
 import { IBitcoinDataProvider } from '../bitcoin-api.interface';
-import * as https from 'https';
+import * as https from 'node:https';
 
 export class MempoolService implements IBitcoinDataProvider {
   private mempool: ReturnType<typeof mempoolJS>;

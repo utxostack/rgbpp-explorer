@@ -9,8 +9,8 @@ import {
   UTXO,
 } from '../bitcoin-api.schema';
 import { HttpException } from '@nestjs/common';
-import * as http from 'http';
-import * as https from 'https';
+import * as https from 'node:https';
+import * as http from 'node:http';
 
 export class ElectrsService implements IBitcoinDataProvider {
   private request: AxiosInstance;
