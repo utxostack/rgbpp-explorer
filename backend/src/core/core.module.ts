@@ -10,6 +10,7 @@ import { HealthModule } from './health/health.module';
 import { BlockchainModule } from './blockchain/blockchain.module';
 import { IndexerModule } from './indexer/indexer.module';
 import { DatabaseModule } from './database/database.module';
+import { CoreService } from './core.service';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { DatabaseModule } from './database/database.module';
     BlockchainModule,
     IndexerModule,
   ],
-  providers: [CkbExplorerService, CkbRpcWebsocketService, BitcoinApiService],
+  providers: [CkbExplorerService, CkbRpcWebsocketService, BitcoinApiService, CoreService],
   exports: [CkbExplorerService, CkbRpcWebsocketService, BitcoinApiService],
 })
 export class CoreModule {}

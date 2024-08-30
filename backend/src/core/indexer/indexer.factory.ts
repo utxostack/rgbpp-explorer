@@ -1,9 +1,9 @@
-import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { IndexerService } from './indexer.service';
-import { ModuleRef } from '@nestjs/core';
 import { BlockchainServiceFactory } from '../blockchain/blockchain.factory';
 import { IndexerQueueService } from './indexer.queue';
+import { SchedulerRegistry } from '@nestjs/schedule';
 
 export class IndexerServiceFactoryError extends Error {
   constructor(message: string) {
@@ -17,9 +17,10 @@ export class IndexerServiceFactory implements OnModuleDestroy {
   private services: Map<number, IndexerService> = new Map();
 
   constructor(
-    private prismaService: PrismaService,
     private blockchainServiceFactory: BlockchainServiceFactory,
+    private prismaService: PrismaService,
     private indexerQueueService: IndexerQueueService,
+    private schedulerRegistry: SchedulerRegistry,
   ) { }
 
   public async onModuleDestroy() {
@@ -42,6 +43,7 @@ export class IndexerServiceFactory implements OnModuleDestroy {
         blockchainService,
         this.prismaService,
         this.indexerQueueService,
+        this.schedulerRegistry,
       );
       this.services.set(chain.id, service);
     }
