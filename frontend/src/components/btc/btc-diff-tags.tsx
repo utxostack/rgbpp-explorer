@@ -54,7 +54,7 @@ export function BtcDiffTags({
       .filter((x) => x.input.prevout?.address?.address === address && x.cell?.xudtInfo?.symbol === xudt?.symbol)
       .reduce((acc, x) => acc.plus(x.cell?.xudtInfo?.amount || 0), BigNumber(0))
     const xudtBalanceWithoutThisAddress = outputs
-      .filter((x) => x.output?.address?.address === address && x.cell?.xudtInfo?.symbol === xudt?.symbol)
+      .filter((x) => x.output?.address?.address !== address && x.cell?.xudtInfo?.symbol === xudt?.symbol)
       .reduce((acc, x) => acc.plus(x.cell?.xudtInfo?.amount || 0), BigNumber(0))
     const diff = BigNumber(xudtBalanceWithoutThisAddress).minus(BigNumber(balance))
     return !diff.isZero() ? (
