@@ -23,6 +23,6 @@ import { CoreService } from './core.service';
     IndexerModule,
   ],
   providers: [CkbExplorerService, CkbRpcWebsocketService, BitcoinApiService, CoreService],
-  exports: [CkbExplorerService, CkbRpcWebsocketService, BitcoinApiService],
+  exports: [CkbExplorerService, CkbRpcWebsocketService, BitcoinApiService, CoreService],
 })
-export class CoreModule {}
+export class CoreModule { }

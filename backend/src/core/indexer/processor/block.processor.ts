@@ -11,6 +11,7 @@ import { Cell, Transaction } from 'src/core/blockchain/blockchain.interface';
 import { PrismaClient } from '@prisma/client';
 import { ITXClientDenyList } from '@prisma/client/runtime/library';
 import { IndexerServiceFactory } from '../indexer.factory';
+import { IndexerEvent } from '../indexer.service';
 
 export const INDEXER_BLOCK_QUEUE = 'indexer-block-queue';
 
@@ -67,7 +68,7 @@ export class IndexerBlockProcessor extends WorkerHost {
     } else {
       const indexerServiceFactory = this.moduleRef.get(IndexerServiceFactory);
       const indexerService = await indexerServiceFactory.getService(chainId);
-      indexerService.emit('block-indexed', block);
+      indexerService.emit(IndexerEvent.BlockIndexed, block);
       return;
     }
 
@@ -104,7 +105,8 @@ export class IndexerBlockProcessor extends WorkerHost {
               output_data: tx.outputs_data[index],
               tx_index: BI.from(txIndex).toHexString(),
             };
-            return indexerAssetsService.processAssetCell(chainId, cell, assetType, prisma);
+            await indexerAssetsService.processAssetCell(chainId, cell, assetType, prisma);
+            return;
           }
         }),
       );

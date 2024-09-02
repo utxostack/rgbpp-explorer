@@ -29,7 +29,6 @@ model Chain {
 
   Block       Block[]
   Transaction Transaction[]
-  Address     Address[]
 }
 
 model Block {
@@ -96,8 +95,6 @@ model Output {
   updatedAt        DateTime @updatedAt
 
   transaction Transaction @relation(fields: [chainId, txHash], references: [chainId, hash])
-  lockScript  LockScript  @relation(fields: [chainId, lockScriptHash], references: [chainId, scriptHash])
-  typeScript  TypeScript? @relation(fields: [chainId, typeScriptHash], references: [chainId, scriptHash])
 
   @@unique([chainId, txHash, index])
 }
@@ -111,12 +108,9 @@ model LockScript {
   scriptHash    String   @unique @db.Char(66)
   isRgbppLock   Boolean  @default(false)
   isBtcTimeLock Boolean  @default(false)
-  ownerAddress  Address  @relation(fields: [addressId], references: [id])
+  ownerAddress  String?
   createdTime   DateTime @default(now())
   updatedTime   DateTime @updatedAt
-
-  Output    Output[]
-  addressId Int
 
   @@unique([chainId, id])
   @@unique([chainId, scriptHash])
@@ -131,8 +125,6 @@ model TypeScript {
   scriptHash  String   @unique @db.Char(66)
   createdTime DateTime @default(now())
   updatedTime DateTime @updatedAt
-
-  Output Output[]
 
   @@unique([chainId, id])
   @@unique([chainId, scriptHash])
@@ -167,16 +159,3 @@ model AssetType {
   @@unique([chainId, codeHash, hashType])
 }
 
-enum LayerType {
-  L1
-  L2
-}
-
-model Address {
-  id         Int          @id @default(autoincrement())
-  address    String       @unique
-  layer      LayerType
-  Chain      Chain?       @relation(fields: [chainId], references: [id])
-  chainId    Int?
-  LockScript LockScript[]
-}

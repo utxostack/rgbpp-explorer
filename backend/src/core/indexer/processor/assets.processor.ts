@@ -1,5 +1,4 @@
-import { BI, HashType, Script } from '@ckb-lumos/lumos';
-import { computeScriptHash } from '@ckb-lumos/lumos/utils';
+import { BI, HashType } from '@ckb-lumos/lumos';
 import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { AssetType } from '@prisma/client';
@@ -11,6 +10,7 @@ import { IndexerQueueService } from '../indexer.queue';
 import { ModuleRef } from '@nestjs/core';
 import { IndexerServiceFactory } from '../indexer.factory';
 import { IndexerAssetsService } from '../service/assets.service';
+import { IndexerEvent } from '../indexer.service';
 
 export const INDEXER_ASSETS_QUEUE = 'indexer-assets-queue';
 
@@ -20,7 +20,7 @@ export interface IndexerAssetsJobData {
   cursor?: string;
 }
 
-const BATCH_SIZE = BI.from(1000).toHexString();
+const BATCH_SIZE = BI.from(400).toHexString();
 
 @Processor(INDEXER_ASSETS_QUEUE, {
   concurrency: 100,
@@ -66,7 +66,7 @@ export class IndexerAssetsProcessor extends WorkerHost {
     if (cursor === '0x') {
       const indexerServiceFactory = this.moduleRef.get(IndexerServiceFactory);
       const indexerService = await indexerServiceFactory.getService(chainId);
-      indexerService.emit('asset-indexed', assetType);
+      indexerService.emit(IndexerEvent.AssetIndexed, assetType);
       return;
     }
 

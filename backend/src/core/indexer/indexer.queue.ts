@@ -2,11 +2,13 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { INDEXER_ASSETS_QUEUE, IndexerAssetsJobData } from './processor/assets.processor';
 import { Queue } from 'bullmq';
-import { BI, HashType, Script } from '@ckb-lumos/lumos';
+import { HashType, Script } from '@ckb-lumos/lumos';
 import { computeScriptHash } from '@ckb-lumos/lumos/utils';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { AssetType } from '@prisma/client';
 import { INDEXER_BLOCK_QUEUE, IndexerBlockJobData } from './processor/block.processor';
+import { INDEXER_LOCK_QUEUE, IndexerLockJobData } from './processor/lock.processor';
+import { INDEXER_TYPE_QUEUE, IndexerTypeJobData } from './processor/type.processor';
 
 @Injectable()
 export class IndexerQueueService {
@@ -15,6 +17,8 @@ export class IndexerQueueService {
   constructor(
     @InjectQueue(INDEXER_ASSETS_QUEUE) public assetsQueue: Queue,
     @InjectQueue(INDEXER_BLOCK_QUEUE) public blockQueue: Queue,
+    @InjectQueue(INDEXER_LOCK_QUEUE) public lockQueue: Queue,
+    @InjectQueue(INDEXER_TYPE_QUEUE) public typeQueue: Queue,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) { }
 
@@ -57,6 +61,11 @@ export class IndexerQueueService {
     await this.cacheManager.set(`${INDEXER_ASSETS_QUEUE}:${typeHash}`, cursor || '');
   }
 
+  public async getLatestIndexedBlock(chainId: number) {
+    const blockNumber = await this.cacheManager.get<number>(`${INDEXER_BLOCK_QUEUE}:${chainId}`);
+    return blockNumber;
+  }
+
   public async addBlockJob(data: IndexerBlockJobData) {
     const { chainId, blockNumber } = data;
     const params = new URLSearchParams();
@@ -69,5 +78,34 @@ export class IndexerQueueService {
       `Added block job ${jobId} for chain ${chainId} with block number ${blockNumber}`,
     );
     await this.blockQueue.add(jobId, data, { jobId });
+    await this.cacheManager.set(`${INDEXER_BLOCK_QUEUE}:${chainId}`, blockNumber);
+  }
+
+  public async addLockJob(data: IndexerLockJobData) {
+    const { chainId, script } = data;
+    const params = new URLSearchParams();
+    params.append('jobType', 'index-lock');
+    params.append('chainId', chainId.toString());
+    params.append('script', computeScriptHash(script));
+    const jobId = params.toString();
+
+    this.logger.debug(
+      `Added lock job ${jobId} for chain ${chainId} with script hash ${computeScriptHash(script)}`,
+    );
+    await this.lockQueue.add(jobId, data, { jobId });
+  }
+
+  public async addTypeJob(data: IndexerTypeJobData) {
+    const { chainId, script } = data;
+    const params = new URLSearchParams();
+    params.append('jobType', 'index-type');
+    params.append('chainId', chainId.toString());
+    params.append('script', computeScriptHash(script));
+    const jobId = params.toString();
+
+    this.logger.debug(
+      `Added type job ${jobId} for chain ${chainId} with script hash ${computeScriptHash(script)}`,
+    );
+    await this.typeQueue.add(jobId, data, { jobId });
   }
 }

@@ -1,9 +1,6 @@
 -- CreateEnum
 CREATE TYPE "LeapDirection" AS ENUM ('LeapIn', 'LeapOut', 'Within');
 
--- CreateEnum
-CREATE TYPE "LayerType" AS ENUM ('L1', 'L2');
-
 -- CreateTable
 CREATE TABLE "Chain" (
     "id" SERIAL NOT NULL,
@@ -87,9 +84,9 @@ CREATE TABLE "LockScript" (
     "scriptHash" CHAR(66) NOT NULL,
     "isRgbppLock" BOOLEAN NOT NULL DEFAULT false,
     "isBtcTimeLock" BOOLEAN NOT NULL DEFAULT false,
+    "ownerAddress" TEXT,
     "createdTime" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedTime" TIMESTAMP(3) NOT NULL,
-    "addressId" INTEGER NOT NULL,
 
     CONSTRAINT "LockScript_pkey" PRIMARY KEY ("id")
 );
@@ -135,16 +132,6 @@ CREATE TABLE "AssetType" (
     CONSTRAINT "AssetType_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
-CREATE TABLE "Address" (
-    "id" SERIAL NOT NULL,
-    "address" TEXT NOT NULL,
-    "layer" "LayerType" NOT NULL,
-    "chainId" INTEGER,
-
-    CONSTRAINT "Address_pkey" PRIMARY KEY ("id")
-);
-
 -- CreateIndex
 CREATE UNIQUE INDEX "Block_chainId_hash_key" ON "Block"("chainId", "hash");
 
@@ -184,9 +171,6 @@ CREATE UNIQUE INDEX "AssetType_chainId_id_key" ON "AssetType"("chainId", "id");
 -- CreateIndex
 CREATE UNIQUE INDEX "AssetType_chainId_codeHash_hashType_key" ON "AssetType"("chainId", "codeHash", "hashType");
 
--- CreateIndex
-CREATE UNIQUE INDEX "Address_address_key" ON "Address"("address");
-
 -- AddForeignKey
 ALTER TABLE "Block" ADD CONSTRAINT "Block_chainId_fkey" FOREIGN KEY ("chainId") REFERENCES "Chain"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -200,16 +184,4 @@ ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_chainId_blockNumber_fkey" 
 ALTER TABLE "Output" ADD CONSTRAINT "Output_chainId_txHash_fkey" FOREIGN KEY ("chainId", "txHash") REFERENCES "Transaction"("chainId", "hash") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Output" ADD CONSTRAINT "Output_chainId_lockScriptHash_fkey" FOREIGN KEY ("chainId", "lockScriptHash") REFERENCES "LockScript"("chainId", "scriptHash") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Output" ADD CONSTRAINT "Output_chainId_typeScriptHash_fkey" FOREIGN KEY ("chainId", "typeScriptHash") REFERENCES "TypeScript"("chainId", "scriptHash") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "LockScript" ADD CONSTRAINT "LockScript_addressId_fkey" FOREIGN KEY ("addressId") REFERENCES "Address"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Asset" ADD CONSTRAINT "Asset_chainId_assetTypeId_fkey" FOREIGN KEY ("chainId", "assetTypeId") REFERENCES "AssetType"("chainId", "id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Address" ADD CONSTRAINT "Address_chainId_fkey" FOREIGN KEY ("chainId") REFERENCES "Chain"("id") ON DELETE SET NULL ON UPDATE CASCADE;
