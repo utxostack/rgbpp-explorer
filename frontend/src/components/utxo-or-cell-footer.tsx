@@ -78,7 +78,7 @@ export function UtxoOrCellFooter({
             </Box>
           ) : null}
           {ckbCell && address ? <CkbDiffTags {...ckbCell} address={address} /> : null}
-          {btcUtxo && address ? <BtcDiffTags {...btcUtxo} address={address} /> : null}
+          {btcUtxo && address ? <BtcDiffTags {...btcUtxo} ckbCell={ckbCell} address={address} /> : null}
         </HStack>
       ) : null}
       {children}
