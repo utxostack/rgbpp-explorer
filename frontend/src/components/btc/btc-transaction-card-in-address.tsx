@@ -7,9 +7,17 @@ import { VStack } from 'styled-system/jsx'
 import { BtcUtxoTables } from '@/components/btc/btc-utxo-tables'
 import { TransactionHeaderInAddress } from '@/components/transaction-header-in-address'
 import { UtxoOrCellFooter } from '@/components/utxo-or-cell-footer'
-import { BitcoinInput, BitcoinOutput, BitcoinTransaction } from '@/gql/graphql'
+import { BitcoinInput, BitcoinOutput, BitcoinTransaction, CkbTransaction } from '@/gql/graphql'
 
-export function BtcTransactionCardInAddress({ tx, address }: { tx: BitcoinTransaction; address: string }) {
+export function BtcTransactionCardInAddress({
+  tx,
+  address,
+  ckbCell,
+}: {
+  tx: BitcoinTransaction
+  ckbCell?: CkbTransaction
+  address: string
+}) {
   const { i18n } = useLingui()
   return (
     <VStack key={tx.txid} w="100%" gap={0} bg="bg.card" rounded="8px">
@@ -18,6 +26,7 @@ export function BtcTransactionCardInAddress({ tx, address }: { tx: BitcoinTransa
         txid={tx.txid}
         vin={tx.vin as BitcoinInput[]}
         vout={tx.vout as BitcoinOutput[]}
+        ckbCell={ckbCell}
         currentAddress={address}
       />
       <UtxoOrCellFooter
@@ -27,6 +36,7 @@ export function BtcTransactionCardInAddress({ tx, address }: { tx: BitcoinTransa
         feeUnit={t(i18n)`sats`}
         address={address}
         btcUtxo={{ vin: tx.vin as BitcoinInput[], vout: tx.vout as BitcoinOutput[] }}
+        ckbCell={ckbCell}
       />
     </VStack>
   )
