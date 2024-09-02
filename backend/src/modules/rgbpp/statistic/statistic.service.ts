@@ -11,6 +11,9 @@ import { HashType, Script } from '@ckb-lumos/lumos';
 import { RgbppService } from '../rgbpp.service';
 import { RgbppTransactionService } from '../transaction/transaction.service';
 import { LeapDirection } from '../transaction/transaction.model';
+import { PrismaService } from 'src/core/database/prisma/prisma.service';
+import { Holder, Prisma } from '@prisma/client';
+import { OrderType } from 'src/modules/api.model';
 
 // TODO: refactor the `Average Block Time` constant
 // CKB testnet: ~8s, see https://pudge.explorer.nervos.org/charts/average-block-time
@@ -37,6 +40,7 @@ export class RgbppStatisticService {
     private ckbScriptService: CkbScriptService,
     private rgbppTransactionService: RgbppTransactionService,
     private rgbppService: RgbppService,
+    private prismaService: PrismaService,
     @Inject(CACHE_MANAGER) protected cacheManager: Cache,
   ) {
     // this.collectLatest24HourRgbppTransactions();
@@ -156,5 +160,32 @@ export class RgbppStatisticService {
       ckbTxHashes: rgbppL2Txhashes,
       leapDirectionMap,
     };
+  }
+
+  public async getRgbppAssetsHolders(
+    isLayer1: boolean,
+    order?: 'asc' | 'desc',
+    limit?: number,
+  ): Promise<Pick<Holder, 'address' | 'assetCount'>[]> {
+    const results = await this.prismaService.holder.groupBy({
+      by: ['address'],
+      where: {
+        isLayer1,
+      },
+      _sum: {
+        assetCount: true,
+      },
+      orderBy: {
+        _sum: {
+          assetCount: order ?? 'desc',
+        },
+      },
+      ...(limit !== undefined && { take: limit }),
+    });
+    const holders = results.map((result) => ({
+      address: result.address,
+      assetCount: result._sum.assetCount || 0,
+    }));
+    return holders;
   }
 }

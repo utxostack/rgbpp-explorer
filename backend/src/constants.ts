@@ -19,6 +19,7 @@ export const BtcTestnetTypeMap: Record<NetworkType.testnet | NetworkType.signet,
 };
 
 export const CKB_MIN_SAFE_CONFIRMATIONS = 24;
+export const CKB_CHAIN_ID = 1;
 
 export const XUDT_TYPESCRIPTS = {
   [NetworkType.mainnet]: [

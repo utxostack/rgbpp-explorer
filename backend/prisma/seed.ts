@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { envSchema } from '../src/env';
 import {
+  CKB_CHAIN_ID,
   DOB_TYPESCRIPTS,
   MNFT_TYPESCRIPTS,
   SUDT_TYPESCRIPTS,
@@ -24,9 +25,9 @@ async function main() {
     where: { id: 1 },
     update: {},
     create: {
-      id: 1,
+      id: CKB_CHAIN_ID,
       name: 'CKB',
-      ws: 'https://cota-testnet.nervina.dev/wsckbnode',
+      ws: env.CKB_RPC_WEBSOCKET_URL,
       startBlock: 0,
     },
   });

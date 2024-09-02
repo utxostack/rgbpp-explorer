@@ -1,7 +1,9 @@
 import { Args, Float, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { RgbppStatistic } from './statistic.model';
+import { RgbppHolder, RgbppStatistic } from './statistic.model';
 import { RgbppStatisticService } from './statistic.service';
 import { LeapDirection } from '../transaction/transaction.model';
+import { OrderType } from 'src/modules/api.model';
+import { Holder } from '@prisma/client';
 
 @Resolver(() => RgbppStatistic)
 export class RgbppStatisticResolver {
@@ -12,16 +14,22 @@ export class RgbppStatisticResolver {
     return {};
   }
 
-  @ResolveField(() => Float)
-  public async transactionsCount(): Promise<number> {
-    // TODO: implement this
-    return 0;
+  @ResolveField(() => [RgbppHolder])
+  public async holders(
+    @Args('isLayer1', { type: () => Boolean }) isLayer1: boolean,
+    @Args('order', { type: () => OrderType, nullable: true }) order?: OrderType,
+    @Args('limit', { type: () => Float, nullable: true }) limit?: number,
+  ): Promise<Pick<Holder, 'address' | 'assetCount'>[]> {
+    const holders = await this.rgbppStatisticService.getRgbppAssetsHolders(isLayer1, order, limit);
+    return holders;
   }
 
   @ResolveField(() => Float)
-  public async holdersCount(): Promise<number> {
-    // TODO: implement this
-    return 0;
+  public async holdersCount(
+    @Args('isLayer1', { type: () => Boolean }) isLayer1: boolean,
+  ): Promise<number> {
+    const holders = await this.rgbppStatisticService.getRgbppAssetsHolders(isLayer1);
+    return holders.length;
   }
 
   @ResolveField(() => Float, { nullable: true })

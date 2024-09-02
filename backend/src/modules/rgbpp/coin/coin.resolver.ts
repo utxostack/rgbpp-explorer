@@ -8,10 +8,16 @@ import {
   CkbExplorerXUDTTransactionsLoader,
   CkbExplorerXUDTTransactionsLoaderType,
 } from './coin.dataloader';
+import { RgbppHolder } from '../statistic/statistic.model';
+import { OrderType } from 'src/modules/api.model';
+import { RgbppCoinService } from './coin.service';
 
 @Resolver(() => RgbppCoin)
 export class RgbppCoinResolver {
-  constructor(private ckbExplorerService: CkbExplorerService) {}
+  constructor(
+    private ckbExplorerService: CkbExplorerService,
+    private rgbppCoinService: RgbppCoinService,
+  ) { }
 
   @Query(() => RgbppCoinList, { name: 'rgbppCoins' })
   public async coins(
@@ -82,5 +88,36 @@ export class RgbppCoinResolver {
       return null;
     }
     return transactions.meta.total;
+  }
+
+  @ResolveField(() => [RgbppHolder], { nullable: true })
+  public async holders(
+    @Parent() coin: RgbppCoin,
+    @Args('isLayer1', { type: () => Boolean }) isLayer1: boolean,
+    @Args('order', { type: () => OrderType, nullable: true }) order?: OrderType,
+    @Args('limit', { type: () => Float, nullable: true }) limit?: number,
+  ) {
+    if (!coin.typeHash) {
+      return null;
+    }
+    const holders = await this.rgbppCoinService.getCoinHolders(
+      coin.typeHash,
+      isLayer1,
+      order,
+      limit,
+    );
+    return holders;
+  }
+
+  @ResolveField(() => Float, { nullable: true })
+  public async holdersCount(
+    @Parent() coin: RgbppCoin,
+    @Args('isLayer1', { type: () => Boolean, nullable: true }) isLayer1?: boolean,
+  ) {
+    if (!coin.typeHash) {
+      return null;
+    }
+    const holders = await this.rgbppCoinService.getCoinHolders(coin.typeHash, isLayer1);
+    return holders.length;
   }
 }

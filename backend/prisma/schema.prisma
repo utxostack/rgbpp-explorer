@@ -5,7 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["views"]
 }
 
 datasource db {
@@ -159,3 +160,11 @@ model AssetType {
   @@unique([chainId, codeHash, hashType])
 }
 
+view Holder {
+  address        String
+  isLayer1       Boolean
+  assetCount     Int
+  typeScriptHash String
+
+  @@unique([address, typeScriptHash])
+}
