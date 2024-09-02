@@ -22,7 +22,7 @@ export const envSchema = z
         return origin.map((host) => host.trim());
       }),
 
-    // DATABASE_URL: z.string(),
+    DATABASE_URL: z.string(),
     REDIS_URL: z.string(),
 
     BITCOIN_PRIMARY_DATA_PROVIDER: z.enum(['mempool', 'electrs']).default('mempool'),
