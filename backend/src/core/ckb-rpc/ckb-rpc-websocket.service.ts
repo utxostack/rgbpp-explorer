@@ -166,20 +166,46 @@ export class CkbRpcWebsocketService {
 
   @Cacheable({
     namespace: 'CkbRpcWebsocketService',
-    key: (blockNumber: string) => `getBlockByNumber:${blockNumber}`,
+    key: (blockNumber: string, withTxData: boolean, withTxWitness: boolean) => {
+      let key = `getBlockByNumber:${blockNumber}`;
+      if (withTxData) {
+        key += ':withTxData';
+      }
+      if (withTxWitness) {
+        key += ':withTxWitness';
+      }
+      return key;
+    },
     ttl: ONE_MONTH_MS,
     shouldCache: async (block: Block, that: CkbRpcWebsocketService) => {
       const { number } = block.header;
       return that.isSafeConfirmations(number);
     },
   })
-  public async getBlockByNumber(blockNumber: string): Promise<Block> {
+  public async getBlockByNumber(
+    blockNumber: string,
+    withTxData: boolean = false,
+    withTxWitness: boolean = false,
+  ): Promise<Block> {
     await this.websocketReady;
     this.logger.debug(`get_block_by_number - blockNumber: ${blockNumber}`);
-    const block = await this.websocket.call('get_block_by_number', [
+    const response = await this.websocket.call('get_block_by_number', [
       BI.from(blockNumber).toHexString(),
     ]);
-    return block as Block;
+    const block = response as Block;
+    if (!withTxData) {
+      block.transactions = block.transactions.map((tx) => {
+        tx.outputs_data = [];
+        return tx;
+      });
+    }
+    if (!withTxWitness) {
+      block.transactions = block.transactions.map((tx) => {
+        tx.witnesses = [];
+        return tx;
+      });
+    }
+    return block;
   }
 
   @Cacheable({
@@ -217,13 +243,14 @@ export class CkbRpcWebsocketService {
     this.logger.debug(
       `get_transactions - searchKey: ${JSON.stringify(searchKey)}, order: ${order}, limit: ${limit}, after: ${after}`,
     );
-    const transactions = await this.websocket.call('get_transactions', [
+    const response = await this.websocket.call('get_transactions', [
       searchKey,
       order,
       limit,
       after,
     ]);
-    return transactions as GetTransactionsResult;
+    const transactions = response as GetTransactionsResult;
+    return transactions;
   }
 
   public async getCells(
