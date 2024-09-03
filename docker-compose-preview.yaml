@@ -1,14 +1,12 @@
 services:
-  explorer-backend:
-    restart: unless-stopped
+  preview-explorer-backend:
     depends_on:
       - redis
+    restart: unless-stopped
     build:
       context: .
       args:
         - GIT_BRANCH=${GIT_BRANCH}
-    ports:
-      - '3000:3000'
     env_file:
       - ./backend/.env
     deploy:
@@ -16,17 +14,15 @@ services:
         limits:
           memory: 4096M
 
-  redis:
+  preview-redis:
     # https://github.com/docker-library/redis/blob/b77450d/7.4/alpine/Dockerfile
     image: redis:7-alpine
     restart: unless-stopped
-    ports:
-      - '127.0.0.1:6379:6379'
     volumes:
       # Redis' WORKDIR is /data
-      - redis-data:/data
+      - preview-redis-data:/data
       - ./backend/redis.conf:/usr/local/etc/redis/redis.conf:ro
     command: /usr/local/etc/redis/redis.conf
 
 volumes:
-  redis-data:
+  preview-redis-data:
