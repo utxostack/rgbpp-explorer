@@ -1,7 +1,7 @@
 services:
   preview-explorer-backend:
     depends_on:
-      - redis
+      - preview-redis
     restart: unless-stopped
     build:
       context: .
