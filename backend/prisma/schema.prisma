@@ -139,6 +139,7 @@ model Asset {
   chainId        Int
   lockScriptHash String  @db.Char(66)
   typeScriptHash String  @db.Char(66)
+  amount         Decimal  @default(0) @db.Decimal(65,0)
   assetTypeId    Int
   isLive         Boolean @default(true)
 
@@ -152,6 +153,7 @@ model AssetType {
   chainId     Int
   codeHash    String   @db.Char(66)
   hashType    String
+  fungible    Boolean  @default(false)
   createdTime DateTime @default(now())
   updatedTime DateTime @updatedAt
   Asset       Asset[]
@@ -164,6 +166,7 @@ view Holder {
   address        String
   isLayer1       Boolean
   assetCount     Int
+  assetAmount    Decimal  @default(0) @db.Decimal(65,0)
   typeScriptHash String
 
   @@unique([address, typeScriptHash])

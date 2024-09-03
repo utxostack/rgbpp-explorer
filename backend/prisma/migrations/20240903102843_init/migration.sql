@@ -114,6 +114,7 @@ CREATE TABLE "Asset" (
     "chainId" INTEGER NOT NULL,
     "lockScriptHash" CHAR(66) NOT NULL,
     "typeScriptHash" CHAR(66) NOT NULL,
+    "amount" DECIMAL(65,0) NOT NULL DEFAULT 0,
     "assetTypeId" INTEGER NOT NULL,
     "isLive" BOOLEAN NOT NULL DEFAULT true,
 
@@ -126,6 +127,7 @@ CREATE TABLE "AssetType" (
     "chainId" INTEGER NOT NULL,
     "codeHash" CHAR(66) NOT NULL,
     "hashType" TEXT NOT NULL,
+    "fungible" BOOLEAN NOT NULL DEFAULT false,
     "createdTime" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedTime" TIMESTAMP(3) NOT NULL,
 

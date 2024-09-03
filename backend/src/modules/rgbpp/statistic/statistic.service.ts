@@ -162,6 +162,16 @@ export class RgbppStatisticService {
     };
   }
 
+  public async getRgbppAssetsHoldersCount(isLayer1: boolean): Promise<number> {
+    const results = await this.prismaService.holder.groupBy({
+      by: ['address'],
+      where: {
+        isLayer1,
+      },
+    });
+    return results.length;
+  }
+
   public async getRgbppAssetsHolders(
     isLayer1: boolean,
     order?: 'asc' | 'desc',

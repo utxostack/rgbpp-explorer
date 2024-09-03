@@ -149,8 +149,14 @@ type RgbppCoin {
   deployedAt: Timestamp!
   transactions(page: Int, pageSize: Int): [RgbppTransaction!]
   transactionsCount: Float
-  holders(isLayer1: Boolean!, order: OrderType, limit: Float): [RgbppHolder!]
-  holdersCount(isLayer1: Boolean): Float
+  amount(layer: Layer): String!
+  holders(layer: Layer!, order: OrderType, limit: Float): [RgbppHolder!]
+  holdersCount(layer: Layer!): Float
+}
+
+enum Layer {
+  L1
+  L2
 }
 
 enum OrderType {
@@ -167,8 +173,8 @@ type RgbppCoinList {
 
 """RGB++ Statistic"""
 type RgbppStatistic {
-  holders(isLayer1: Boolean!, order: OrderType, limit: Float): [RgbppHolder!]!
-  holdersCount(isLayer1: Boolean!): Float!
+  holders(layer: Layer!, order: OrderType, limit: Float): [RgbppHolder!]!
+  holdersCount(layer: Layer!): Float!
   latest24HoursL1TransactionsCount(leapDirection: LeapDirection): Float
   latest24HoursL2TransactionsCount: Float
 }
@@ -177,6 +183,7 @@ type RgbppStatistic {
 type RgbppHolder {
   address: String!
   assetCount: Int!
+  assetAmount: String
 }
 
 """Bitcoin Address"""

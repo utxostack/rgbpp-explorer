@@ -13,12 +13,13 @@ const network = env.NETWORK;
 
 const prisma = new PrismaClient();
 
-const assetTypeScripts = [
-  XUDT_TYPESCRIPTS,
-  SUDT_TYPESCRIPTS,
-  DOB_TYPESCRIPTS,
-  MNFT_TYPESCRIPTS,
-].flatMap((scripts) => scripts[network]);
+const NON_FUNGIBLE_ASSET_TYPE_SCRIPTS = [DOB_TYPESCRIPTS, MNFT_TYPESCRIPTS].flatMap(
+  (scripts) => scripts[network],
+);
+
+const FUNGIBLE_ASSET_TYPE_SCRIPTS = [XUDT_TYPESCRIPTS, SUDT_TYPESCRIPTS].flatMap(
+  (scripts) => scripts[network],
+);
 
 async function main() {
   await prisma.chain.upsert({
@@ -32,12 +33,13 @@ async function main() {
     },
   });
 
-  for (const script of assetTypeScripts) {
+  for (const script of [...NON_FUNGIBLE_ASSET_TYPE_SCRIPTS, ...FUNGIBLE_ASSET_TYPE_SCRIPTS]) {
     await prisma.assetType.create({
       data: {
         chainId: 1,
         codeHash: script.codeHash,
         hashType: script.hashType,
+        fungible: FUNGIBLE_ASSET_TYPE_SCRIPTS.some((s) => s.codeHash === script.codeHash),
       },
     });
   }

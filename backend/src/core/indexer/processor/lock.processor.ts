@@ -6,7 +6,6 @@ import { PrismaService } from 'src/core/database/prisma/prisma.service';
 import { computeScriptHash } from '@ckb-lumos/lumos/utils';
 import { CoreService } from 'src/core/core.service';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
-import { Cell } from 'src/core/blockchain/blockchain.interface';
 import { Env } from 'src/env';
 import { ConfigService } from '@nestjs/config';
 import { NetworkType } from 'src/constants';
@@ -16,7 +15,6 @@ export const INDEXER_LOCK_QUEUE = 'indexer-lock-queue';
 export interface IndexerLockJobData {
   chainId: number;
   script: Script;
-  cell: Cell;
 }
 
 @Processor(INDEXER_LOCK_QUEUE, {
@@ -60,8 +58,7 @@ export class IndexerLockProcessor extends WorkerHost {
   }
 
   public async process(job: Job<IndexerLockJobData>): Promise<any> {
-    const { chainId, script, cell } = job.data;
-    const index = BI.from(cell.out_point.index).toNumber();
+    const { chainId, script } = job.data;
     const scriptHash = computeScriptHash(script);
     const isRgbppLock = this.coreService.isRgbppLockScript(script);
     const isBtcTimeLock = this.coreService.isBtcTimeLockScript(script);
@@ -69,12 +66,12 @@ export class IndexerLockProcessor extends WorkerHost {
     let address: string | null = null;
     if (isRgbppLock) {
       try {
-        const { btcTxid } = this.coreService.parseRgbppLockArgs(script.args);
+        const { btcTxid, outIndex } = this.coreService.parseRgbppLockArgs(script.args);
         const btcTx = await this.bitcoinApiService.getTx({ txid: btcTxid });
-        const output = btcTx.vout[index + 1];
+        const output = btcTx.vout[outIndex];
 
         if (!output.scriptpubkey_address) {
-          this.logger.error(`No address found for output ${index + 1} of tx ${btcTxid}`);
+          this.logger.error(`No address found for output ${outIndex} of tx ${btcTxid}`);
           return;
         }
         address = output.scriptpubkey_address;

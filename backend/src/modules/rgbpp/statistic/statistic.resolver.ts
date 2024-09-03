@@ -1,5 +1,5 @@
 import { Args, Float, Query, ResolveField, Resolver } from '@nestjs/graphql';
-import { RgbppHolder, RgbppStatistic } from './statistic.model';
+import { Layer, RgbppHolder, RgbppStatistic } from './statistic.model';
 import { RgbppStatisticService } from './statistic.service';
 import { LeapDirection } from '../transaction/transaction.model';
 import { OrderType } from 'src/modules/api.model';
@@ -7,7 +7,7 @@ import { Holder } from '@prisma/client';
 
 @Resolver(() => RgbppStatistic)
 export class RgbppStatisticResolver {
-  constructor(private rgbppStatisticService: RgbppStatisticService) { }
+  constructor(private rgbppStatisticService: RgbppStatisticService) {}
 
   @Query(() => RgbppStatistic, { name: 'rgbppStatistic' })
   public async getRgbppStatistic(): Promise<RgbppStatistic> {
@@ -16,20 +16,22 @@ export class RgbppStatisticResolver {
 
   @ResolveField(() => [RgbppHolder])
   public async holders(
-    @Args('isLayer1', { type: () => Boolean }) isLayer1: boolean,
+    @Args('layer', { type: () => Layer }) layer: Layer,
     @Args('order', { type: () => OrderType, nullable: true }) order?: OrderType,
     @Args('limit', { type: () => Float, nullable: true }) limit?: number,
   ): Promise<Pick<Holder, 'address' | 'assetCount'>[]> {
-    const holders = await this.rgbppStatisticService.getRgbppAssetsHolders(isLayer1, order, limit);
+    const holders = await this.rgbppStatisticService.getRgbppAssetsHolders(
+      layer === Layer.L1,
+      order,
+      limit,
+    );
     return holders;
   }
 
   @ResolveField(() => Float)
-  public async holdersCount(
-    @Args('isLayer1', { type: () => Boolean }) isLayer1: boolean,
-  ): Promise<number> {
-    const holders = await this.rgbppStatisticService.getRgbppAssetsHolders(isLayer1);
-    return holders.length;
+  public async holdersCount(@Args('layer', { type: () => Layer }) layer: Layer): Promise<number> {
+    const count = await this.rgbppStatisticService.getRgbppAssetsHoldersCount(layer === Layer.L1);
+    return count;
   }
 
   @ResolveField(() => Float, { nullable: true })
