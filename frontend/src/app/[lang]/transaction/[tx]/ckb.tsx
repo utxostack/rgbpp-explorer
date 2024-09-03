@@ -1,16 +1,11 @@
-import { t } from '@lingui/macro'
-import { Box, HStack, VStack } from 'styled-system/jsx'
+import { VStack } from 'styled-system/jsx'
 
 import { BtcUtxos } from '@/components/btc/btc-utxos'
 import { CkbCells } from '@/components/ckb/ckb-cells'
 import { CkbTransactionOverview } from '@/components/ckb/ckb-transaction-overview'
-import { Copier } from '@/components/copier'
-import { LayerType } from '@/components/layer-type'
-import { Heading, Text } from '@/components/ui'
+import { TransactionHeader } from '@/components/transaction-header'
 import { BitcoinTransaction, CkbTransaction, LeapDirection } from '@/gql/graphql'
-import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { resolveLayerTypeFromRGBppTransaction } from '@/lib/resolve-layer-type-from-rgbpp-transaction'
-import { formatNumber } from '@/lib/string/format-number'
 
 export function CKBTransactionPage({
   ckbTransaction,
@@ -21,35 +16,13 @@ export function CKBTransactionPage({
   btcTransaction?: BitcoinTransaction | null
   leapDirection?: LeapDirection | null
 }) {
-  const i18n = getI18nFromHeaders()
   return (
-    <VStack w="100%" maxW="content" p="30px" gap="30px">
-      <HStack w="100%" gap="24px" p="30px" bg="bg.card" rounded="8px">
-        <Heading fontSize="20px" fontWeight="semibold">
-          {t(i18n)`Transactions`}
-        </Heading>
-        <Copier value={ckbTransaction.hash}>{ckbTransaction.hash}</Copier>
-        {btcTransaction ? (
-          <LayerType type={resolveLayerTypeFromRGBppTransaction({ ckbTransaction, leapDirection, btcTransaction })} />
-        ) : null}
-        <Box
-          color="brand"
-          fontWeight="semibold"
-          fontSize="20px"
-          lineHeight="24px"
-          py="4px"
-          px="12px"
-          rounded="4px"
-          bg="brand.a10"
-          border="1px solid currentColor"
-          ml="auto"
-        >
-          {formatNumber(ckbTransaction.confirmations)}{' '}
-          <Text as="span" fontSize="14px" fontWeight="medium">
-            {t(i18n)`Confirmations`}
-          </Text>
-        </Box>
-      </HStack>
+    <VStack w="100%" maxW="content" p={{ base: '20px', xl: '30px' }} gap={{ base: '20px', xl: '30px' }}>
+      <TransactionHeader
+        type={resolveLayerTypeFromRGBppTransaction({ ckbTransaction, leapDirection, btcTransaction })}
+        txid={ckbTransaction.hash}
+        confirmations={ckbTransaction.confirmations}
+      />
       <CkbTransactionOverview ckbTransaction={ckbTransaction} />
       <CkbCells ckbTransaction={ckbTransaction} />
       {btcTransaction ? (

@@ -1,7 +1,7 @@
 import { t } from '@lingui/macro'
 import { notFound } from 'next/navigation'
 import { PropsWithChildren } from 'react'
-import { HStack, styled, VStack } from 'styled-system/jsx'
+import { Box, Flex, Grid, styled } from 'styled-system/jsx'
 
 import BtcIcon from '@/assets/chains/btc.svg'
 import { Copier } from '@/components/copier'
@@ -30,27 +30,41 @@ export default async function AssetDetail({
   if (!response.rgbppCoin) notFound()
   return (
     <>
-      <HStack gap="16px" w="100%" maxW="content" py="20px" px="30px" bg="bg.card" rounded="8px">
-        {response.rgbppCoin.icon ? (
-          <styled.img w="56px" h="56px" src={response.rgbppCoin.icon} rounded="100%" />
-        ) : (
-          <BtcIcon w="56px" h="56px" />
-        )}
-
-        <VStack alignItems="start">
-          <HStack>
-            <Text fontSize="20px">{response.rgbppCoin.symbol}</Text>
-            <Text as="span" fontSize="14px" color="text.third">
-              {response.rgbppCoin.name}
-            </Text>
-          </HStack>
+      <Grid
+        gridTemplateColumns="56px 1fr"
+        columnGap="16px"
+        rowGap={{ base: '16px', md: 0 }}
+        w="100%"
+        maxW="content"
+        py="20px"
+        px={{ base: '20px', xl: '30px' }}
+        bg="bg.card"
+        rounded="8px"
+        alignItems="center"
+      >
+        <Box w="56px" h="56px" gridRow={{ base: '1/2', md: '1/3' }}>
+          {response.rgbppCoin.icon ? (
+            <styled.img w="100%" h="100%" src={response.rgbppCoin.icon} rounded="100%" />
+          ) : (
+            <BtcIcon w="100%" h="100%" />
+          )}
+        </Box>
+        <Flex gap="12px" flexDirection={{ base: 'column', md: 'row' }}>
+          <Text fontSize="20px" lineHeight="24px">
+            {response.rgbppCoin.symbol}
+          </Text>
+          <Text as="span" fontSize="14px" color="text.third" lineHeight="18px">
+            {response.rgbppCoin.name}
+          </Text>
+        </Flex>
+        <Box gridColumn={{ base: '1/3', md: '2/3' }}>
           <Copier value={typeHash}>
-            <Text fontSize="14px" color="text.secondary">
+            <Text fontSize="14px" color="text.secondary" lineHeight="24px" wordBreak="break-all" textAlign="left">
               {typeHash}
             </Text>
           </Copier>
-        </VStack>
-      </HStack>
+        </Box>
+      </Grid>
       <LinkTabs
         links={[
           {

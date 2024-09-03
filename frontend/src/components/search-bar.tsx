@@ -15,6 +15,8 @@ import { HoverCard, Text } from '@/components/ui'
 import { graphql } from '@/gql'
 import { graphQLClient } from '@/lib/graphql'
 
+import { SystemProperties } from '../../styled-system/types'
+
 function SearchResult({
   children,
   open,
@@ -26,10 +28,10 @@ function SearchResult({
   isLoading: boolean
   error: boolean
   children: ReactNode
-  maxW?: string
+  maxW?: SystemProperties['maxW']
 }) {
   return (
-    <HoverCard.Root open={open ? error || isLoading : false} positioning={{ placement: 'bottom' }}>
+    <HoverCard.Root open={open ? error || isLoading : false} positioning={{ placement: 'bottom', sameWidth: true }}>
       <HoverCard.Trigger asChild>{children}</HoverCard.Trigger>
       <HoverCard.Positioner>
         <HoverCard.Content w="100vw" maxW={maxW} py="50px" zIndex={10}>
@@ -112,14 +114,22 @@ export function SearchBar(props: FlexProps) {
 
   return (
     <SearchResult isLoading={isPending} error={!!error} open={isFocus ? !!value : false}>
-      <Flex w="100%" maxW="812px" h="64px" p="6px" bg="rgba(255, 255, 255, 0.9)" rounded="100px" {...props}>
+      <Flex
+        w="100%"
+        maxW={{ base: '400px', md: '600px', lg: '812px' }}
+        h={{ base: '40px', md: '56px', lg: '64px' }}
+        p={{ base: '4px', lg: '6px' }}
+        bg="rgba(255, 255, 255, 0.9)"
+        rounded="100px"
+        {...props}
+      >
         <styled.input
           flex={1}
           placeholder={t(i18n)`Search by Address/Tx Hash/Block Hash/AssetID`}
           pl="20px"
           color="bg.primary"
           fontWeight="medium"
-          fontSize="md"
+          fontSize={{ base: '12px', md: '14px', lg: '16px' }}
           _placeholder={{
             color: 'text.third',
           }}
@@ -131,8 +141,17 @@ export function SearchBar(props: FlexProps) {
           onFocus={() => setFocus(true)}
           onBlur={() => setFocus(false)}
         />
-        <styled.button bg="#000" px="20px" h="100%" rounded="full" cursor="pointer">
-          <SearchIcon w="38px" h="38px" />
+        <styled.button
+          bg="bg.card"
+          w={{ base: '50px', md: '78px', lg: '88px' }}
+          h="100%"
+          rounded="full"
+          cursor="pointer"
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <SearchIcon w={{ base: '24px', md: '32px', lg: '38px' }} h={{ base: '24px', md: '32px', lg: '38px' }} />
         </styled.button>
       </Flex>
     </SearchResult>
@@ -147,13 +166,13 @@ export function SearchBarInNav(props: FlexProps) {
   const [isFocus, setFocus] = useState(false)
 
   return (
-    <SearchResult maxW="500px" isLoading={isPending} error={!!error} open={isFocus ? !!value : false}>
-      <Flex bg="bg.input" h="44px" rounded="100px" w="500px" {...props}>
+    <SearchResult maxW="450px" isLoading={isPending} error={!!error} open={isFocus ? !!value : false}>
+      <Flex bg="bg.input" h={{ base: '32px', sm: '40px', md: '40px', lg: '44px' }} rounded="100px" w="450px" {...props}>
         <styled.input
           flex={1}
           placeholder={t(i18n)`Search by Address/Tx Hash/Block Hash/AssetID`}
-          fontSize="14px"
-          pl="20px"
+          fontSize={{ base: '12px', sm: '14px' }}
+          pl={{ base: '16px', lg: '20px' }}
           color="text.primary"
           fontWeight="medium"
           _placeholder={{
@@ -167,7 +186,15 @@ export function SearchBarInNav(props: FlexProps) {
           onFocus={() => setFocus(true)}
           onBlur={() => setFocus(false)}
         />
-        <styled.button bg="brand" px="20px" h="calc(100% - 8px)" rounded="full" cursor="pointer" m="4px">
+        <styled.button
+          bg={{ base: 'transparent', sm: 'brand' }}
+          color={{ base: 'brand', sm: 'text.primary' }}
+          px={{ base: '8px', sm: '16px', lg: '20px' }}
+          h="calc(100% - 8px)"
+          rounded="full"
+          cursor="pointer"
+          m="4px"
+        >
           <SearchIcon w="24px" h="24px" />
         </styled.button>
       </Flex>

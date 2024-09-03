@@ -152,7 +152,6 @@ export class RgbppStatisticService {
     }
 
     return {
-      ...block,
       btcTxIds: rgbppL1TxIds,
       ckbTxHashes: rgbppL2Txhashes,
       leapDirectionMap,

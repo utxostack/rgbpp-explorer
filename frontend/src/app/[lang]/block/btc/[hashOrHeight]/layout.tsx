@@ -1,18 +1,15 @@
 import { t } from '@lingui/macro'
 import { notFound } from 'next/navigation'
 import { ReactNode } from 'react'
-import { Box, HStack, VStack } from 'styled-system/jsx'
+import { VStack } from 'styled-system/jsx'
 
-import BlockIcon from '@/assets/block.svg'
+import { BlockHeader } from '@/components/block-header'
 import { BtcBlockOverview } from '@/components/btc/btc-block-overview'
-import { Copier } from '@/components/copier'
 import { LinkTabs } from '@/components/link-tabs'
-import { Heading, Text } from '@/components/ui'
 import { graphql } from '@/gql'
 import { BitcoinBlock } from '@/gql/graphql'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { graphQLClient } from '@/lib/graphql'
-import { formatNumber } from '@/lib/string/format-number'
 
 const query = graphql(`
   query BtcBlock($hashOrHeight: String!) {
@@ -55,35 +52,8 @@ export default async function Layout({
   if (!data?.btcBlock) notFound()
 
   return (
-    <VStack w="100%" maxW="content" p="30px" gap="30px">
-      <HStack w="100%" gap="24px" p="30px" bg="bg.card" rounded="8px">
-        <HStack gap="16px">
-          <BlockIcon w="56px" h="56px" />
-          <VStack gap="8px" alignItems="start">
-            <Heading fontSize="20px" fontWeight="semibold">
-              {t(i18n)`Block ${data.btcBlock.height}`}
-            </Heading>
-            <Copier value={data.btcBlock.id}>{data.btcBlock.id}</Copier>
-          </VStack>
-        </HStack>
-        <Box
-          color="brand"
-          fontWeight="semibold"
-          fontSize="20px"
-          lineHeight="24px"
-          py="4px"
-          px="12px"
-          rounded="4px"
-          bg="brand.a10"
-          border="1px solid currentColor"
-          ml="auto"
-        >
-          {formatNumber(data.btcBlock?.confirmations ?? undefined)}
-          <Text as="span" fontSize="14px" fontWeight="medium" ml="4px">
-            {t(i18n)`Confirmations`}
-          </Text>
-        </Box>
-      </HStack>
+    <VStack w="100%" maxW="content" p={{ base: '20px', lg: '30px' }} gap={{ base: '20px', lg: '30px' }}>
+      <BlockHeader id={data.btcBlock.id} height={data.btcBlock.height} confirmations={data.btcBlock.confirmations} />
       <BtcBlockOverview block={data.btcBlock as BitcoinBlock} />
       <LinkTabs
         w="100%"

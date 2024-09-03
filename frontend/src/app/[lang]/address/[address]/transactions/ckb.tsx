@@ -1,14 +1,13 @@
 import { t } from '@lingui/macro'
-import { Center, Flex, HStack, VStack } from 'styled-system/jsx'
+import { Center, HStack, VStack } from 'styled-system/jsx'
 
 import { CkbCellTables } from '@/components/ckb/ckb-cell-tables'
-import { Copier } from '@/components/copier'
 import { FailedFallback } from '@/components/failed-fallback'
+import { IfBreakpoint } from '@/components/if-breakpoint'
 import { NoData } from '@/components/no-data'
 import { PaginationSearchParams } from '@/components/pagination-searchparams'
-import { TimeFormatter } from '@/components/time-formatter'
+import { TransactionHeaderInAddress } from '@/components/transaction-header-in-address'
 import { Text } from '@/components/ui'
-import Link from '@/components/ui/link'
 import { UtxoOrCellFooter } from '@/components/utxo-or-cell-footer'
 import { graphql } from '@/gql'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
@@ -116,14 +115,7 @@ export async function CkbTransactionsByAddress({ address }: { address: string })
         ckbAddress.transactions?.map((tx) => {
           return (
             <VStack key={tx.hash} w="100%" gap={0} bg="bg.card" rounded="8px">
-              <Flex w="100%" bg="bg.input" justifyContent="space-between" py="20px" px="30px" roundedTop="8px">
-                <Copier value={tx.hash} onlyIcon>
-                  <Link color="brand" href={`/transaction/${tx.hash}`}>
-                    {tx.hash}
-                  </Link>
-                </Copier>
-                {tx.block ? <TimeFormatter timestamp={tx.block.timestamp} /> : null}
-              </Flex>
+              <TransactionHeaderInAddress time={tx.block?.timestamp} txid={tx.hash} />
               <CkbCellTables inputs={tx.inputs} outputs={tx.outputs} isCellbase={tx.isCellbase} address={address} />
               <UtxoOrCellFooter
                 fee={tx.fee}
@@ -137,8 +129,10 @@ export async function CkbTransactionsByAddress({ address }: { address: string })
           )
         })
       )}
-      <HStack ml="auto" gap="16px" mt="auto" p="30px">
-        <Text fontSize="14px">{t(i18n)`Total ${formatNumber(total)} Items`}</Text>
+      <HStack gap="16px" mt="auto" p={{ base: '20px', xl: '30px' }}>
+        <IfBreakpoint breakpoint="md">
+          <Text fontSize="14px">{t(i18n)`Total ${formatNumber(total)} Items`}</Text>
+        </IfBreakpoint>
         <PaginationSearchParams count={total} pageSize={pageSize} />
       </HStack>
     </>

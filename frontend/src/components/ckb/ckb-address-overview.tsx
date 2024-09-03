@@ -3,7 +3,8 @@ import { Grid, HStack, VStack } from 'styled-system/jsx'
 
 import OverviewSVG from '@/assets/overview.svg'
 import { OverflowAmount } from '@/components/overflow-amount'
-import { Heading, Text } from '@/components/ui'
+import { OverviewInfo, OverviewInfoItem } from '@/components/overview-info'
+import { Heading } from '@/components/ui'
 import { CkbAddressBaseQuery } from '@/gql/graphql'
 import { shannonToCKB } from '@/lib/ckb/shannon-to-ckb'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
@@ -18,56 +19,32 @@ export function CkbAddressOverview({ ckbAddress }: { ckbAddress: CkbAddressBaseQ
         <OverviewSVG w="24px" />
         <Heading fontSize="16px" fontWeight="semibold">{t(i18n)`Overview`}</Heading>
       </HStack>
-      <Grid w="100%" gridTemplateColumns="repeat(2, 1fr)" gap="30px" pt="20px" pb="30px" px="30px" textAlign="center">
-        <Grid
-          gridTemplateColumns="repeat(3, 1fr)"
-          px="20px"
-          py="25px"
-          bg="bg.card.hover"
-          rounded="8px"
-          fontSize="20px"
-          lineHeight="100%"
-        >
-          <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`CKB Balance`}</Text>
-            <Text>
-              <OverflowAmount amount={formatNumber(shannonToCKB(ckbAddress.balance?.total))} symbol={t(i18n)`CKB`} />
-            </Text>
-          </VStack>
-          <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`Available`}</Text>
-            <Text>
-              <OverflowAmount
-                amount={formatNumber(shannonToCKB(ckbAddress.balance?.available))}
-                symbol={t(i18n)`CKB`}
-              />
-            </Text>
-          </VStack>
-          <VStack gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`Occupied`}</Text>
-            <Text>
-              <OverflowAmount amount={formatNumber(shannonToCKB(ckbAddress.balance?.occupied))} symbol={t(i18n)`CKB`} />
-            </Text>
-          </VStack>
-        </Grid>
-        <Grid
-          gridTemplateColumns="repeat(2, 1fr)"
-          px="20px"
-          py="25px"
-          bg="bg.card.hover"
-          rounded="8px"
-          fontSize="20px"
-          lineHeight="100%"
-        >
-          <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`Txns`}</Text>
-            <Text>{formatNumber(ckbAddress.transactionsCount ?? undefined)}</Text>
-          </VStack>
-          <VStack gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`L2 RGB++ Assets`}</Text>
-            <Text color="text.third">{t(i18n)`Coming Soon`}</Text>
-          </VStack>
-        </Grid>
+      <Grid
+        w="100%"
+        gridTemplateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }}
+        gap={{ base: '20px', xl: '30px' }}
+        pt="20px"
+        pb={{ base: '20px', xl: '30px' }}
+        px={{ base: '20px', xl: '30px' }}
+        textAlign="center"
+      >
+        <OverviewInfo>
+          <OverviewInfoItem label={t(i18n)`CKB Balance`}>
+            <OverflowAmount amount={formatNumber(shannonToCKB(ckbAddress.balance?.total))} symbol={t(i18n)`CKB`} />
+          </OverviewInfoItem>
+          <OverviewInfoItem label={t(i18n)`Available`}>
+            <OverflowAmount amount={formatNumber(shannonToCKB(ckbAddress.balance?.available))} symbol={t(i18n)`CKB`} />
+          </OverviewInfoItem>
+          <OverviewInfoItem label={t(i18n)`Occupied`}>
+            <OverflowAmount amount={formatNumber(shannonToCKB(ckbAddress.balance?.occupied))} symbol={t(i18n)`CKB`} />
+          </OverviewInfoItem>
+        </OverviewInfo>
+        <OverviewInfo>
+          <OverviewInfoItem label={t(i18n)`Txns`} formatNumber>
+            {ckbAddress.transactionsCount}
+          </OverviewInfoItem>
+          <OverviewInfoItem label={t(i18n)`L2 RGB++ Assets`} unsupported />
+        </OverviewInfo>
       </Grid>
     </VStack>
   )

@@ -20,6 +20,7 @@ export function ViewMemPool({ txid }: { txid: string }) {
       px="16px"
       rounded="4px"
       bg="bg.primary"
+      w="fit-content"
     >
       <MemPoolIcon h="18px" w="18px" />
       <Text fontSize="14px" fontWeight="semibold">

@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance, CreateAxiosDefaults } from 'axios';
 import { IBitcoinDataProvider } from '../bitcoin-api.interface';
 import {
   Address,
@@ -9,14 +9,23 @@ import {
   UTXO,
 } from '../bitcoin-api.schema';
 import { HttpException } from '@nestjs/common';
+import * as https from 'node:https';
+import * as http from 'node:http';
 
 export class ElectrsService implements IBitcoinDataProvider {
   private request: AxiosInstance;
 
   constructor(baseURL: string) {
-    this.request = axios.create({
+    const config: CreateAxiosDefaults = {
       baseURL,
-    });
+    };
+    const url = new URL(baseURL);
+    if (url.protocol === 'https:') {
+      config.httpsAgent = new https.Agent({ keepAlive: true });
+    } else {
+      config.httpAgent = new http.Agent({ keepAlive: true });
+    }
+    this.request = axios.create(config);
   }
 
   public async getFeesRecommended(): Promise<RecommendedFees> {

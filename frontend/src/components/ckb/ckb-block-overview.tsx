@@ -3,8 +3,9 @@ import { Grid, HStack, VStack } from 'styled-system/jsx'
 
 import OverflowSVG from '@/assets/overview.svg'
 import { OverflowAmount } from '@/components/overflow-amount'
+import { OverviewInfo, OverviewInfoItem } from '@/components/overview-info'
 import { TimeFormatter } from '@/components/time-formatter'
-import { Heading, Text, Tooltip } from '@/components/ui'
+import { Heading, Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { CkbBlock } from '@/gql/graphql'
 import { formatCkbAddress } from '@/lib/address/format-ckb-address'
@@ -25,71 +26,45 @@ export function CkbBlockOverview({
         <Heading fontSize="16px" fontWeight="semibold">{t(i18n)`Overview`}</Heading>
         {block.timestamp ? <TimeFormatter timestamp={block.timestamp} /> : null}
       </HStack>
-      <Grid w="100%" gridTemplateColumns="repeat(2, 1fr)" gap="30px" pt="20px" pb="30px" px="30px" textAlign="center">
-        <Grid
-          gridTemplateColumns="repeat(2, 1fr)"
-          px="20px"
-          py="25px"
-          bg="bg.card.hover"
-          rounded="8px"
-          fontSize="20px"
-          lineHeight="100%"
-        >
-          <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`Block size`}</Text>
-            <Text>
-              <OverflowAmount amount={formatNumber(block.size ?? undefined)} symbol={t(i18n)`bytes`} />
-            </Text>
-          </VStack>
-          <VStack gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`Transaction`}</Text>
-            <Text>{formatNumber(block.transactionsCount)} </Text>
-          </VStack>
-        </Grid>
-        <Grid
-          gridTemplateColumns="repeat(2, 1fr)"
-          px="20px"
-          py="25px"
-          bg="bg.card.hover"
-          rounded="8px"
-          fontSize="20px"
-          lineHeight="100%"
-        >
-          <VStack borderRight="1px solid" borderRightColor="border.primary" gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`Miner`}</Text>
+      <Grid
+        w="100%"
+        gridTemplateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }}
+        gap={{ base: '20px', md: '30px' }}
+        pt="20px"
+        pb={{ base: '20px', md: '30px' }}
+        px={{ base: '20px', xl: '30px' }}
+        textAlign="center"
+      >
+        <OverviewInfo>
+          <OverviewInfoItem label={t(i18n)`Block size`}>
+            <OverflowAmount amount={formatNumber(block.size)} symbol={t(i18n)`bytes`} />
+          </OverviewInfoItem>
+          <OverviewInfoItem label={t(i18n)`Transaction`} formatNumber>
+            {block.transactionsCount}
+          </OverviewInfoItem>
+        </OverviewInfo>
+        <OverviewInfo>
+          <OverviewInfoItem label={t(i18n)`Miner`}>
             {block.miner ? (
-              <Tooltip.Root openDelay={0} closeDelay={0}>
-                <Tooltip.Trigger cursor="pointer">
-                  <Link
-                    href={`/address/${block.miner.address}`}
-                    whiteSpace="nowrap"
-                    maxW="250px"
-                    truncate
-                    color="brand"
-                    _hover={{ textDecoration: 'underline' }}
-                    cursor="pointer"
-                  >
-                    {formatCkbAddress(block.miner.address)}
-                  </Link>
-                </Tooltip.Trigger>
-                <Tooltip.Positioner>
-                  <Tooltip.Arrow>
-                    <Tooltip.ArrowTip />
-                  </Tooltip.Arrow>
-                  <Tooltip.Content maxW="unset">{block.miner.address}</Tooltip.Content>
-                </Tooltip.Positioner>
-              </Tooltip.Root>
+              <Link
+                href={`/address/${block.miner.address}`}
+                whiteSpace="nowrap"
+                maxW="250px"
+                truncate
+                color="brand"
+                _hover={{ textDecoration: 'underline' }}
+                cursor="pointer"
+              >
+                {formatCkbAddress(block.miner.address)}
+              </Link>
             ) : (
               <Text color="text.third">-</Text>
             )}
-          </VStack>
-          <VStack gap="15px">
-            <Text color="text.third" fontSize="14px">{t(i18n)`Miner Reward`}</Text>
-            <Text>
-              <OverflowAmount amount={formatNumber(block.reward)} symbol={t(i18n)`CKB`} />
-            </Text>
-          </VStack>
-        </Grid>
+          </OverviewInfoItem>
+          <OverviewInfoItem label={t(i18n)`Miner Reward`} formatNumber>
+            <OverflowAmount amount={formatNumber(block.reward)} symbol={t(i18n)`CKB`} />
+          </OverviewInfoItem>
+        </OverviewInfo>
       </Grid>
     </VStack>
   )
