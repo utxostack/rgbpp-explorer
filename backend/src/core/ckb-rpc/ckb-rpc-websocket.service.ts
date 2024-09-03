@@ -16,7 +16,7 @@ import { ONE_MONTH_MS } from 'src/common/date';
 import { CKB_MIN_SAFE_CONFIRMATIONS } from 'src/constants';
 import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 
-class WebsocketError extends Error {}
+class WebsocketError extends Error { }
 
 @Injectable()
 export class CkbRpcWebsocketService {
@@ -71,9 +71,7 @@ export class CkbRpcWebsocketService {
     } else {
       const error = new WebsocketError('Max reconnection attempts reached');
       this.logger.error(error.message);
-      this.sentryService
-        .instance()
-        .captureException(error);
+      this.sentryService.instance().captureException(error);
     }
   }
 
@@ -84,7 +82,16 @@ export class CkbRpcWebsocketService {
 
   @Cacheable({
     namespace: 'CkbRpcWebsocketService',
-    key: (txHash: string) => `getTransaction:${txHash}`,
+    key: (txHash: string, withData: boolean, withWitness: boolean) => {
+      let key = `getTransaction:${txHash}`;
+      if (withData) {
+        key += ':withData';
+      }
+      if (withWitness) {
+        key += ':withWitness';
+      }
+      return key;
+    },
     ttl: ONE_MONTH_MS,
     shouldCache: async (tx: TransactionWithStatusResponse, that: CkbRpcWebsocketService) => {
       if (tx.tx_status.status !== 'committed' || !tx.tx_status.block_number) {
@@ -93,16 +100,37 @@ export class CkbRpcWebsocketService {
       return that.isSafeConfirmations(tx.tx_status.block_number);
     },
   })
-  public async getTransaction(txHash: string): Promise<TransactionWithStatusResponse> {
+  public async getTransaction(
+    txHash: string,
+    withData: boolean = false,
+    withWitness: boolean = false,
+  ): Promise<TransactionWithStatusResponse> {
     await this.websocketReady;
     this.logger.debug(`get_transaction - txHash: ${txHash}`);
-    const tx = await this.websocket.call('get_transaction', [txHash]);
-    return tx as TransactionWithStatusResponse;
+    const response = await this.websocket.call('get_transaction', [txHash]);
+    const tx = response as TransactionWithStatusResponse;
+    // XXX: we don't need these fields by default, remove them to save cache/memory space
+    if (!withData) {
+      tx.transaction.outputs_data = [];
+    }
+    if (!withWitness) {
+      tx.transaction.witnesses = [];
+    }
+    return tx;
   }
 
   @Cacheable({
     namespace: 'CkbRpcWebsocketService',
-    key: (blockHash: string) => `getBlock:${blockHash}`,
+    key: (blockHash: string, withTxData: boolean, withTxWitness: boolean) => {
+      let key = `getBlock:${blockHash}`;
+      if (withTxData) {
+        key += ':withTxData';
+      }
+      if (withTxWitness) {
+        key += ':withTxWitness';
+      }
+      return key;
+    },
     ttl: ONE_MONTH_MS,
     shouldCache: async (block: Block, that: CkbRpcWebsocketService) => {
       if (!block?.header) {
@@ -112,11 +140,28 @@ export class CkbRpcWebsocketService {
       return that.isSafeConfirmations(number);
     },
   })
-  public async getBlock(blockHash: string): Promise<Block> {
+  public async getBlock(
+    blockHash: string,
+    withTxData: boolean = false,
+    withTxWitness: boolean = false,
+  ): Promise<Block> {
     await this.websocketReady;
     this.logger.debug(`get_block - blockHash: ${blockHash}`);
-    let block = await this.websocket.call('get_block', [blockHash]);
-    return block as Block;
+    const response = await this.websocket.call('get_block', [blockHash]);
+    const block = response as Block;
+    if (!withTxData) {
+      block.transactions = block.transactions.map((tx) => {
+        tx.outputs_data = [];
+        return tx;
+      });
+    }
+    if (!withTxWitness) {
+      block.transactions = block.transactions.map((tx) => {
+        tx.witnesses = [];
+        return tx;
+      });
+    }
+    return block;
   }
 
   @Cacheable({
