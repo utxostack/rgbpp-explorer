@@ -30,6 +30,7 @@ export function BtcTransactionCardInAddress({
         currentAddress={address}
       />
       <UtxoOrCellFooter
+        txid={tx.txid}
         fee={tx.fee}
         confirmations={tx.confirmations}
         feeRate={tx.feeRate}

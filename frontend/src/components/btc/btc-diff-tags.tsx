@@ -15,11 +15,13 @@ export function BtcDiffTags({
   vout = [],
   ckbCell,
   address,
+  txid,
 }: {
   vin?: BitcoinInput[]
   vout?: BitcoinOutput[]
   address: string
   ckbCell?: Pick<CkbTransaction, 'inputs' | 'outputs'>
+  txid?: string
 }) {
   const inputBalance = sum(
     compact(vin.filter((x) => address === x.prevout?.address?.address).map((x) => x.prevout?.value)),
@@ -42,7 +44,7 @@ export function BtcDiffTags({
       const cell = ckbCell?.outputs?.find((cell) => {
         if (!isRgbppLockCell(cell)) return false
         const { btcTxid, outIndex } = parseRgbppLockArgs(cell.lock.args)
-        return !(outIndex !== i || !vout[outIndex] || btcTxid !== output.txid)
+        return !(outIndex !== i || !vout[outIndex]) && btcTxid === txid
       })
       return { cell, output }
     })
@@ -54,7 +56,7 @@ export function BtcDiffTags({
       .filter((x) => x.input.prevout?.address?.address === address && x.cell?.xudtInfo?.symbol === xudt?.symbol)
       .reduce((acc, x) => acc.plus(x.cell?.xudtInfo?.amount || 0), BigNumber(0))
     const xudtBalanceWithoutThisAddress = outputs
-      .filter((x) => x.output?.address?.address !== address && x.cell?.xudtInfo?.symbol === xudt?.symbol)
+      .filter((x) => x.output?.address?.address === address && x.cell?.xudtInfo?.symbol === xudt?.symbol)
       .reduce((acc, x) => acc.plus(x.cell?.xudtInfo?.amount || 0), BigNumber(0))
     const diff = BigNumber(xudtBalanceWithoutThisAddress).minus(BigNumber(balance))
     return !diff.isZero() ? (
