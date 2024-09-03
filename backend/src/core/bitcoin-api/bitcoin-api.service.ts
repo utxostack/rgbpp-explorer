@@ -10,6 +10,7 @@ import { MempoolService } from './provider/mempool.service';
 import { ChainInfo, Transaction } from './bitcoin-api.schema';
 import { ONE_HOUR_MS, ONE_MONTH_MS, TEN_MINUTES_MS } from 'src/common/date';
 import { Cacheable } from 'src/decorators/cacheable.decorator';
+import { PLimit } from 'src/decorators/plimit.decorator';
 
 type MethodParameters<T, K extends keyof T> = T[K] extends (...args: infer P) => any ? P : never;
 type MethodReturnType<T, K extends keyof T> = T[K] extends (...args: any[]) => infer R ? R : never;
@@ -172,14 +173,22 @@ export class BitcoinApiService {
     return this.call('getFeesRecommended');
   }
 
+  @PLimit({ concurrency: 200 })
   public async getAddress({ address }: { address: string }) {
     return this.call('getAddress', { address });
   }
 
+  @PLimit({ concurrency: 200 })
   public async getAddressTxsUtxo({ address }: { address: string }) {
     return this.call('getAddressTxsUtxo', { address });
   }
 
+  @PLimit({ concurrency: 200 })
+  @Cacheable({
+    namespace: 'bitcoinApiService',
+    key: ({ address, afterTxid }) => `getAddressTxs:${address}:${afterTxid}`,
+    ttl: 5000,
+  })
   public async getAddressTxs({ address, afterTxid }: { address: string; afterTxid?: string }) {
     return this.call('getAddressTxs', { address, afterTxid });
   }
@@ -197,14 +206,17 @@ export class BitcoinApiService {
     return this.call('getTx', { txid });
   }
 
+  @PLimit({ concurrency: 200 })
   public async getTxOutSpend({ txid, vout }: { txid: string; vout: number }) {
     return this.call('getTxOutSpend', { txid, vout });
   }
 
+  @PLimit({ concurrency: 200 })
   public async getTxOutSpends({ txid }: { txid: string }) {
     return this.call('getTxOutSpends', { txid });
   }
 
+  @PLimit({ concurrency: 200 })
   public async getTransactionTimes({ txids }: { txids: string[] }) {
     return this.call('getTransactionTimes', { txids });
   }
