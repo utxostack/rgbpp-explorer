@@ -17,7 +17,7 @@ export class RgbppCoinResolver {
   constructor(
     private ckbExplorerService: CkbExplorerService,
     private rgbppCoinService: RgbppCoinService,
-  ) {}
+  ) { }
 
   @Query(() => RgbppCoinList, { name: 'rgbppCoins' })
   public async coins(
@@ -109,18 +109,19 @@ export class RgbppCoinResolver {
   public async holders(
     @Parent() coin: RgbppCoin,
     @Args('layer', { type: () => Layer }) layer: Layer,
+    @Args('page', { type: () => Int, nullable: true }) page?: number,
+    @Args('pageSize', { type: () => Int, nullable: true }) pageSize?: number,
     @Args('order', { type: () => OrderType, nullable: true }) order?: OrderType,
-    @Args('limit', { type: () => Float, nullable: true }) limit?: number,
   ) {
     if (!coin.typeHash) {
       return null;
     }
-    const holders = await this.rgbppCoinService.getCoinHolders(
-      coin.typeHash,
-      layer === Layer.L1,
+    const holders = await this.rgbppCoinService.getCoinHolders(coin.typeHash, {
+      page: page ?? 1,
+      pageSize: pageSize ?? 10,
       order,
-      limit,
-    );
+      isLayer1: layer === Layer.L1,
+    });
     return holders;
   }
 
@@ -132,7 +133,10 @@ export class RgbppCoinResolver {
     if (!coin.typeHash) {
       return null;
     }
-    const count = await this.rgbppCoinService.getCoinHoldersCount(coin.typeHash, layer === Layer.L1);
+    const count = await this.rgbppCoinService.getCoinHoldersCount(
+      coin.typeHash,
+      layer === Layer.L1,
+    );
     return count;
   }
 }

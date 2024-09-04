@@ -4,6 +4,13 @@ import { PrismaService } from 'src/core/database/prisma/prisma.service';
 import { Holder } from '@prisma/client';
 import { BI } from '@ckb-lumos/bi';
 
+export interface GetCoinHoldersParams {
+  page: number;
+  pageSize?: number;
+  order?: 'asc' | 'desc';
+  isLayer1?: boolean;
+}
+
 @Injectable()
 export class RgbppCoinService {
   constructor(
@@ -24,9 +31,7 @@ export class RgbppCoinService {
 
   public async getCoinHolders(
     scriptHash: string,
-    isLayer1?: boolean,
-    order?: 'asc' | 'desc',
-    limit?: number,
+    { page = 1, pageSize = 10, order, isLayer1 }: GetCoinHoldersParams,
   ): Promise<Pick<Holder, 'address' | 'assetCount'>[]> {
     const results = await this.prismaService.holder.groupBy({
       by: ['address'],
@@ -40,15 +45,16 @@ export class RgbppCoinService {
       },
       orderBy: {
         _sum: {
-          assetCount: order ?? 'desc',
+          assetAmount: order ?? 'desc',
         },
       },
-      ...(limit !== undefined && { take: limit }),
+      take: pageSize,
+      skip: (page - 1) * pageSize,
     });
     const holders = results.map((result) => ({
       address: result.address,
       assetCount: result._sum.assetCount || 0,
-      assetAmount: BI.from(result._sum.assetAmount || 0).toHexString(),
+      assetAmount: result._sum.assetAmount?.toHex() ?? '0x0',
     }));
     return holders;
   }
@@ -63,6 +69,6 @@ export class RgbppCoinService {
         ...(isLayer1 !== undefined && { isLayer1 }),
       },
     });
-    return BI.from(result._sum.assetAmount || 0).toHexString();
+    return result._sum.assetAmount?.toHex() ?? '0x0';
   }
 }

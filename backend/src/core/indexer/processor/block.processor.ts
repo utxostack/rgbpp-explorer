@@ -106,7 +106,6 @@ export class IndexerBlockProcessor extends WorkerHost {
               tx_index: BI.from(txIndex).toHexString(),
             };
             await indexerAssetsService.processAssetCell(chainId, cell, assetType, prisma);
-            return;
           }
         }),
       );

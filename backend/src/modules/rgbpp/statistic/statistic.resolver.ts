@@ -7,7 +7,7 @@ import { Holder } from '@prisma/client';
 
 @Resolver(() => RgbppStatistic)
 export class RgbppStatisticResolver {
-  constructor(private rgbppStatisticService: RgbppStatisticService) {}
+  constructor(private rgbppStatisticService: RgbppStatisticService) { }
 
   @Query(() => RgbppStatistic, { name: 'rgbppStatistic' })
   public async getRgbppStatistic(): Promise<RgbppStatistic> {
@@ -17,14 +17,16 @@ export class RgbppStatisticResolver {
   @ResolveField(() => [RgbppHolder])
   public async holders(
     @Args('layer', { type: () => Layer }) layer: Layer,
+    @Args('page', { type: () => Float, nullable: true }) page?: number,
+    @Args('pageSize', { type: () => Float, nullable: true }) pageSize?: number,
     @Args('order', { type: () => OrderType, nullable: true }) order?: OrderType,
-    @Args('limit', { type: () => Float, nullable: true }) limit?: number,
   ): Promise<Pick<Holder, 'address' | 'assetCount'>[]> {
-    const holders = await this.rgbppStatisticService.getRgbppAssetsHolders(
-      layer === Layer.L1,
-      order,
-      limit,
-    );
+    const holders = await this.rgbppStatisticService.getRgbppAssetsHolders({
+      page: page ?? 1,
+      pageSize: pageSize ?? 10,
+      order: order ?? 'desc',
+      isLayer1: layer === Layer.L1,
+    });
     return holders;
   }
 

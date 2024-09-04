@@ -150,7 +150,7 @@ type RgbppCoin {
   transactions(page: Int, pageSize: Int): [RgbppTransaction!]
   transactionsCount: Float
   amount(layer: Layer): String!
-  holders(layer: Layer!, order: OrderType, limit: Float): [RgbppHolder!]
+  holders(layer: Layer!, page: Int, pageSize: Int, order: OrderType): [RgbppHolder!]
   holdersCount(layer: Layer!): Float
 }
 
@@ -173,7 +173,7 @@ type RgbppCoinList {
 
 """RGB++ Statistic"""
 type RgbppStatistic {
-  holders(layer: Layer!, order: OrderType, limit: Float): [RgbppHolder!]!
+  holders(layer: Layer!, page: Float, pageSize: Float, order: OrderType): [RgbppHolder!]!
   holdersCount(layer: Layer!): Float!
   latest24HoursL1TransactionsCount(leapDirection: LeapDirection): Float
   latest24HoursL2TransactionsCount: Float
