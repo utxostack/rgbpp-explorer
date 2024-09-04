@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { HealthIndicator, HealthIndicatorResult, HealthCheckError } from '@nestjs/terminus';
 import { CkbRpcWebsocketService } from './ckb-rpc-websocket.service';
-import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
+import * as Sentry from '@sentry/nestjs';
 
 export enum CkbRpcHealthIndicatorKey {
   Websocket = 'ckb-rpc-websocket',
@@ -9,10 +9,7 @@ export enum CkbRpcHealthIndicatorKey {
 
 @Injectable()
 export class CkbRpcHealthIndicator extends HealthIndicator {
-  constructor(
-    private ckbRpcWebsocketService: CkbRpcWebsocketService,
-    @InjectSentry() private sentryService: SentryService,
-  ) {
+  constructor(private ckbRpcWebsocketService: CkbRpcWebsocketService) {
     super();
   }
 
@@ -37,7 +34,7 @@ export class CkbRpcHealthIndicator extends HealthIndicator {
       }
       throw new HealthCheckError('CkbRpcWebsocketService failed', result);
     } catch (e) {
-      this.sentryService.instance().captureException(e);
+      Sentry.captureException(e);
       throw new HealthCheckError('CkbRpcWebsocketService failed', e);
     }
   }

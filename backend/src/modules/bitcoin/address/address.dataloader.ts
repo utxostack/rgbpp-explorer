@@ -5,16 +5,13 @@ import { DataLoaderResponse } from 'src/common/type/dataloader';
 import { Address } from 'src/core/bitcoin-api/bitcoin-api.schema';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import { BitcoinTransaction } from '../transaction/transaction.model';
-import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
+import * as Sentry from '@sentry/nestjs';
 
 @Injectable()
 export class BitcoinAddressLoader implements NestDataLoader<string, Address | null> {
   private logger = new Logger(BitcoinAddressLoader.name);
 
-  constructor(
-    private bitcoinApiService: BitcoinApiService,
-    @InjectSentry() private sentryService: SentryService,
-  ) {}
+  constructor(private bitcoinApiService: BitcoinApiService) {}
 
   public getBatchFunction() {
     return async (addresses: string[]) => {
@@ -27,7 +24,7 @@ export class BitcoinAddressLoader implements NestDataLoader<string, Address | nu
           return result.value;
         }
         this.logger.error(`Requesting: ${addresses[index]}, occurred error: ${result.reason}`);
-        this.sentryService.instance().captureException(result.reason);
+        Sentry.captureException(result.reason);
         return null;
       });
     };
@@ -42,10 +39,7 @@ export class BitcoinAddressTransactionsLoader
 {
   private logger = new Logger(BitcoinAddressTransactionsLoader.name);
 
-  constructor(
-    private bitcoinApiService: BitcoinApiService,
-    @InjectSentry() private sentryService: SentryService,
-  ) {}
+  constructor(private bitcoinApiService: BitcoinApiService) {}
 
   public getBatchFunction() {
     return async (props: string[]) => {
@@ -65,7 +59,7 @@ export class BitcoinAddressTransactionsLoader
           return result.value;
         }
         this.logger.error(`Requesting: ${props[index]}, occurred error: ${result.reason}`);
-        this.sentryService.instance().captureException(result.reason);
+        Sentry.captureException(result.reason);
         return null;
       });
     };

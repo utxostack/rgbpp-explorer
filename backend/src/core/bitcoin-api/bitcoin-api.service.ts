@@ -1,7 +1,6 @@
 import { HttpStatusCode, isAxiosError } from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { HttpException, Injectable, Logger } from '@nestjs/common';
-import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 import { NetworkType } from 'src/constants';
 import { Env } from 'src/env';
 import { IBitcoinDataProvider } from './bitcoin-api.interface';
@@ -11,6 +10,7 @@ import { ChainInfo, Transaction } from './bitcoin-api.schema';
 import { ONE_HOUR_MS, ONE_MONTH_MS, TEN_MINUTES_MS } from 'src/common/date';
 import { Cacheable } from 'src/decorators/cacheable.decorator';
 import { PLimit } from 'src/decorators/plimit.decorator';
+import * as Sentry from '@sentry/nestjs';
 
 type MethodParameters<T, K extends keyof T> = T[K] extends (...args: infer P) => any ? P : never;
 type MethodReturnType<T, K extends keyof T> = T[K] extends (...args: any[]) => infer R ? R : never;
@@ -60,10 +60,7 @@ export class BitcoinApiService {
   private source: IBitcoinDataProvider;
   private fallback?: IBitcoinDataProvider;
 
-  constructor(
-    private configService: ConfigService<Env>,
-    @InjectSentry() private readonly sentryService: SentryService,
-  ) {
+  constructor(private configService: ConfigService<Env>) {
     const BITCOIN_DATA_PROVIDER = this.configService.get('BITCOIN_PRIMARY_DATA_PROVIDER');
     const BITCOIN_ELECTRS_API_URL = this.configService.get('BITCOIN_ELECTRS_API_URL');
     const BITCOIN_MEMPOOL_SPACE_API_URL = this.configService.get('BITCOIN_MEMPOOL_SPACE_API_URL');
@@ -103,7 +100,7 @@ export class BitcoinApiService {
     } catch (err) {
       let calledError = err;
       this.logger.error(err);
-      this.sentryService.instance().captureException(err);
+      Sentry.captureException(err);
       if (this.fallback) {
         this.logger.warn(
           `Fallback to ${this.fallback.constructor.name} due to error: ${(err as Error).message}`,
@@ -114,7 +111,7 @@ export class BitcoinApiService {
           return result as MethodReturnType<IBitcoinDataProvider, K>;
         } catch (fallbackError) {
           this.logger.error(fallbackError);
-          this.sentryService.instance().captureException(fallbackError);
+          Sentry.captureException(fallbackError);
           calledError = fallbackError;
         }
       }

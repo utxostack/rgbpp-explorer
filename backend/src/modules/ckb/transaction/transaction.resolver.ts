@@ -16,9 +16,9 @@ import {
 import { BadRequestException, Logger } from '@nestjs/common';
 import { CellType } from '../script/script.model';
 import { CkbScriptService } from '../script/script.service';
-import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 import { OrderType } from 'src/modules/api.model';
 import { BaseScriptService } from '../script/base/base-script.service';
+import * as Sentry from '@sentry/nestjs';
 
 @Resolver(() => CkbTransaction)
 export class CkbTransactionResolver {
@@ -27,7 +27,6 @@ export class CkbTransactionResolver {
   constructor(
     private ckbTransactionService: CkbTransactionService,
     private ckbScriptService: CkbScriptService,
-    @InjectSentry() private sentryService: SentryService,
   ) {}
 
   @Query(() => [CkbTransaction], { name: 'ckbTransactions' })
@@ -54,7 +53,7 @@ export class CkbTransactionResolver {
       txs.forEach((tx) => {
         if (tx.status === 'rejected') {
           this.logger.error(tx.reason);
-          this.sentryService.instance().captureException(tx.reason);
+          Sentry.captureException(tx.reason);
         }
       });
 

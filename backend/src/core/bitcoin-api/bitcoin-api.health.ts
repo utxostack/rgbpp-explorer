@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { HealthIndicator, HealthIndicatorResult, HealthCheckError } from '@nestjs/terminus';
-import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 import { BitcoinApiService } from './bitcoin-api.service';
+import * as Sentry from '@sentry/nestjs';
 
 @Injectable()
 export class BitcoinApiHealthIndicator extends HealthIndicator {
   constructor(
     private bitcoinApiService: BitcoinApiService,
-    @InjectSentry() private sentryService: SentryService,
+
   ) {
     super();
   }
@@ -22,7 +22,7 @@ export class BitcoinApiHealthIndicator extends HealthIndicator {
       }
       throw new HealthCheckError('BitcoinApiService failed', result);
     } catch (e) {
-      this.sentryService.instance().captureException(e);
+      Sentry.captureException(e);
       throw new HealthCheckError('BitcoinApiService failed', e);
     }
   }
