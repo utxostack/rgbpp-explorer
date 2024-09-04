@@ -8,10 +8,16 @@ import {
   CkbExplorerXUDTTransactionsLoader,
   CkbExplorerXUDTTransactionsLoaderType,
 } from './coin.dataloader';
+import { Layer, RgbppHolder } from '../statistic/statistic.model';
+import { OrderType } from 'src/modules/api.model';
+import { RgbppCoinService } from './coin.service';
 
 @Resolver(() => RgbppCoin)
 export class RgbppCoinResolver {
-  constructor(private ckbExplorerService: CkbExplorerService) {}
+  constructor(
+    private ckbExplorerService: CkbExplorerService,
+    private rgbppCoinService: RgbppCoinService,
+  ) { }
 
   @Query(() => RgbppCoinList, { name: 'rgbppCoins' })
   public async coins(
@@ -82,5 +88,55 @@ export class RgbppCoinResolver {
       return null;
     }
     return transactions.meta.total;
+  }
+
+  @ResolveField(() => String)
+  public async amount(
+    @Parent() coin: RgbppCoin,
+    @Args('layer', { type: () => Layer, nullable: true }) layer?: Layer,
+  ): Promise<String> {
+    if (!coin.typeHash) {
+      return '0x0';
+    }
+    const amount = await this.rgbppCoinService.getCoinAmount(
+      coin.typeHash,
+      layer ? layer === Layer.L1 : undefined,
+    );
+    return amount;
+  }
+
+  @ResolveField(() => [RgbppHolder], { nullable: true })
+  public async holders(
+    @Parent() coin: RgbppCoin,
+    @Args('layer', { type: () => Layer }) layer: Layer,
+    @Args('page', { type: () => Int, nullable: true }) page?: number,
+    @Args('pageSize', { type: () => Int, nullable: true }) pageSize?: number,
+    @Args('order', { type: () => OrderType, nullable: true }) order?: OrderType,
+  ) {
+    if (!coin.typeHash) {
+      return null;
+    }
+    const holders = await this.rgbppCoinService.getCoinHolders(coin.typeHash, {
+      page: page ?? 1,
+      pageSize: pageSize ?? 10,
+      order,
+      isLayer1: layer === Layer.L1,
+    });
+    return holders;
+  }
+
+  @ResolveField(() => Float, { nullable: true })
+  public async holdersCount(
+    @Parent() coin: RgbppCoin,
+    @Args('layer', { type: () => Layer }) layer: Layer,
+  ) {
+    if (!coin.typeHash) {
+      return null;
+    }
+    const count = await this.rgbppCoinService.getCoinHoldersCount(
+      coin.typeHash,
+      layer === Layer.L1,
+    );
+    return count;
   }
 }

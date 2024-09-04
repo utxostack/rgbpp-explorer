@@ -31,9 +31,6 @@ export class RgbppCoin {
   typeScript: CkbScript | null;
 
   @Field(() => Int)
-  holdersCount: number;
-
-  @Field(() => Int)
   h24CkbTransactionsCount: number;
 
   @Field(() => Float)
@@ -57,7 +54,6 @@ export class RgbppCoin {
       icon: xudt.icon_file,
       typeHash: xudt.type_hash,
       typeScript: CkbScript.from(xudt.type_script),
-      holdersCount: toNumber(xudt.addresses_count),
       h24CkbTransactionsCount: toNumber(xudt.h24_ckb_transactions_count),
       totalAmount: toNumber(xudt.total_amount),
       issuer: xudt.issuer_address,

@@ -5,6 +5,7 @@ export const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
     NETWORK: z.enum([NetworkType.mainnet, NetworkType.testnet]).default(NetworkType.testnet),
+    LOGGER_LEVEL: z.enum(['verbose', 'debug', 'log', 'warn', 'error']).default('log'),
     ENABLED_GRAPHQL_PLAYGROUND: z
       .string()
       .default('true')
@@ -21,7 +22,7 @@ export const envSchema = z
         return origin.map((host) => host.trim());
       }),
 
-    // DATABASE_URL: z.string(),
+    DATABASE_URL: z.string(),
     REDIS_URL: z.string(),
 
     BITCOIN_PRIMARY_DATA_PROVIDER: z.enum(['mempool', 'electrs']).default('mempool'),
