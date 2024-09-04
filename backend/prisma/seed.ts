@@ -23,7 +23,7 @@ const FUNGIBLE_ASSET_TYPE_SCRIPTS = [XUDT_TYPESCRIPTS, SUDT_TYPESCRIPTS].flatMap
 
 async function main() {
   await prisma.chain.upsert({
-    where: { id: 1 },
+    where: { id: CKB_CHAIN_ID },
     update: {},
     create: {
       id: CKB_CHAIN_ID,
@@ -36,7 +36,7 @@ async function main() {
   for (const script of [...NON_FUNGIBLE_ASSET_TYPE_SCRIPTS, ...FUNGIBLE_ASSET_TYPE_SCRIPTS]) {
     await prisma.assetType.create({
       data: {
-        chainId: 1,
+        chainId: CKB_CHAIN_ID,
         codeHash: script.codeHash,
         hashType: script.hashType,
         fungible: FUNGIBLE_ASSET_TYPE_SCRIPTS.some((s) => s.codeHash === script.codeHash),
