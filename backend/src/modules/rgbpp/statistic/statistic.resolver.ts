@@ -1,4 +1,4 @@
-import { Args, Float, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Float, Int, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { Layer, RgbppHolder, RgbppStatistic } from './statistic.model';
 import { RgbppStatisticService } from './statistic.service';
 import { LeapDirection } from '../transaction/transaction.model';
@@ -17,8 +17,8 @@ export class RgbppStatisticResolver {
   @ResolveField(() => [RgbppHolder])
   public async holders(
     @Args('layer', { type: () => Layer }) layer: Layer,
-    @Args('page', { type: () => Float, nullable: true }) page?: number,
-    @Args('pageSize', { type: () => Float, nullable: true }) pageSize?: number,
+    @Args('page', { type: () => Int, nullable: true }) page?: number,
+    @Args('pageSize', { type: () => Int, nullable: true }) pageSize?: number,
     @Args('order', { type: () => OrderType, nullable: true }) order?: OrderType,
   ): Promise<Pick<Holder, 'address' | 'assetCount'>[]> {
     const holders = await this.rgbppStatisticService.getRgbppAssetsHolders({

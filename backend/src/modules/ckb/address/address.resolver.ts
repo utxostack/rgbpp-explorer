@@ -1,5 +1,5 @@
 import { Loader } from '@applifting-io/nestjs-dataloader';
-import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { Args, Float, Int, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { CkbTransaction } from '../transaction/transaction.model';
 import { CkbAddressBalance, CkbAddress } from './address.model';
 import {
@@ -55,8 +55,8 @@ export class CkbAddressResolver {
     @Parent() address: CkbAddress,
     @Loader(CkbAddressTransactionsLoader) addressTxsLoader: CkbAddressTransactionsLoaderType,
     @Loader(CkbRpcTransactionLoader) rpcTxLoader: CkbRpcTransactionLoaderType,
-    @Args('page', { nullable: true }) page?: number,
-    @Args('pageSize', { nullable: true }) pageSize?: number,
+    @Args('page', { type: () => Int, nullable: true }) page?: number,
+    @Args('pageSize', { type: () => Int, nullable: true }) pageSize?: number,
   ): Promise<(CkbTransaction | null)[] | null> {
     const res = await addressTxsLoader.load({
       address: address.address,
