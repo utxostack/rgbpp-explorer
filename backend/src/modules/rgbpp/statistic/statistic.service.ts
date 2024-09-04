@@ -35,12 +35,6 @@ export class RgbppStatisticService {
   private latest24L2TransactionsCacheKey = 'RgbppStatisticService:latest24L2Transactions';
   private transactionLeapDirectionCachePrefix = 'RgbppStatisticService:leapDirection';
 
-  private rgbppAssetsTypeScripts = RGBPP_ASSETS_CELL_TYPE.map((type) => {
-    const service = this.ckbScriptService.getServiceByCellType(type);
-    const scripts = service.getScripts();
-    return scripts;
-  }).flat();
-
   constructor(
     private ckbRpcService: CkbRpcWebsocketService,
     private ckbScriptService: CkbScriptService,
@@ -49,7 +43,15 @@ export class RgbppStatisticService {
     private prismaService: PrismaService,
     @Inject(CACHE_MANAGER) protected cacheManager: Cache,
   ) {
-    // this.collectLatest24HourRgbppTransactions();
+    this.collectLatest24HourRgbppTransactions();
+  }
+
+  private get rgbppAssetsTypeScripts() {
+    return RGBPP_ASSETS_CELL_TYPE.map((type) => {
+      const service = this.ckbScriptService.getServiceByCellType(type);
+      const scripts = service.getScripts();
+      return scripts;
+    }).flat();
   }
 
   public async getLatest24L1Transactions() {

@@ -1,6 +1,5 @@
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { BlockchainService } from './blockchain.service';
-import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 import { PrismaService } from '../database/prisma/prisma.service';
 
 export class ChainServiceFactoryError extends Error {
@@ -14,10 +13,7 @@ export class ChainServiceFactoryError extends Error {
 export class BlockchainServiceFactory implements OnModuleDestroy {
   private services: Map<number, BlockchainService> = new Map();
 
-  constructor(
-    private prismaService: PrismaService,
-    @InjectSentry() private sentryService: SentryService,
-  ) { }
+  constructor(private prismaService: PrismaService) {}
 
   public async getService(chainId: number): Promise<BlockchainService> {
     const chain = await this.prismaService.chain.findUnique({
@@ -33,7 +29,7 @@ export class BlockchainServiceFactory implements OnModuleDestroy {
           `Chain with ID ${chainId} does not have a WebSocket URL`,
         );
       }
-      this.services.set(chainId, new BlockchainService(chainId, chain.ws, this.sentryService));
+      this.services.set(chainId, new BlockchainService(chainId, chain.ws));
     }
     return this.services.get(chainId)!;
   }
