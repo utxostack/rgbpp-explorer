@@ -5,7 +5,7 @@ import { DataLoaderResponse } from 'src/common/type/dataloader';
 import * as CkbRpcInterface from 'src/core/ckb-rpc/ckb-rpc.interface';
 import * as CkbExplorerInterface from 'src/core/ckb-explorer/ckb-explorer.interface';
 import { CkbTransactionService } from './transaction.service';
-import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
+import * as Sentry from '@sentry/nestjs';
 
 @Injectable()
 export class CkbRpcTransactionLoader
@@ -13,10 +13,7 @@ export class CkbRpcTransactionLoader
 {
   private logger = new Logger(CkbRpcTransactionLoader.name);
 
-  constructor(
-    private transactionService: CkbTransactionService,
-    @InjectSentry() private sentryService: SentryService,
-  ) {}
+  constructor(private transactionService: CkbTransactionService) {}
 
   public getBatchFunction() {
     return async (hashes: string[]) => {
@@ -29,7 +26,7 @@ export class CkbRpcTransactionLoader
           return result.value;
         }
         this.logger.error(`Requesting: ${hashes[index]}, occurred error: ${result.reason}`);
-        this.sentryService.instance().captureException(result.reason);
+        Sentry.captureException(result.reason);
         return null;
       });
     };
@@ -47,10 +44,7 @@ export class CkbExplorerTransactionLoader
 {
   private logger = new Logger(CkbExplorerTransactionLoader.name);
 
-  constructor(
-    private transactionService: CkbTransactionService,
-    @InjectSentry() private sentryService: SentryService,
-  ) {}
+  constructor(private transactionService: CkbTransactionService) {}
 
   public getBatchFunction() {
     return async (hashes: string[]) => {
@@ -63,7 +57,7 @@ export class CkbExplorerTransactionLoader
           return result.value;
         }
         this.logger.error(`Requesting: ${hashes[index]}, occurred error: ${result.reason}`);
-        this.sentryService.instance().captureException(result.reason);
+        Sentry.captureException(result.reason);
         return null;
       });
     };

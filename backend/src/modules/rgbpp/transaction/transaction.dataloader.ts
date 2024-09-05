@@ -4,16 +4,13 @@ import { NestDataLoader } from '@applifting-io/nestjs-dataloader';
 import { DataLoaderResponse } from 'src/common/type/dataloader';
 import { RgbppTransactionService } from './transaction.service';
 import { RgbppTransaction } from './transaction.model';
-import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
+import * as Sentry from '@sentry/nestjs';
 
 @Injectable()
 export class RgbppTransactionLoader implements NestDataLoader<string, RgbppTransaction | null> {
   private logger = new Logger(RgbppTransactionLoader.name);
 
-  constructor(
-    private transactionService: RgbppTransactionService,
-    @InjectSentry() private sentryService: SentryService,
-  ) {}
+  constructor(private transactionService: RgbppTransactionService) {}
 
   public getBatchFunction() {
     return async (ids: string[]) => {
@@ -26,7 +23,7 @@ export class RgbppTransactionLoader implements NestDataLoader<string, RgbppTrans
           return result.value;
         }
         this.logger.error(`Requesting: ${ids[index]}, occurred error: ${result.reason}`);
-        this.sentryService.instance().captureException(result.reason);
+        Sentry.captureException(result.reason);
         return null;
       });
     };

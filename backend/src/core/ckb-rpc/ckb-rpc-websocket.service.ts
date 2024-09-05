@@ -14,9 +14,9 @@ import {
 import { Cacheable } from 'src/decorators/cacheable.decorator';
 import { ONE_MONTH_MS } from 'src/common/date';
 import { CKB_MIN_SAFE_CONFIRMATIONS } from 'src/constants';
-import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
+import * as Sentry from '@sentry/nestjs';
 
-class WebsocketError extends Error { }
+class WebsocketError extends Error {}
 
 @Injectable()
 export class CkbRpcWebsocketService {
@@ -27,10 +27,7 @@ export class CkbRpcWebsocketService {
   private maxReconnectAttempts = 5;
   private reconnectInterval = 5000;
 
-  constructor(
-    private configService: ConfigService<Env>,
-    @InjectSentry() private sentryService: SentryService,
-  ) {
+  constructor(private configService: ConfigService<Env>) {
     this.initializeWebSocket();
   }
 
@@ -49,7 +46,7 @@ export class CkbRpcWebsocketService {
         const webSocketError = new WebsocketError(error.message);
         webSocketError.stack = error.stack;
         this.websocketReady = Promise.reject(webSocketError);
-        this.sentryService.instance().captureException(webSocketError);
+        Sentry.captureException(webSocketError);
       });
 
       this.websocket.on('close', () => {
@@ -71,7 +68,7 @@ export class CkbRpcWebsocketService {
     } else {
       const error = new WebsocketError('Max reconnection attempts reached');
       this.logger.error(error.message);
-      this.sentryService.instance().captureException(error);
+      Sentry.captureException(error);
     }
   }
 

@@ -1,9 +1,8 @@
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER } from '@nestjs/core';
 import { CacheModule, CacheStore } from '@nestjs/cache-manager';
-import { HttpException, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { SentryInterceptor, SentryModule } from '@ntegral/nestjs-sentry';
-import { nodeProfilingIntegration } from '@sentry/profiling-node';
+import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
 import type { RedisClientOptions } from 'redis';
 import { redisStore } from 'cache-manager-redis-yet';
 import { Env } from './env';
@@ -19,22 +18,7 @@ import { BootstrapService } from './bootstrap.service';
 @Module({
   imports: [
     configModule,
-    SentryModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService<Env>) => ({
-        dsn: configService.get('SENTRY_DSN'),
-        environment: configService.get('NODE_ENV'),
-        enableTracing: true,
-        tracesSampleRate: 0.5,
-        profilesSampleRate: 0.5,
-        integrations: [nodeProfilingIntegration()],
-        logLevels:
-          configService.get('NODE_ENV') === 'production'
-            ? ['warn', 'error']
-            : ['debug', 'log', 'warn', 'error'],
-      }),
-      inject: [ConfigService],
-    }),
+    SentryModule.forRoot(),
     CacheableModule.register(),
     CacheModule.registerAsync<RedisClientOptions>({
       isGlobal: true,
@@ -73,18 +57,10 @@ import { BootstrapService } from './bootstrap.service';
     AppController,
     BootstrapService,
     {
-      provide: APP_INTERCEPTOR,
-      useFactory: () =>
-        new SentryInterceptor({
-          filters: [
-            {
-              type: HttpException,
-              filter: (exception: HttpException) => 500 >= exception.getStatus(),
-            },
-          ],
-        }),
+      provide: APP_FILTER,
+      useClass: SentryGlobalFilter,
     },
   ],
   controllers: [AppController],
 })
-export class AppModule {}
+export class AppModule { }

@@ -5,16 +5,13 @@ import { DataLoaderResponse } from 'src/common/type/dataloader';
 import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
 import * as CkbExplorer from 'src/core/ckb-explorer/ckb-explorer.interface';
 import { CkbBlockService } from './block.service';
-import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
+import * as Sentry from '@sentry/nestjs';
 
 @Injectable()
 export class CkbRpcBlockLoader implements NestDataLoader<string, CkbRpc.Block | null> {
   private logger = new Logger(CkbRpcBlockLoader.name);
 
-  constructor(
-    private blockService: CkbBlockService,
-    @InjectSentry() private sentryService: SentryService,
-  ) {}
+  constructor(private blockService: CkbBlockService) {}
 
   public getBatchFunction() {
     return async (heightOrHashList: string[]) => {
@@ -29,7 +26,7 @@ export class CkbRpcBlockLoader implements NestDataLoader<string, CkbRpc.Block | 
         this.logger.error(
           `Requesting: ${heightOrHashList[index]}, occurred error: ${result.reason}`,
         );
-        this.sentryService.instance().captureException(result.reason);
+        Sentry.captureException(result.reason);
         return null;
       });
     };
@@ -42,10 +39,7 @@ export type CkbRpcBlockLoaderResponse = DataLoaderResponse<CkbRpcBlockLoader>;
 export class CkbExplorerBlockLoader implements NestDataLoader<string, CkbExplorer.Block | null> {
   private logger = new Logger(CkbRpcBlockLoader.name);
 
-  constructor(
-    private blockService: CkbBlockService,
-    @InjectSentry() private sentryService: SentryService,
-  ) {}
+  constructor(private blockService: CkbBlockService) {}
 
   public getBatchFunction() {
     return async (heightOrHashList: string[]) => {
@@ -62,7 +56,7 @@ export class CkbExplorerBlockLoader implements NestDataLoader<string, CkbExplore
         this.logger.error(
           `Requesting: ${heightOrHashList[index]}, occurred error: ${result.reason}`,
         );
-        this.sentryService.instance().captureException(result.reason);
+        Sentry.captureException(result.reason);
         return null;
       });
     };
@@ -77,10 +71,7 @@ export class CkbBlockEconomicStateLoader
 {
   private logger = new Logger(CkbBlockEconomicStateLoader.name);
 
-  constructor(
-    private blockService: CkbBlockService,
-    @InjectSentry() private sentryService: SentryService,
-  ) {}
+  constructor(private blockService: CkbBlockService) {}
 
   public getBatchFunction() {
     return async (hashes: string[]) => {
@@ -93,7 +84,7 @@ export class CkbBlockEconomicStateLoader
           return result.value;
         }
         this.logger.error(`Requesting: ${hashes[index]}, occurred error: ${result.reason}`);
-        this.sentryService.instance().captureException(result.reason);
+        Sentry.captureException(result.reason);
         return null;
       });
     };

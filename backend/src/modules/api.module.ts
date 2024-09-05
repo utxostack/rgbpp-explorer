@@ -3,23 +3,23 @@ import { Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
-import { SentryService } from '@ntegral/nestjs-sentry';
-import { MercuriusDriver, MercuriusDriverConfig } from '@nestjs/mercurius';
 import { DataLoaderInterceptor } from '@applifting-io/nestjs-dataloader';
 import { Env } from 'src/env';
 import { CkbModule } from './ckb/ckb.module';
 import { RgbppModule } from './rgbpp/rgbpp.module';
 import { BitcoinModule } from './bitcoin/bitcoin.module';
-import { FastifyReply, FastifyRequest } from 'fastify';
 import { SearchModule } from './search/search.module';
 import { fieldPerformanceMiddleware } from 'src/middlewares/field-performance.middleware';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
+import { ComplexityPlugin } from './complexity.plugin';
+import * as Sentry from '@sentry/nestjs';
 
 @Module({
   imports: [
-    GraphQLModule.forRootAsync<MercuriusDriverConfig>({
-      driver: MercuriusDriver,
-      inject: [ConfigService, SentryService],
-      useFactory: async (configService: ConfigService<Env>, sentryService: SentryService) => ({
+    GraphQLModule.forRootAsync<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService<Env>) => ({
         playground: configService.get('ENABLED_GRAPHQL_PLAYGROUND'),
         installSubscriptionHandlers: true,
         introspection: true,
@@ -29,13 +29,9 @@ import { fieldPerformanceMiddleware } from 'src/middlewares/field-performance.mi
           dateScalarMode: 'timestamp',
           fieldMiddleware: [fieldPerformanceMiddleware],
         },
-        context: (req: FastifyRequest, res: FastifyReply) => {
-          if (req.method === 'GET') {
-            res.redirect(302, '/graphiql');
-            return;
-          }
+        context: () => {
           return {
-            span: sentryService.instance().startInactiveSpan({
+            span: Sentry.startInactiveSpan({
               op: 'gql',
               name: 'GraphQLTransaction',
             }),
@@ -53,6 +49,7 @@ import { fieldPerformanceMiddleware } from 'src/middlewares/field-performance.mi
       provide: APP_INTERCEPTOR,
       useClass: DataLoaderInterceptor,
     },
+    ComplexityPlugin,
   ],
 })
-export class ApiModule {}
+export class ApiModule { }
