@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BlockchainServiceFactory } from '../blockchain/blockchain.factory';
 import { CKB_CHAIN_ID } from 'src/constants';
 import { BlockchainService } from '../blockchain/blockchain.service';

@@ -58,6 +58,43 @@ export class IndexerBlockProcessor extends WorkerHost {
     const { chainId, blockNumber, targetBlockNumber } = job.data;
     const block = await this.getBlock(job);
 
+    const assetTypeScripts = await this.prismaService.assetType.findMany({ where: { chainId } });
+    await Promise.all(
+      block.transactions.map(async (tx, txIndex) => {
+        await this.updateInputAssetCellStatus(chainId, tx);
+
+        for (let index = 0; index < tx.outputs.length; index += 1) {
+          const output = tx.outputs[index];
+          if (!output.type) {
+            continue;
+          }
+
+          const assetType = assetTypeScripts.find((assetType) => {
+            return (
+              assetType.codeHash === output.type!.code_hash &&
+              assetType.hashType === output.type!.hash_type
+            );
+          });
+          if (!assetType) {
+            continue;
+          }
+
+          const indexerAssetsService = this.moduleRef.get(IndexerAssetsService);
+          const cell: Cell = {
+            block_number: block.header.number,
+            out_point: {
+              index: BI.from(index).toHexString(),
+              tx_hash: tx.hash,
+            },
+            output,
+            output_data: tx.outputs_data[index],
+            tx_index: BI.from(txIndex).toHexString(),
+          };
+          await indexerAssetsService.processAssetCell(chainId, cell, assetType);
+        }
+      }),
+    );
+
     if (blockNumber < targetBlockNumber) {
       const indexerQueueService = this.moduleRef.get(IndexerQueueService);
       await indexerQueueService.addBlockJob({
@@ -71,54 +108,11 @@ export class IndexerBlockProcessor extends WorkerHost {
       indexerService.emit(IndexerEvent.BlockIndexed, block);
       return;
     }
-
-    const assetTypeScripts = await this.prismaService.assetType.findMany({ where: { chainId } });
-    await this.prismaService.$transaction(async (prisma) => {
-      await Promise.all(
-        block.transactions.map(async (tx, txIndex) => {
-          await this.updateInputAssetCellStatus(chainId, tx, prisma);
-
-          for (let index = 0; index < tx.outputs.length; index += 1) {
-            const output = tx.outputs[index];
-            if (!output.type) {
-              continue;
-            }
-
-            const assetType = assetTypeScripts.find((assetType) => {
-              return (
-                assetType.codeHash === output.type!.code_hash &&
-                assetType.hashType === output.type!.hash_type
-              );
-            });
-            if (!assetType) {
-              continue;
-            }
-
-            const indexerAssetsService = this.moduleRef.get(IndexerAssetsService);
-            const cell: Cell = {
-              block_number: block.header.number,
-              out_point: {
-                index: BI.from(index).toHexString(),
-                tx_hash: tx.hash,
-              },
-              output,
-              output_data: tx.outputs_data[index],
-              tx_index: BI.from(txIndex).toHexString(),
-            };
-            await indexerAssetsService.processAssetCell(chainId, cell, assetType, prisma);
-          }
-        }),
-      );
-    });
   }
 
-  private async updateInputAssetCellStatus(
-    chainId: number,
-    tx: Transaction,
-    prisma: Omit<PrismaClient, ITXClientDenyList>,
-  ) {
+  private async updateInputAssetCellStatus(chainId: number, tx: Transaction) {
     for (const input of tx.inputs) {
-      const existingAsset = await prisma.asset.findUnique({
+      const existingAsset = await this.prismaService.asset.findUnique({
         where: {
           chainId_txHash_index: {
             chainId: chainId,
@@ -131,7 +125,7 @@ export class IndexerBlockProcessor extends WorkerHost {
         continue;
       }
 
-      await prisma.asset.update({
+      await this.prismaService.asset.update({
         where: {
           chainId_txHash_index: {
             chainId: chainId,
@@ -148,7 +142,7 @@ export class IndexerBlockProcessor extends WorkerHost {
 
   private async getBlock(job: Job<IndexerBlockJobData>) {
     const { chainId, blockNumber } = job.data;
-    const blockchainService = await this.blockchainServiceFactory.getService(chainId);
+    const blockchainService = this.blockchainServiceFactory.getService(chainId);
     const block = await blockchainService.getBlockByNumber(BI.from(blockNumber).toHexString());
     return block;
   }

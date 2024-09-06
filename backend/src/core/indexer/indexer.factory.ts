@@ -35,7 +35,7 @@ export class IndexerServiceFactory implements OnModuleDestroy {
       throw new IndexerServiceFactoryError(`Chain with ID ${chainId} not found`);
     }
     if (!this.services.has(chain.id)) {
-      const blockchainService = await this.blockchainServiceFactory.getService(chain.id);
+      const blockchainService = this.blockchainServiceFactory.getService(chain.id);
       const service = new IndexerService(
         chain,
         blockchainService,

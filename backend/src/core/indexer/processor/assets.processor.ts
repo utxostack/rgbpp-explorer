@@ -95,7 +95,7 @@ export class IndexerAssetsProcessor extends WorkerHost {
 
   private async getLiveCells(job: Job<IndexerAssetsJobData>) {
     const { chainId, assetType, cursor } = job.data;
-    const blockchainService = await this.blockchainServiceFactory.getService(chainId);
+    const blockchainService = this.blockchainServiceFactory.getService(chainId);
     const searchKey: SearchKey = {
       script: {
         code_hash: assetType.codeHash,
