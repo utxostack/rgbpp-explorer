@@ -12,13 +12,16 @@ export class HealthController {
     private bitcoinApiHealthIndicator: BitcoinApiHealthIndicator,
     private ckbRpcHealthIndicator: CkbRpcHealthIndicator,
     private ckbExplorerHealthIndicator: CkbExplorerHealthIndicator,
-  ) {}
+  ) { }
 
   @Get()
   @HealthCheck()
   check() {
     return this.health.check([
-      () => this.http.pingCheck('graphql', 'http://localhost:3000/graphql'),
+      () =>
+        this.http.pingCheck('graphql', 'http://localhost:3000/graphql?query=%7B__typename%7D', {
+          headers: { 'apollo-require-preflight': true },
+        }),
       () => this.bitcoinApiHealthIndicator.isHealthy(),
       () => this.ckbRpcHealthIndicator.isHealthy(CkbRpcHealthIndicatorKey.Websocket),
       () => this.ckbExplorerHealthIndicator.isHealthy(),
