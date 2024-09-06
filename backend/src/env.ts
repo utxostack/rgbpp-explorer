@@ -10,6 +10,7 @@ export const envSchema = z
       .string()
       .default('true')
       .transform((value) => value === 'true'),
+    GRAPHQL_COMPLEXITY_LIMIT: z.coerce.number().default(100),
 
     /**
      * CORS origin whitelist (split by comma)

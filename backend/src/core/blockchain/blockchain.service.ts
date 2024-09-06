@@ -13,6 +13,7 @@ import { Cacheable } from 'src/decorators/cacheable.decorator';
 import { ONE_MONTH_MS } from 'src/common/date';
 import { CKB_MIN_SAFE_CONFIRMATIONS } from 'src/constants';
 import * as Sentry from '@sentry/nestjs';
+import { Chain } from '@prisma/client';
 
 class WebsocketError extends Error {
   constructor(message: string) {
@@ -32,15 +33,20 @@ export class BlockchainService {
 
   constructor(
     public chainId: number,
-    private wsUrl: string,
+    private chainPromise: Promise<Chain | null>,
   ) {
     this.createConnection();
   }
 
   private createConnection() {
-    this.websocket = new RpcWebsocketsClient(this.wsUrl);
+    this.websocketReady = new Promise(async (resolve, reject) => {
+      const chain = await this.chainPromise;
+      if (!chain) {
+        reject(new Error(`Chain with id ${this.chainId} not found`));
+        return;
+      }
 
-    this.websocketReady = new Promise((resolve) => {
+      this.websocket = new RpcWebsocketsClient(chain.ws);
       this.websocket.on('open', () => {
         this.logger.log(`WebSocket connection established for chain ${this.chainId}`);
         this.reconnectAttempts = 0;

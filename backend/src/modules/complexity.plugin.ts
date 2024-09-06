@@ -4,13 +4,18 @@ import { ApolloServerPlugin, GraphQLRequestListener } from 'apollo-server-plugin
 import { GraphQLError } from 'graphql';
 import { fieldExtensionsEstimator, getComplexity, simpleEstimator } from 'graphql-query-complexity';
 import * as Sentry from '@sentry/nestjs';
+import { ConfigService } from '@nestjs/config';
+import { Env } from 'src/env';
 
 @Plugin()
 export class ComplexityPlugin implements ApolloServerPlugin {
-  constructor(private gqlSchemaHost: GraphQLSchemaHost) {}
+  constructor(
+    private gqlSchemaHost: GraphQLSchemaHost,
+    private configSErvice: ConfigService<Env>,
+  ) { }
 
   async requestDidStart(): Promise<GraphQLRequestListener> {
-    const maxComplexity = 100;
+    const maxComplexity = this.configSErvice.get('GRAPHQL_COMPLEXITY_LIMIT');
     const { schema } = this.gqlSchemaHost;
 
     return {
@@ -22,6 +27,12 @@ export class ComplexityPlugin implements ApolloServerPlugin {
           variables: request.variables,
           estimators: [fieldExtensionsEstimator(), simpleEstimator({ defaultComplexity: 1 })],
         });
+        // Skip introspection query
+        const operation = document.definitions.find((def) => def.kind === 'OperationDefinition');
+        if (operation?.name?.value === 'IntrospectionQuery') {
+          return;
+        }
+
         if (complexity > maxComplexity) {
           Sentry.setContext('graphql', {
             query: request.query,
@@ -32,7 +43,6 @@ export class ComplexityPlugin implements ApolloServerPlugin {
             `Query is too complex: ${complexity}. Maximum allowed complexity: ${maxComplexity}`,
           );
         }
-        console.log('Query Complexity:', complexity);
       },
     };
   }
