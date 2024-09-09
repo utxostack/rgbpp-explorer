@@ -18,10 +18,7 @@ import { truncateMiddle } from '@/lib/string/truncate-middle'
 import { Box, HStack, VStack } from '../../../styled-system/jsx'
 
 export function LatestTxnListUI<
-  T extends Pick<
-    RgbppTransaction,
-    'ckbTransaction' | 'timestamp' | 'btcTransaction' | 'leapDirection' | 'btcTxid' | 'ckbTxHash'
-  >,
+  T extends Pick<RgbppTransaction, 'ckbTransaction' | 'timestamp' | 'leapDirection' | 'btcTxid' | 'ckbTxHash'>,
 >({ txs }: { txs: T[] }) {
   const isMd = useBreakpoints('md')
 

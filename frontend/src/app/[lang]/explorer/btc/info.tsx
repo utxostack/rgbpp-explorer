@@ -38,6 +38,7 @@ export async function Info() {
         }
         rgbppStatistic {
           latest24HoursL1TransactionsCount
+          holdersCount(layer: L1)
         }
       }
     `),
@@ -57,7 +58,9 @@ export async function Info() {
           <OverviewInfoItem label={t(i18n)`L1 RGB++ Txns(24H)`} formatNumber>
             {rgbppStatistic.latest24HoursL1TransactionsCount}
           </OverviewInfoItem>
-          <OverviewInfoItem label={t(i18n)`RGB++ Assets Holders`} unsupported />
+          <OverviewInfoItem label={t(i18n)`RGB++ Assets Holders`} formatNumber>
+            {rgbppStatistic.holdersCount}
+          </OverviewInfoItem>
         </OverviewInfo>
         <OverviewInfoGrid
           gridTemplateColumns={{ base: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }}

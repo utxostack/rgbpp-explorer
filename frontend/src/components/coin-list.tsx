@@ -2,6 +2,7 @@
 
 import { Trans } from '@lingui/macro'
 import dayjs from 'dayjs'
+import { sum } from 'lodash-es'
 import { Box, HStack, styled, VStack } from 'styled-system/jsx'
 
 import BtcIcon from '@/assets/chains/btc.svg'
@@ -10,22 +11,23 @@ import { TextOverflowTooltip } from '@/components/text-overflow-tooltip'
 import { Table, Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { DATE_TEMPLATE } from '@/constants'
-import { RgbppCoin } from '@/gql/graphql'
+import { RgbppCoinsQuery } from '@/gql/graphql'
 import { formatNumber } from '@/lib/string/format-number'
 
-export function CoinList<
-  T extends Pick<
-    RgbppCoin,
-    | 'typeHash'
-    | 'icon'
-    | 'symbol'
-    | 'holdersCount'
-    | 'h24CkbTransactionsCount'
-    | 'totalAmount'
-    | 'decimal'
-    | 'deployedAt'
-  >,
->({ coins }: { coins: T[] }) {
+type PickedCoin = Pick<
+  RgbppCoinsQuery['rgbppCoins']['coins'][number],
+  | 'typeHash'
+  | 'icon'
+  | 'symbol'
+  | 'l1HoldersCount'
+  | 'l2HoldersCount'
+  | 'h24CkbTransactionsCount'
+  | 'totalAmount'
+  | 'decimal'
+  | 'deployedAt'
+>
+
+export function CoinList<T extends PickedCoin>({ coins }: { coins: T[] }) {
   return (
     <IfBreakpoint breakpoint="lg" fallback={<CoinListGrid coins={coins} />}>
       <Table.Root w="100%" tableLayout="fixed">
@@ -73,7 +75,7 @@ export function CoinList<
                     </TextOverflowTooltip>
                   </Link>
                 </Table.Cell>
-                <Table.Cell>{formatNumber(coin.holdersCount)}</Table.Cell>
+                <Table.Cell>{formatNumber(sum([coin.l1HoldersCount, coin.l2HoldersCount]))}</Table.Cell>
                 <Table.Cell>{formatNumber(coin.h24CkbTransactionsCount)}</Table.Cell>
                 <Table.Cell>{formatNumber(coin.totalAmount, coin.decimal)}</Table.Cell>
                 <Table.Cell>{coin.deployedAt ? dayjs(coin.deployedAt).format(DATE_TEMPLATE) : '-'}</Table.Cell>
@@ -86,19 +88,7 @@ export function CoinList<
   )
 }
 
-export function CoinListGrid<
-  T extends Pick<
-    RgbppCoin,
-    | 'typeHash'
-    | 'icon'
-    | 'symbol'
-    | 'holdersCount'
-    | 'h24CkbTransactionsCount'
-    | 'totalAmount'
-    | 'decimal'
-    | 'deployedAt'
-  >,
->({ coins }: { coins: T[] }) {
+export function CoinListGrid<T extends PickedCoin>({ coins }: { coins: T[] }) {
   return (
     <VStack gap={0} w="100%">
       {coins.map((coin) => {
@@ -132,7 +122,7 @@ export function CoinListGrid<
             {[
               {
                 label: <Trans>L1 and L2 Holders</Trans>,
-                value: formatNumber(coin.holdersCount),
+                value: formatNumber(sum([coin.l1HoldersCount, coin.l2HoldersCount])),
               },
               {
                 label: <Trans>Txns(24H)</Trans>,

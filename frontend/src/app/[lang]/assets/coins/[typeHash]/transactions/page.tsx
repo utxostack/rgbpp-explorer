@@ -24,13 +24,6 @@ const query = graphql(`
         blockNumber
         timestamp
         ckbTransaction {
-          isCellbase
-          blockNumber
-          hash
-          fee
-          feeRate
-          size
-          confirmations
           inputs {
             txHash
             index
@@ -81,63 +74,6 @@ const query = graphql(`
               amount
               decimal
               typeHash
-            }
-          }
-        }
-        btcTransaction {
-          blockHeight
-          blockHash
-          txid
-          version
-          size
-          locktime
-          weight
-          fee
-          feeRate
-          confirmed
-          confirmations
-          vin {
-            txid
-            vout
-            scriptsig
-            scriptsigAsm
-            isCoinbase
-            sequence
-            prevout {
-              scriptpubkey
-              scriptpubkeyAsm
-              scriptpubkeyType
-              scriptpubkeyAddress
-              value
-              status {
-                spent
-                txid
-                vin
-              }
-              address {
-                address
-                satoshi
-                pendingSatoshi
-                transactionsCount
-              }
-            }
-          }
-          vout {
-            scriptpubkey
-            scriptpubkeyAsm
-            scriptpubkeyType
-            scriptpubkeyAddress
-            value
-            status {
-              spent
-              txid
-              vin
-            }
-            address {
-              address
-              satoshi
-              pendingSatoshi
-              transactionsCount
             }
           }
         }
