@@ -29,5 +29,12 @@ COPY --from=prod-deps /app/backend/node_modules ./backend/node_modules
 COPY --from=prod-deps /app/backend/package*.json ./backend
 COPY --from=build /app/backend/dist ./backend/dist
 
+COPY backend/scripts/migrate-and-seed.sh ./backend/scripts/migrate-and-seed.sh
+RUN chmod +x ./backend/scripts/migrate-and-seed.sh
+
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
 EXPOSE 3000
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["node", "backend/dist/src/main.js"]

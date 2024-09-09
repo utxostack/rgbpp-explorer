@@ -23,7 +23,7 @@
     "prepare": "husky"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "npx ts-node prisma/seed.ts"
   },
   "lint-staged": {
     "*.ts": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix"
