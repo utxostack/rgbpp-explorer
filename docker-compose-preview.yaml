@@ -26,12 +26,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: base
-    command:
-      [
-        'sh',
-        '-c',
-        'cd /app/backend && pnpm install && npx prisma migrate deploy && npx prisma generate && npx prisma db seed',
-      ]
+    command: ['sh', '/app/backend/scripts/migrate-and-seed.sh']
     env_file:
       # Need DATABASE_URL to be set in .env
       - ./backend/.env
