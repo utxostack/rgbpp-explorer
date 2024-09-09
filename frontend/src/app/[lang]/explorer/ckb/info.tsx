@@ -26,6 +26,7 @@ export async function Info() {
         }
         rgbppStatistic {
           latest24HoursL2TransactionsCount
+          holdersCount(layer: L2)
         }
       }
     `),
@@ -45,7 +46,9 @@ export async function Info() {
           <OverviewInfoItem label={t(i18n)`L2 RGB++ Txns(24H)`} formatNumber>
             {rgbppStatistic.latest24HoursL2TransactionsCount}
           </OverviewInfoItem>
-          <OverviewInfoItem label={t(i18n)`RGB++ Assets Holders`} unsupported />
+          <OverviewInfoItem label={t(i18n)`RGB++ Assets Holders`} formatNumber>
+            {rgbppStatistic.holdersCount}
+          </OverviewInfoItem>
         </OverviewInfo>
         <OverviewInfo>
           <OverviewInfoItem

@@ -19,7 +19,8 @@ const query = graphql(`
         icon
         name
         symbol
-        holdersCount
+        l1HoldersCount: holdersCount(layer: L1)
+        l2HoldersCount: holdersCount(layer: L2)
         h24CkbTransactionsCount
         totalAmount
         deployedAt
@@ -42,7 +43,7 @@ export default async function Page() {
       <Box bg="bg.card" w="100%" rounded="8px" pt={{ base: '10px', lg: '30px' }} pb="10px">
         <CoinList coins={response.rgbppCoins.coins} />
       </Box>
-      <HStack gap="16px" mt="auto">
+      <HStack gap="16px">
         <IfBreakpoint breakpoint="md">
           <Text fontSize="14px">{t(i18n)`Total ${response.rgbppCoins.total} Items`}</Text>
         </IfBreakpoint>
