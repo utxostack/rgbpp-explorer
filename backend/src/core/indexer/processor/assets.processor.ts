@@ -82,15 +82,13 @@ export class IndexerAssetsProcessor extends WorkerHost {
     }
 
     const indexerAssetsService = this.moduleRef.get(IndexerAssetsService);
-    await this.prismaService.$transaction(async (tx) => {
-      const assets = await Promise.all(
-        cells.objects.map(async (cell) => {
-          return indexerAssetsService.processAssetCell(chainId, cell, assetType, tx);
-        }),
-      );
+    const assets = await Promise.all(
+      cells.objects.map(async (cell) => {
+        return indexerAssetsService.processAssetCell(chainId, cell, assetType);
+      }),
+    );
 
-      return assets;
-    });
+    return assets;
   }
 
   private async getLiveCells(job: Job<IndexerAssetsJobData>) {
