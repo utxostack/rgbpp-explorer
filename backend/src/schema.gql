@@ -150,8 +150,8 @@ type RgbppCoin {
   transactions(page: Int, pageSize: Int): [RgbppTransaction!]
   transactionsCount: Float
   amount(layer: Layer): String!
-  holders(layer: Layer!, page: Int, pageSize: Int, order: OrderType): [RgbppHolder!]
-  holdersCount(layer: Layer!): Float
+  holders(layer: Layer, page: Int, pageSize: Int, order: OrderType): [RgbppHolder!]
+  holdersCount(layer: Layer): Float
 }
 
 enum Layer {
