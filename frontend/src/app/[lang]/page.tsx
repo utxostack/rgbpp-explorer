@@ -3,7 +3,7 @@ import { LastRgbppTxnsTable } from 'src/components/latest-tx-list'
 import { Box, Center, Flex } from 'styled-system/jsx'
 
 import HomeBgSVG from '@/assets/home-bg.svg'
-import { HomeQuickInfo } from '@/components/home-quick-info'
+// import { HomeQuickInfo } from '@/components/home-quick-info'
 import { HomeTitle } from '@/components/home-title'
 import { NetworkCards } from '@/components/network-cards'
 import { SearchBar } from '@/components/search-bar'
@@ -24,7 +24,7 @@ export default function Home() {
         >
           <Flex w="100%" direction="column" textAlign="center" align="center" justify="start" gap="54px" pb="40px">
             <HomeTitle />
-            <HomeQuickInfo />
+            {/* <HomeQuickInfo />*/}
             <SearchBar />
           </Flex>
         </Flex>
