@@ -5,12 +5,12 @@ import { AssetType } from '@prisma/client';
 import { Job } from 'bullmq';
 import { BlockchainServiceFactory } from 'src/core/blockchain/blockchain.factory';
 import { SearchKey } from 'src/core/blockchain/blockchain.interface';
-import { PrismaService } from 'src/core/database/prisma/prisma.service';
 import { IndexerQueueService } from '../indexer.queue';
 import { ModuleRef } from '@nestjs/core';
 import { IndexerServiceFactory } from '../indexer.factory';
 import { IndexerAssetsService } from '../service/assets.service';
 import { IndexerEvent } from '../indexer.service';
+import * as Sentry from '@sentry/node';
 
 export const INDEXER_ASSETS_QUEUE = 'indexer-assets-queue';
 
@@ -30,7 +30,6 @@ export class IndexerAssetsProcessor extends WorkerHost {
 
   constructor(
     private blockchainServiceFactory: BlockchainServiceFactory,
-    private prismaService: PrismaService,
     private moduleRef: ModuleRef,
   ) {
     super();
@@ -58,7 +57,7 @@ export class IndexerAssetsProcessor extends WorkerHost {
     this.logger.error(
       `Indexing assets (code hash: ${assetType.codeHash}, cursor: ${cursor}) for chain ${chainId} failed`,
     );
-    this.logger.error(error);
+    Sentry.captureException(error);
   }
 
   public async process(job: Job<IndexerAssetsJobData>): Promise<any> {
@@ -82,15 +81,13 @@ export class IndexerAssetsProcessor extends WorkerHost {
     }
 
     const indexerAssetsService = this.moduleRef.get(IndexerAssetsService);
-    await this.prismaService.$transaction(async (tx) => {
-      const assets = await Promise.all(
-        cells.objects.map(async (cell) => {
-          return indexerAssetsService.processAssetCell(chainId, cell, assetType, tx);
-        }),
-      );
+    const assets = await Promise.all(
+      cells.objects.map(async (cell) => {
+        return indexerAssetsService.processAssetCell(chainId, cell, assetType);
+      }),
+    );
 
-      return assets;
-    });
+    return assets;
   }
 
   private async getLiveCells(job: Job<IndexerAssetsJobData>) {

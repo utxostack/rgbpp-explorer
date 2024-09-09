@@ -1,4 +1,4 @@
-import { BI, config, helpers, Script } from '@ckb-lumos/lumos';
+import { config, helpers, Script } from '@ckb-lumos/lumos';
 import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
@@ -9,12 +9,20 @@ import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import { Env } from 'src/env';
 import { ConfigService } from '@nestjs/config';
 import { NetworkType } from 'src/constants';
+import * as Sentry from '@sentry/node';
 
 export const INDEXER_LOCK_QUEUE = 'indexer-lock-queue';
 
 export interface IndexerLockJobData {
   chainId: number;
   script: Script;
+}
+
+class IndexerLockError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'IndexerLockError';
+  }
 }
 
 @Processor(INDEXER_LOCK_QUEUE, {
@@ -54,7 +62,7 @@ export class IndexerLockProcessor extends WorkerHost {
     this.logger.error(
       `Indexing lock script for chain ${chainId} with script hash ${computeScriptHash(script)} failed`,
     );
-    this.logger.error(error);
+    Sentry.captureException(error);
   }
 
   public async process(job: Job<IndexerLockJobData>): Promise<any> {
@@ -70,13 +78,22 @@ export class IndexerLockProcessor extends WorkerHost {
         const btcTx = await this.bitcoinApiService.getTx({ txid: btcTxid });
         const output = btcTx.vout[outIndex];
 
+        if (!output) {
+          throw new IndexerLockError(`No output found for index ${outIndex} of tx ${btcTxid}`);
+        }
+
         if (!output.scriptpubkey_address) {
-          this.logger.error(`No address found for output ${outIndex} of tx ${btcTxid}`);
-          return;
+          throw new IndexerLockError(`No address found for output ${outIndex} of tx ${btcTxid}`);
         }
         address = output.scriptpubkey_address;
-      } catch (error) {
-        this.logger.error(error);
+      } catch (err) {
+        this.logger.error(err.message);
+        if (err instanceof IndexerLockError) {
+          Sentry.captureException(err);
+        }
+        const error = new IndexerLockError(err.message);
+        Sentry.captureException(error);
+        return;
       }
     } else {
       const ckbAddress = helpers.encodeToAddress(script, {
