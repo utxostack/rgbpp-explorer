@@ -8,10 +8,9 @@ import { PrismaService } from 'src/core/database/prisma/prisma.service';
 import { IndexerQueueService } from '../indexer.queue';
 import { IndexerAssetsService } from '../service/assets.service';
 import { Cell, Transaction } from 'src/core/blockchain/blockchain.interface';
-import { PrismaClient } from '@prisma/client';
-import { ITXClientDenyList } from '@prisma/client/runtime/library';
 import { IndexerServiceFactory } from '../indexer.factory';
 import { IndexerEvent } from '../indexer.service';
+import * as Sentry from '@sentry/node';
 
 export const INDEXER_BLOCK_QUEUE = 'indexer-block-queue';
 
@@ -51,7 +50,7 @@ export class IndexerBlockProcessor extends WorkerHost {
   public onFailed(job: Job<IndexerBlockJobData>, error: Error) {
     const { chainId, blockNumber } = job.data;
     this.logger.error(`Indexing block ${blockNumber} for chain ${chainId} failed`);
-    this.logger.error(error);
+    Sentry.captureException(error);
   }
 
   public async process(job: Job<IndexerBlockJobData>): Promise<any> {

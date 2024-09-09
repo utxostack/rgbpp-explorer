@@ -4,6 +4,7 @@ import { Logger } from '@nestjs/common';
 import { Job } from 'bullmq';
 import { PrismaService } from 'src/core/database/prisma/prisma.service';
 import { computeScriptHash } from '@ckb-lumos/lumos/utils';
+import * as Sentry from '@sentry/node';
 
 export const INDEXER_TYPE_QUEUE = 'indexer-type-queue';
 
@@ -44,7 +45,7 @@ export class IndexerTypeProcessor extends WorkerHost {
     this.logger.error(
       `Indexing lock script for chain ${chainId} with script hash ${computeScriptHash(script)} failed`,
     );
-    this.logger.error(error);
+    Sentry.captureException(error);
   }
 
   public async process(job: Job<IndexerTypeJobData>): Promise<any> {
