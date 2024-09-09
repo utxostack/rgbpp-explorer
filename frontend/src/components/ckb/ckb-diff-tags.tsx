@@ -90,7 +90,15 @@ export const CkbDiffTags = memo(function CkbDiffTags({
       ) : null}
       {xudtTags}
       {!dobDiff.isZero() ? (
-        <Flex align="center" bg="brand" py="8px" fontSize="14px" lineHeight="16px" px="16px" rounded="4px">
+        <Flex
+          align="center"
+          bg={dobDiff.isGreaterThan(0) ? 'success' : 'danger'}
+          py="8px"
+          fontSize="14px"
+          lineHeight="16px"
+          px="16px"
+          rounded="4px"
+        >
           <Trans>{formatNumber(dobDiff)} DOB</Trans>
           <MoneyIcon w="16px" h="16px" ml="6px" />
         </Flex>

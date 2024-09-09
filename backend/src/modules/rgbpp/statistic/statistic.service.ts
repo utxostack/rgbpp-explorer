@@ -11,6 +11,8 @@ import { HashType, Script } from '@ckb-lumos/lumos';
 import { RgbppService } from '../rgbpp.service';
 import { RgbppTransactionService } from '../transaction/transaction.service';
 import { LeapDirection } from '../transaction/transaction.model';
+import { PrismaService } from 'src/core/database/prisma/prisma.service';
+import { Holder } from '@prisma/client';
 
 // TODO: refactor the `Average Block Time` constant
 // CKB testnet: ~8s, see https://pudge.explorer.nervos.org/charts/average-block-time
@@ -19,6 +21,13 @@ const CKB_24_HOURS_BLOCK_NUMBER = ONE_DAY_MS / 10000;
 const RGBPP_ASSETS_CELL_TYPE = [CellType.XUDT, CellType.SUDT, CellType.DOB, CellType.MNFT];
 const limit = pLimit(200);
 
+export interface GetRgbppAssetsHoldersParams {
+  page: number;
+  pageSize?: number;
+  order?: 'asc' | 'desc';
+  isLayer1?: boolean;
+}
+
 @Injectable()
 export class RgbppStatisticService {
   private logger = new Logger(RgbppStatisticService.name);
@@ -26,20 +35,23 @@ export class RgbppStatisticService {
   private latest24L2TransactionsCacheKey = 'RgbppStatisticService:latest24L2Transactions';
   private transactionLeapDirectionCachePrefix = 'RgbppStatisticService:leapDirection';
 
-  private rgbppAssetsTypeScripts = RGBPP_ASSETS_CELL_TYPE.map((type) => {
-    const service = this.ckbScriptService.getServiceByCellType(type);
-    const scripts = service.getScripts();
-    return scripts;
-  }).flat();
-
   constructor(
     private ckbRpcService: CkbRpcWebsocketService,
     private ckbScriptService: CkbScriptService,
     private rgbppTransactionService: RgbppTransactionService,
     private rgbppService: RgbppService,
+    private prismaService: PrismaService,
     @Inject(CACHE_MANAGER) protected cacheManager: Cache,
   ) {
     this.collectLatest24HourRgbppTransactions();
+  }
+
+  private get rgbppAssetsTypeScripts() {
+    return RGBPP_ASSETS_CELL_TYPE.map((type) => {
+      const service = this.ckbScriptService.getServiceByCellType(type);
+      const scripts = service.getScripts();
+      return scripts;
+    }).flat();
   }
 
   public async getLatest24L1Transactions() {
@@ -156,5 +168,44 @@ export class RgbppStatisticService {
       ckbTxHashes: rgbppL2Txhashes,
       leapDirectionMap,
     };
+  }
+
+  public async getRgbppAssetsHoldersCount(isLayer1: boolean): Promise<number> {
+    const results = await this.prismaService.holder.groupBy({
+      by: ['address'],
+      where: {
+        isLayer1,
+      },
+    });
+    return results.length;
+  }
+
+  public async getRgbppAssetsHolders({
+    page,
+    pageSize = 10,
+    order,
+    isLayer1,
+  }: GetRgbppAssetsHoldersParams): Promise<Pick<Holder, 'address' | 'assetCount'>[]> {
+    const results = await this.prismaService.holder.groupBy({
+      by: ['address'],
+      where: {
+        isLayer1,
+      },
+      _sum: {
+        assetCount: true,
+      },
+      orderBy: {
+        _sum: {
+          assetCount: order ?? 'desc',
+        },
+      },
+      take: pageSize,
+      skip: (page - 1) * pageSize,
+    });
+    const holders = results.map((result) => ({
+      address: result.address,
+      assetCount: result._sum.assetCount || 0,
+    }));
+    return holders;
   }
 }

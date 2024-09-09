@@ -17,15 +17,10 @@ const rgbppTxQuery = graphql(`
       blockNumber
       timestamp
       btcTransaction {
+        txid
         blockHeight
         blockHash
-        txid
-        version
         size
-        block {
-          timestamp
-        }
-        weight
         fee
         feeRate
         confirmed
@@ -33,23 +28,13 @@ const rgbppTxQuery = graphql(`
         vin {
           txid
           vout
-          scriptsig
-          scriptsigAsm
           isCoinbase
-          sequence
           prevout {
             txid
             vout
-            scriptpubkey
-            scriptpubkeyAsm
-            scriptpubkeyType
-            scriptpubkeyAddress
             value
             address {
               address
-              satoshi
-              pendingSatoshi
-              transactionsCount
             }
             status {
               spent
@@ -61,16 +46,9 @@ const rgbppTxQuery = graphql(`
         vout {
           txid
           vout
-          scriptpubkey
-          scriptpubkeyAsm
-          scriptpubkeyType
-          scriptpubkeyAddress
           value
           address {
             address
-            satoshi
-            pendingSatoshi
-            transactionsCount
           }
           status {
             spent
@@ -85,9 +63,6 @@ const rgbppTxQuery = graphql(`
         hash
         fee
         feeRate
-        size
-        confirmed
-        confirmations
         outputs {
           txHash
           index

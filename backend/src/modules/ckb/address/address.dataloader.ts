@@ -8,7 +8,7 @@ import {
   GetAddressParams,
   GetAddressTransactionsParams,
 } from 'src/core/ckb-explorer/ckb-explorer.service';
-import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
+import * as Sentry from '@sentry/nestjs';
 
 @Injectable()
 export class CkbAddressLoader
@@ -16,10 +16,7 @@ export class CkbAddressLoader
 {
   private logger = new Logger(CkbAddressLoader.name);
 
-  constructor(
-    private ckbExplorerService: CkbExplorerService,
-    @InjectSentry() private sentryService: SentryService,
-  ) {}
+  constructor(private ckbExplorerService: CkbExplorerService) {}
 
   public getBatchFunction() {
     return async (batchParams: GetAddressParams[]) => {
@@ -35,7 +32,7 @@ export class CkbAddressLoader
           return result.value;
         }
         this.logger.error(`Requesting: ${batchParams[index]}, occurred error: ${result.reason}`);
-        this.sentryService.instance().captureException(result.reason);
+        Sentry.captureException(result.reason);
         return null;
       });
     };
@@ -55,10 +52,7 @@ export class CkbAddressTransactionsLoader
 {
   private logger = new Logger(CkbAddressTransactionsLoader.name);
 
-  constructor(
-    private ckbExplorerService: CkbExplorerService,
-    @InjectSentry() private sentryService: SentryService,
-  ) {}
+  constructor(private ckbExplorerService: CkbExplorerService) {}
 
   public getBatchFunction() {
     return async (batchParams: GetAddressParams[]) => {
@@ -77,7 +71,7 @@ export class CkbAddressTransactionsLoader
           return result.value;
         }
         this.logger.error(`Requesting: ${batchParams[index]}, occurred error: ${result.reason}`);
-        this.sentryService.instance().captureException(result.reason);
+        Sentry.captureException(result.reason);
         return null;
       });
     };

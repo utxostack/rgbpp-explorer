@@ -1,4 +1,5 @@
 import { t } from '@lingui/macro'
+import { sum } from 'lodash-es'
 import { Box, Grid, VStack } from 'styled-system/jsx'
 
 import { graphql } from '@/gql'
@@ -13,13 +14,30 @@ export async function HomeQuickInfo() {
       graphql(`
         query RgbppStatistic {
           rgbppStatistic {
-            transactionsCount
-            holdersCount
+            l1HoldersCount: holdersCount(layer: L1)
+            l2HoldersCount: holdersCount(layer: L2)
+            latest24HoursL2TransactionsCount
+            latest24HoursL1TransactionsCountLeapIn: latest24HoursL1TransactionsCount(leapDirection: LeapIn)
+            latest24HoursL1TransactionsCountLeapOutput: latest24HoursL1TransactionsCount(leapDirection: LeapOut)
+            latest24HoursL1TransactionsCountLeapWithin: latest24HoursL1TransactionsCount(leapDirection: Within)
           }
         }
       `),
     )
-    .catch(() => ({ rgbppStatistic: { transactionsCount: undefined, holdersCount: undefined } }))
+    .catch(() => ({ rgbppStatistic: null }))
+  const transactionsCount = formatNumber(
+    rgbppStatistic
+      ? sum([
+          rgbppStatistic.latest24HoursL1TransactionsCountLeapIn,
+          rgbppStatistic.latest24HoursL1TransactionsCountLeapOutput,
+          rgbppStatistic.latest24HoursL1TransactionsCountLeapWithin,
+        ])
+      : undefined,
+  )
+
+  const holdersCount = formatNumber(
+    rgbppStatistic ? sum([rgbppStatistic.l1HoldersCount, rgbppStatistic.l2HoldersCount]) : undefined,
+  )
 
   return (
     <Grid
@@ -36,7 +54,7 @@ export async function HomeQuickInfo() {
       fontWeight="bold"
     >
       <VStack gap="2px" borderRight="2px solid" borderColor="rgba(255, 255, 255, 0.1)">
-        <Box>{formatNumber(rgbppStatistic.transactionsCount)}</Box>
+        <Box>{transactionsCount}</Box>
         <Box
           fontSize={{ base: '12px', md: '14px' }}
           lineHeight={{ base: '16px', md: '20px' }}
@@ -47,7 +65,7 @@ export async function HomeQuickInfo() {
         </Box>
       </VStack>
       <VStack gap="2px">
-        <Box>{formatNumber(rgbppStatistic.holdersCount)}</Box>
+        <Box>{holdersCount}</Box>
         <Box
           fontSize={{ base: '12px', md: '14px' }}
           lineHeight={{ base: '16px', md: '20px' }}

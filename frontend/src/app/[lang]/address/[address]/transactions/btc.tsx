@@ -8,7 +8,7 @@ import { NoData } from '@/components/no-data'
 import { Button } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { graphql } from '@/gql'
-import { BitcoinTransaction } from '@/gql/graphql'
+import { BitcoinTransaction, CkbTransaction } from '@/gql/graphql'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { getUrl } from '@/lib/get-url'
 import { graphQLClient } from '@/lib/graphql'
@@ -17,6 +17,77 @@ const query = graphql(`
   query BtcTransactionByAddress($address: String!, $afterTxid: String) {
     btcAddress(address: $address) {
       transactions(afterTxid: $afterTxid) {
+        txid
+        rgbppTransaction {
+          ckbTransaction {
+            isCellbase
+            blockNumber
+            hash
+            fee
+            feeRate
+            size
+            confirmed
+            confirmations
+            outputs {
+              txHash
+              index
+              capacity
+              cellType
+              type {
+                codeHash
+                hashType
+                args
+              }
+              lock {
+                codeHash
+                hashType
+                args
+              }
+              status {
+                consumed
+                txHash
+                index
+              }
+              xudtInfo {
+                symbol
+                amount
+                decimal
+                typeHash
+              }
+            }
+            inputs {
+              txHash
+              index
+              capacity
+              cellType
+              type {
+                codeHash
+                hashType
+                args
+              }
+              lock {
+                codeHash
+                hashType
+                args
+              }
+              xudtInfo {
+                symbol
+                amount
+                decimal
+                typeHash
+              }
+              status {
+                consumed
+                txHash
+                index
+              }
+            }
+            block {
+              timestamp
+              hash
+            }
+          }
+        }
         blockHeight
         blockHash
         txid
@@ -101,8 +172,15 @@ export async function BtcTransactionsByAddress({ address }: { address: string })
           <NoData>{t(i18n)`No Transaction`}</NoData>
         </Center>
       ) : (
-        btcAddress.transactions?.map((tx) => {
-          return <BtcTransactionCardInAddress address={address} tx={tx as BitcoinTransaction} key={tx.txid} />
+        btcAddress.transactions?.map(({ rgbppTransaction, ...tx }) => {
+          return (
+            <BtcTransactionCardInAddress
+              address={address}
+              tx={tx as BitcoinTransaction}
+              ckbCell={rgbppTransaction?.ckbTransaction as CkbTransaction}
+              key={tx.txid}
+            />
+          )
         })
       )}
       <Center w="100%">

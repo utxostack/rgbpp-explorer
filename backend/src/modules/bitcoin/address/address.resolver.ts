@@ -64,10 +64,7 @@ export class BitcoinAddressResolver {
     addressTxsLoader: BitcoinAddressTransactionsLoaderType,
     @Args('afterTxid', { nullable: true }) afterTxid?: string,
   ): Promise<BitcoinTransaction[] | null> {
-    const list = await addressTxsLoader.load({
-      address: address.address,
-      afterTxid: afterTxid,
-    });
+    const list = await addressTxsLoader.load(`${address.address},${afterTxid}`);
     return list || null;
   }
 

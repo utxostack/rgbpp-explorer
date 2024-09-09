@@ -7,16 +7,22 @@ import { CkbRpcModule } from './ckb-rpc/ckb-rpc.module';
 import { CkbRpcWebsocketService } from './ckb-rpc/ckb-rpc-websocket.service';
 import { BitcoinApiService } from './bitcoin-api/bitcoin-api.service';
 import { HealthModule } from './health/health.module';
+import { BlockchainModule } from './blockchain/blockchain.module';
+import { IndexerModule } from './indexer/indexer.module';
+import { DatabaseModule } from './database/database.module';
+import { CoreService } from './core.service';
 
 @Module({
   imports: [
-    // DatabaseModule,
+    DatabaseModule,
     CkbExplorerModule,
     CkbRpcModule,
     BitcoinApiModule,
     HealthModule,
+    BlockchainModule,
+    IndexerModule,
   ],
-  providers: [CkbExplorerService, CkbRpcWebsocketService, BitcoinApiService],
-  exports: [CkbExplorerService, CkbRpcWebsocketService, BitcoinApiService],
+  providers: [CkbExplorerService, CkbRpcWebsocketService, BitcoinApiService, CoreService],
+  exports: [CkbExplorerService, CkbRpcWebsocketService, BitcoinApiService, CoreService],
 })
-export class CoreModule {}
+export class CoreModule { }

@@ -1,0 +1,74 @@
+services:
+  preview-explorer-backend:
+    depends_on:
+      preview-prisma-migrate:
+        condition: service_completed_successfully
+      preview-redis:
+        condition: service_started
+      preview-postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    build:
+      context: .
+      args:
+        - GIT_BRANCH=${GIT_BRANCH}
+    env_file:
+      - ./backend/.env
+    deploy:
+      resources:
+        limits:
+          memory: 2048M
+    networks:
+      - preview
+
+  preview-prisma-migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    command: ['sh', '/app/backend/scripts/migrate-and-seed.sh']
+    env_file:
+      # Need DATABASE_URL to be set in .env
+      - ./backend/.env
+    depends_on:
+      preview-postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app/backend
+    networks:
+      - preview
+
+  preview-redis:
+    # https://github.com/docker-library/redis/blob/b77450d/7.4/alpine/Dockerfile
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      # Redis' WORKDIR is /data
+      - preview-redis-data:/data
+      - ./backend/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    command: /usr/local/etc/redis/redis.conf
+    networks:
+      - preview
+
+  preview-postgres:
+    image: postgres:13
+    env_file:
+      # Need POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB to be set in .env
+      - ./backend/.env
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - preview-pg-volume:/var/lib/postgresql/data
+    networks:
+      - preview
+
+volumes:
+  preview-redis-data:
+  preview-pg-volume:
+
+networks:
+  preview:
+    driver: bridge
