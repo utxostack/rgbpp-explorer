@@ -4,8 +4,6 @@ set -e
 
 cd /app/backend
 
-pnpm install
-
 if npx prisma migrate status | grep -q "Database schema is up to date"; then
     echo "No pending migrations. Skipping migration."
 else

@@ -8,8 +8,6 @@ services:
     ports:
       - '3000:3000'
     depends_on:
-      prisma-migrate:
-        condition: service_completed_successfully
       redis:
         condition: service_started
       postgres:
@@ -20,23 +18,6 @@ services:
       resources:
         limits:
           memory: 4096M
-    networks:
-      - internal
-
-  prisma-migrate:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: base
-    command: ['sh', '/app/backend/scripts/migrate-and-seed.sh']
-    env_file:
-      # Need DATABASE_URL to be set in .env
-      - ./backend/.env
-    depends_on:
-      postgres:
-        condition: service_healthy
-    volumes:
-      - ./backend:/app/backend
     networks:
       - internal
 
