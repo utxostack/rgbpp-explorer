@@ -108,7 +108,7 @@ export class RgbppCoinResolver {
   @ResolveField(() => [RgbppHolder], { nullable: true })
   public async holders(
     @Parent() coin: RgbppCoin,
-    @Args('layer', { type: () => Layer }) layer: Layer,
+    @Args('layer', { type: () => Layer, nullable: true }) layer?: Layer,
     @Args('page', { type: () => Int, nullable: true }) page?: number,
     @Args('pageSize', { type: () => Int, nullable: true }) pageSize?: number,
     @Args('order', { type: () => OrderType, nullable: true }) order?: OrderType,
@@ -120,7 +120,7 @@ export class RgbppCoinResolver {
       page: page ?? 1,
       pageSize: pageSize ?? 10,
       order,
-      isLayer1: layer === Layer.L1,
+      isLayer1: layer ? layer === Layer.L1 : undefined,
     });
     return holders;
   }
@@ -128,14 +128,14 @@ export class RgbppCoinResolver {
   @ResolveField(() => Float, { nullable: true })
   public async holdersCount(
     @Parent() coin: RgbppCoin,
-    @Args('layer', { type: () => Layer }) layer: Layer,
+    @Args('layer', { type: () => Layer, nullable: true }) layer?: Layer,
   ) {
     if (!coin.typeHash) {
       return null;
     }
     const count = await this.rgbppCoinService.getCoinHoldersCount(
       coin.typeHash,
-      layer === Layer.L1,
+      layer ? layer === Layer.L1 : undefined,
     );
     return count;
   }
