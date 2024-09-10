@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { HealthIndicator, HealthIndicatorResult, HealthCheckError } from '@nestjs/terminus';
-import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 import { CkbExplorerService } from './ckb-explorer.service';
+import * as Sentry from '@sentry/nestjs';
 
 @Injectable()
 export class CkbExplorerHealthIndicator extends HealthIndicator {
   constructor(
     private ckbExplorerService: CkbExplorerService,
-    @InjectSentry() private sentryService: SentryService,
+
   ) {
     super();
   }
@@ -24,7 +24,7 @@ export class CkbExplorerHealthIndicator extends HealthIndicator {
       }
       throw new HealthCheckError('CkbExplorerService failed', result);
     } catch (e) {
-      this.sentryService.instance().captureException(e);
+      Sentry.captureException(e);
       throw new HealthCheckError('CkbExplorerService failed', e);
     }
   }

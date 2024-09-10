@@ -1,10 +1,10 @@
 import { NestDataLoader } from '@applifting-io/nestjs-dataloader';
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 import DataLoader from 'dataloader';
 import { DataLoaderResponse } from 'src/common/type/dataloader';
 import * as CkbExplorerInterface from 'src/core/ckb-explorer/ckb-explorer.interface';
 import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
+import * as Sentry from '@sentry/nestjs';
 
 export interface CkbExplorerXUDTTransactionsLoaderKey {
   typeHash: string;
@@ -24,10 +24,7 @@ export class CkbExplorerXUDTTransactionsLoader
 {
   private logger = new Logger(CkbExplorerXUDTTransactionsLoader.name);
 
-  constructor(
-    private ckbExplorerService: CkbExplorerService,
-    @InjectSentry() private sentryService: SentryService,
-  ) {}
+  constructor(private ckbExplorerService: CkbExplorerService) {}
 
   public getBatchFunction() {
     return async (keys: CkbExplorerXUDTTransactionsLoaderKey[]) => {
@@ -51,7 +48,7 @@ export class CkbExplorerXUDTTransactionsLoader
         this.logger.error(
           `Requesting: ${JSON.stringify(keys[index])}, occurred error: ${result.reason}`,
         );
-        this.sentryService.instance().captureException(result.reason);
+        Sentry.captureException(result.reason);
         return null;
       });
     };

@@ -1,26 +1,61 @@
 services:
   explorer-backend:
-    depends_on:
-      - redis
+    restart: unless-stopped
     build:
       context: .
       args:
         - GIT_BRANCH=${GIT_BRANCH}
     ports:
       - '3000:3000'
+    depends_on:
+      redis:
+        condition: service_started
+      postgres:
+        condition: service_healthy
     env_file:
       - ./backend/.env
+    deploy:
+      resources:
+        limits:
+          memory: 4096M
+    networks:
+      - internal
 
   redis:
     # https://github.com/docker-library/redis/blob/b77450d/7.4/alpine/Dockerfile
     image: redis:7-alpine
+    restart: unless-stopped
     ports:
       - '127.0.0.1:6379:6379'
+    command: /usr/local/etc/redis/redis.conf
     volumes:
       # Redis' WORKDIR is /data
       - redis-data:/data
       - ./backend/redis.conf:/usr/local/etc/redis/redis.conf:ro
-    command: /usr/local/etc/redis/redis.conf
+    networks:
+      - internal
+
+  postgres:
+    image: postgres:13
+    env_file:
+      # Need POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB to be set in .env
+      - ./backend/.env
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+    # set shared memory limit when using docker-compose
+    shm_size: 128mb
+    networks:
+      - internal
 
 volumes:
   redis-data:
+  postgres_volume:
+
+networks:
+  internal:
+    driver: bridge

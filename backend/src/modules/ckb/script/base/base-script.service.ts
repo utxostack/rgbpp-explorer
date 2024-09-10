@@ -1,7 +1,6 @@
 import { BI, Script } from '@ckb-lumos/lumos';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
 import { isScriptEqual } from '@rgbpp-sdk/ckb';
 import { CkbRpcWebsocketService } from 'src/core/ckb-rpc/ckb-rpc-websocket.service';
 import { SearchKey } from 'src/core/ckb-rpc/ckb-rpc.interface';
@@ -9,6 +8,7 @@ import * as CkbRpc from 'src/core/ckb-rpc/ckb-rpc.interface';
 import { Env } from 'src/env';
 import { CellType } from '../script.model';
 import { OrderType } from 'src/modules/api.model';
+import * as Sentry from '@sentry/nestjs';
 
 export abstract class BaseScriptService {
   protected logger = new Logger(BaseScriptService.name);
@@ -17,7 +17,6 @@ export abstract class BaseScriptService {
   constructor(
     protected configService: ConfigService<Env>,
     protected ckbRpcService: CkbRpcWebsocketService,
-    @InjectSentry() protected sentryService: SentryService,
   ) {}
 
   public static sortTransactionCmp(a: CkbRpc.IndexerCell, b: CkbRpc.IndexerCell, order: OrderType) {
@@ -67,7 +66,7 @@ export abstract class BaseScriptService {
         transactions.push(r.value);
       } else {
         this.logger.error(r.reason);
-        this.sentryService.instance().captureException(r.reason);
+        Sentry.captureException(r.reason);
       }
     });
     return transactions

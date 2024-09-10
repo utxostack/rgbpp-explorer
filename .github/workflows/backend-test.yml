@@ -58,6 +58,7 @@ jobs:
           echo CKB_EXPLORER_API_URL="${{ secrets.CKB_EXPLORER_API_URL }}" >> .env
           echo CKB_RPC_WEBSOCKET_URL="${{ secrets.CKB_RPC_WEBSOCKET_URL }}" >> .env
           echo REDIS_URL="redis://localhost:6379" >> .env
+          echo DATABASE_URL="postgres://postgres:postgres@postgres:5432/explorer?sslmode=disable" >> .env
           cat .env
           pnpm run test
         working-directory: backend

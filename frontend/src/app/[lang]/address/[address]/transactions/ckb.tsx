@@ -16,7 +16,7 @@ import { resolveSearchParamsPage } from '@/lib/resolve-searchparams-page'
 import { formatNumber } from '@/lib/string/format-number'
 
 const query = graphql(`
-  query CkbAddress($address: String!, $page: Float!, $pageSize: Float!) {
+  query CkbAddress($address: String!, $page: Int!, $pageSize: Int!) {
     ckbAddress(address: $address) {
       transactionsCount
       transactions(page: $page, pageSize: $pageSize) {

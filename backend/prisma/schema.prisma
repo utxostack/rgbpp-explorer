@@ -5,7 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["views"]
 }
 
 datasource db {
@@ -13,180 +14,160 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum LeapDirection {
+  LeapIn
+  LeapOut
+  Within
+}
+
+model Chain {
+  id         Int      @id @default(autoincrement())
+  name       String
+  ws         String
+  startBlock Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  Block       Block[]
+  Transaction Transaction[]
+}
+
 model Block {
-  id                BigInt   @id @default(autoincrement())
-  version           Int      @default(0)
-  // epoch             BitInt
-  blockHash         String   @unique @db.Char(64)
-  parentHash        String   @db.Char(64)
-  blockNumber       BigInt   @unique
-  timestamp         DateTime @db.Timestamp(6)
+  id                Int      @id @default(autoincrement())
+  chainId           Int
+  hash              String
+  number            Int
+  timestamp         DateTime
   transactionsCount Int
   size              Int
   totalFee          BigInt
   minFee            BigInt
   maxFee            BigInt
-  createdTime       DateTime @default(now())
-  updatedTime       DateTime @updatedAt
+  difficulty        BigInt
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   transactions Transaction[]
+  chain        Chain         @relation(fields: [chainId], references: [id])
 
-  @@index([blockNumber(sort: Desc)])
-  @@map("blocks")
-}
-
-enum TransactionStatus {
-  pending
-  confirmed
+  @@unique([chainId, hash])
+  @@unique([chainId, number])
 }
 
 model Transaction {
-  id          BigInt            @id @default(autoincrement())
-  version     Int               @default(0)
-  blockId     BigInt
-  blockHash   String            @db.Char(64)
-  blockNumber BigInt
-  txHash      String            @unique @db.Char(64)
-  index       Int
-  timestamp   DateTime          @db.Timestamp(6)
-  outputSum   BigInt
-  size        Int
-  fee         BigInt
-  cellDeps    Json              @default("{}")
-  headerDeps  Json              @default("[]")
-  witnesses   Json              @default("[]")
-  status      TransactionStatus @default(pending)
-  createdTime DateTime          @default(now())
-  updatedTime DateTime          @updatedAt
+  id            Int            @id @default(autoincrement())
+  chainId       Int
+  hash          String
+  index         String
+  blockNumber   Int
+  timestamp     DateTime
+  fee           BigInt
+  size          Int
+  isCellbase    Boolean        @default(false)
+  isRgbpp       Boolean        @default(false)
+  leapDirection LeapDirection?
+  inputCount    Int
+  outputCount   Int
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 
-  block   Block    @relation(fields: [blockId], references: [id])
+  chain   Chain    @relation(fields: [chainId], references: [id])
+  block   Block    @relation(fields: [chainId, blockNumber], references: [chainId, number])
   outputs Output[]
 
-  @@index([blockNumber])
-  @@index([timestamp(Sort: Desc)])
-  @@map("transactions")
+  @@unique([chainId, hash])
 }
 
 model Output {
-  id                  BigInt   @id @default(autoincrement())
-  blockNumber         BigInt
-  txId                BigInt
-  txHash              String   @db.Char(64)
-  index               Int
-  capacity            BigInt
-  occupiedCapacity    BigInt
-  consumedByTxHash    String   @db.Char(64)
-  consumedByTxId      BigInt
-  consumedByCellIndex Int
-  timestamp           DateTime @db.Timestamp(6)
-  lockScriptId        BigInt
-  typeScriptId        BigInt
-  udtId               BigInt
-  udtAmount           Decimal  @db.Decimal(39, 0)
-  udtSymbol           String
-  address             String
-  data                String
-  dataSize            Int
-  createdTime         DateTime @default(now())
-  updatedTime         DateTime @updatedAt
+  id               Int      @id @default(autoincrement())
+  chainId          Int
+  txHash           String
+  index            String
+  consumedByTxHash String?
+  consumedByIndex  String?
+  capacity         BigInt
+  lockScriptHash   String   @db.Char(66)
+  typeScriptHash   String?  @db.Char(66)
+  isLive           Boolean  @default(true)
+  rgbppBound       Boolean  @default(false)
+  boundBtcTxId     String?
+  boundBtcTxIndex  Int?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  transaction Transaction @relation(fields: [txId], references: [id])
-  lockScript  LockScript  @relation(fields: [lockScriptId], references: [id])
-  typeScript  TypeScript? @relation(fields: [typeScriptId], references: [id])
-  udt         UDT?        @relation(fields: [udtId], references: [id])
+  transaction Transaction @relation(fields: [chainId, txHash], references: [chainId, hash])
 
-  @@unique([txHash, index])
-  @@unique([consumedByTxHash, consumedByCellIndex])
-  @@index([blockNumber])
-  @@map("outputs")
+  @@unique([chainId, txHash, index])
 }
 
 model LockScript {
-  id          BigInt   @id @default(autoincrement())
-  codeHash    String   @db.Char(64)
-  hashType    Int
-  args        String
-  scriptHash  String   @unique @db.Char(64)
-  createdTime DateTime @default(now())
-  updatedTime DateTime @updatedAt
-
-  outputs    Output[]
-  balance    Balance[]
-  TypeScript TypeScript[]
-  UDT        UDT[]
-
-  @@map("lock_scripts")
-}
-
-model TypeScript {
-  id           BigInt   @id @default(autoincrement())
-  codeHash     String   @db.Char(64)
-  hashType     Int
-  args         String
-  scriptHash   String   @unique @db.Char(64)
-  lockScriptId BigInt
-  createdTime  DateTime @default(now())
-  updatedTime  DateTime @updatedAt
-
-  lockScript LockScript @relation(fields: [lockScriptId], references: [id])
-  outputs    Output[]
-  udts       UDT[]
-
-  @@index([lockScriptId])
-  @@map("type_scripts")
-}
-
-model UDT {
-  id                   BigInt   @id @default(autoincrement())
-  deployerLockScriptId BigInt
-  isFirst              Boolean  @default(false)
-  udtTypeHash          String   @unique @db.Char(64)
-  decimal              Int
-  name                 String
-  symbol               String
-  blockTimestamp       DateTime @db.Timestamp(6)
-  createdTxHash        String   @db.Char(64)
-  uniqueCellScriptHash String   @unique @db.Char(64)
-  typeScriptId         BigInt
-  logo                 String
-  isPublished          Boolean  @default(true)
-  createdTime          DateTime @default(now())
-  updatedTime          DateTime @updatedAt
-
-  typeScript         TypeScript @relation(fields: [typeScriptId], references: [id])
-  deployerLockScript LockScript @relation(fields: [deployerLockScriptId], references: [id])
-  outputs            Output[]
-
-  @@map("udts")
-}
-
-model Balance {
-  id               BigInt   @id @default(autoincrement())
-  assetType        Int
-  scriptHash       String?
-  decimal          Int
-  lockScriptId     BigInt
-  symbol           Int
-  symbolStr        String
-  capacity         Decimal  @db.Decimal(39, 0)
-  pendingCapacity  Decimal  @db.Decimal(39, 0)
-  occupiedCapacity Decimal  @db.Decimal(39, 0)
-  createdTime      DateTime @default(now())
-  updatedTime      DateTime @updatedAt
-
-  lockScript LockScript @relation(fields: [lockScriptId], references: [id])
-
-  @@unique([scriptHash, lockScriptId])
-  @@index([lockScriptId])
-  @@map("balances")
-}
-
-model ChainStats {
-  id            BigInt   @id @default(autoincrement())
-  totalTxsCount Int
-  h24TxsCount   Int
+  id            Int      @id @default(autoincrement())
+  chainId       Int
+  codeHash      String   @db.Char(66)
+  hashType      String
+  args          String   @db.Text
+  scriptHash    String   @unique @db.Char(66)
+  isRgbppLock   Boolean  @default(false)
+  isBtcTimeLock Boolean  @default(false)
+  ownerAddress  String?
   createdTime   DateTime @default(now())
   updatedTime   DateTime @updatedAt
 
-  @@map("chain_stats")
+  @@unique([chainId, id])
+  @@unique([chainId, scriptHash])
+}
+
+model TypeScript {
+  id          Int      @id @default(autoincrement())
+  chainId     Int
+  codeHash    String   @db.Char(66)
+  hashType    String
+  args        String   @db.Text
+  scriptHash  String   @unique @db.Char(66)
+  createdTime DateTime @default(now())
+  updatedTime DateTime @updatedAt
+
+  @@unique([chainId, id])
+  @@unique([chainId, scriptHash])
+}
+
+model Asset {
+  id             Int     @id @default(autoincrement())
+  blockNumber    Int
+  txHash         String
+  index          String
+  chainId        Int
+  lockScriptHash String  @db.Char(66)
+  typeScriptHash String  @db.Char(66)
+  amount         Decimal  @default(0) @db.Decimal(65,0)
+  assetTypeId    Int
+  isLive         Boolean @default(true)
+
+  AssetType AssetType @relation(fields: [chainId, assetTypeId], references: [chainId, id])
+
+  @@unique([chainId, txHash, index])
+}
+
+model AssetType {
+  id          Int      @id @default(autoincrement())
+  chainId     Int
+  codeHash    String   @db.Char(66)
+  hashType    String
+  fungible    Boolean  @default(false)
+  createdTime DateTime @default(now())
+  updatedTime DateTime @updatedAt
+  Asset       Asset[]
+
+  @@unique([chainId, id])
+  @@unique([chainId, codeHash, hashType])
+}
+
+view Holder {
+  address        String
+  isLayer1       Boolean
+  assetCount     Int
+  assetAmount    Decimal  @default(0) @db.Decimal(65,0)
+  typeScriptHash String
+
+  @@unique([address, typeScriptHash])
 }

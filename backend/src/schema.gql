@@ -71,7 +71,7 @@ type CkbAddress {
   address: String!
   shannon: Float
   transactionsCount: Float
-  transactions(page: Float, pageSize: Float): [CkbTransaction!]
+  transactions(page: Int, pageSize: Int): [CkbTransaction!]
   balance: CkbAddressBalance
 }
 
@@ -143,13 +143,25 @@ type RgbppCoin {
   icon: String
   typeHash: String
   typeScript: CkbScript
-  holdersCount: Int!
   h24CkbTransactionsCount: Int!
   totalAmount: Float!
   issuer: String!
   deployedAt: Timestamp!
   transactions(page: Int, pageSize: Int): [RgbppTransaction!]
   transactionsCount: Float
+  amount(layer: Layer): String!
+  holders(layer: Layer, page: Int, pageSize: Int, order: OrderType): [RgbppHolder!]
+  holdersCount(layer: Layer): Float
+}
+
+enum Layer {
+  L1
+  L2
+}
+
+enum OrderType {
+  Desc
+  Asc
 }
 
 """RGB++ Coin List"""
@@ -161,10 +173,17 @@ type RgbppCoinList {
 
 """RGB++ Statistic"""
 type RgbppStatistic {
-  transactionsCount: Float!
-  holdersCount: Float!
+  holders(layer: Layer!, page: Int, pageSize: Int, order: OrderType): [RgbppHolder!]!
+  holdersCount(layer: Layer!): Float!
   latest24HoursL1TransactionsCount(leapDirection: LeapDirection): Float
   latest24HoursL2TransactionsCount: Float
+}
+
+"""RGB++ Holder"""
+type RgbppHolder {
+  address: String!
+  assetCount: Int!
+  assetAmount: String
 }
 
 """Bitcoin Address"""
@@ -335,11 +354,6 @@ input CkbScriptInput {
   codeHash: String!
   hashType: String!
   args: String!
-}
-
-enum OrderType {
-  Desc
-  Asc
 }
 
 enum TransactionListSortType {

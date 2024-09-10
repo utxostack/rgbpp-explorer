@@ -20,6 +20,7 @@ export function UtxoOrCellFooter({
   feeUnit,
   address,
   children,
+  txid,
 }: {
   address?: string
   fee?: number | null
@@ -32,6 +33,7 @@ export function UtxoOrCellFooter({
   }
   feeUnit?: ReactNode
   children?: ReactNode
+  txid?: string
 }) {
   return (
     <Flex
@@ -78,7 +80,7 @@ export function UtxoOrCellFooter({
             </Box>
           ) : null}
           {ckbCell && address ? <CkbDiffTags {...ckbCell} address={address} /> : null}
-          {btcUtxo && address ? <BtcDiffTags {...btcUtxo} address={address} /> : null}
+          {btcUtxo && address ? <BtcDiffTags {...btcUtxo} txid={txid} ckbCell={ckbCell} address={address} /> : null}
         </HStack>
       ) : null}
       {children}

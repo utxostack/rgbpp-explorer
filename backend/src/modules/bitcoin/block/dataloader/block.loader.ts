@@ -6,7 +6,7 @@ import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import * as BitcoinApi from 'src/core/bitcoin-api/bitcoin-api.schema';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { BitcoinBaseLoader } from './base';
-import { InjectSentry, SentryService } from '@ntegral/nestjs-sentry';
+import * as Sentry from '@sentry/nestjs';
 
 @Injectable()
 export class BitcoinBlockLoader
@@ -18,7 +18,6 @@ export class BitcoinBlockLoader
   constructor(
     public bitcoinApiService: BitcoinApiService,
     @Inject(CACHE_MANAGER) public cacheManager: Cache,
-    @InjectSentry() private sentryService: SentryService,
   ) {
     super();
   }
@@ -32,7 +31,7 @@ export class BitcoinBlockLoader
           return result.value;
         }
         this.logger.error(`Requesting: ${keys[index]}, occurred error: ${result.reason}`);
-        this.sentryService.instance().captureException(result.reason);
+        Sentry.captureException(result.reason);
         return null;
       });
     };

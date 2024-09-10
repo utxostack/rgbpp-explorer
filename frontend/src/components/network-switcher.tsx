@@ -2,12 +2,12 @@
 
 import { Trans } from '@lingui/macro'
 import { memo } from 'react'
-import { Box, Flex, VStack } from 'styled-system/jsx'
+import { Box, styled, VStack } from 'styled-system/jsx'
 
 import ArrowDownIcon from '@/assets/arrow-down.svg'
 import MainnetSVG from '@/assets/mainnet.svg'
 import TestnetSVG from '@/assets/testnet.svg'
-import { Popover, Text } from '@/components/ui'
+import { HoverCard, Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { env } from '@/constants/env'
 
@@ -44,22 +44,22 @@ export const NetworkSwitcher = memo(function NetworkSwitcher() {
   const network = env.public.IS_MAINNET ? networks[0] : networks[1]
 
   return (
-    <Popover.Root unmountOnExit>
-      <Popover.Trigger asChild>
-        <Flex align="center" color="brand" cursor="default" fontSize={{ base: '14px', md: '16px' }}>
-          <Text as="span" mr="8px" display={{ base: 'none', md: 'block' }}>
+    <HoverCard.Root unmountOnExit openDelay={0} closeDelay={200}>
+      <HoverCard.Trigger asChild>
+        <styled.button display="flex" alignItems="center" color="brand" cursor="default">
+          <Text as="span" mr="8px">
             {network.icon}
           </Text>
           {network.label}
           <ArrowDownIcon w="16px" h="16px" ml="12px" />
-        </Flex>
-      </Popover.Trigger>
+        </styled.button>
+      </HoverCard.Trigger>
 
-      <Popover.Positioner>
-        <Popover.Content w="200px">
-          <Popover.Arrow>
-            <Popover.ArrowTip />
-          </Popover.Arrow>
+      <HoverCard.Positioner>
+        <HoverCard.Content w="200px">
+          <HoverCard.Arrow>
+            <HoverCard.ArrowTip />
+          </HoverCard.Arrow>
           <VStack gap="16px" w="100%">
             {networks.map((x, i) => {
               return (
@@ -96,8 +96,8 @@ export const NetworkSwitcher = memo(function NetworkSwitcher() {
               )
             })}
           </VStack>
-        </Popover.Content>
-      </Popover.Positioner>
-    </Popover.Root>
+        </HoverCard.Content>
+      </HoverCard.Positioner>
+    </HoverCard.Root>
   )
 })
