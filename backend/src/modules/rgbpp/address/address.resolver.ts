@@ -4,15 +4,14 @@ import { RgbppAddress } from './address.model';
 import { ParentField } from 'src/decorators/parent-field.decorator';
 import { RgbppAsset } from '../asset/asset.model';
 import { CkbXUDTInfo } from 'src/modules/ckb/cell/cell.model';
-import { Loader } from 'src/common/dataloader';
-import {
-  CkbExplorerTransactionLoader,
-  CkbExplorerTransactionLoaderType,
-} from 'src/modules/ckb/transaction/transaction.dataloader';
+import { RgbppAddressService } from './address.service';
 
 @Resolver(() => RgbppAddress)
 export class RgbppAddressResolver {
-  constructor(private ckbExplorerService: CkbExplorerService) { }
+  constructor(
+    private ckbExplorerService: CkbExplorerService,
+    private rgbppAddressService: RgbppAddressService,
+  ) {}
 
   @Query(() => RgbppAddress, { name: 'rgbppAddress', nullable: true })
   public async getBtcAddress(@Args('address') address: string): Promise<RgbppAddress> {
@@ -35,16 +34,12 @@ export class RgbppAddressResolver {
 
   @ResolveField(() => [RgbppAsset])
   public async assets(@ParentField('address') address: string): Promise<RgbppAsset[]> {
-    // TODO: implement this
     return [];
   }
 
   @ResolveField(() => [CkbXUDTInfo])
-  public async balances(
-    @ParentField('address') address: string,
-    @Loader(CkbExplorerTransactionLoader) explorerTxLoader: CkbExplorerTransactionLoaderType,
-  ): Promise<(CkbXUDTInfo | null)[]> {
-    // TODO: implement this
-    return [];
+  public async balances(@ParentField('address') address: string): Promise<(CkbXUDTInfo | null)[]> {
+    const balances = await this.rgbppAddressService.getAddressBalances(address);
+    return balances;
   }
 }
