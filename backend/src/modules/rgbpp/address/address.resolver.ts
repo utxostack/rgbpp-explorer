@@ -26,15 +26,10 @@ export class RgbppAddressResolver {
     return cells.meta.total;
   }
 
-  @ResolveField(() => Float)
-  public async cellsCount(@ParentField('address') address: string): Promise<number> {
-    // TODO: implement this
-    return 0;
-  }
-
   @ResolveField(() => [RgbppAsset])
   public async assets(@ParentField('address') address: string): Promise<RgbppAsset[]> {
-    return [];
+    const assets = await this.rgbppAddressService.getAddressAssets(address);
+    return assets;
   }
 
   @ResolveField(() => [CkbXUDTInfo])
