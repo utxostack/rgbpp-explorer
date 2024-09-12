@@ -96,8 +96,17 @@ export class BlockchainService {
   }
 
   @Cacheable({
-    namespace: 'CkbRpcWebsocketService',
-    key: (txHash: string) => `getTransaction:${txHash}`,
+    namespace: 'BlockchainService',
+    key: (txHash: string, withData: boolean, withWitness: boolean) => {
+      let key = `getTransaction:${txHash}`;
+      if (withData) {
+        key += ':withData';
+      }
+      if (withWitness) {
+        key += ':withWitness';
+      }
+      return key;
+    },
     ttl: ONE_MONTH_MS,
     shouldCache: async (tx: TransactionWithStatusResponse, that: BlockchainService) => {
       if (tx.tx_status.status !== 'committed' || !tx.tx_status.block_number) {
@@ -106,29 +115,119 @@ export class BlockchainService {
       return that.isSafeConfirmations(tx.tx_status.block_number);
     },
   })
-  public async getTransaction(txHash: string): Promise<TransactionWithStatusResponse> {
+  public async getTransaction(
+    txHash: string,
+    withData: boolean = false,
+    withWitness: boolean = false,
+  ): Promise<TransactionWithStatusResponse> {
     await this.websocketReady;
     this.logger.debug(`get_transaction - txHash: ${txHash}`);
-    const tx = await this.websocket.call('get_transaction', [txHash]);
-    return tx as TransactionWithStatusResponse;
+    const response = await this.websocket.call('get_transaction', [txHash]);
+    const tx = response as TransactionWithStatusResponse;
+    // XXX: we don't need these fields by default, remove them to save cache/memory space
+    if (!withData) {
+      tx.transaction.outputs_data = [];
+    }
+    if (!withWitness) {
+      tx.transaction.witnesses = [];
+    }
+    return tx;
   }
 
-  public async getBlock(blockHash: string): Promise<Block> {
+  @Cacheable({
+    namespace: 'BlockchainService',
+    key: (blockHash: string, withTxData: boolean, withTxWitness: boolean) => {
+      let key = `getBlock:${blockHash}`;
+      if (withTxData) {
+        key += ':withTxData';
+      }
+      if (withTxWitness) {
+        key += ':withTxWitness';
+      }
+      return key;
+    },
+    ttl: ONE_MONTH_MS,
+    shouldCache: async (block: Block, that: BlockchainService) => {
+      if (!block?.header) {
+        return false;
+      }
+      const { number } = block.header;
+      return that.isSafeConfirmations(number);
+    },
+  })
+  public async getBlock(
+    blockHash: string,
+    withTxData: boolean = false,
+    withTxWitness: boolean = false,
+  ): Promise<Block> {
     await this.websocketReady;
     this.logger.debug(`get_block - blockHash: ${blockHash}`);
-    const block = await this.websocket.call('get_block', [blockHash]);
-    return block as Block;
+    const response = await this.websocket.call('get_block', [blockHash]);
+    const block = response as Block;
+    if (!withTxData) {
+      block.transactions = block.transactions.map((tx) => {
+        tx.outputs_data = [];
+        return tx;
+      });
+    }
+    if (!withTxWitness) {
+      block.transactions = block.transactions.map((tx) => {
+        tx.witnesses = [];
+        return tx;
+      });
+    }
+    return block;
   }
 
-  public async getBlockByNumber(blockNumber: string): Promise<Block> {
+  @Cacheable({
+    namespace: 'BlockchainService',
+    key: (blockNumber: string, withTxData: boolean, withTxWitness: boolean) => {
+      let key = `getBlockByNumber:${blockNumber}`;
+      if (withTxData) {
+        key += ':withTxData';
+      }
+      if (withTxWitness) {
+        key += ':withTxWitness';
+      }
+      return key;
+    },
+    ttl: ONE_MONTH_MS,
+    shouldCache: async (block: Block, that: BlockchainService) => {
+      const { number } = block.header;
+      return that.isSafeConfirmations(number);
+    },
+  })
+  public async getBlockByNumber(
+    blockNumber: string,
+    withTxData: boolean = false,
+    withTxWitness: boolean = false,
+  ): Promise<Block> {
     await this.websocketReady;
     this.logger.debug(`get_block_by_number - blockNumber: ${blockNumber}`);
-    const block = await this.websocket.call('get_block_by_number', [
+    const response = await this.websocket.call('get_block_by_number', [
       BI.from(blockNumber).toHexString(),
     ]);
-    return block as Block;
+    const block = response as Block;
+    if (!withTxData) {
+      block.transactions = block.transactions.map((tx) => {
+        tx.outputs_data = [];
+        return tx;
+      });
+    }
+    if (!withTxWitness) {
+      block.transactions = block.transactions.map((tx) => {
+        tx.witnesses = [];
+        return tx;
+      });
+    }
+    return block;
   }
 
+  @Cacheable({
+    namespace: 'BlockchainService',
+    key: (blockHash: string) => `getBlockEconomicState:${blockHash}`,
+    ttl: ONE_MONTH_MS,
+  })
   public async getBlockEconomicState(blockHash: string): Promise<BlockEconomicState> {
     await this.websocketReady;
     this.logger.debug(`get_block_economic_state - blockHash: ${blockHash}`);
@@ -136,6 +235,12 @@ export class BlockchainService {
     return blockEconomicState as BlockEconomicState;
   }
 
+  @Cacheable({
+    namespace: 'BlockchainService',
+    key: 'getTipBlockNumber',
+    // just cache for 1 second to avoid too many requests
+    ttl: 1000,
+  })
   public async getTipBlockNumber(): Promise<number> {
     await this.websocketReady;
     this.logger.debug('get_tip_block_number');
@@ -153,13 +258,14 @@ export class BlockchainService {
     this.logger.debug(
       `get_transactions - searchKey: ${JSON.stringify(searchKey)}, order: ${order}, limit: ${limit}, after: ${after}`,
     );
-    const transactions = await this.websocket.call('get_transactions', [
+    const result = await this.websocket.call('get_transactions', [
       searchKey,
       order,
       limit,
       after,
     ]);
-    return transactions as GetTransactionsResult;
+    const transactions = result as GetTransactionsResult;
+    return transactions;
   }
 
   public async getCells(
@@ -167,12 +273,20 @@ export class BlockchainService {
     order: 'asc' | 'desc',
     limit: string,
     after?: string,
+    withData: boolean = false,
   ): Promise<GetCellsResult> {
     await this.websocketReady;
     this.logger.debug(
       `get_cells - searchKey: ${JSON.stringify(searchKey)}, order: ${order}, limit: ${limit}, after: ${after}`,
     );
-    const cells = await this.websocket.call('get_cells', [searchKey, order, limit, after]);
-    return cells as GetCellsResult;
+    const result = await this.websocket.call('get_cells', [searchKey, order, limit, after]);
+    const cells = result as GetCellsResult;
+    cells.objects = cells.objects.map((cell) => {
+      if (!withData) {
+        cell.output_data = '';
+      }
+      return cell;
+    });
+    return cells;
   }
 }

@@ -43,7 +43,7 @@ export class RgbppStatisticService {
     private prismaService: PrismaService,
     @Inject(CACHE_MANAGER) protected cacheManager: Cache,
   ) {
-    this.collectLatest24HourRgbppTransactions();
+    // this.collectLatest24HourRgbppTransactions();
   }
 
   private get rgbppAssetsTypeScripts() {
