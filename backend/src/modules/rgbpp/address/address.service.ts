@@ -5,6 +5,7 @@ import { PrismaService } from 'src/core/database/prisma/prisma.service';
 import { CkbCell, CkbXUDTInfo } from 'src/modules/ckb/cell/cell.model';
 import { RgbppAsset } from '../asset/asset.model';
 import { CkbRpcWebsocketService } from 'src/core/ckb-rpc/ckb-rpc-websocket.service';
+import { CKB_CHAIN_ID } from 'src/constants';
 
 @Injectable()
 export class RgbppAddressService {
@@ -18,6 +19,7 @@ export class RgbppAddressService {
     const lockScript = await this.prismaService.lockScript.findMany({
       where: {
         ownerAddress: address,
+        chainId: CKB_CHAIN_ID,
       },
     });
     if (lockScript.length === 0) {
@@ -28,6 +30,7 @@ export class RgbppAddressService {
         lockScriptHash: {
           in: lockScript.map((script) => script.scriptHash),
         },
+        isLive: true,
       },
     });
     if (results.length === 0) {
