@@ -3,12 +3,20 @@ import { IndexerServiceFactory } from './indexer.factory';
 import { BullModule } from '@nestjs/bullmq';
 import { INDEXER_ASSETS_QUEUE, IndexerAssetsProcessor } from './processor/assets.processor';
 import { IndexerQueueService } from './indexer.queue';
-import { INDEXER_BLOCK_QUEUE, IndexerBlockProcessor } from './processor/block.processor';
+import {
+  INDEXER_BLOCK_ASSETS_QUEUE,
+  IndexerBlockAssetsProcessor,
+} from './processor/block-assets.processor';
 import { IndexerAssetsService } from './service/assets.service';
 import { CoreModule } from '../core.module';
 import { INDEXER_TYPE_QUEUE, IndexerTypeProcessor } from './processor/type.processor';
 import { INDEXER_LOCK_QUEUE, IndexerLockProcessor } from './processor/lock.processor';
 import { DefaultJobOptions } from 'bullmq';
+import { INDEXER_BLOCK_QUEUE, IndexerBlockProcessor } from './processor/block.processor';
+import {
+  INDEXER_TRANSACTION_QUEUE,
+  IndexerTransactionProcessor,
+} from './processor/transaction.processor';
 
 const commonAttemptsConfig: Pick<DefaultJobOptions, 'attempts' | 'backoff'> = {
   attempts: 10,
@@ -23,10 +31,12 @@ const commonAttemptsConfig: Pick<DefaultJobOptions, 'attempts' | 'backoff'> = {
   imports: [
     BullModule.registerQueue({
       name: INDEXER_ASSETS_QUEUE,
-      ...commonAttemptsConfig,
+      defaultJobOptions: {
+        ...commonAttemptsConfig,
+      },
     }),
     BullModule.registerQueue({
-      name: INDEXER_BLOCK_QUEUE,
+      name: INDEXER_BLOCK_ASSETS_QUEUE,
       defaultJobOptions: {
         removeOnComplete: true,
         removeOnFail: true,
@@ -34,12 +44,30 @@ const commonAttemptsConfig: Pick<DefaultJobOptions, 'attempts' | 'backoff'> = {
       },
     }),
     BullModule.registerQueue({
+      name: INDEXER_BLOCK_QUEUE,
+      defaultJobOptions: {
+        removeOnComplete: true,
+        ...commonAttemptsConfig,
+      },
+    }),
+    BullModule.registerQueue({
+      name: INDEXER_TRANSACTION_QUEUE,
+      defaultJobOptions: {
+        removeOnComplete: true,
+        ...commonAttemptsConfig,
+      },
+    }),
+    BullModule.registerQueue({
       name: INDEXER_LOCK_QUEUE,
-      ...commonAttemptsConfig,
+      defaultJobOptions: {
+        ...commonAttemptsConfig,
+      },
     }),
     BullModule.registerQueue({
       name: INDEXER_TYPE_QUEUE,
-      ...commonAttemptsConfig,
+      defaultJobOptions: {
+        ...commonAttemptsConfig,
+      },
     }),
     forwardRef(() => CoreModule),
   ],
@@ -48,9 +76,11 @@ const commonAttemptsConfig: Pick<DefaultJobOptions, 'attempts' | 'backoff'> = {
     IndexerAssetsService,
     IndexerQueueService,
     IndexerAssetsProcessor,
-    IndexerBlockProcessor,
+    IndexerBlockAssetsProcessor,
     IndexerLockProcessor,
     IndexerTypeProcessor,
+    IndexerBlockProcessor,
+    IndexerTransactionProcessor,
   ],
   exports: [IndexerServiceFactory, IndexerQueueService],
 })

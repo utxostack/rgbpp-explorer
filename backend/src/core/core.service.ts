@@ -1,4 +1,4 @@
-import { Script } from '@ckb-lumos/lumos';
+import { BI, HashType, Script } from '@ckb-lumos/lumos';
 import { bytes } from '@ckb-lumos/lumos/codec';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -11,19 +11,19 @@ import {
 } from '@rgbpp-sdk/ckb';
 import { BtcTestnetTypeMap, NetworkType } from 'src/constants';
 import { Env } from 'src/env';
-
-export enum LeapDirection {
-  LeapIn = 'leap_in',
-  LeapOut = 'leap_out',
-  Within = 'within',
-}
+import { Transaction } from './blockchain/blockchain.interface';
+import { BlockchainServiceFactory } from './blockchain/blockchain.factory';
+import { LeapDirection } from '@prisma/client';
 
 export const CELLBASE_TX_HASH =
   '0x0000000000000000000000000000000000000000000000000000000000000000';
 
 @Injectable()
 export class CoreService {
-  constructor(private configService: ConfigService<Env>) {}
+  constructor(
+    private configService: ConfigService<Env>,
+    private blockchainServiceFactory: BlockchainServiceFactory,
+  ) {}
 
   public get rgbppLockScript() {
     const network = this.configService.get('NETWORK');
@@ -70,5 +70,53 @@ export class CoreService {
       },
       this.btcTimeLockScript,
     );
+  }
+
+  public async getLeapDirectionByCkbTx(chainId: number, ckbTx: Transaction) {
+    const blockchainService = this.blockchainServiceFactory.getService(chainId);
+    const inputCells = await Promise.all(
+      ckbTx.inputs.map(async (input) => {
+        const inputTx = await blockchainService.getTransaction(input.previous_output.tx_hash);
+        const index = BI.from(input.previous_output.index).toNumber();
+        return inputTx?.transaction.outputs?.[index] ?? null;
+      }),
+    );
+    const hasRgbppLockInput = inputCells.some(
+      (cell) =>
+        cell?.lock &&
+        this.isRgbppLockScript({
+          codeHash: cell.lock.code_hash,
+          hashType: cell.lock.hash_type as HashType,
+          args: cell.lock.args,
+        }),
+    );
+    const hasRgbppLockOuput = ckbTx.outputs.some(
+      (output) =>
+        output?.lock &&
+        this.isRgbppLockScript({
+          codeHash: output.lock.code_hash,
+          hashType: output.lock.hash_type as HashType,
+          args: output.lock.args,
+        }),
+    );
+    const hasBtcTimeLockOutput = ckbTx.outputs.some(
+      (output) =>
+        output.lock &&
+        this.isBtcTimeLockScript({
+          codeHash: output.lock.code_hash,
+          hashType: output.lock.hash_type as HashType,
+          args: output.lock.args,
+        }),
+    );
+    if (hasRgbppLockInput && hasBtcTimeLockOutput) {
+      return LeapDirection.LeapOut;
+    }
+    if (hasRgbppLockInput && hasRgbppLockOuput) {
+      return LeapDirection.Within;
+    }
+    if (!hasRgbppLockInput && hasRgbppLockOuput) {
+      return LeapDirection.LeapIn;
+    }
+    return null;
   }
 }

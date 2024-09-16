@@ -31,7 +31,7 @@ export class CkbAddressResolver {
     @Parent() address: CkbAddress,
     @Loader(CkbAddressLoader) addressLoader: CkbAddressLoaderType,
   ): Promise<number | null> {
-    const addressInfo = await addressLoader.load({ address: address.address });
+    const addressInfo = await addressLoader.load(address.address);
     if (!addressInfo) {
       return null;
     }
@@ -43,7 +43,7 @@ export class CkbAddressResolver {
     @Parent() address: CkbAddress,
     @Loader(CkbAddressLoader) addressLoader: CkbAddressLoaderType,
   ): Promise<number | null> {
-    const addressInfo = await addressLoader.load({ address: address.address });
+    const addressInfo = await addressLoader.load(address.address);
     if (!addressInfo) {
       return null;
     }
@@ -82,7 +82,7 @@ export class CkbAddressResolver {
     @Parent() address: CkbAddress,
     @Loader(CkbAddressLoader) addressLoader: CkbAddressLoaderType,
   ): Promise<CkbAddressBalance | null> {
-    const addressInfo = await addressLoader.load({ address: address.address });
+    const addressInfo = await addressLoader.load(address.address);
     if (!addressInfo) {
       return null;
     }
