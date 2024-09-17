@@ -32,7 +32,7 @@ export class IndexerService {
   public async start() {
     await this.indexerQueueService.moveActiveJobToDelay();
     await Promise.all([
-      // this.assetsFlow.start(),
+      this.assetsFlow.start(),
       this.transactionsFlow.start(),
     ]);
   }
