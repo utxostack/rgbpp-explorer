@@ -14,6 +14,8 @@ import { Cacheable } from 'src/decorators/cacheable.decorator';
 import { ONE_MONTH_MS } from 'src/common/date';
 import { CkbScriptService } from 'src/modules/ckb/script/script.service';
 import { LeapDirection } from '@prisma/client';
+import { PrismaService } from 'src/core/database/prisma/prisma.service';
+import { CKB_CHAIN_ID } from 'src/constants';
 
 @Injectable()
 export class RgbppTransactionService {
@@ -22,72 +24,51 @@ export class RgbppTransactionService {
   constructor(
     private ckbExplorerService: CkbExplorerService,
     private ckbRpcService: CkbRpcWebsocketService,
-    private ckbScriptService: CkbScriptService,
+    private prismaService: PrismaService,
     private rgbppService: RgbppService,
     private bitcoinApiService: BitcoinApiService,
     private configService: ConfigService<Env>,
   ) { }
 
-  public async getLatestTransactions(
-    page: number,
-    pageSize: number,
-  ): Promise<RgbppLatestTransactionList> {
-    const response = await this.ckbExplorerService.getRgbppTransactions({
-      page,
-      pageSize,
+  public async getLatestTransactions(limit: number) {
+    const transactions = await this.prismaService.transaction.findMany({
+      where: {
+        chainId: CKB_CHAIN_ID,
+      },
+      orderBy: {
+        blockNumber: 'desc',
+      },
+      include: {
+        block: true,
+      },
+      take: limit,
     });
-    return {
-      txs: response.data.ckb_transactions.map((tx) => RgbppTransaction.from(tx)),
-      total: response.meta.total,
-      pageSize: response.meta.page_size,
-    };
+    return transactions.map(RgbppTransaction.from);
+  }
+
+  public async getLatestL1Transactions(limit: number) {
+    const response = await this.ckbExplorerService.getRgbppTransactions({
+      page: 1,
+      pageSize: limit,
+    });
+    return response.data.ckb_transactions.map((tx) => RgbppTransaction.fromRgbppTransaction(tx));
   }
 
   public async getLatestL2Transactions(limit: number) {
-    const rgbppL2Txs: RgbppTransaction[] = [];
-    const tipBlockNumber = await this.ckbRpcService.getTipBlockNumber();
-    let blockNumber = BI.from(tipBlockNumber);
-    while (rgbppL2Txs.length < limit) {
-      const txss = await Promise.all(
-        Array({ length: limit }).map(async (_, index) => {
-          const block = await this.ckbRpcService.getBlockByNumber(
-            blockNumber.sub(index).toHexString(),
-          );
-
-          const ckbTxs = block.transactions.filter((tx) => {
-            return tx.outputs.some((output) => {
-              if (!output.type) {
-                return false;
-              }
-              return this.ckbScriptService.matchScript({
-                codeHash: output.type.code_hash,
-                hashType: output.type.hash_type as HashType,
-                args: output.type.args,
-              });
-            });
-          });
-
-          const txs = await Promise.all(
-            ckbTxs.map((tx) => this.ckbExplorerService.getTransaction(tx.hash)),
-          );
-          return txs;
-        }),
-      );
-      const flatTxs = txss.flat().filter(res => {
-        const attr = res?.data?.attributes;
-        if (!attr) return false;
-        return attr.is_rgb_transaction !== true && attr.is_btc_time_lock !== true;
-      }).map((tx) => RgbppTransaction.fromCkbTransaction(tx.data.attributes));
-
-      rgbppL2Txs.push(...flatTxs);
-      blockNumber = blockNumber.sub(limit);
-    }
-
-    return {
-      txs: rgbppL2Txs.slice(0, limit),
-      total: limit,
-      pageSize: limit,
-    };
+    const transactions = await this.prismaService.transaction.findMany({
+      where: {
+        chainId: CKB_CHAIN_ID,
+        isRgbpp: false,
+      },
+      orderBy: {
+        blockNumber: 'desc',
+      },
+      include: {
+        block: true,
+      },
+      take: limit,
+    });
+    return transactions.map(RgbppTransaction.from);
   }
 
   public async getTransactionByCkbTxHash(txHash: string): Promise<RgbppTransaction | null> {
@@ -124,8 +105,7 @@ export class RgbppTransactionService {
 
   @Cacheable({
     namespace: 'RgbppTransactionService',
-    key: (tx: CkbRpcInterface.Transaction) =>
-      `getLeapDirectionByCkbTx:${tx.hash}`,
+    key: (tx: CkbRpcInterface.Transaction) => `getLeapDirectionByCkbTx:${tx.hash}`,
     ttl: ONE_MONTH_MS,
   })
   public async getLeapDirectionByCkbTx(ckbTx: CkbRpcInterface.Transaction) {

@@ -43,6 +43,10 @@ export class IndexerTransactionsFlow extends EventEmitter {
       startBlockNumber = Math.max(startBlockNumber, block.number + 1);
     }
 
+    if (startBlockNumber >= targetBlockNumber) {
+      this.emit(IndexerTransactionsEvent.BlockIndexed);
+      return;
+    }
     this.logger.log(`Indexing blocks from ${startBlockNumber} to ${targetBlockNumber}`);
     this.indexerQueueService.addBlockJob({
       chainId: this.chain.id,
@@ -54,7 +58,7 @@ export class IndexerTransactionsFlow extends EventEmitter {
   private setupBlockAssetsIndexedListener() {
     this.on(IndexerTransactionsEvent.BlockIndexed, () => {
       setTimeout(() => {
-        this.start();
+        this.startBlockAssetsIndexing();
       }, 1000 * 10);
     });
   }
