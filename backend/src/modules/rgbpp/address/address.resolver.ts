@@ -4,7 +4,7 @@ import { RgbppAddress } from './address.model';
 import { ParentField } from 'src/decorators/parent-field.decorator';
 import { RgbppAsset } from '../asset/asset.model';
 import { CkbXUDTInfo } from 'src/modules/ckb/cell/cell.model';
-import { Loader } from '@applifting-io/nestjs-dataloader';
+import { Loader } from 'src/common/dataloader';
 import {
   CkbExplorerTransactionLoader,
   CkbExplorerTransactionLoaderType,

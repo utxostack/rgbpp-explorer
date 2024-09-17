@@ -1,6 +1,6 @@
 import { BI } from '@ckb-lumos/bi';
 import { toNumber } from 'lodash';
-import { Loader } from '@applifting-io/nestjs-dataloader';
+import { Loader } from 'src/common/dataloader';
 import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { CkbRpcBlockLoader, CkbRpcBlockLoaderType } from '../block/block.dataloader';
 import { CkbBlock } from '../block/block.model';
