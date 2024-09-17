@@ -11,10 +11,11 @@ import {
   BitcoinTransactionLoader,
   BitcoinTransactionLoaderType,
 } from 'src/modules/bitcoin/transaction/transaction.dataloader';
-import { RgbppTransaction, RgbppLatestTransactionList, LeapDirection } from './transaction.model';
+import { RgbppTransaction, RgbppLatestTransactionList } from './transaction.model';
 import { RgbppTransactionLoader, RgbppTransactionLoaderType } from './transaction.dataloader';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import { BI } from '@ckb-lumos/bi';
+import { LeapDirection } from '@prisma/client';
 
 @Resolver(() => RgbppTransaction)
 export class RgbppTransactionResolver {

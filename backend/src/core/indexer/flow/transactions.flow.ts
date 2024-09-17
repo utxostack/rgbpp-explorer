@@ -26,6 +26,11 @@ export class IndexerTransactionsFlow extends EventEmitter {
   }
 
   public async start() {
+    this.startBlockAssetsIndexing();
+    this.setupBlockAssetsIndexedListener();
+  }
+
+  public async startBlockAssetsIndexing() {
     const tipBlockNumber = await this.blockchainService.getTipBlockNumber();
     let startBlockNumber = tipBlockNumber - CKB_24_HOURS_BLOCK_NUMBER;
     const targetBlockNumber = tipBlockNumber - CKB_MIN_SAFE_CONFIRMATIONS;
@@ -43,6 +48,14 @@ export class IndexerTransactionsFlow extends EventEmitter {
       chainId: this.chain.id,
       blockNumber: startBlockNumber,
       targetBlockNumber,
+    });
+  }
+
+  private setupBlockAssetsIndexedListener() {
+    this.on(IndexerTransactionsEvent.BlockIndexed, () => {
+      setTimeout(() => {
+        this.start();
+      }, 1000 * 10);
     });
   }
 }

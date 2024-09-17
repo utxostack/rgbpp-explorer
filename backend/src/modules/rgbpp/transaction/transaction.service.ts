@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
-import { RgbppTransaction, RgbppLatestTransactionList, LeapDirection } from './transaction.model';
+import { RgbppTransaction, RgbppLatestTransactionList } from './transaction.model';
 import { ConfigService } from '@nestjs/config';
 import { Env } from 'src/env';
 import { CkbRpcWebsocketService } from 'src/core/ckb-rpc/ckb-rpc-websocket.service';
@@ -13,6 +13,7 @@ import { BI, HashType } from '@ckb-lumos/lumos';
 import { Cacheable } from 'src/decorators/cacheable.decorator';
 import { ONE_MONTH_MS } from 'src/common/date';
 import { CkbScriptService } from 'src/modules/ckb/script/script.service';
+import { LeapDirection } from '@prisma/client';
 
 @Injectable()
 export class RgbppTransactionService {
