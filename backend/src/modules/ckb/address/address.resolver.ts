@@ -1,4 +1,4 @@
-import { Loader } from '@applifting-io/nestjs-dataloader';
+import { Loader } from 'src/common/dataloader';
 import { Args, Float, Int, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { CkbTransaction } from '../transaction/transaction.model';
 import { CkbAddressBalance, CkbAddress } from './address.model';
