@@ -25,7 +25,7 @@ export class HealthController {
           headers: { 'apollo-require-preflight': true },
         }),
       () => this.indexerHealthIndicator.isHealthy(IndexerHealthIndicatorKey.Asset),
-      () => this.indexerHealthIndicator.isHealthy(IndexerHealthIndicatorKey.Block),
+      () => this.indexerHealthIndicator.isHealthy(IndexerHealthIndicatorKey.Transaction),
       () => this.bitcoinApiHealthIndicator.isHealthy(),
       () => this.ckbRpcHealthIndicator.isHealthy(CkbRpcHealthIndicatorKey.Websocket),
       () => this.ckbExplorerHealthIndicator.isHealthy(),

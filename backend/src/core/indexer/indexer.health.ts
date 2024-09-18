@@ -7,7 +7,7 @@ import { CKB_CHAIN_ID, CKB_MIN_SAFE_CONFIRMATIONS } from 'src/constants';
 import { IndexerQueueService } from './indexer.queue';
 
 export enum IndexerHealthIndicatorKey {
-  Block = 'indexer.block',
+  Transaction = 'indexer.transaction',
   Asset = 'indexer.asset',
 }
 
@@ -32,8 +32,8 @@ export class IndexerHealthIndicator extends HealthIndicator {
           isHealthy = assetHealthy.isHealthy;
           result = assetHealthy.result;
           break;
-        case IndexerHealthIndicatorKey.Block:
-          const healthy = await this.isBlockIndexerHealthy();
+        case IndexerHealthIndicatorKey.Transaction:
+          const healthy = await this.isTransactionIndexerHealthy();
           isHealthy = healthy.isHealthy;
           result = healthy.result;
           break;
@@ -71,7 +71,7 @@ export class IndexerHealthIndicator extends HealthIndicator {
     };
   }
 
-  private async isBlockIndexerHealthy(): Promise<{
+  private async isTransactionIndexerHealthy(): Promise<{
     isHealthy: boolean;
     result: HealthIndicatorResult;
   }> {
@@ -89,7 +89,7 @@ export class IndexerHealthIndicator extends HealthIndicator {
     });
 
     const isHealthy = !!block && block.number >= targetBlockNumber - 2;
-    const result = this.getStatus('indexer.block', isHealthy, {
+    const result = this.getStatus('indexer.transaction', isHealthy, {
       targetBlockNumber,
       currentBlockNumber: block?.number,
     });
