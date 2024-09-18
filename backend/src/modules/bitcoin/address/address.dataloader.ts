@@ -1,11 +1,11 @@
 import DataLoader from 'dataloader';
 import { Injectable, Logger } from '@nestjs/common';
-import { NestDataLoader } from '@applifting-io/nestjs-dataloader';
-import { DataLoaderResponse } from 'src/common/type/dataloader';
+import { DataLoaderResponse } from 'src/common/dataloader';
 import { Address } from 'src/core/bitcoin-api/bitcoin-api.schema';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import { BitcoinTransaction } from '../transaction/transaction.model';
 import * as Sentry from '@sentry/nestjs';
+import { NestDataLoader } from 'src/common/dataloader';
 
 @Injectable()
 export class BitcoinAddressLoader implements NestDataLoader<string, Address | null> {
@@ -33,20 +33,33 @@ export class BitcoinAddressLoader implements NestDataLoader<string, Address | nu
 export type BitcoinAddressLoaderType = DataLoader<string, Address | null>;
 export type BitcoinAddressLoaderResponse = DataLoaderResponse<BitcoinAddressLoader>;
 
+export interface GetAddressTxsParams {
+  address: string;
+  afterTxid?: string;
+}
+
 @Injectable()
 export class BitcoinAddressTransactionsLoader
-  implements NestDataLoader<string, BitcoinTransaction[] | null>
+  implements NestDataLoader<GetAddressTxsParams, BitcoinTransaction[] | null>
 {
   private logger = new Logger(BitcoinAddressTransactionsLoader.name);
 
   constructor(private bitcoinApiService: BitcoinApiService) {}
 
+  public getOptions() {
+    return {
+      cacheKeyFn: (key: GetAddressTxsParams) => {
+        const afterTxid = key.afterTxid ? `-${key.afterTxid}` : '';
+        return `${key.address}${afterTxid}`;
+      },
+    };
+  }
+
   public getBatchFunction() {
-    return async (props: string[]) => {
-      this.logger.debug(`Loading bitcoin addresses txs: ${props}`);
+    return async (batchParams: GetAddressTxsParams[]) => {
+      this.logger.debug(`Loading bitcoin addresses txs: ${JSON.stringify(batchParams)}`);
       const results = await Promise.allSettled(
-        props.map(async (key) => {
-          const [address, afterTxid] = key.split(',');
+        batchParams.map(async ({ address, afterTxid }) => {
           const txs = await this.bitcoinApiService.getAddressTxs({
             address,
             afterTxid,
@@ -58,7 +71,9 @@ export class BitcoinAddressTransactionsLoader
         if (result.status === 'fulfilled') {
           return result.value;
         }
-        this.logger.error(`Requesting: ${props[index]}, occurred error: ${result.reason}`);
+        this.logger.error(
+          `Requesting: ${JSON.stringify(batchParams[index])}, occurred error: ${result.reason}`,
+        );
         Sentry.captureException(result.reason);
         return null;
       });

@@ -1,4 +1,4 @@
-import { Loader } from '@applifting-io/nestjs-dataloader';
+import { Loader } from 'src/common/dataloader';
 import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { RgbppAddress } from 'src/modules/rgbpp/address/address.model';
 import { BitcoinTransaction } from '../transaction/transaction.model';

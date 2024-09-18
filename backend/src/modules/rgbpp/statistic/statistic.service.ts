@@ -2,7 +2,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { ONE_DAY_MS } from 'src/common/date';
 import { CkbRpcWebsocketService } from 'src/core/ckb-rpc/ckb-rpc-websocket.service';
-import * as pLimit from 'p-limit';
+import pLimit from 'p-limit';
 import { BI } from '@ckb-lumos/bi';
 import { CkbScriptService } from 'src/modules/ckb/script/script.service';
 import { CellType } from 'src/modules/ckb/script/script.model';

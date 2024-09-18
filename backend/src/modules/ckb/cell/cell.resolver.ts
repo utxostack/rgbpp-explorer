@@ -1,5 +1,5 @@
 import { BI } from '@ckb-lumos/bi';
-import { Loader } from '@applifting-io/nestjs-dataloader';
+import { Loader } from 'src/common/dataloader';
 import { Parent, ResolveField, Resolver } from '@nestjs/graphql';
 import {
   CkbExplorerTransactionLoader,
