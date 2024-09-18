@@ -17,6 +17,7 @@ import {
   INDEXER_TRANSACTION_QUEUE,
   IndexerTransactionProcessor,
 } from './processor/transaction.processor';
+import { IndexerHealthIndicator } from './indexer.health';
 
 const commonAttemptsConfig: Pick<DefaultJobOptions, 'attempts' | 'backoff'> = {
   attempts: 10,
@@ -81,7 +82,8 @@ const commonAttemptsConfig: Pick<DefaultJobOptions, 'attempts' | 'backoff'> = {
     IndexerTypeProcessor,
     IndexerBlockProcessor,
     IndexerTransactionProcessor,
+    IndexerHealthIndicator,
   ],
-  exports: [IndexerServiceFactory, IndexerQueueService],
+  exports: [IndexerServiceFactory, IndexerQueueService, IndexerHealthIndicator],
 })
-export class IndexerModule { }
+export class IndexerModule {}

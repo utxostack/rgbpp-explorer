@@ -18,12 +18,6 @@ export class CkbAddressLoader
 
   constructor(private ckbExplorerService: CkbExplorerService) {}
 
-  public getOptions() {
-    return {
-      cacheKeyFn: (key: GetAddressParams) => key.address,
-    };
-  }
-
   public getBatchFunction() {
     return async (addresses: string[]) => {
       this.logger.debug(`Loading CKB addresses info: ${addresses}`);
