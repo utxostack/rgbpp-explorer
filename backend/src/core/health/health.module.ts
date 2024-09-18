@@ -6,6 +6,7 @@ import { CkbExplorerModule } from '../ckb-explorer/ckb-explorer.module';
 import { BitcoinApiModule } from '../bitcoin-api/bitcoin-api.module';
 import { HttpModule } from '@nestjs/axios';
 import { IndexerModule } from '../indexer/indexer.module';
+import { DatabaseModule } from '../database/database.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { IndexerModule } from '../indexer/indexer.module';
     CkbRpcModule,
     CkbExplorerModule,
     IndexerModule,
+    DatabaseModule,
   ],
   providers: [HealthController],
   controllers: [HealthController],
