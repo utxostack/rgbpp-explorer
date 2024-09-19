@@ -11,6 +11,8 @@ export enum IndexerHealthIndicatorKey {
   Asset = 'indexer.asset',
 }
 
+const INDEEXR_HEALTH_THRESHOLD = 6;
+
 @Injectable()
 export class IndexerHealthIndicator extends HealthIndicator {
   constructor(
@@ -60,7 +62,8 @@ export class IndexerHealthIndicator extends HealthIndicator {
     const targetBlockNumber = tipBlockNumber - CKB_MIN_SAFE_CONFIRMATIONS;
     const currentBlockNumber = await this.indexerQueueService.getLatestIndexedBlock(CKB_CHAIN_ID);
 
-    const isHealthy = !!currentBlockNumber && currentBlockNumber >= targetBlockNumber - 2;
+    const isHealthy =
+      !!currentBlockNumber && currentBlockNumber >= targetBlockNumber - INDEEXR_HEALTH_THRESHOLD;
     const result = this.getStatus('indexer.asset', isHealthy, {
       targetBlockNumber,
       currentBlockNumber,
@@ -88,7 +91,7 @@ export class IndexerHealthIndicator extends HealthIndicator {
       },
     });
 
-    const isHealthy = !!block && block.number >= targetBlockNumber - 2;
+    const isHealthy = !!block && block.number >= targetBlockNumber - INDEEXR_HEALTH_THRESHOLD;
     const result = this.getStatus('indexer.transaction', isHealthy, {
       targetBlockNumber,
       currentBlockNumber: block?.number,
