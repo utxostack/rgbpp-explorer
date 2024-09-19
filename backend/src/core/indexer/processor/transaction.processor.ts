@@ -57,13 +57,15 @@ export class IndexerTransactionProcessor extends WorkerHost {
 
     const hasRgbppAssets = transaction.outputs.some((output) => {
       if (!output.type) return false;
-      const lock: Script = {
+      const typeScript: Script = {
         codeHash: output.type.code_hash,
         hashType: output.type.hash_type as HashType,
         args: output.type.args,
       };
       return assetTypeScripts.some((assetType) => {
-        return assetType.codeHash === lock.codeHash && assetType.hashType === lock.hashType;
+        return (
+          assetType.codeHash === typeScript.codeHash && assetType.hashType === typeScript.hashType
+        );
       });
     });
     if (!hasRgbppAssets) {

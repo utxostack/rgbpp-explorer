@@ -28,7 +28,6 @@ export class RgbppStatisticService {
         ...(leapDirection ? { leapDirection } : {}),
       },
     });
-    console.log(transactions);
     return transactions;
   }
 
