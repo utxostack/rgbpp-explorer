@@ -16,7 +16,7 @@ export class BootstrapService {
     for (const chain of chains) {
       this.logger.log(`Indexing assets for chain ${chain.name}`);
       const indexerService = await this.IndexerServiceFactory.getService(chain.id);
-      await indexerService.startAssetsIndexing();
+      await indexerService.start();
     }
   }
 }

@@ -45,6 +45,7 @@ export class IndexerTypeProcessor extends WorkerHost {
     this.logger.error(
       `Indexing lock script for chain ${chainId} with script hash ${computeScriptHash(script)} failed`,
     );
+    this.logger.error(error.stack);
     Sentry.captureException(error);
   }
 
