@@ -30,7 +30,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
         <Providers lang={locale}>
           <Navbar />
           {children}
-          <Footer />
+          <Footer lang={locale} />
         </Providers>
       </body>
     </html>

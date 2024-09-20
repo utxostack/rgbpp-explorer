@@ -1,7 +1,6 @@
 import { t } from '@lingui/macro'
 import { Box, HStack, VStack } from 'styled-system/jsx'
 
-import { getI18nInstance } from '@/app/[lang]/appRouterI18n'
 import { CoinList } from '@/components/coin-list'
 import { IfBreakpoint } from '@/components/if-breakpoint'
 import { PaginationSearchParams } from '@/components/pagination-searchparams'
@@ -9,6 +8,7 @@ import { Text } from '@/components/ui'
 import { graphql } from '@/gql'
 import { graphQLClient } from '@/lib/graphql'
 import { resolvePage } from '@/lib/resolve-page'
+import { withI18n } from '@/lib/with-i18n'
 
 const query = graphql(`
   query RgbppCoins($page: Int!, $pageSize: Int!) {
@@ -31,14 +31,7 @@ const query = graphql(`
   }
 `)
 
-export default async function Page({
-  params: { lang },
-  searchParams,
-}: {
-  params: { lang: string }
-  searchParams: { page?: string }
-}) {
-  const i18n = getI18nInstance(lang)
+export default withI18n<{}, { page?: string }>(async function Page({ searchParams }, { i18n }) {
   const page = resolvePage(searchParams.page)
   const pageSize = 10
   const response = await graphQLClient.request(query, { page, pageSize })
@@ -56,4 +49,4 @@ export default async function Page({
       </HStack>
     </VStack>
   )
-}
+})

@@ -1,3 +1,5 @@
+'use client'
+
 import { t } from '@lingui/macro'
 import BigNumber from 'bignumber.js'
 import { Box, Grid, HStack, VStack } from 'styled-system/jsx'
@@ -11,7 +13,6 @@ import { Heading, Text, Tooltip } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { BitcoinBlock } from '@/gql/graphql'
 import { resolveBtcTime } from '@/lib/btc/resolve-btc-time'
-import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { formatNumber } from '@/lib/string/format-number'
 import { truncateMiddle } from '@/lib/string/truncate-middle'
 
@@ -24,8 +25,6 @@ export function BtcBlockOverview({
   >
 }) {
   if (!block) return null
-  const i18n = getI18nFromHeaders()
-  console.log(block.feeRateRange)
   return (
     <VStack gap={0} w="100%" bg="bg.card" rounded="8px">
       <HStack
@@ -37,7 +36,7 @@ export function BtcBlockOverview({
         borderBottomColor="border.primary"
       >
         <OverviewSVG w="24px" />
-        <Heading fontSize="16px" fontWeight="semibold">{t(i18n)`Overview`}</Heading>
+        <Heading fontSize="16px" fontWeight="semibold">{t`Overview`}</Heading>
         {block.timestamp ? <TimeFormatter timestamp={resolveBtcTime(block.timestamp)} ml="auto" /> : null}
       </HStack>
       <Grid
@@ -50,21 +49,19 @@ export function BtcBlockOverview({
         textAlign="center"
       >
         <OverviewInfo>
-          <OverviewInfoItem label={t(i18n)`Block size`}>
-            <OverflowAmount amount={formatNumber(block.size)} symbol={t(i18n)`bytes`} />
+          <OverviewInfoItem label={t`Block size`}>
+            <OverflowAmount amount={formatNumber(block.size)} symbol={t`bytes`} />
           </OverviewInfoItem>
-          <OverviewInfoItem label={t(i18n)`Transaction`} formatNumber>
+          <OverviewInfoItem label={t`Transaction`} formatNumber>
             {block.transactionsCount}
           </OverviewInfoItem>
         </OverviewInfo>
         <OverviewInfo>
-          <OverviewInfoItem label={t(i18n)`Fee rate span`}>
+          <OverviewInfoItem label={t`Fee rate span`}>
             <TextOverflowTooltip
               label={
                 <Text whiteSpace="nowrap">
-                  {t(
-                    i18n,
-                  )`${formatNumber(block.feeRateRange?.min ?? 0)} sats/VB ~ ${formatNumber(BigNumber(block.feeRateRange?.max ?? 0))} sats/VB`}
+                  {t`${formatNumber(block.feeRateRange?.min ?? 0)} sats/VB ~ ${formatNumber(BigNumber(block.feeRateRange?.max ?? 0))} sats/VB`}
                 </Text>
               }
               contentProps={{ maxW: 'unset' }}
@@ -81,17 +78,17 @@ export function BtcBlockOverview({
               >
                 {formatNumber(block.feeRateRange?.min ?? 0)}
                 <Text as="span" fontSize="14px" ml="4px">
-                  {t(i18n)`sats/VB`}
+                  {t`sats/VB`}
                 </Text>
                 {' ~ '}
                 {formatNumber(BigNumber(block.feeRateRange?.max ?? 0))}{' '}
                 <Text as="span" fontSize="14px">
-                  {t(i18n)`sats/VB`}
+                  {t`sats/VB`}
                 </Text>
               </Box>
             </TextOverflowTooltip>
           </OverviewInfoItem>
-          <OverviewInfoItem label={t(i18n)`Miner`} formatNumber>
+          <OverviewInfoItem label={t`Miner`} formatNumber>
             {block.miner ? (
               <Tooltip.Root openDelay={0} closeDelay={0}>
                 <Tooltip.Trigger asChild>

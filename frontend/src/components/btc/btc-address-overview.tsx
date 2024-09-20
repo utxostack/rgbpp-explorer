@@ -1,3 +1,5 @@
+'use client'
+
 import { t } from '@lingui/macro'
 import { Grid, HStack, VStack } from 'styled-system/jsx'
 
@@ -7,17 +9,15 @@ import { OverviewInfo, OverviewInfoItem } from '@/components/overview-info'
 import { Heading } from '@/components/ui'
 import { BtcAddressBaseQuery } from '@/gql/graphql'
 import { satsToBtc } from '@/lib/btc/sats-to-btc'
-import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { formatNumber } from '@/lib/string/format-number'
 
 export function BtcAddressOverview({ btcAddress }: { btcAddress: BtcAddressBaseQuery['btcAddress'] }) {
   if (!btcAddress) return null
-  const i18n = getI18nFromHeaders()
   return (
     <VStack gap={0} w="100%" bg="bg.card" rounded="8px">
       <HStack w="100%" px="30px" py="16px" gap="12px" borderBottom="1px solid" borderBottomColor="border.primary">
         <OverviewSVG w="24px" />
-        <Heading fontSize="16px" fontWeight="semibold">{t(i18n)`Overview`}</Heading>
+        <Heading fontSize="16px" fontWeight="semibold">{t`Overview`}</Heading>
       </HStack>
       <Grid
         w="100%"
@@ -29,24 +29,24 @@ export function BtcAddressOverview({ btcAddress }: { btcAddress: BtcAddressBaseQ
         textAlign="center"
       >
         <OverviewInfo>
-          <OverviewInfoItem label={t(i18n)`BTC Balance`}>
-            <OverflowAmount amount={formatNumber(satsToBtc(btcAddress.satoshi))} symbol={t(i18n)`BTC`} />
+          <OverviewInfoItem label={t`BTC Balance`}>
+            <OverflowAmount amount={formatNumber(satsToBtc(btcAddress.satoshi))} symbol={t`BTC`} />
           </OverviewInfoItem>
-          <OverviewInfoItem label={t(i18n)`Confirmed`}>
+          <OverviewInfoItem label={t`Confirmed`}>
             <OverflowAmount
               amount={formatNumber(satsToBtc(btcAddress.satoshi).minus(btcAddress.pendingSatoshi))}
-              symbol={t(i18n)`BTC`}
+              symbol={t`BTC`}
             />
           </OverviewInfoItem>
-          <OverviewInfoItem label={t(i18n)`Unconfirmed`}>
-            <OverflowAmount amount={formatNumber(satsToBtc(btcAddress.pendingSatoshi))} symbol={t(i18n)`BTC`} />
+          <OverviewInfoItem label={t`Unconfirmed`}>
+            <OverflowAmount amount={formatNumber(satsToBtc(btcAddress.pendingSatoshi))} symbol={t`BTC`} />
           </OverviewInfoItem>
         </OverviewInfo>
         <OverviewInfo>
-          <OverviewInfoItem label={t(i18n)`Txns`} formatNumber>
+          <OverviewInfoItem label={t`Txns`} formatNumber>
             {btcAddress.transactionsCount}
           </OverviewInfoItem>
-          <OverviewInfoItem label={t(i18n)`L1 RGB++ Assets`} unsupported />
+          <OverviewInfoItem label={t`L1 RGB++ Assets`} unsupported />
         </OverviewInfo>
       </Grid>
     </VStack>

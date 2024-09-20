@@ -7,8 +7,8 @@ import { CkbOutputsSum } from '@/components/ckb/ckb-outputs-sum'
 import { TransactionHeaderInAddress } from '@/components/transaction-header-in-address'
 import { UtxoOrCellFooter } from '@/components/utxo-or-cell-footer'
 import { graphql } from '@/gql'
-import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { graphQLClient } from '@/lib/graphql'
+import { withI18n } from '@/lib/with-i18n'
 
 export const dynamic = 'force-static'
 export const revalidate = 10
@@ -82,8 +82,7 @@ const query = graphql(`
   }
 `)
 
-export default async function Page({ params: { hashOrHeight } }: { params: { hashOrHeight: string } }) {
-  const i18n = getI18nFromHeaders()
+export default withI18n<{ hashOrHeight: string }>(async function Page({ params: { hashOrHeight } }, { i18n }) {
   const data = await graphQLClient.request(query, { hashOrHeight })
 
   if (!data?.ckbBlock) notFound()
@@ -105,4 +104,4 @@ export default async function Page({ params: { hashOrHeight } }: { params: { has
       })}
     </VStack>
   )
-}
+})

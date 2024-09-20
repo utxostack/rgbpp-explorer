@@ -9,7 +9,7 @@ import { HomeTitle } from '@/components/home-title'
 import { NetworkCards } from '@/components/network-cards'
 import { SearchBar } from '@/components/search-bar'
 import { Heading } from '@/components/ui'
-import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
+import { withI18n } from '@/lib/with-i18n'
 
 export const dynamic = 'force-static'
 export const revalidate = 3600
@@ -18,8 +18,7 @@ export async function generateStaticParams() {
   return linguiConfig.locales.map((locale) => ({ lang: locale }))
 }
 
-export default function Home() {
-  const i18n = getI18nFromHeaders()
+export default withI18n(function Home({}, { i18n }) {
   return (
     <>
       <Center flexDir="column" w="100%" position="relative" px={{ base: '20px', xl: '30px' }}>
@@ -58,4 +57,4 @@ export default function Home() {
       </Center>
     </>
   )
-}
+})

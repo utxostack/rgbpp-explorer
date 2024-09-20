@@ -1,3 +1,5 @@
+'use client'
+
 import { t } from '@lingui/macro'
 import { Flex, HStack, VStack } from 'styled-system/jsx'
 
@@ -8,7 +10,6 @@ import { Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { ViewMemPool } from '@/components/view-mempool'
 import { BitcoinInput, BitcoinOutput, BitcoinTransaction, CkbTransaction } from '@/gql/graphql'
-import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { truncateMiddle } from '@/lib/string/truncate-middle'
 
 export interface BtcUtxosProps extends Pick<BitcoinTransaction, 'txid' | 'vin' | 'vout'> {
@@ -17,7 +18,6 @@ export interface BtcUtxosProps extends Pick<BitcoinTransaction, 'txid' | 'vin' |
 }
 
 export function BtcUtxos({ txid, vin, vout, isBinding, ckbCell }: BtcUtxosProps) {
-  const i18n = getI18nFromHeaders()
   return (
     <VStack w="100%" gap={0} bg="bg.card" rounded="8px">
       <Flex
@@ -34,7 +34,7 @@ export function BtcUtxos({ txid, vin, vout, isBinding, ckbCell }: BtcUtxosProps)
           <BtcIcon h="40px" w="40px" />
           {isBinding ? (
             <VStack alignItems="start" gap={0}>
-              <Text fontSize="16px" fontWeight="semibold">{t(i18n)`RGB++ Binding Txn on BTC`}</Text>
+              <Text fontSize="16px" fontWeight="semibold">{t`RGB++ Binding Txn on BTC`}</Text>
               <Link
                 href={`/transaction/${txid}`}
                 color="brand"
@@ -49,7 +49,7 @@ export function BtcUtxos({ txid, vin, vout, isBinding, ckbCell }: BtcUtxosProps)
               </Link>
             </VStack>
           ) : (
-            <Text fontSize="16px" fontWeight="semibold">{t(i18n)`BTC Txn`}</Text>
+            <Text fontSize="16px" fontWeight="semibold">{t`BTC Txn`}</Text>
           )}
         </HStack>
         <ViewMemPool txid={txid} />

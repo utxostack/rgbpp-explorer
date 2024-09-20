@@ -1,6 +1,5 @@
 import { t } from '@lingui/macro'
 import { notFound } from 'next/navigation'
-import { ReactNode } from 'react'
 import { VStack } from 'styled-system/jsx'
 
 import { BlockHeader } from '@/components/block-header'
@@ -8,8 +7,8 @@ import { BtcBlockOverview } from '@/components/btc/btc-block-overview'
 import { LinkTabs } from '@/components/link-tabs'
 import { graphql } from '@/gql'
 import { BitcoinBlock } from '@/gql/graphql'
-import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { graphQLClient } from '@/lib/graphql'
+import { withI18n } from '@/lib/with-i18n'
 
 export const dynamic = 'force-static'
 export const revalidate = 10
@@ -42,14 +41,10 @@ const query = graphql(`
   }
 `)
 
-export default async function Layout({
-  params: { hashOrHeight },
-  children,
-}: {
-  params: { hashOrHeight: string }
-  children: ReactNode
-}) {
-  const i18n = getI18nFromHeaders()
+export default withI18n<{ hashOrHeight: string }>(async function Layout(
+  { params: { hashOrHeight }, children },
+  { i18n },
+) {
   const data = await graphQLClient.request(query, { hashOrHeight })
 
   if (!data?.btcBlock) notFound()
@@ -70,4 +65,4 @@ export default async function Layout({
       {children}
     </VStack>
   )
-}
+})

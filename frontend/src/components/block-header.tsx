@@ -1,10 +1,11 @@
+'use client'
+
 import { t } from '@lingui/macro'
 
 import BlockIcon from '@/assets/block.svg'
 import { Copier } from '@/components/copier'
 import { Heading, Text } from '@/components/ui'
 import { Icon } from '@/components/ui/primitives/icon'
-import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { formatNumber } from '@/lib/string/format-number'
 
 import { Box, Grid } from '../../styled-system/jsx'
@@ -18,8 +19,6 @@ export function BlockHeader({
   height: number
   confirmations?: number | null
 }) {
-  const i18n = getI18nFromHeaders()
-
   return (
     <Grid
       gridTemplateColumns={{ base: 'auto 1fr', lg: '56px auto 1fr' }}
@@ -37,7 +36,7 @@ export function BlockHeader({
       </Icon>
 
       <Heading fontSize="20px" fontWeight="semibold" gridRow="1/2">
-        {t(i18n)`Block ${formatNumber(height)}`}
+        {t`Block ${formatNumber(height)}`}
       </Heading>
 
       <Box gridRow="2/3" gridColumn={{ base: '1/3', lg: '2/3' }}>
@@ -66,7 +65,7 @@ export function BlockHeader({
         >
           {formatNumber(confirmations)}{' '}
           <Text as="span" fontSize="14px" fontWeight="medium" display={{ base: 'none', xl: 'inline' }}>
-            {t(i18n)`Confirmations`}
+            {t`Confirmations`}
           </Text>
         </Box>
       ) : null}

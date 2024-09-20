@@ -1,12 +1,10 @@
 import { t } from '@lingui/macro'
-import type { PropsWithChildren } from 'react'
 import { VStack } from 'styled-system/jsx'
 
 import { LinkTabs } from '@/components/link-tabs'
-import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
+import { withI18n } from '@/lib/with-i18n'
 
-export default function Layout({ children }: PropsWithChildren) {
-  const i18n = getI18nFromHeaders()
+export default withI18n(function Layout({ children }, { i18n }) {
   return (
     <VStack gap="30px" w="100%" px={{ base: '20px', xl: '40px' }} pt="30px" pb="56px" flex={1}>
       <LinkTabs
@@ -27,4 +25,4 @@ export default function Layout({ children }: PropsWithChildren) {
       {children}
     </VStack>
   )
-}
+})

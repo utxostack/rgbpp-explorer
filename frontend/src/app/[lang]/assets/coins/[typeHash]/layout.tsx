@@ -1,6 +1,5 @@
 import { t } from '@lingui/macro'
 import { notFound } from 'next/navigation'
-import { PropsWithChildren } from 'react'
 import { Box, Flex, Grid, styled } from 'styled-system/jsx'
 
 import BtcIcon from '@/assets/chains/btc.svg'
@@ -8,8 +7,8 @@ import { Copier } from '@/components/copier'
 import { LinkTabs } from '@/components/link-tabs'
 import { Text } from '@/components/ui'
 import { graphql } from '@/gql'
-import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { graphQLClient } from '@/lib/graphql'
+import { withI18n } from '@/lib/with-i18n'
 
 export const dynamic = 'force-static'
 export const revalidate = 10
@@ -24,11 +23,7 @@ const query = graphql(`
   }
 `)
 
-export default async function AssetDetail({
-  params: { typeHash },
-  children,
-}: { params: { typeHash: string } } & PropsWithChildren) {
-  const i18n = getI18nFromHeaders()
+export default withI18n<{ typeHash: string }>(async function AssetDetail({ params: { typeHash }, children }, { i18n }) {
   const response = await graphQLClient.request(query, { typeHash })
   if (!response.rgbppCoin) notFound()
   return (
@@ -86,4 +81,4 @@ export default async function AssetDetail({
       {children}
     </>
   )
-}
+})
