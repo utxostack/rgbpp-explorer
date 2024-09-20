@@ -11,6 +11,9 @@ import { graphql } from '@/gql'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { graphQLClient } from '@/lib/graphql'
 
+export const dynamic = 'force-static'
+export const revalidate = 10
+
 const query = graphql(`
   query RgbppCoin($typeHash: String!) {
     rgbppCoin(typeHash: $typeHash) {

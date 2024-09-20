@@ -1,4 +1,5 @@
 import { t } from '@lingui/macro'
+import linguiConfig from 'lingui.config.mjs'
 import { LastRgbppTxnsTable } from 'src/components/latest-tx-list'
 import { Box, Center, Flex } from 'styled-system/jsx'
 
@@ -9,6 +10,13 @@ import { NetworkCards } from '@/components/network-cards'
 import { SearchBar } from '@/components/search-bar'
 import { Heading } from '@/components/ui'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
+
+export const dynamic = 'force-static'
+export const revalidate = 3600
+
+export async function generateStaticParams() {
+  return linguiConfig.locales.map((locale) => ({ lang: locale }))
+}
 
 export default function Home() {
   const i18n = getI18nFromHeaders()

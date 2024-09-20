@@ -13,6 +13,9 @@ import { graphQLClient } from '@/lib/graphql'
 import { resolveSearchParamsPage } from '@/lib/resolve-searchparams-page'
 import { formatNumber } from '@/lib/string/format-number'
 
+export const dynamic = 'force-static'
+export const revalidate = 10
+
 const query = graphql(`
   query RgbppCoinTransactionsByTypeHash($typeHash: String!, $page: Int!, $pageSize: Int!) {
     rgbppCoin(typeHash: $typeHash) {

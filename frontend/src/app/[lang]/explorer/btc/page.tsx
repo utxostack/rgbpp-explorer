@@ -9,7 +9,8 @@ import { RgbppTransaction } from '@/gql/graphql'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { graphQLClient } from '@/lib/graphql'
 
-export const revalidate = 5
+export const revalidate = 10
+export const dynamic = 'force-static'
 
 const query = graphql(`
   query RgbppLatestL1Transactions($limit: Int!) {

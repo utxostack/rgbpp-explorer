@@ -7,6 +7,7 @@ import { BitcoinTransaction, CkbTransaction } from '@/gql/graphql'
 import { graphQLClient } from '@/lib/graphql'
 
 export const revalidate = 60
+export const dynamic = 'force-static'
 
 const rgbppTxQuery = graphql(`
   query RgbppTransaction($txidOrTxHash: String!) {

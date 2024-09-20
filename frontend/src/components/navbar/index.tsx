@@ -136,15 +136,15 @@ export function Navbar() {
           </HStack>
         </HStack>
         <HStack gap="20px">
-          <IfPathname isNotOneOf={['/']} exact>
-            {isLg ? <SearchBarInNav ml="auto" /> : null}
-          </IfPathname>
-          <IfPathname isOneOf={['/']} exact>
-            <Box pl="24px">
-              <NetworkSwitcher />
-            </Box>
-          </IfPathname>
           <ClientOnly>
+            <IfPathname isNotOneOf={['/']} exact>
+              {isLg ? <SearchBarInNav ml="auto" /> : null}
+            </IfPathname>
+            <IfPathname isOneOf={['/']} exact>
+              <Box pl="24px">
+                <NetworkSwitcher />
+              </Box>
+            </IfPathname>
             {!isMd ? (
               <Popover.Root
                 open={isOpen}

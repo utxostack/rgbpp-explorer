@@ -11,6 +11,9 @@ import { BitcoinInput, BitcoinOutput } from '@/gql/graphql'
 import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { graphQLClient } from '@/lib/graphql'
 
+export const dynamic = 'force-static'
+export const revalidate = 10
+
 const query = graphql(`
   query BtcBlockTransaction($hashOrHeight: String!) {
     btcBlock(hashOrHeight: $hashOrHeight) {
