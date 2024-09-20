@@ -2,15 +2,15 @@ import { t } from '@lingui/macro'
 import { notFound } from 'next/navigation'
 import { Box, HStack, VStack } from 'styled-system/jsx'
 
+import { getI18nInstance } from '@/app/[lang]/appRouterI18n'
 import { IfBreakpoint } from '@/components/if-breakpoint'
 import { LatestTxnListUI } from '@/components/latest-tx-list/ui'
 import { PaginationSearchParams } from '@/components/pagination-searchparams'
 import { Text } from '@/components/ui'
 import { graphql } from '@/gql'
 import { RgbppTransaction } from '@/gql/graphql'
-import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { graphQLClient } from '@/lib/graphql'
-import { resolveSearchParamsPage } from '@/lib/resolve-searchparams-page'
+import { resolvePage } from '@/lib/resolve-page'
 import { formatNumber } from '@/lib/string/format-number'
 
 export const dynamic = 'force-static'
@@ -85,9 +85,15 @@ const query = graphql(`
   }
 `)
 
-export default async function Page({ params: { typeHash } }: { params: { typeHash: string } }) {
-  const i18n = getI18nFromHeaders()
-  const page = resolveSearchParamsPage()
+export default async function Page({
+  params: { typeHash, lang },
+  searchParams,
+}: {
+  params: { typeHash: string; lang: string }
+  searchParams: { page?: string }
+}) {
+  const i18n = getI18nInstance(lang)
+  const page = resolvePage(searchParams.page)
   const pageSize = 10
   const response = await graphQLClient.request(query, { typeHash, page, pageSize })
   if (!response.rgbppCoin) notFound()
