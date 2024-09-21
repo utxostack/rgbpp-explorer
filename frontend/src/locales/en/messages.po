@@ -194,7 +194,7 @@ msgstr "Coin"
 msgid "Coinbase"
 msgstr "Coinbase"
 
-#: src/app/[lang]/assets/layout.tsx:14
+#: src/app/[lang]/assets/layout.tsx:21
 msgid "Coins"
 msgstr "Coins"
 
@@ -248,7 +248,7 @@ msgstr "Deploy Time"
 msgid "DOB"
 msgstr "DOB"
 
-#: src/app/[lang]/assets/layout.tsx:18
+#: src/app/[lang]/assets/layout.tsx:25
 msgid "DOBs"
 msgstr "DOBs"
 
@@ -312,7 +312,7 @@ msgstr "Fee rate:<0>{0}</0>{feeUnit}/vB"
 msgid "High"
 msgstr "High"
 
-#: src/app/[lang]/assets/coins/[typeHash]/layout.tsx:70
+#: src/app/[lang]/assets/coins/[typeHash]/layout.tsx:75
 msgid "Holders"
 msgstr "Holders"
 
@@ -358,15 +358,15 @@ msgstr "L2 RGB++ Assets"
 msgid "L2 RGB++ Txns(24H)"
 msgstr "L2 RGB++ Txns(24H)"
 
-#: src/app/[lang]/explorer/btc/page.tsx:61
+#: src/app/[lang]/explorer/btc/page.tsx:62
 msgid "Latest L1 RGB++ transaction"
 msgstr "Latest L1 RGB++ transaction"
 
-#: src/app/[lang]/explorer/ckb/page.tsx:59
+#: src/app/[lang]/explorer/ckb/page.tsx:60
 msgid "Latest L2 RGB++ transaction"
 msgstr "Latest L2 RGB++ transaction"
 
-#: src/app/[lang]/page.tsx:52
+#: src/app/[lang]/page.tsx:53
 msgid "Latest RGB++ Txns"
 msgstr "Latest RGB++ Txns"
 
@@ -501,7 +501,7 @@ msgstr "RGB++ Explorer"
 msgid "RGB++ Holders"
 msgstr "RGB++ Holders"
 
-#: src/app/[lang]/page.tsx:45
+#: src/app/[lang]/page.tsx:46
 msgid "RGB++ Networks"
 msgstr "RGB++ Networks"
 
@@ -513,8 +513,8 @@ msgstr "RGB++ Txns"
 msgid "sat/VB"
 msgstr "sat/VB"
 
-#: src/app/[lang]/block/btc/[hashOrHeight]/transactions/page.tsx:94
-#: src/app/[lang]/block/ckb/[hashOrHeight]/transactions/page.tsx:97
+#: src/app/[lang]/block/btc/[hashOrHeight]/transactions/page.tsx:99
+#: src/app/[lang]/block/ckb/[hashOrHeight]/transactions/page.tsx:102
 #: src/components/btc/btc-transaction-card-in-address.tsx:37
 #: src/components/btc/btc-transaction-overview.tsx:58
 msgid "sats"
@@ -614,7 +614,7 @@ msgstr "Time"
 
 #: src/app/[lang]/address/[address]/transactions/page.tsx:342
 #: src/app/[lang]/assets/coins/[typeHash]/transactions/page.tsx:109
-#: src/app/[lang]/assets/coins/page.tsx:46
+#: src/app/[lang]/assets/coins/page.tsx:54
 msgid "Total {0} Items"
 msgstr "Total {0} Items"
 
@@ -624,9 +624,9 @@ msgid "Transaction"
 msgstr "Transaction"
 
 #: src/app/[lang]/address/[address]/layout.tsx:104
-#: src/app/[lang]/assets/coins/[typeHash]/layout.tsx:74
-#: src/app/[lang]/block/btc/[hashOrHeight]/layout.tsx:61
-#: src/app/[lang]/block/ckb/[hashOrHeight]/layout.tsx:61
+#: src/app/[lang]/assets/coins/[typeHash]/layout.tsx:79
+#: src/app/[lang]/block/btc/[hashOrHeight]/layout.tsx:63
+#: src/app/[lang]/block/ckb/[hashOrHeight]/layout.tsx:58
 #: src/components/transaction-header.tsx:44
 msgid "Transactions"
 msgstr "Transactions"

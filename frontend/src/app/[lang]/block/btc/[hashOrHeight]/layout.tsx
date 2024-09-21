@@ -1,14 +1,15 @@
 import { t } from '@lingui/macro'
 import { notFound } from 'next/navigation'
+import { PropsWithChildren } from 'react'
 import { VStack } from 'styled-system/jsx'
 
+import { getI18nInstance } from '@/app/[lang]/appRouterI18n'
 import { BlockHeader } from '@/components/block-header'
 import { BtcBlockOverview } from '@/components/btc/btc-block-overview'
 import { LinkTabs } from '@/components/link-tabs'
 import { graphql } from '@/gql'
 import { BitcoinBlock } from '@/gql/graphql'
 import { graphQLClient } from '@/lib/graphql'
-import { withI18n } from '@/lib/with-i18n'
 
 export const dynamic = 'force-static'
 export const revalidate = 10
@@ -41,10 +42,11 @@ const query = graphql(`
   }
 `)
 
-export default withI18n<{ hashOrHeight: string }>(async function Layout(
-  { params: { hashOrHeight }, children },
-  { i18n },
-) {
+export default async function Layout({
+  params: { hashOrHeight, lang },
+  children,
+}: PropsWithChildren<{ params: { hashOrHeight: string; lang: string } }>) {
+  const i18n = getI18nInstance(lang)
   const data = await graphQLClient.request(query, { hashOrHeight })
 
   if (!data?.btcBlock) notFound()
@@ -65,4 +67,4 @@ export default withI18n<{ hashOrHeight: string }>(async function Layout(
       {children}
     </VStack>
   )
-})
+}

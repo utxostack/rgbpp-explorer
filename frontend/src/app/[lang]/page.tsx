@@ -3,13 +3,13 @@ import linguiConfig from 'lingui.config.mjs'
 import { LastRgbppTxnsTable } from 'src/components/latest-tx-list'
 import { Box, Center, Flex } from 'styled-system/jsx'
 
+import { getI18nInstance } from '@/app/[lang]/appRouterI18n'
 import HomeBgSVG from '@/assets/home-bg.svg'
 // import { HomeQuickInfo } from '@/components/home-quick-info'
 import { HomeTitle } from '@/components/home-title'
 import { NetworkCards } from '@/components/network-cards'
 import { SearchBar } from '@/components/search-bar'
 import { Heading } from '@/components/ui'
-import { withI18n } from '@/lib/with-i18n'
 
 export const dynamic = 'force-static'
 export const revalidate = 3600
@@ -18,7 +18,8 @@ export async function generateStaticParams() {
   return linguiConfig.locales.map((locale) => ({ lang: locale }))
 }
 
-export default withI18n(function Home({}, { i18n }) {
+export default function Home({ params: { lang } }: { params: { lang: string } }) {
+  const i18n = getI18nInstance(lang)
   return (
     <>
       <Center flexDir="column" w="100%" position="relative" px={{ base: '20px', xl: '30px' }}>
@@ -57,4 +58,4 @@ export default withI18n(function Home({}, { i18n }) {
       </Center>
     </>
   )
-})
+}

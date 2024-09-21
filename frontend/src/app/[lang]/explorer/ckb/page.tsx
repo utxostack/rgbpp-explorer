@@ -1,13 +1,13 @@
 import { t } from '@lingui/macro'
 import { Box, Grid } from 'styled-system/jsx'
 
+import { getI18nInstance } from '@/app/[lang]/appRouterI18n'
 import { Info } from '@/app/[lang]/explorer/ckb/info'
 import { ExplorerTxList } from '@/components/explorer-tx-list'
 import { Heading } from '@/components/ui'
 import { graphql } from '@/gql'
 import { RgbppTransaction } from '@/gql/graphql'
 import { graphQLClient } from '@/lib/graphql'
-import { withI18n } from '@/lib/with-i18n'
 
 export const revalidate = 10
 export const dynamic = 'force-static'
@@ -49,7 +49,8 @@ const query = graphql(`
   }
 `)
 
-export default withI18n(async function Page(props, { i18n }) {
+export default async function Page({ params: { lang } }: { params: { lang: string } }) {
+  const i18n = getI18nInstance(lang)
   const { rgbppLatestL2Transactions } = await graphQLClient.request(query, { limit: 10 })
 
   return (
@@ -64,4 +65,4 @@ export default withI18n(async function Page(props, { i18n }) {
       </Box>
     </Grid>
   )
-})
+}

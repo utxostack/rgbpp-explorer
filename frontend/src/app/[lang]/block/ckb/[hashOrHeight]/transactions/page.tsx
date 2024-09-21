@@ -2,13 +2,13 @@ import { t } from '@lingui/macro'
 import { notFound } from 'next/navigation'
 import { HStack, VStack } from 'styled-system/jsx'
 
+import { getI18nInstance } from '@/app/[lang]/appRouterI18n'
 import { CkbCellTables } from '@/components/ckb/ckb-cell-tables'
 import { CkbOutputsSum } from '@/components/ckb/ckb-outputs-sum'
 import { TransactionHeaderInAddress } from '@/components/transaction-header-in-address'
 import { UtxoOrCellFooter } from '@/components/utxo-or-cell-footer'
 import { graphql } from '@/gql'
 import { graphQLClient } from '@/lib/graphql'
-import { withI18n } from '@/lib/with-i18n'
 
 export const dynamic = 'force-static'
 export const revalidate = 10
@@ -82,7 +82,12 @@ const query = graphql(`
   }
 `)
 
-export default withI18n<{ hashOrHeight: string }>(async function Page({ params: { hashOrHeight } }, { i18n }) {
+export default async function Page({
+  params: { hashOrHeight, lang },
+}: {
+  params: { hashOrHeight: string; lang: string }
+}) {
+  const i18n = getI18nInstance(lang)
   const data = await graphQLClient.request(query, { hashOrHeight })
 
   if (!data?.ckbBlock) notFound()
@@ -104,4 +109,4 @@ export default withI18n<{ hashOrHeight: string }>(async function Page({ params: 
       })}
     </VStack>
   )
-})
+}

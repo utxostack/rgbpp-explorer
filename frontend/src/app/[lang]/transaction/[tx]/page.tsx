@@ -5,7 +5,6 @@ import { CKBTransactionPage } from '@/app/[lang]/transaction/[tx]/ckb'
 import { graphql } from '@/gql'
 import { BitcoinTransaction, CkbTransaction } from '@/gql/graphql'
 import { graphQLClient } from '@/lib/graphql'
-import { withI18n } from '@/lib/with-i18n'
 
 export const revalidate = 60
 export const dynamic = 'force-static'
@@ -265,7 +264,7 @@ const ckbTxQuery = graphql(`
   }
 `)
 
-export default withI18n<{ tx: string }>(async function Page({ params: { tx } }, { i18n }) {
+export default async function Page({ params: { tx } }: { params: { tx: string; lang: string } }) {
   const { rgbppTransaction } = await graphQLClient.request(rgbppTxQuery, { txidOrTxHash: tx })
 
   if (rgbppTransaction) {
@@ -303,4 +302,4 @@ export default withI18n<{ tx: string }>(async function Page({ params: { tx } }, 
   }
 
   notFound()
-})
+}
