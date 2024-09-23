@@ -35,6 +35,9 @@ export const envSchema = z
 
     CACHE_KEY_PREFIX: z.string().default('rgbpp-explorer@v1'),
 
+    RATE_LIMIT_WINDOW_MS: z.coerce.number().default(60_000),
+    RATE_LIMIT_PER_MINUTE: z.coerce.number().default(100),
+
     GIT_BRANCH: z.string().optional(),
   })
   .and(
