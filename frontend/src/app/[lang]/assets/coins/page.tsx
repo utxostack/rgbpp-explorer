@@ -10,6 +10,9 @@ import { graphql } from '@/gql'
 import { graphQLClient } from '@/lib/graphql'
 import { resolvePage } from '@/lib/resolve-page'
 
+export const dynamic = 'force-static'
+export const revalidate = 10
+
 const query = graphql(`
   query RgbppCoins($page: Int!, $pageSize: Int!) {
     rgbppCoins(page: $page, pageSize: $pageSize) {

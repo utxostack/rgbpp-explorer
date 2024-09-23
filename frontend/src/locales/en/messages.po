@@ -617,7 +617,7 @@ msgstr "Time"
 
 #: src/app/[lang]/address/[address]/transactions/page.tsx:342
 #: src/app/[lang]/assets/coins/[typeHash]/transactions/page.tsx:109
-#: src/app/[lang]/assets/coins/page.tsx:54
+#: src/app/[lang]/assets/coins/page.tsx:57
 msgid "Total {0} Items"
 msgstr "Total {0} Items"
 
