@@ -1,5 +1,3 @@
-'use client'
-
 import { t } from '@lingui/macro'
 import { Grid, HStack, VStack } from 'styled-system/jsx'
 

@@ -104,7 +104,7 @@ msgstr "Address"
 msgid "Amount"
 msgstr "Amount"
 
-#: src/components/ckb/ckb-address-overview.tsx:35
+#: src/components/ckb/ckb-address-overview.tsx:41
 msgid "Available"
 msgstr "Available"
 
@@ -141,15 +141,15 @@ msgstr "Block Height"
 msgid "Block size"
 msgstr "Block size"
 
-#: src/components/btc/btc-address-overview.tsx:33
-#: src/components/btc/btc-address-overview.tsx:38
-#: src/components/btc/btc-address-overview.tsx:42
+#: src/components/btc/btc-address-overview.tsx:39
+#: src/components/btc/btc-address-overview.tsx:44
+#: src/components/btc/btc-address-overview.tsx:48
 #: src/components/btc/btc-utxo-tables.tsx:150
 #: src/components/btc/btc-utxo-tables.tsx:230
 msgid "BTC"
 msgstr "BTC"
 
-#: src/components/btc/btc-address-overview.tsx:32
+#: src/components/btc/btc-address-overview.tsx:38
 msgid "BTC Balance"
 msgstr "BTC Balance"
 
@@ -165,9 +165,9 @@ msgid "bytes"
 msgstr "bytes"
 
 #: src/app/[lang]/explorer/ckb/info.tsx:38
-#: src/components/ckb/ckb-address-overview.tsx:33
-#: src/components/ckb/ckb-address-overview.tsx:36
 #: src/components/ckb/ckb-address-overview.tsx:39
+#: src/components/ckb/ckb-address-overview.tsx:42
+#: src/components/ckb/ckb-address-overview.tsx:45
 #: src/components/ckb/ckb-block-overview.tsx:65
 #: src/components/ckb/ckb-cell-tables.tsx:131
 #: src/components/ckb/ckb-transaction-overview.tsx:56
@@ -177,7 +177,7 @@ msgstr "bytes"
 msgid "CKB"
 msgstr "CKB"
 
-#: src/components/ckb/ckb-address-overview.tsx:32
+#: src/components/ckb/ckb-address-overview.tsx:38
 msgid "CKB Balance"
 msgstr "CKB Balance"
 
@@ -223,7 +223,7 @@ msgstr "Coming soon, please stay tuned"
 msgid "Confirmations"
 msgstr "Confirmations"
 
-#: src/components/btc/btc-address-overview.tsx:35
+#: src/components/btc/btc-address-overview.tsx:41
 msgid "Confirmed"
 msgstr "Confirmed"
 
@@ -336,7 +336,7 @@ msgstr "L1"
 msgid "L1 and L2 Holders"
 msgstr "L1 and L2 Holders"
 
-#: src/components/btc/btc-address-overview.tsx:49
+#: src/components/btc/btc-address-overview.tsx:55
 msgid "L1 RGB++ Assets"
 msgstr "L1 RGB++ Assets"
 
@@ -350,7 +350,7 @@ msgstr "L1 RGB++ Txns(24H)"
 msgid "L2"
 msgstr "L2"
 
-#: src/components/ckb/ckb-address-overview.tsx:46
+#: src/components/ckb/ckb-address-overview.tsx:52
 msgid "L2 RGB++ Assets"
 msgstr "L2 RGB++ Assets"
 
@@ -434,7 +434,7 @@ msgstr "No Data"
 msgid "No Transaction"
 msgstr "No Transaction"
 
-#: src/components/ckb/ckb-address-overview.tsx:38
+#: src/components/ckb/ckb-address-overview.tsx:44
 msgid "Occupied"
 msgstr "Occupied"
 
@@ -460,10 +460,10 @@ msgstr "Outputs ({0})"
 #~ msgid "Overflow"
 #~ msgstr "Overflow"
 
-#: src/components/btc/btc-address-overview.tsx:20
+#: src/components/btc/btc-address-overview.tsx:26
 #: src/components/btc/btc-block-overview.tsx:39
 #: src/components/btc/btc-transaction-overview.tsx:28
-#: src/components/ckb/ckb-address-overview.tsx:20
+#: src/components/ckb/ckb-address-overview.tsx:26
 #: src/components/ckb/ckb-block-overview.tsx:26
 #: src/components/ckb/ckb-transaction-overview.tsx:28
 msgid "Overview"
@@ -652,8 +652,8 @@ msgstr "Txn fee:<0>{0} </0>{feeUnit}"
 #~ msgid "Txn fee:<0>{0} </0>sats"
 #~ msgstr "Txn fee:<0>{0} </0>sats"
 
-#: src/components/btc/btc-address-overview.tsx:46
-#: src/components/ckb/ckb-address-overview.tsx:43
+#: src/components/btc/btc-address-overview.tsx:52
+#: src/components/ckb/ckb-address-overview.tsx:49
 msgid "Txns"
 msgstr "Txns"
 
@@ -668,7 +668,7 @@ msgstr "Txns(24H)"
 msgid "Type"
 msgstr "Type"
 
-#: src/components/btc/btc-address-overview.tsx:41
+#: src/components/btc/btc-address-overview.tsx:47
 msgid "Unconfirmed"
 msgstr "Unconfirmed"
 
