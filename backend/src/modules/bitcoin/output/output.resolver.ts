@@ -1,4 +1,4 @@
-import { Loader } from 'src/common/dataloader';
+import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Parent, ResolveField, Resolver } from '@nestjs/graphql';
 import { BitcoinAddress } from '../address/address.model';
 import { BitcoinOutput, BitcoinOutputStatus } from './output.model';

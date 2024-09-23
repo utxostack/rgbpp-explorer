@@ -1,10 +1,10 @@
 import DataLoader from 'dataloader';
 import { Injectable, Logger } from '@nestjs/common';
+import { NestDataLoader } from '@applifting-io/nestjs-dataloader';
 import * as BitcoinApi from 'src/core/bitcoin-api/bitcoin-api.schema';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
-import { DataLoaderResponse } from 'src/common/dataloader';
+import { DataLoaderResponse } from 'src/common/type/dataloader';
 import * as Sentry from '@sentry/nestjs';
-import { NestDataLoader } from 'src/common/dataloader';
 
 @Injectable()
 export class BitcoinTransactionLoader

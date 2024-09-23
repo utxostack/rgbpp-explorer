@@ -1,10 +1,10 @@
 import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { SearchResult } from './search.model';
-import { Loader } from 'src/common/dataloader';
+import { Loader } from '@applifting-io/nestjs-dataloader';
 import {
   BitcoinBlockLoader,
   BitcoinBlockLoaderType,
-} from '../bitcoin/block/dataloader/block.dataloader';
+} from '../bitcoin/block/dataloader/block.loader';
 import {
   BitcoinTransactionLoader,
   BitcoinTransactionLoaderType,

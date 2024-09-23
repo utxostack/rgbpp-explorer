@@ -39,6 +39,11 @@ model Block {
   number            Int
   timestamp         DateTime
   transactionsCount Int
+  size              Int
+  totalFee          BigInt
+  minFee            BigInt
+  maxFee            BigInt
+  difficulty        BigInt
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
@@ -53,11 +58,13 @@ model Transaction {
   id            Int            @id @default(autoincrement())
   chainId       Int
   hash          String
-  index         Int
+  index         String
   blockNumber   Int
+  timestamp     DateTime
+  fee           BigInt
+  size          Int
   isCellbase    Boolean        @default(false)
   isRgbpp       Boolean        @default(false)
-  btcTxid       String?
   leapDirection LeapDirection?
   inputCount    Int
   outputCount   Int
@@ -66,8 +73,31 @@ model Transaction {
 
   chain   Chain    @relation(fields: [chainId], references: [id])
   block   Block    @relation(fields: [chainId, blockNumber], references: [chainId, number])
+  outputs Output[]
 
   @@unique([chainId, hash])
+}
+
+model Output {
+  id               Int      @id @default(autoincrement())
+  chainId          Int
+  txHash           String
+  index            String
+  consumedByTxHash String?
+  consumedByIndex  String?
+  capacity         BigInt
+  lockScriptHash   String   @db.Char(66)
+  typeScriptHash   String?  @db.Char(66)
+  isLive           Boolean  @default(true)
+  rgbppBound       Boolean  @default(false)
+  boundBtcTxId     String?
+  boundBtcTxIndex  Int?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  transaction Transaction @relation(fields: [chainId, txHash], references: [chainId, hash])
+
+  @@unique([chainId, txHash, index])
 }
 
 model LockScript {

@@ -1,4 +1,4 @@
-import { Loader } from 'src/common/dataloader';
+import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { RgbppAddress } from 'src/modules/rgbpp/address/address.model';
 import { BitcoinTransaction } from '../transaction/transaction.model';
@@ -64,10 +64,7 @@ export class BitcoinAddressResolver {
     addressTxsLoader: BitcoinAddressTransactionsLoaderType,
     @Args('afterTxid', { nullable: true }) afterTxid?: string,
   ): Promise<BitcoinTransaction[] | null> {
-    const list = await addressTxsLoader.load({
-      address: address.address,
-      afterTxid,
-    });
+    const list = await addressTxsLoader.load(`${address.address},${afterTxid}`);
     return list || null;
   }
 
