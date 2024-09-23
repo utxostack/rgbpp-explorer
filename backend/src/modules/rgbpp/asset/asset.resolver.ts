@@ -6,7 +6,7 @@ import {
   BitcoinTransactionLoaderType,
 } from 'src/modules/bitcoin/transaction/transaction.dataloader';
 import { RgbppService } from '../rgbpp.service';
-import { Loader } from 'src/common/dataloader';
+import { Loader } from '@applifting-io/nestjs-dataloader';
 
 @Resolver(() => RgbppAsset)
 export class RgbppAssetResolver {

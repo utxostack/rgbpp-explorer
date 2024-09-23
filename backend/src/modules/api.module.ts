@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
-import { DataLoaderInterceptor } from 'src/common/dataloader';
+import { DataLoaderInterceptor } from '@applifting-io/nestjs-dataloader';
 import { Env } from 'src/env';
 import { CkbModule } from './ckb/ckb.module';
 import { RgbppModule } from './rgbpp/rgbpp.module';

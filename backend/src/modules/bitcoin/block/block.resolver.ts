@@ -1,13 +1,13 @@
-import { Loader } from 'src/common/dataloader';
+import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { BitcoinTransaction } from '../transaction/transaction.model';
 import { BitcoinAddress } from '../address/address.model';
 import { BitcoinBlock, FeeRateRange } from './block.model';
-import { BitcoinBlockLoader, BitcoinBlockLoaderType } from './dataloader/block.dataloader';
+import { BitcoinBlockLoader, BitcoinBlockLoaderType } from './dataloader/block.loader';
 import {
   BitcoinBlockTransactionsLoader,
   BitcoinBlockTransactionsLoaderType,
-} from './dataloader/block-transactions.dataloader';
+} from './dataloader/block-transactions.loader';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 
 @Resolver(() => BitcoinBlock)
