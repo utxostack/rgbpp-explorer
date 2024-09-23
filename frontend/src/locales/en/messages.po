@@ -112,7 +112,7 @@ msgstr "Available"
 msgid "Back to first page"
 msgstr "Back to first page"
 
-#: src/app/not-found.tsx:21
+#: src/app/not-found.tsx:19
 msgid "Back to Home"
 msgstr "Back to Home"
 
@@ -129,6 +129,8 @@ msgstr "Block {0}"
 
 #: src/app/[lang]/explorer/btc/info.tsx:54
 #: src/app/[lang]/explorer/ckb/info.tsx:42
+#: src/components/btc/btc-transaction-overview.tsx:42
+#: src/components/ckb/ckb-transaction-overview.tsx:40
 #: src/components/network-cards.tsx:81
 #: src/components/network-cards.tsx:114
 msgid "Block Height"
@@ -136,8 +138,8 @@ msgstr "Block Height"
 
 #: src/components/btc/btc-transaction-overview.tsx:42
 #: src/components/ckb/ckb-transaction-overview.tsx:40
-msgid "Block Height(i18n)"
-msgstr "Block Height(i18n)"
+#~ msgid "Block Height(i18n)"
+#~ msgstr "Block Height(i18n)"
 
 #: src/components/btc/btc-block-overview.tsx:52
 #: src/components/ckb/ckb-block-overview.tsx:39
@@ -582,7 +584,7 @@ msgstr "Size"
 msgid "Something wrong. Error code: {0}"
 msgstr "Something wrong. Error code: {0}"
 
-#: src/app/not-found.tsx:19
+#: src/app/not-found.tsx:15
 msgid "Sorry, the page you visited does not exist"
 msgstr "Sorry, the page you visited does not exist"
 
