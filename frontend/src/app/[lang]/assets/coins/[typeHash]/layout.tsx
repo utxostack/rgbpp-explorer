@@ -11,9 +11,6 @@ import { Text } from '@/components/ui'
 import { graphql } from '@/gql'
 import { graphQLClient } from '@/lib/graphql'
 
-export const dynamic = 'force-static'
-export const revalidate = 10
-
 const query = graphql(`
   query RgbppCoin($typeHash: String!) {
     rgbppCoin(typeHash: $typeHash) {

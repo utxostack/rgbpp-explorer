@@ -10,9 +10,6 @@ import { graphql } from '@/gql'
 import { graphQLClient } from '@/lib/graphql'
 import { resolvePage } from '@/lib/resolve-page'
 
-export const dynamic = 'force-static'
-export const revalidate = 10
-
 const query = graphql(`
   query RgbppCoins($page: Int!, $pageSize: Int!) {
     rgbppCoins(page: $page, pageSize: $pageSize) {
@@ -43,7 +40,6 @@ export default async function Page({
 }) {
   const i18n = getI18nInstance(params.lang)
   const page = resolvePage(searchParams.page)
-
   const pageSize = 10
   const response = await graphQLClient.request(query, { page, pageSize })
 

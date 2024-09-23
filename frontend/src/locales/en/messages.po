@@ -108,7 +108,7 @@ msgstr "Amount"
 msgid "Available"
 msgstr "Available"
 
-#: src/app/[lang]/address/[address]/transactions/page.tsx:280
+#: src/app/[lang]/address/[address]/transactions/page.tsx:277
 msgid "Back to first page"
 msgstr "Back to first page"
 
@@ -317,7 +317,7 @@ msgstr "Fee rate:<0>{0}</0>{feeUnit}/vB"
 msgid "High"
 msgstr "High"
 
-#: src/app/[lang]/assets/coins/[typeHash]/layout.tsx:75
+#: src/app/[lang]/assets/coins/[typeHash]/layout.tsx:72
 msgid "Holders"
 msgstr "Holders"
 
@@ -426,7 +426,7 @@ msgstr "More Info"
 msgid "Nervos CKB"
 msgstr "Nervos CKB"
 
-#: src/app/[lang]/address/[address]/transactions/page.tsx:292
+#: src/app/[lang]/address/[address]/transactions/page.tsx:289
 msgid "Next"
 msgstr "Next"
 
@@ -434,8 +434,8 @@ msgstr "Next"
 msgid "No Data"
 msgstr "No Data"
 
-#: src/app/[lang]/address/[address]/transactions/page.tsx:262
-#: src/app/[lang]/address/[address]/transactions/page.tsx:320
+#: src/app/[lang]/address/[address]/transactions/page.tsx:259
+#: src/app/[lang]/address/[address]/transactions/page.tsx:315
 msgid "No Transaction"
 msgstr "No Transaction"
 
@@ -559,7 +559,7 @@ msgstr "SDK"
 msgid "Search by Address/Tx Hash/Block Hash/AssetID"
 msgstr "Search by Address/Tx Hash/Block Hash/AssetID"
 
-#: src/app/[lang]/address/[address]/transactions/page.tsx:333
+#: src/app/[lang]/address/[address]/transactions/page.tsx:328
 msgid "shannons"
 msgstr "shannons"
 
@@ -617,9 +617,9 @@ msgstr "Testnet"
 msgid "Time"
 msgstr "Time"
 
-#: src/app/[lang]/address/[address]/transactions/page.tsx:342
-#: src/app/[lang]/assets/coins/[typeHash]/transactions/page.tsx:109
-#: src/app/[lang]/assets/coins/page.tsx:57
+#: src/app/[lang]/address/[address]/transactions/page.tsx:337
+#: src/app/[lang]/assets/coins/[typeHash]/transactions/page.tsx:106
+#: src/app/[lang]/assets/coins/page.tsx:53
 msgid "Total {0} Items"
 msgstr "Total {0} Items"
 
@@ -629,7 +629,7 @@ msgid "Transaction"
 msgstr "Transaction"
 
 #: src/app/[lang]/address/[address]/layout.tsx:104
-#: src/app/[lang]/assets/coins/[typeHash]/layout.tsx:79
+#: src/app/[lang]/assets/coins/[typeHash]/layout.tsx:76
 #: src/app/[lang]/block/btc/[hashOrHeight]/layout.tsx:67
 #: src/app/[lang]/block/ckb/[hashOrHeight]/layout.tsx:62
 #: src/components/transaction-header.tsx:45

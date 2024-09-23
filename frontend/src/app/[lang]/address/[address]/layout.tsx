@@ -16,9 +16,6 @@ import { isValidBTCAddress } from '@/lib/btc/is-valid-btc-address'
 import { isValidCkbAddress } from '@/lib/ckb/is-valid-ckb-address'
 import { graphQLClient } from '@/lib/graphql'
 
-export const dynamic = 'force-static'
-export const revalidate = 10
-
 const btcAddressQuery = graphql(`
   query BtcAddressBase($address: String!) {
     btcAddress(address: $address) {
@@ -48,7 +45,10 @@ const ckbAddressQuery = graphql(`
 export default async function Layout({
   children,
   params: { address, lang },
-}: PropsWithChildren & { params: { address: string; lang: string } }) {
+}: PropsWithChildren<{
+  params: { address: string; lang: string }
+  searchParams: { page?: string }
+}>) {
   const i18n = getI18nInstance(lang)
   const isBtcAddress = isValidBTCAddress(address)
   const isCkbAddress = isValidCkbAddress(address)

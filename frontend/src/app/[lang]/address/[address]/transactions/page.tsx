@@ -22,8 +22,6 @@ import { resolvePage } from '@/lib/resolve-page'
 import { formatNumber } from '@/lib/string/format-number'
 
 export const maxDuration = 30
-export const dynamic = 'force-static'
-export const revalidate = 10
 
 const btcAddressTxsQuery = graphql(`
   query BtcTransactionByAddress($address: String!, $afterTxid: String) {
@@ -237,11 +235,12 @@ const ckbAddressTxsQuery = graphql(`
 
 export default async function Page({
   params: { address, lang },
-  searchParams: { afterTxid, ...searchParams },
+  searchParams,
 }: {
   params: { address: string; lang: string }
   searchParams: { page?: string; afterTxid?: string }
 }) {
+  const { afterTxid } = searchParams
   const i18n = getI18nInstance(lang)
   if (isValidBTCAddress(address)) {
     const { btcAddress } = await graphQLClient.request(btcAddressTxsQuery, {
@@ -251,9 +250,7 @@ export default async function Page({
 
     const nextCursor = last(btcAddress?.transactions)?.txid
 
-    if (!btcAddress) {
-      notFound()
-    }
+    if (!btcAddress) notFound()
 
     return (
       <>
@@ -307,9 +304,7 @@ export default async function Page({
       pageSize,
     })
 
-    if (!ckbAddress) {
-      notFound()
-    }
+    if (!ckbAddress) notFound()
 
     const total = ckbAddress?.transactionsCount ?? 0
 
