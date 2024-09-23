@@ -1,6 +1,6 @@
 ARG NODE_VERSION=20
 
-FROM node:${NODE_VERSION}-slim AS base
+FROM node:${NODE_VERSION} AS base
 ARG GIT_BRANCH
 
 ENV PNPM_HOME="/pnpm"
@@ -15,7 +15,7 @@ FROM base AS prod-deps
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile --ignore-scripts
 RUN pnpm run --filter backend postinstall
 
-FROM base as build
+FROM base AS build
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm run --filter backend build
 

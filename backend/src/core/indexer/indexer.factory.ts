@@ -3,6 +3,7 @@ import { PrismaService } from '../database/prisma/prisma.service';
 import { IndexerService } from './indexer.service';
 import { BlockchainServiceFactory } from '../blockchain/blockchain.factory';
 import { IndexerQueueService } from './indexer.queue';
+import { ModuleRef } from '@nestjs/core';
 
 export class IndexerServiceFactoryError extends Error {
   constructor(message: string) {
@@ -18,8 +19,8 @@ export class IndexerServiceFactory implements OnModuleDestroy {
   constructor(
     private blockchainServiceFactory: BlockchainServiceFactory,
     private prismaService: PrismaService,
-    private indexerQueueService: IndexerQueueService,
-  ) { }
+    private moduleRef: ModuleRef,
+  ) {}
 
   public async onModuleDestroy() {
     for (const service of this.services.values()) {
@@ -35,12 +36,13 @@ export class IndexerServiceFactory implements OnModuleDestroy {
       throw new IndexerServiceFactoryError(`Chain with ID ${chainId} not found`);
     }
     if (!this.services.has(chain.id)) {
+      const indexerQueueService = this.moduleRef.get(IndexerQueueService);
       const blockchainService = this.blockchainServiceFactory.getService(chain.id);
       const service = new IndexerService(
         chain,
         blockchainService,
         this.prismaService,
-        this.indexerQueueService,
+        indexerQueueService,
       );
       this.services.set(chain.id, service);
     }

@@ -10,10 +10,21 @@ export class RgbppAsset {
   @Field(() => CkbCell)
   cell: CkbCell;
 
-  public static from(address: string, cell: CkbRpc.Cell): RgbppAsset {
+  public static fromCell(address: string, cell: CkbRpc.Cell): RgbppAsset {
     return {
       owner: address,
       cell: CkbCell.fromCell(cell),
+    };
+  }
+
+  public static fromTransaction(
+    address: string,
+    tx: CkbRpc.Transaction,
+    index: number,
+  ): RgbppAsset {
+    return {
+      owner: address,
+      cell: CkbCell.fromTransaction(tx, index),
     };
   }
 }
