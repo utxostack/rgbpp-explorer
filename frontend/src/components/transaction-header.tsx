@@ -1,5 +1,4 @@
-'use client'
-
+import type { I18n } from '@lingui/core'
 import { t } from '@lingui/macro'
 import BigNumber from 'bignumber.js'
 
@@ -15,10 +14,12 @@ export function TransactionHeader({
   type,
   txid,
   confirmations,
+  i18n,
 }: {
   type: LayerTypeProps['type']
   txid: string
   confirmations?: BigNumber.Value
+  i18n: I18n
 }) {
   const layerType = type ? <LayerType display="inline-flex" type={type} /> : null
   return (
@@ -41,7 +42,7 @@ export function TransactionHeader({
         lineHeight="24px"
         fontWeight="semibold"
       >
-        {t`Transactions`}
+        {t(i18n)`Transactions`}
         <IfBreakpoint breakpoint="lg" fallback={layerType} />
       </Heading>
       <Box gridRow={{ base: '2/3', lg: 'auto' }} gridColumn={{ base: '1/3', lg: 'auto' }}>
@@ -68,7 +69,7 @@ export function TransactionHeader({
         >
           {formatNumber(confirmations)}{' '}
           <Text as="span" fontSize="14px" fontWeight="medium" display={{ base: 'none', xl: 'inline' }}>
-            {t`Confirmations`}
+            {t(i18n)`Confirmations`}
           </Text>
         </Box>
       ) : null}

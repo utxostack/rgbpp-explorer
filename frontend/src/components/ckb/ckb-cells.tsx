@@ -1,5 +1,4 @@
-'use client'
-
+import type { I18n } from '@lingui/core'
 import { t } from '@lingui/macro'
 import { Flex, HStack, VStack } from 'styled-system/jsx'
 
@@ -15,9 +14,11 @@ import { truncateMiddle } from '@/lib/string/truncate-middle'
 export function CkbCells({
   ckbTransaction,
   isBinding,
+  i18n,
 }: {
   ckbTransaction: Pick<CkbTransaction, 'hash' | 'outputs' | 'inputs'>
   isBinding?: boolean
+  i18n: I18n
 }) {
   return (
     <VStack w="100%" gap={0} bg="bg.card" rounded="8px">
@@ -35,7 +36,7 @@ export function CkbCells({
           <CkbIcon h="40px" w="40px" />
           {isBinding ? (
             <VStack alignItems="start" gap={0}>
-              <Text fontSize="16px" fontWeight="semibold">{t`RGB++ Binding Txn on CKB`}</Text>
+              <Text fontSize="16px" fontWeight="semibold">{t(i18n)`RGB++ Binding Txn on CKB`}</Text>
               <Link
                 href={`/transaction/${ckbTransaction.hash}`}
                 color="brand"
@@ -51,7 +52,7 @@ export function CkbCells({
               </Link>
             </VStack>
           ) : (
-            <Text fontSize="16px" fontWeight="semibold">{t`CKB Txn`}</Text>
+            <Text fontSize="16px" fontWeight="semibold">{t(i18n)`CKB Txn`}</Text>
           )}
         </HStack>
         <ViewCkbExplorer txHash={ckbTransaction.hash} />

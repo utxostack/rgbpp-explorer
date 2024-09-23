@@ -1,5 +1,4 @@
-'use client'
-
+import type { I18n } from '@lingui/core'
 import { t } from '@lingui/macro'
 import { Grid, HStack, VStack } from 'styled-system/jsx'
 
@@ -13,7 +12,7 @@ import { CkbTransaction } from '@/gql/graphql'
 import { shannonToCKB } from '@/lib/ckb/shannon-to-ckb'
 import { formatNumber } from '@/lib/string/format-number'
 
-export function CkbTransactionOverview({ ckbTransaction }: { ckbTransaction: CkbTransaction }) {
+export function CkbTransactionOverview({ ckbTransaction, i18n }: { i18n: I18n; ckbTransaction: CkbTransaction }) {
   return (
     <VStack gap={0} w="100%" bg="bg.card" rounded="8px">
       <HStack
@@ -25,7 +24,7 @@ export function CkbTransactionOverview({ ckbTransaction }: { ckbTransaction: Ckb
         borderBottomColor="border.primary"
       >
         <OverflowSVG w="24px" />
-        <Heading fontSize="16px" fontWeight="semibold">{t`Overview`}</Heading>
+        <Heading fontSize="16px" fontWeight="semibold">{t(i18n)`Overview`}</Heading>
         {ckbTransaction.block?.timestamp ? <TimeFormatter timestamp={ckbTransaction.block.timestamp} /> : null}
       </HStack>
       <Grid
@@ -38,7 +37,7 @@ export function CkbTransactionOverview({ ckbTransaction }: { ckbTransaction: Ckb
         textAlign="center"
       >
         <OverviewInfo>
-          <OverviewInfoItem label={t`Block Height`}>
+          <OverviewInfoItem label={t(i18n)`Block Height(i18n)`}>
             <Link
               href={`/block/ckb/${ckbTransaction.block?.hash || ckbTransaction.blockNumber}`}
               color="brand"
@@ -47,16 +46,16 @@ export function CkbTransactionOverview({ ckbTransaction }: { ckbTransaction: Ckb
               {formatNumber(ckbTransaction.blockNumber)}
             </Link>
           </OverviewInfoItem>
-          <OverviewInfoItem label={t`Size`} formatNumber unit={t`bytes`}>
+          <OverviewInfoItem label={t(i18n)`Size`} formatNumber unit={t(i18n)`bytes`}>
             {ckbTransaction.size}
           </OverviewInfoItem>
         </OverviewInfo>
         <OverviewInfo>
-          <OverviewInfoItem label={t`Fee`}>
-            <OverflowAmount amount={formatNumber(shannonToCKB(ckbTransaction.fee))} symbol={t`CKB`} />
+          <OverviewInfoItem label={t(i18n)`Fee`}>
+            <OverflowAmount amount={formatNumber(shannonToCKB(ckbTransaction.fee))} symbol={t(i18n)`CKB`} />
           </OverviewInfoItem>
-          <OverviewInfoItem label={t`Size`}>
-            <OverflowAmount amount={formatNumber(ckbTransaction.feeRate)} symbol={t`shannons/kB`} />
+          <OverviewInfoItem label={t(i18n)`Size`}>
+            <OverflowAmount amount={formatNumber(ckbTransaction.feeRate)} symbol={t(i18n)`shannons/kB`} />
           </OverviewInfoItem>
         </OverviewInfo>
       </Grid>

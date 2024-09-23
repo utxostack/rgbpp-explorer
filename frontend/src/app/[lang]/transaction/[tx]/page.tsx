@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 
+import { getI18nInstance } from '@/app/[lang]/appRouterI18n'
 import { BTCTransactionPage } from '@/app/[lang]/transaction/[tx]/btc'
 import { CKBTransactionPage } from '@/app/[lang]/transaction/[tx]/ckb'
 import { graphql } from '@/gql'
@@ -264,7 +265,8 @@ const ckbTxQuery = graphql(`
   }
 `)
 
-export default async function Page({ params: { tx } }: { params: { tx: string; lang: string } }) {
+export default async function Page({ params: { tx, lang } }: { params: { tx: string; lang: string } }) {
+  const i18n = getI18nInstance(lang)
   const { rgbppTransaction } = await graphQLClient.request(rgbppTxQuery, { txidOrTxHash: tx })
 
   if (rgbppTransaction) {
@@ -275,6 +277,7 @@ export default async function Page({ params: { tx } }: { params: { tx: string; l
           btcTransaction={btcTransaction as BitcoinTransaction}
           ckbTransaction={ckbTransaction as CkbTransaction}
           leapDirection={rgbppTransaction?.leapDirection}
+          i18n={i18n}
         />
       )
     }
@@ -285,6 +288,7 @@ export default async function Page({ params: { tx } }: { params: { tx: string; l
           ckbTransaction={ckbTransaction as CkbTransaction}
           btcTransaction={btcTransaction as BitcoinTransaction}
           leapDirection={rgbppTransaction?.leapDirection}
+          i18n={i18n}
         />
       )
     }
@@ -293,12 +297,12 @@ export default async function Page({ params: { tx } }: { params: { tx: string; l
   const btcTxRes = await graphQLClient.request(btcTxQuery, { txid: tx })
 
   if (btcTxRes.btcTransaction) {
-    return <BTCTransactionPage btcTransaction={btcTxRes.btcTransaction as BitcoinTransaction} />
+    return <BTCTransactionPage i18n={i18n} btcTransaction={btcTxRes.btcTransaction as BitcoinTransaction} />
   }
 
   const ckbTxRes = await graphQLClient.request(ckbTxQuery, { hash: tx })
   if (ckbTxRes.ckbTransaction) {
-    return <CKBTransactionPage ckbTransaction={ckbTxRes.ckbTransaction as CkbTransaction} />
+    return <CKBTransactionPage i18n={i18n} ckbTransaction={ckbTxRes.ckbTransaction as CkbTransaction} />
   }
 
   notFound()
