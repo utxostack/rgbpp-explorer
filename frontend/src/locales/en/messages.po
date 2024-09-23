@@ -129,12 +129,15 @@ msgstr "Block {0}"
 
 #: src/app/[lang]/explorer/btc/info.tsx:54
 #: src/app/[lang]/explorer/ckb/info.tsx:42
-#: src/components/btc/btc-transaction-overview.tsx:43
-#: src/components/ckb/ckb-transaction-overview.tsx:41
 #: src/components/network-cards.tsx:81
 #: src/components/network-cards.tsx:114
 msgid "Block Height"
 msgstr "Block Height"
+
+#: src/components/btc/btc-transaction-overview.tsx:42
+#: src/components/ckb/ckb-transaction-overview.tsx:40
+msgid "Block Height(i18n)"
+msgstr "Block Height(i18n)"
 
 #: src/components/btc/btc-block-overview.tsx:52
 #: src/components/ckb/ckb-block-overview.tsx:39
@@ -158,9 +161,9 @@ msgid "BTC Txn"
 msgstr "BTC Txn"
 
 #: src/components/btc/btc-block-overview.tsx:53
-#: src/components/btc/btc-transaction-overview.tsx:53
+#: src/components/btc/btc-transaction-overview.tsx:52
 #: src/components/ckb/ckb-block-overview.tsx:40
-#: src/components/ckb/ckb-transaction-overview.tsx:50
+#: src/components/ckb/ckb-transaction-overview.tsx:49
 msgid "bytes"
 msgstr "bytes"
 
@@ -170,7 +173,7 @@ msgstr "bytes"
 #: src/components/ckb/ckb-address-overview.tsx:45
 #: src/components/ckb/ckb-block-overview.tsx:65
 #: src/components/ckb/ckb-cell-tables.tsx:131
-#: src/components/ckb/ckb-transaction-overview.tsx:56
+#: src/components/ckb/ckb-transaction-overview.tsx:55
 #: src/components/footer.tsx:94
 #: src/components/navbar/index.tsx:38
 #: src/components/network-cards.tsx:107
@@ -181,7 +184,7 @@ msgstr "CKB"
 msgid "CKB Balance"
 msgstr "CKB Balance"
 
-#: src/components/ckb/ckb-cells.tsx:54
+#: src/components/ckb/ckb-cells.tsx:55
 msgid "CKB Txn"
 msgstr "CKB Txn"
 
@@ -219,7 +222,7 @@ msgstr "Coming soon, please stay tuned"
 #~ msgstr "confirmations"
 
 #: src/components/block-header.tsx:68
-#: src/components/transaction-header.tsx:71
+#: src/components/transaction-header.tsx:72
 msgid "Confirmations"
 msgstr "Confirmations"
 
@@ -277,12 +280,12 @@ msgstr "Explorer"
 #~ msgid "Fast"
 #~ msgstr "Fast"
 
-#: src/components/btc/btc-transaction-overview.tsx:57
-#: src/components/ckb/ckb-transaction-overview.tsx:55
+#: src/components/btc/btc-transaction-overview.tsx:56
+#: src/components/ckb/ckb-transaction-overview.tsx:54
 msgid "Fee"
 msgstr "Fee"
 
-#: src/components/btc/btc-transaction-overview.tsx:60
+#: src/components/btc/btc-transaction-overview.tsx:59
 msgid "Fee rate"
 msgstr "Fee rate"
 
@@ -462,10 +465,10 @@ msgstr "Outputs ({0})"
 
 #: src/components/btc/btc-address-overview.tsx:26
 #: src/components/btc/btc-block-overview.tsx:39
-#: src/components/btc/btc-transaction-overview.tsx:28
+#: src/components/btc/btc-transaction-overview.tsx:27
 #: src/components/ckb/ckb-address-overview.tsx:26
 #: src/components/ckb/ckb-block-overview.tsx:26
-#: src/components/ckb/ckb-transaction-overview.tsx:28
+#: src/components/ckb/ckb-transaction-overview.tsx:27
 msgid "Overview"
 msgstr "Overview"
 
@@ -488,7 +491,7 @@ msgstr "RGB++ Assets Holders"
 msgid "RGB++ Binding Txn on BTC"
 msgstr "RGB++ Binding Txn on BTC"
 
-#: src/components/ckb/ckb-cells.tsx:38
+#: src/components/ckb/ckb-cells.tsx:39
 msgid "RGB++ Binding Txn on CKB"
 msgstr "RGB++ Binding Txn on CKB"
 
@@ -509,14 +512,14 @@ msgstr "RGB++ Networks"
 msgid "RGB++ Txns"
 msgstr "RGB++ Txns"
 
-#: src/components/btc/btc-transaction-overview.tsx:61
+#: src/components/btc/btc-transaction-overview.tsx:60
 msgid "sat/VB"
 msgstr "sat/VB"
 
 #: src/app/[lang]/block/btc/[hashOrHeight]/transactions/page.tsx:99
 #: src/app/[lang]/block/ckb/[hashOrHeight]/transactions/page.tsx:102
 #: src/components/btc/btc-transaction-card-in-address.tsx:37
-#: src/components/btc/btc-transaction-overview.tsx:58
+#: src/components/btc/btc-transaction-overview.tsx:57
 msgid "sats"
 msgstr "sats"
 
@@ -561,13 +564,13 @@ msgstr "shannons"
 #: src/app/[lang]/explorer/ckb/info.tsx:55
 #: src/app/[lang]/explorer/ckb/info.tsx:66
 #: src/app/[lang]/explorer/ckb/info.tsx:77
-#: src/components/ckb/ckb-transaction-overview.tsx:59
+#: src/components/ckb/ckb-transaction-overview.tsx:58
 msgid "shannons/kB"
 msgstr "shannons/kB"
 
-#: src/components/btc/btc-transaction-overview.tsx:52
-#: src/components/ckb/ckb-transaction-overview.tsx:50
-#: src/components/ckb/ckb-transaction-overview.tsx:58
+#: src/components/btc/btc-transaction-overview.tsx:51
+#: src/components/ckb/ckb-transaction-overview.tsx:49
+#: src/components/ckb/ckb-transaction-overview.tsx:57
 msgid "Size"
 msgstr "Size"
 
@@ -627,7 +630,7 @@ msgstr "Transaction"
 #: src/app/[lang]/assets/coins/[typeHash]/layout.tsx:79
 #: src/app/[lang]/block/btc/[hashOrHeight]/layout.tsx:63
 #: src/app/[lang]/block/ckb/[hashOrHeight]/layout.tsx:58
-#: src/components/transaction-header.tsx:44
+#: src/components/transaction-header.tsx:45
 msgid "Transactions"
 msgstr "Transactions"
 
