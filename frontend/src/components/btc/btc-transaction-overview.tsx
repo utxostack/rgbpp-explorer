@@ -39,7 +39,7 @@ export function BtcTransactionOverview({ btcTransaction, i18n }: { btcTransactio
         textAlign="center"
       >
         <OverviewInfo>
-          <OverviewInfoItem label={t(i18n)`Block Height(i18n)`}>
+          <OverviewInfoItem label={t(i18n)`Block Height`}>
             <Link
               href={`/block/btc/${btcTransaction.blockHash}`}
               color="brand"

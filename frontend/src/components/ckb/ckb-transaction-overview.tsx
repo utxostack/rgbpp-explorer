@@ -37,7 +37,7 @@ export function CkbTransactionOverview({ ckbTransaction, i18n }: { i18n: I18n; c
         textAlign="center"
       >
         <OverviewInfo>
-          <OverviewInfoItem label={t(i18n)`Block Height(i18n)`}>
+          <OverviewInfoItem label={t(i18n)`Block Height`}>
             <Link
               href={`/block/ckb/${ckbTransaction.block?.hash || ckbTransaction.blockNumber}`}
               color="brand"
