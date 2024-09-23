@@ -3,6 +3,7 @@
 import { t } from '@lingui/macro'
 import { Grid, HStack, VStack } from 'styled-system/jsx'
 
+import { getI18nInstance } from '@/app/[lang]/appRouterI18n'
 import OverviewSVG from '@/assets/overview.svg'
 import { OverflowAmount } from '@/components/overflow-amount'
 import { OverviewInfo, OverviewInfoItem } from '@/components/overview-info'
@@ -11,8 +12,15 @@ import { CkbAddressBaseQuery } from '@/gql/graphql'
 import { shannonToCKB } from '@/lib/ckb/shannon-to-ckb'
 import { formatNumber } from '@/lib/string/format-number'
 
-export function CkbAddressOverview({ ckbAddress }: { ckbAddress: CkbAddressBaseQuery['ckbAddress'] }) {
+export function CkbAddressOverview({
+  ckbAddress,
+  lang,
+}: {
+  lang: string
+  ckbAddress: CkbAddressBaseQuery['ckbAddress']
+}) {
   if (!ckbAddress) return null
+  const i18n = getI18nInstance(lang)
   return (
     <VStack gap={0} w="100%" bg="bg.card" rounded="8px">
       <HStack w="100%" px="30px" py="16px" gap="12px" borderBottom="1px solid" borderBottomColor="border.primary">

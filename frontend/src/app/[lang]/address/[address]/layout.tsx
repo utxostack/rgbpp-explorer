@@ -59,12 +59,12 @@ export default async function Layout({
   if (isBtcAddress) {
     const data = await graphQLClient.request(btcAddressQuery, { address })
     if (data?.btcAddress) {
-      overflow = <BtcAddressOverview btcAddress={data?.btcAddress} />
+      overflow = <BtcAddressOverview lang={lang} btcAddress={data?.btcAddress} />
     }
   } else if (isCkbAddress) {
     const data = await graphQLClient.request(ckbAddressQuery, { address })
     if (data?.ckbAddress) {
-      overflow = <CkbAddressOverview ckbAddress={data?.ckbAddress} />
+      overflow = <CkbAddressOverview ckbAddress={data?.ckbAddress} lang={lang} />
     }
   }
 
