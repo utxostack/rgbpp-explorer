@@ -1,5 +1,4 @@
-'use client'
-
+import type { I18n } from '@lingui/core'
 import { t } from '@lingui/macro'
 
 import BlockIcon from '@/assets/block.svg'
@@ -14,10 +13,12 @@ export function BlockHeader({
   id,
   height,
   confirmations,
+  i18n,
 }: {
   id: string
   height: number
   confirmations?: number | null
+  i18n: I18n
 }) {
   return (
     <Grid
@@ -36,7 +37,7 @@ export function BlockHeader({
       </Icon>
 
       <Heading fontSize="20px" fontWeight="semibold" gridRow="1/2">
-        {t`Block ${formatNumber(height)}`}
+        {t(i18n)`Block ${formatNumber(height)}`}
       </Heading>
 
       <Box gridRow="2/3" gridColumn={{ base: '1/3', lg: '2/3' }}>
@@ -65,7 +66,7 @@ export function BlockHeader({
         >
           {formatNumber(confirmations)}{' '}
           <Text as="span" fontSize="14px" fontWeight="medium" display={{ base: 'none', xl: 'inline' }}>
-            {t`Confirmations`}
+            {t(i18n)`Confirmations`}
           </Text>
         </Box>
       ) : null}

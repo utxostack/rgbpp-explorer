@@ -41,15 +41,19 @@ export default async function Layout({
 }: PropsWithChildren<{
   params: { hashOrHeight: string; lang: string }
 }>) {
-  const i18n = getI18nInstance(lang)
   const data = await graphQLClient.request(query, { hashOrHeight })
-
   if (!data?.ckbBlock) notFound()
+  const i18n = getI18nInstance(lang)
 
   return (
     <VStack w="100%" maxW="content" p={{ base: '20px', lg: '30px' }} gap={{ base: '20px', lg: '30px' }}>
-      <BlockHeader id={data.ckbBlock.hash} height={data.ckbBlock.number} confirmations={data.ckbBlock.confirmations} />
-      <CkbBlockOverview block={data.ckbBlock as CkbBlock} />
+      <BlockHeader
+        i18n={i18n}
+        id={data.ckbBlock.hash}
+        height={data.ckbBlock.number}
+        confirmations={data.ckbBlock.confirmations}
+      />
+      <CkbBlockOverview i18n={i18n} block={data.ckbBlock as CkbBlock} />
       <LinkTabs
         w="100%"
         links={[

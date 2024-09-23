@@ -1,5 +1,4 @@
-'use client'
-
+import type { I18n } from '@lingui/core'
 import { t } from '@lingui/macro'
 import { Grid, HStack, VStack } from 'styled-system/jsx'
 
@@ -15,15 +14,17 @@ import { formatNumber } from '@/lib/string/format-number'
 
 export function CkbBlockOverview({
   block,
+  i18n,
 }: {
   block: Pick<CkbBlock, 'timestamp' | 'transactionsCount' | 'miner' | 'reward' | 'size' | 'confirmations'>
+  i18n: I18n
 }) {
   if (!block) return null
   return (
     <VStack gap={0} w="100%" bg="bg.card" rounded="8px">
       <HStack w="100%" px="30px" py="16px" gap="12px" borderBottom="1px solid" borderBottomColor="border.primary">
         <OverflowSVG w="24px" />
-        <Heading fontSize="16px" fontWeight="semibold">{t`Overview`}</Heading>
+        <Heading fontSize="16px" fontWeight="semibold">{t(i18n)`Overview`}</Heading>
         {block.timestamp ? <TimeFormatter timestamp={block.timestamp} /> : null}
       </HStack>
       <Grid
@@ -36,15 +37,15 @@ export function CkbBlockOverview({
         textAlign="center"
       >
         <OverviewInfo>
-          <OverviewInfoItem label={t`Block size`}>
-            <OverflowAmount amount={formatNumber(block.size)} symbol={t`bytes`} />
+          <OverviewInfoItem label={t(i18n)`Block size`}>
+            <OverflowAmount amount={formatNumber(block.size)} symbol={t(i18n)`bytes`} />
           </OverviewInfoItem>
-          <OverviewInfoItem label={t`Transaction`} formatNumber>
+          <OverviewInfoItem label={t(i18n)`Transaction`} formatNumber>
             {block.transactionsCount}
           </OverviewInfoItem>
         </OverviewInfo>
         <OverviewInfo>
-          <OverviewInfoItem label={t`Miner`}>
+          <OverviewInfoItem label={t(i18n)`Miner`}>
             {block.miner ? (
               <Link
                 href={`/address/${block.miner.address}`}
@@ -61,8 +62,8 @@ export function CkbBlockOverview({
               <Text color="text.third">-</Text>
             )}
           </OverviewInfoItem>
-          <OverviewInfoItem label={t`Miner Reward`} formatNumber>
-            <OverflowAmount amount={formatNumber(block.reward)} symbol={t`CKB`} />
+          <OverviewInfoItem label={t(i18n)`Miner Reward`} formatNumber>
+            <OverflowAmount amount={formatNumber(block.reward)} symbol={t(i18n)`CKB`} />
           </OverviewInfoItem>
         </OverviewInfo>
       </Grid>

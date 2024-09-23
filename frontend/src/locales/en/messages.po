@@ -41,7 +41,7 @@ msgstr "{0} confirmed"
 msgid "{0} DOB"
 msgstr "{0} DOB"
 
-#: src/components/btc/btc-block-overview.tsx:64
+#: src/components/btc/btc-block-overview.tsx:65
 msgid "{0} sats/VB ~ {1} sats/VB"
 msgstr "{0} sats/VB ~ {1} sats/VB"
 
@@ -123,7 +123,7 @@ msgstr "Back to Home"
 msgid "Bitcoin"
 msgstr "Bitcoin"
 
-#: src/components/block-header.tsx:39
+#: src/components/block-header.tsx:40
 msgid "Block {0}"
 msgstr "Block {0}"
 
@@ -141,8 +141,8 @@ msgstr "Block Height"
 #~ msgid "Block Height(i18n)"
 #~ msgstr "Block Height(i18n)"
 
-#: src/components/btc/btc-block-overview.tsx:52
-#: src/components/ckb/ckb-block-overview.tsx:39
+#: src/components/btc/btc-block-overview.tsx:53
+#: src/components/ckb/ckb-block-overview.tsx:40
 msgid "Block size"
 msgstr "Block size"
 
@@ -162,9 +162,9 @@ msgstr "BTC Balance"
 msgid "BTC Txn"
 msgstr "BTC Txn"
 
-#: src/components/btc/btc-block-overview.tsx:53
+#: src/components/btc/btc-block-overview.tsx:54
 #: src/components/btc/btc-transaction-overview.tsx:52
-#: src/components/ckb/ckb-block-overview.tsx:40
+#: src/components/ckb/ckb-block-overview.tsx:41
 #: src/components/ckb/ckb-transaction-overview.tsx:49
 msgid "bytes"
 msgstr "bytes"
@@ -173,7 +173,7 @@ msgstr "bytes"
 #: src/components/ckb/ckb-address-overview.tsx:39
 #: src/components/ckb/ckb-address-overview.tsx:42
 #: src/components/ckb/ckb-address-overview.tsx:45
-#: src/components/ckb/ckb-block-overview.tsx:65
+#: src/components/ckb/ckb-block-overview.tsx:66
 #: src/components/ckb/ckb-cell-tables.tsx:131
 #: src/components/ckb/ckb-transaction-overview.tsx:55
 #: src/components/footer.tsx:94
@@ -223,7 +223,7 @@ msgstr "Coming soon, please stay tuned"
 #~ msgid "confirmations"
 #~ msgstr "confirmations"
 
-#: src/components/block-header.tsx:68
+#: src/components/block-header.tsx:69
 #: src/components/transaction-header.tsx:72
 msgid "Confirmations"
 msgstr "Confirmations"
@@ -291,7 +291,7 @@ msgstr "Fee"
 msgid "Fee rate"
 msgstr "Fee rate"
 
-#: src/components/btc/btc-block-overview.tsx:60
+#: src/components/btc/btc-block-overview.tsx:61
 msgid "Fee rate span"
 msgstr "Fee rate span"
 
@@ -401,12 +401,12 @@ msgstr "Mainnet"
 msgid "Medium"
 msgstr "Medium"
 
-#: src/components/btc/btc-block-overview.tsx:91
-#: src/components/ckb/ckb-block-overview.tsx:47
+#: src/components/btc/btc-block-overview.tsx:94
+#: src/components/ckb/ckb-block-overview.tsx:48
 msgid "Miner"
 msgstr "Miner"
 
-#: src/components/ckb/ckb-block-overview.tsx:64
+#: src/components/ckb/ckb-block-overview.tsx:65
 msgid "Miner Reward"
 msgstr "Miner Reward"
 
@@ -466,10 +466,10 @@ msgstr "Outputs ({0})"
 #~ msgstr "Overflow"
 
 #: src/components/btc/btc-address-overview.tsx:26
-#: src/components/btc/btc-block-overview.tsx:39
+#: src/components/btc/btc-block-overview.tsx:40
 #: src/components/btc/btc-transaction-overview.tsx:27
 #: src/components/ckb/ckb-address-overview.tsx:26
-#: src/components/ckb/ckb-block-overview.tsx:26
+#: src/components/ckb/ckb-block-overview.tsx:27
 #: src/components/ckb/ckb-transaction-overview.tsx:27
 msgid "Overview"
 msgstr "Overview"
@@ -536,8 +536,8 @@ msgstr "sats/kB"
 #~ msgid "sats/vB"
 #~ msgstr "sats/vB"
 
-#: src/components/btc/btc-block-overview.tsx:81
-#: src/components/btc/btc-block-overview.tsx:86
+#: src/components/btc/btc-block-overview.tsx:84
+#: src/components/btc/btc-block-overview.tsx:89
 msgid "sats/VB"
 msgstr "sats/VB"
 
@@ -623,15 +623,15 @@ msgstr "Time"
 msgid "Total {0} Items"
 msgstr "Total {0} Items"
 
-#: src/components/btc/btc-block-overview.tsx:55
-#: src/components/ckb/ckb-block-overview.tsx:42
+#: src/components/btc/btc-block-overview.tsx:56
+#: src/components/ckb/ckb-block-overview.tsx:43
 msgid "Transaction"
 msgstr "Transaction"
 
 #: src/app/[lang]/address/[address]/layout.tsx:104
 #: src/app/[lang]/assets/coins/[typeHash]/layout.tsx:79
-#: src/app/[lang]/block/btc/[hashOrHeight]/layout.tsx:63
-#: src/app/[lang]/block/ckb/[hashOrHeight]/layout.tsx:58
+#: src/app/[lang]/block/btc/[hashOrHeight]/layout.tsx:67
+#: src/app/[lang]/block/ckb/[hashOrHeight]/layout.tsx:62
 #: src/components/transaction-header.tsx:45
 msgid "Transactions"
 msgstr "Transactions"

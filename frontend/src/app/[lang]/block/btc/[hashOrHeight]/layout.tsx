@@ -46,15 +46,19 @@ export default async function Layout({
   params: { hashOrHeight, lang },
   children,
 }: PropsWithChildren<{ params: { hashOrHeight: string; lang: string } }>) {
-  const i18n = getI18nInstance(lang)
   const data = await graphQLClient.request(query, { hashOrHeight })
-
   if (!data?.btcBlock) notFound()
+  const i18n = getI18nInstance(lang)
 
   return (
     <VStack w="100%" maxW="content" p={{ base: '20px', lg: '30px' }} gap={{ base: '20px', lg: '30px' }}>
-      <BlockHeader id={data.btcBlock.id} height={data.btcBlock.height} confirmations={data.btcBlock.confirmations} />
-      <BtcBlockOverview block={data.btcBlock as BitcoinBlock} />
+      <BlockHeader
+        i18n={i18n}
+        id={data.btcBlock.id}
+        height={data.btcBlock.height}
+        confirmations={data.btcBlock.confirmations}
+      />
+      <BtcBlockOverview i18n={i18n} block={data.btcBlock as BitcoinBlock} />
       <LinkTabs
         w="100%"
         links={[
