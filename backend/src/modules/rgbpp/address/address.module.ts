@@ -6,6 +6,7 @@ import { CkbRpcModule } from 'src/core/ckb-rpc/ckb-rpc.module';
 import { RgbppModule } from '../rgbpp.module';
 import { CkbTransactionModule } from 'src/modules/ckb/transaction/transaction.module';
 import { BullModule } from '@nestjs/bullmq';
+import { RgbppAddressService } from './address.service';
 
 @Module({
   imports: [
@@ -22,6 +23,6 @@ import { BullModule } from '@nestjs/bullmq';
       },
     }),
   ],
-  providers: [RgbppAddressResolver],
+  providers: [RgbppAddressResolver, RgbppAddressService],
 })
 export class RgbppAddressModule {}

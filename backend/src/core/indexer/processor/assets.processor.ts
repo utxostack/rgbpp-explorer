@@ -9,8 +9,8 @@ import { IndexerQueueService } from '../indexer.queue';
 import { ModuleRef } from '@nestjs/core';
 import { IndexerServiceFactory } from '../indexer.factory';
 import { IndexerAssetsService } from '../service/assets.service';
-import { IndexerEvent } from '../indexer.service';
 import * as Sentry from '@sentry/node';
+import { IndexerAssetsEvent } from '../flow/assets.flow';
 
 export const INDEXER_ASSETS_QUEUE = 'indexer-assets-queue';
 
@@ -57,6 +57,7 @@ export class IndexerAssetsProcessor extends WorkerHost {
     this.logger.error(
       `Indexing assets (code hash: ${assetType.codeHash}, cursor: ${cursor}) for chain ${chainId} failed`,
     );
+    this.logger.error(error.stack);
     Sentry.captureException(error);
   }
 
@@ -65,7 +66,7 @@ export class IndexerAssetsProcessor extends WorkerHost {
     if (cursor === '0x') {
       const indexerServiceFactory = this.moduleRef.get(IndexerServiceFactory);
       const indexerService = await indexerServiceFactory.getService(chainId);
-      indexerService.emit(IndexerEvent.AssetIndexed, assetType);
+      indexerService.assetsFlow.emit(IndexerAssetsEvent.AssetIndexed, assetType);
       return;
     }
 

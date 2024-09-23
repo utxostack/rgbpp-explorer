@@ -30,7 +30,6 @@
   },
   "dependencies": {
     "@apollo/server": "^4.11.0",
-    "@applifting-io/nestjs-dataloader": "^1.1.5",
     "@as-integrations/fastify": "^2.1.1",
     "@cell-studio/mempool.js": "^2.5.3",
     "@ckb-lumos/bi": "^0.23.0",
