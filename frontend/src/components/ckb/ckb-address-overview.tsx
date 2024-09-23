@@ -23,7 +23,7 @@ export function CkbAddressOverview({
     <VStack gap={0} w="100%" bg="bg.card" rounded="8px">
       <HStack w="100%" px="30px" py="16px" gap="12px" borderBottom="1px solid" borderBottomColor="border.primary">
         <OverviewSVG w="24px" />
-        <Heading fontSize="16px" fontWeight="semibold">{t`Overview`}</Heading>
+        <Heading fontSize="16px" fontWeight="semibold">{t(i18n)`Overview`}</Heading>
       </HStack>
       <Grid
         w="100%"
@@ -35,21 +35,21 @@ export function CkbAddressOverview({
         textAlign="center"
       >
         <OverviewInfo>
-          <OverviewInfoItem label={t`CKB Balance`}>
-            <OverflowAmount amount={formatNumber(shannonToCKB(ckbAddress.balance?.total))} symbol={t`CKB`} />
+          <OverviewInfoItem label={t(i18n)`CKB Balance`}>
+            <OverflowAmount amount={formatNumber(shannonToCKB(ckbAddress.balance?.total))} symbol={t(i18n)`CKB`} />
           </OverviewInfoItem>
-          <OverviewInfoItem label={t`Available`}>
-            <OverflowAmount amount={formatNumber(shannonToCKB(ckbAddress.balance?.available))} symbol={t`CKB`} />
+          <OverviewInfoItem label={t(i18n)`Available`}>
+            <OverflowAmount amount={formatNumber(shannonToCKB(ckbAddress.balance?.available))} symbol={t(i18n)`CKB`} />
           </OverviewInfoItem>
-          <OverviewInfoItem label={t`Occupied`}>
-            <OverflowAmount amount={formatNumber(shannonToCKB(ckbAddress.balance?.occupied))} symbol={t`CKB`} />
+          <OverviewInfoItem label={t(i18n)`Occupied`}>
+            <OverflowAmount amount={formatNumber(shannonToCKB(ckbAddress.balance?.occupied))} symbol={t(i18n)`CKB`} />
           </OverviewInfoItem>
         </OverviewInfo>
         <OverviewInfo>
-          <OverviewInfoItem label={t`Txns`} formatNumber>
+          <OverviewInfoItem label={t(i18n)`Txns`} formatNumber>
             {ckbAddress.transactionsCount}
           </OverviewInfoItem>
-          <OverviewInfoItem label={t`L2 RGB++ Assets`} unsupported />
+          <OverviewInfoItem label={t(i18n)`L2 RGB++ Assets`} unsupported />
         </OverviewInfo>
       </Grid>
     </VStack>
