@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.11.2",
-    "@ark-ui/react": "^3.5.0",
+    "@ark-ui/react": "^3.12.1",
     "@bitcoinerlab/secp256k1": "^1.1.1",
     "@ckb-lumos/lumos": "^0.23.0",
     "@graphql-typed-document-node/core": "^3.2.0",
