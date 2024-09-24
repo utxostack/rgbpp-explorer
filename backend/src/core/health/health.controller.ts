@@ -3,8 +3,6 @@ import { HealthCheckService, HealthCheck, HttpHealthIndicator } from '@nestjs/te
 import { CkbRpcHealthIndicator, CkbRpcHealthIndicatorKey } from '../ckb-rpc/ckb-rpc.health';
 import { BitcoinApiHealthIndicator } from '../bitcoin-api/bitcoin-api.health';
 import { CkbExplorerHealthIndicator } from '../ckb-explorer/ckb-explorer.health';
-import { IndexerHealthIndicator, IndexerHealthIndicatorKey } from '../indexer/indexer.health';
-import { DatabaseHealthIndicator } from '../database/database.health';
 import { SkipThrottle } from '@nestjs/throttler';
 
 @SkipThrottle()
@@ -16,9 +14,7 @@ export class HealthController {
     private bitcoinApiHealthIndicator: BitcoinApiHealthIndicator,
     private ckbRpcHealthIndicator: CkbRpcHealthIndicator,
     private ckbExplorerHealthIndicator: CkbExplorerHealthIndicator,
-    private indexerHealthIndicator: IndexerHealthIndicator,
-    private databaseHealthIndicator: DatabaseHealthIndicator,
-  ) {}
+  ) { }
 
   @Get()
   @HealthCheck()
@@ -28,9 +24,6 @@ export class HealthController {
         this.http.pingCheck('graphql', 'http://localhost:3000/graphql?query=%7B__typename%7D', {
           headers: { 'apollo-require-preflight': true },
         }),
-      () => this.databaseHealthIndicator.isHealthy(),
-      () => this.indexerHealthIndicator.isHealthy(IndexerHealthIndicatorKey.Asset),
-      () => this.indexerHealthIndicator.isHealthy(IndexerHealthIndicatorKey.Transaction),
       () => this.bitcoinApiHealthIndicator.isHealthy(),
       () => this.ckbRpcHealthIndicator.isHealthy(CkbRpcHealthIndicatorKey.Websocket),
       () => this.ckbExplorerHealthIndicator.isHealthy(),

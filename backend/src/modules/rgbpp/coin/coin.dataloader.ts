@@ -1,10 +1,10 @@
+import { NestDataLoader } from '@applifting-io/nestjs-dataloader';
 import { Injectable, Logger } from '@nestjs/common';
 import DataLoader from 'dataloader';
-import { DataLoaderResponse } from 'src/common/dataloader';
+import { DataLoaderResponse } from 'src/common/type/dataloader';
 import * as CkbExplorerInterface from 'src/core/ckb-explorer/ckb-explorer.interface';
 import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
 import * as Sentry from '@sentry/nestjs';
-import { NestDataLoader } from 'src/common/dataloader';
 
 export interface CkbExplorerXUDTTransactionsLoaderKey {
   typeHash: string;
@@ -25,14 +25,6 @@ export class CkbExplorerXUDTTransactionsLoader
   private logger = new Logger(CkbExplorerXUDTTransactionsLoader.name);
 
   constructor(private ckbExplorerService: CkbExplorerService) {}
-
-  public getOptions() {
-    return {
-      cacheKeyFn: (key: CkbExplorerXUDTTransactionsLoaderKey) => {
-        return `${key.typeHash}-${key.page}-${key.pageSize}-${key.txHash}-${key.addressHash}`;
-      },
-    };
-  }
 
   public getBatchFunction() {
     return async (keys: CkbExplorerXUDTTransactionsLoaderKey[]) => {

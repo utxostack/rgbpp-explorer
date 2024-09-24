@@ -1,4 +1,4 @@
-import { Loader } from 'src/common/dataloader';
+import { Loader } from '@applifting-io/nestjs-dataloader';
 import { Args, Int, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { CkbTransaction } from 'src/modules/ckb/transaction/transaction.model';
 import {
@@ -11,11 +11,10 @@ import {
   BitcoinTransactionLoader,
   BitcoinTransactionLoaderType,
 } from 'src/modules/bitcoin/transaction/transaction.dataloader';
-import { RgbppTransaction, RgbppLatestTransactionList } from './transaction.model';
+import { RgbppTransaction, RgbppLatestTransactionList, LeapDirection } from './transaction.model';
 import { RgbppTransactionLoader, RgbppTransactionLoaderType } from './transaction.dataloader';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import { BI } from '@ckb-lumos/bi';
-import { LeapDirection } from '@prisma/client';
 
 @Resolver(() => RgbppTransaction)
 export class RgbppTransactionResolver {
@@ -28,37 +27,31 @@ export class RgbppTransactionResolver {
   public async getRecentTransactions(
     @Args('limit', { type: () => Int, nullable: true }) limit: number = 10,
   ): Promise<RgbppLatestTransactionList> {
-    const transactions = await this.rgbppTransactionService.getLatestTransactions(limit);
+    const { txs: l1Txs } = await this.rgbppTransactionService.getLatestTransactions(1, limit);
+    const l2Txs = await this.rgbppTransactionService.getLatestL2Transactions(limit);
+    const txs = [...l1Txs, ...l2Txs.txs].sort((a, b) => b.blockNumber - a.blockNumber);
 
     return {
-      txs: transactions,
-      total: transactions.length,
-      pageSize: 1,
+      txs: txs.slice(0, limit),
+      total: txs.length,
+      pageSize: limit,
     };
   }
 
   @Query(() => RgbppLatestTransactionList, { name: 'rgbppLatestL1Transactions' })
   public async getLatestL1Transactions(
-    @Args('limit', { type: () => Int, nullable: true }) limit: number = 10,
+    @Args('page', { type: () => Int, nullable: true }) page: number = 1,
+    @Args('pageSize', { type: () => Int, nullable: true }) pageSize: number = 10,
   ): Promise<RgbppLatestTransactionList> {
-    const transactions = await this.rgbppTransactionService.getLatestL1Transactions(limit);
-    return {
-      txs: transactions,
-      total: transactions.length,
-      pageSize: 1,
-    };
+    const txs = await this.rgbppTransactionService.getLatestTransactions(page, pageSize);
+    return txs;
   }
 
   @Query(() => RgbppLatestTransactionList, { name: 'rgbppLatestL2Transactions' })
   public async getLatestL2Transactions(
     @Args('limit', { type: () => Int, nullable: true }) limit: number = 10,
   ): Promise<RgbppLatestTransactionList> {
-    const transactions = await this.rgbppTransactionService.getLatestL2Transactions(limit);
-    return {
-      txs: transactions,
-      total: transactions.length,
-      pageSize: 1,
-    };
+    return this.rgbppTransactionService.getLatestL2Transactions(limit);
   }
 
   @Query(() => RgbppTransaction, { name: 'rgbppTransaction', nullable: true })

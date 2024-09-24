@@ -14,7 +14,7 @@ export class IndexerAssetsService {
   constructor(
     private prismaService: PrismaService,
     private moduleRef: ModuleRef,
-  ) {}
+  ) { }
 
   public async processAssetCell(
     chainId: number,
@@ -44,12 +44,9 @@ export class IndexerAssetsService {
       script: typeScript,
     });
 
-    let amount = '0';
-    if (cell.output_data && cell.output_data !== '0x') {
-      amount = assetType.fungible
-        ? BI.from(leToU128(remove0x(cell.output_data).slice(0, 32))).toString()
-        : '1';
-    }
+    const amount = assetType.fungible
+      ? BI.from(leToU128(remove0x(cell.output_data).slice(0, 32))).toString()
+      : 1;
 
     const data = {
       chainId,

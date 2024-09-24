@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { FieldMiddleware, MiddlewareContext, NextFn } from '@nestjs/graphql';
 import * as Sentry from '@sentry/nestjs';
 
@@ -17,3 +18,5 @@ export const fieldPerformanceMiddleware: FieldMiddleware = async (
   Sentry.setMeasurement('graphql.executionTime', executionTime, 'millisecond');
   return value;
 };
+
+const logger = new Logger(fieldPerformanceMiddleware.name);
