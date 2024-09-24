@@ -28,7 +28,7 @@ export function PaginationSearchParams(props: { count: number; pageSize: number 
       <NumberInput
         value={`${page}`}
         onValueChange={(e) => setPage(e.valueAsNumber)}
-        min={0}
+        min={1}
         max={Math.ceil(count / pageSize)}
         w="150px"
       />
