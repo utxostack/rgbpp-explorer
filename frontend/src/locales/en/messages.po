@@ -96,7 +96,7 @@ msgstr "<0>Explore the<1><2/></1></0><3>Ecosystem</3>"
 #~ msgid "🔥 Popular RGB++ Assets"
 #~ msgstr "🔥 Popular RGB++ Assets"
 
-#: src/app/[lang]/address/[address]/layout.tsx:84
+#: src/app/[lang]/address/[address]/layout.tsx:83
 msgid "Address"
 msgstr "Address"
 
@@ -478,7 +478,7 @@ msgstr "Overview"
 msgid "RGB++"
 msgstr "RGB++"
 
-#: src/app/[lang]/address/[address]/layout.tsx:108
+#: src/app/[lang]/address/[address]/layout.tsx:107
 #: src/components/navbar/index.tsx:134
 #: src/components/navbar/index.tsx:194
 msgid "RGB++ Assets"
@@ -628,7 +628,7 @@ msgstr "Total {0} Items"
 msgid "Transaction"
 msgstr "Transaction"
 
-#: src/app/[lang]/address/[address]/layout.tsx:104
+#: src/app/[lang]/address/[address]/layout.tsx:103
 #: src/app/[lang]/assets/coins/[typeHash]/layout.tsx:76
 #: src/app/[lang]/block/btc/[hashOrHeight]/layout.tsx:67
 #: src/app/[lang]/block/ckb/[hashOrHeight]/layout.tsx:62

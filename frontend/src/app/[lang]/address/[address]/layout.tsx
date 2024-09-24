@@ -47,7 +47,6 @@ export default async function Layout({
   params: { address, lang },
 }: PropsWithChildren<{
   params: { address: string; lang: string }
-  searchParams: { page?: string }
 }>) {
   const i18n = getI18nInstance(lang)
   const isBtcAddress = isValidBTCAddress(address)
