@@ -30,14 +30,6 @@ const btcAddressTxsQuery = graphql(`
         txid
         rgbppTransaction {
           ckbTransaction {
-            isCellbase
-            blockNumber
-            hash
-            fee
-            feeRate
-            size
-            confirmed
-            confirmations
             outputs {
               txHash
               index
@@ -91,10 +83,6 @@ const btcAddressTxsQuery = graphql(`
                 txHash
                 index
               }
-            }
-            block {
-              timestamp
-              hash
             }
           }
         }
@@ -264,7 +252,7 @@ export default async function Page({
               <BtcTransactionCardInAddress
                 address={address}
                 tx={tx as BitcoinTransaction}
-                ckbCell={rgbppTransaction?.ckbTransaction as CkbTransaction}
+                ckbCell={rgbppTransaction?.ckbTransaction as Pick<CkbTransaction, 'inputs' | 'outputs'>}
                 key={tx.txid}
               />
             )
