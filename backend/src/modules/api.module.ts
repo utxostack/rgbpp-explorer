@@ -1,6 +1,6 @@
 import { join } from 'node:path';
 import { ExecutionContext, Injectable, Module } from '@nestjs/common';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { GqlExecutionContext, GraphQLModule } from '@nestjs/graphql';
 import { DataLoaderInterceptor } from 'src/common/dataloader';
@@ -15,6 +15,8 @@ import { ComplexityPlugin } from './complexity.plugin';
 import * as Sentry from '@sentry/nestjs';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { FastifyReply, FastifyRequest } from 'fastify';
+import { SentryGlobalGraphQLFilter } from '@sentry/nestjs/setup';
+import { AllExceptionsFilter } from 'src/filters/all-exceptions.filter';
 
 @Injectable()
 export class GqlThrottlerGuard extends ThrottlerGuard {
@@ -76,6 +78,10 @@ export class GqlThrottlerGuard extends ThrottlerGuard {
     {
       provide: APP_INTERCEPTOR,
       useClass: DataLoaderInterceptor,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
     },
     ComplexityPlugin,
   ],
