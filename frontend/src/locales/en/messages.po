@@ -108,7 +108,7 @@ msgstr "Amount"
 msgid "Available"
 msgstr "Available"
 
-#: src/app/[lang]/address/[address]/transactions/page.tsx:277
+#: src/app/[lang]/address/[address]/transactions/page.tsx:265
 msgid "Back to first page"
 msgstr "Back to first page"
 
@@ -118,7 +118,7 @@ msgstr "Back to Home"
 
 #: src/app/[lang]/explorer/btc/info.tsx:50
 #: src/components/footer.tsx:91
-#: src/components/navbar/index.tsx:33
+#: src/components/navbar/index.tsx:34
 #: src/components/network-cards.tsx:74
 msgid "Bitcoin"
 msgstr "Bitcoin"
@@ -177,7 +177,7 @@ msgstr "bytes"
 #: src/components/ckb/ckb-cell-tables.tsx:131
 #: src/components/ckb/ckb-transaction-overview.tsx:55
 #: src/components/footer.tsx:94
-#: src/components/navbar/index.tsx:38
+#: src/components/navbar/index.tsx:39
 #: src/components/network-cards.tsx:107
 msgid "CKB"
 msgstr "CKB"
@@ -274,7 +274,7 @@ msgstr "Drop"
 #~ msgstr "Explore the<0>BTC</0>Ecosystem"
 
 #: src/components/footer.tsx:88
-#: src/components/navbar/index.tsx:111
+#: src/components/navbar/index.tsx:113
 msgid "Explorer"
 msgstr "Explorer"
 
@@ -311,6 +311,10 @@ msgstr "Fee rate:<0>{0}</0>{feeUnit}/vB"
 #: src/components/utxo-or-cell-footer.tsx:43
 #~ msgid "Fee rate:<0>{0}</0>sats/vB"
 #~ msgstr "Fee rate:<0>{0}</0>sats/vB"
+
+#: src/components/pagination-searchparams.tsx:44
+msgid "Go"
+msgstr "Go"
 
 #: src/app/[lang]/explorer/btc/info.tsx:87
 #: src/app/[lang]/explorer/ckb/info.tsx:58
@@ -426,7 +430,7 @@ msgstr "More Info"
 msgid "Nervos CKB"
 msgstr "Nervos CKB"
 
-#: src/app/[lang]/address/[address]/transactions/page.tsx:289
+#: src/app/[lang]/address/[address]/transactions/page.tsx:277
 msgid "Next"
 msgstr "Next"
 
@@ -434,8 +438,8 @@ msgstr "Next"
 msgid "No Data"
 msgstr "No Data"
 
-#: src/app/[lang]/address/[address]/transactions/page.tsx:259
-#: src/app/[lang]/address/[address]/transactions/page.tsx:315
+#: src/app/[lang]/address/[address]/transactions/page.tsx:247
+#: src/app/[lang]/address/[address]/transactions/page.tsx:303
 msgid "No Transaction"
 msgstr "No Transaction"
 
@@ -479,8 +483,8 @@ msgid "RGB++"
 msgstr "RGB++"
 
 #: src/app/[lang]/address/[address]/layout.tsx:107
-#: src/components/navbar/index.tsx:134
-#: src/components/navbar/index.tsx:194
+#: src/components/navbar/index.tsx:136
+#: src/components/navbar/index.tsx:196
 msgid "RGB++ Assets"
 msgstr "RGB++ Assets"
 
@@ -498,7 +502,7 @@ msgid "RGB++ Binding Txn on CKB"
 msgstr "RGB++ Binding Txn on CKB"
 
 #: src/components/footer.tsx:54
-#: src/components/navbar/index.tsx:92
+#: src/components/navbar/index.tsx:94
 msgid "RGB++ Explorer"
 msgstr "RGB++ Explorer"
 
@@ -559,7 +563,7 @@ msgstr "SDK"
 msgid "Search by Address/Tx Hash/Block Hash/AssetID"
 msgstr "Search by Address/Tx Hash/Block Hash/AssetID"
 
-#: src/app/[lang]/address/[address]/transactions/page.tsx:328
+#: src/app/[lang]/address/[address]/transactions/page.tsx:316
 msgid "shannons"
 msgstr "shannons"
 
@@ -617,7 +621,7 @@ msgstr "Testnet"
 msgid "Time"
 msgstr "Time"
 
-#: src/app/[lang]/address/[address]/transactions/page.tsx:337
+#: src/app/[lang]/address/[address]/transactions/page.tsx:325
 #: src/app/[lang]/assets/coins/[typeHash]/transactions/page.tsx:106
 #: src/app/[lang]/assets/coins/page.tsx:53
 msgid "Total {0} Items"

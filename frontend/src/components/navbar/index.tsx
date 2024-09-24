@@ -3,6 +3,7 @@
 import { Trans } from '@lingui/macro'
 import { useLingui } from '@lingui/react'
 import { usePathname } from 'next/navigation'
+import { AppProgressBar as ProgressBar } from 'next-nprogress-bar'
 import { useState } from 'react'
 import { Box, Center, Flex, HStack, styled, VStack } from 'styled-system/jsx'
 
@@ -84,6 +85,7 @@ export function Navbar() {
       shadow="lg"
       minH={{ base: '64px', lg: '80px' }}
     >
+      <ProgressBar height="4px" color="var(--colors-brand)" options={{ showSpinner: false }} shallowRouting />
       <Flex maxW="1280px" w="100%" h={{ base: '64px', lg: '80px' }} alignItems="center" justifyContent="space-between">
         <HStack fontWeight="medium" gap={{ base: '40px', xl: '80px' }} flex={1} pr={{ base: 0, lg: '24px' }}>
           <Link display="flex" href="/" gap="8px" alignItems="center">
