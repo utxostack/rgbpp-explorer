@@ -206,7 +206,7 @@ export class CkbExplorerService {
 
   @Cacheable({
     namespace: 'CkbExplorerService',
-    key: (address: string, tags, sort, page = 1, pageSize = 10) =>
+    key: (address: string, tags = [], sort, page = 1, pageSize = 10) =>
       `getXUDTList:${address},${tags.join('|')},${sort},${page},${pageSize}`,
     ttl: 10_000,
   })
