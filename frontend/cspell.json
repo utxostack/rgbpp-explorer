@@ -31,7 +31,8 @@
     "bech",
     "lumos",
     "hexify",
-    "bytify"
+    "bytify",
+    "nprogress"
   ],
   "ignorePaths": [
     "pnpm-lock.yaml",
