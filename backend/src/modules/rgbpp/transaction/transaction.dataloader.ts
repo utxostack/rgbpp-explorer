@@ -1,10 +1,10 @@
 import DataLoader from 'dataloader';
 import { Injectable, Logger } from '@nestjs/common';
-import { NestDataLoader } from '@applifting-io/nestjs-dataloader';
-import { DataLoaderResponse } from 'src/common/type/dataloader';
+import { DataLoaderResponse } from 'src/common/dataloader';
 import { RgbppTransactionService } from './transaction.service';
 import { RgbppTransaction } from './transaction.model';
 import * as Sentry from '@sentry/nestjs';
+import { NestDataLoader } from 'src/common/dataloader';
 
 @Injectable()
 export class RgbppTransactionLoader implements NestDataLoader<string, RgbppTransaction | null> {

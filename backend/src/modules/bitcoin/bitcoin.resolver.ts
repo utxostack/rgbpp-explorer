@@ -1,11 +1,11 @@
 import { Float, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import { BitcoinBaseChainInfo, BitcoinChainInfo, BitcoinFees } from './bitcoin.model';
-import { Loader } from '@applifting-io/nestjs-dataloader';
+import { Loader } from 'src/common/dataloader';
 import {
   BitcoinBlockTxidsLoader,
   BitcoinBlockTxidsLoaderType,
-} from './block/dataloader/block-txids.loader';
+} from './block/dataloader/block-txids.dataloader';
 
 // 60 * 24 = 1440 minutes
 const BLOCK_NUMBER_OF_24_HOURS = 144;

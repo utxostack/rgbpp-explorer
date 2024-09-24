@@ -5,8 +5,6 @@ import { RgbppStatisticService } from './statistic.service';
 import { CkbRpcModule } from 'src/core/ckb-rpc/ckb-rpc.module';
 import { BitcoinApiModule } from 'src/core/bitcoin-api/bitcoin-api.module';
 import { RgbppModule } from '../rgbpp.module';
-import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
-import { CronJob } from 'cron';
 import { CkbScriptModule } from 'src/modules/ckb/script/script.module';
 import { RgbppTransactionModule } from '../transaction/transaction.module';
 
@@ -23,16 +21,4 @@ import { RgbppTransactionModule } from '../transaction/transaction.module';
   providers: [RgbppStatisticResolver, RgbppStatisticService],
   exports: [RgbppStatisticService],
 })
-export class RgbppStatisticModule {
-  constructor(
-    private rgbppStatisticService: RgbppStatisticService,
-    private schedulerRegistry: SchedulerRegistry,
-  ) {
-    this.schedulerRegistry.addCronJob(
-      'collectLatest24HourRgbppTransactions',
-      new CronJob(CronExpression.EVERY_HOUR, () => {
-        this.rgbppStatisticService.collectLatest24HourRgbppTransactions();
-      }),
-    );
-  }
-}
+export class RgbppStatisticModule {}

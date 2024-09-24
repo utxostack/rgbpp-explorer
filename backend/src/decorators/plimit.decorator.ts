@@ -1,4 +1,4 @@
-import * as pLimit from 'p-limit';
+import pLimit from 'p-limit';
 
 export interface PLimitOptions {
   concurrency: number;
