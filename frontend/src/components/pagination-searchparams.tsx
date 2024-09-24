@@ -1,7 +1,7 @@
 'use client'
 
 import { Trans } from '@lingui/macro'
-import { redirect, usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { redirect, usePathname, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui'
@@ -10,7 +10,6 @@ import { NumberInput } from '@/components/ui/number-input'
 
 export function PaginationSearchParams(props: { count: number; pageSize: number }) {
   const { count, pageSize } = props
-  const router = useRouter()
   const searchParams = useSearchParams()
   const initialPage = Number(searchParams.get('page') ?? '1')
   const pathname = usePathname()

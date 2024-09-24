@@ -9,6 +9,7 @@ import { Text } from '@/components/ui'
 import { graphql } from '@/gql'
 import { graphQLClient } from '@/lib/graphql'
 import { resolvePage } from '@/lib/resolve-page'
+import { formatNumber } from '@/lib/string/format-number'
 
 const query = graphql(`
   query RgbppCoins($page: Int!, $pageSize: Int!) {
@@ -50,7 +51,7 @@ export default async function Page({
       </Box>
       <HStack gap="16px">
         <IfBreakpoint breakpoint="md">
-          <Text fontSize="14px">{t(i18n)`Total ${response.rgbppCoins.total} Items`}</Text>
+          <Text fontSize="14px">{t(i18n)`Total ${formatNumber(response.rgbppCoins.total)} Items`}</Text>
         </IfBreakpoint>
         <PaginationSearchParams count={response.rgbppCoins.total} pageSize={pageSize} />
       </HStack>
