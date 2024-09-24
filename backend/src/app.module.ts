@@ -1,8 +1,7 @@
-import { APP_FILTER } from '@nestjs/core';
 import { CacheModule, CacheStore } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { SentryGlobalGraphQLFilter, SentryModule } from '@sentry/nestjs/setup';
+import { SentryModule } from '@sentry/nestjs/setup';
 import type { RedisClientOptions } from 'redis';
 import { redisStore } from 'cache-manager-redis-yet';
 import { Env } from './env';
@@ -56,10 +55,6 @@ import { BootstrapService } from './bootstrap.service';
   providers: [
     AppController,
     BootstrapService,
-    {
-      provide: APP_FILTER,
-      useClass: SentryGlobalGraphQLFilter,
-    },
   ],
   controllers: [AppController],
 })
