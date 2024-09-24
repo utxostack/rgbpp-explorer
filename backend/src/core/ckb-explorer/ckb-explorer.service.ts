@@ -6,13 +6,10 @@ import {
   AddressInfo,
   AddressTransactionSortType,
   Block,
-  BlockList,
-  BlockSortType,
   CkbExplorerResponse,
   DetailTransaction,
   NonPaginatedResponse,
   PaginatedResponse,
-  RgbppDigest,
   RgbppTransaction,
   Transaction,
   TransactionSortType,
@@ -21,7 +18,6 @@ import {
   Statistics,
   TransactionFeesStatistic,
   TransactionListSortType,
-  TransactionListItem,
 } from './ckb-explorer.interface';
 import { ONE_MONTH_MS } from 'src/common/date';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
@@ -44,10 +40,6 @@ export type GetAddressTransactionsParams = BasePaginationParams & {
   sort?: AddressTransactionSortType;
 };
 
-type GetBlockListParams = BasePaginationParams & {
-  sort?: BlockSortType;
-};
-
 type GetRgbppTransactionsParams = BasePaginationParams & {
   sort?: TransactionSortType;
   leapDirection?: 'in' | 'out';
@@ -62,10 +54,6 @@ type GetXUDTListParams = BasePaginationParams & {
 type GetXUDTTransactionsParams = BasePaginationParams & {
   txHash?: string;
   addressHash?: string;
-};
-
-type GetTransactionListParams = BasePaginationParams & {
-  sort?: 'height.desc' | 'height.asc';
 };
 
 @Injectable()
@@ -119,6 +107,12 @@ export class CkbExplorerService {
     return response.data;
   }
 
+  @Cacheable({
+    namespace: 'CkbExplorerService',
+    key: (address: string, sort, page = 1, pageSize = 10) =>
+      `getAddressTransactions:${address},${sort},${page},${pageSize}`,
+    ttl: 10_000,
+  })
   public async getAddressTransactions({
     address,
     sort,
@@ -132,17 +126,6 @@ export class CkbExplorerService {
         pageSize,
       },
     });
-    return response.data;
-  }
-
-  public async getBlockList({
-    page = 1,
-    pageSize = 10,
-    sort = BlockSortType.HeightDesc,
-  }: GetBlockListParams = {}): Promise<PaginatedResponse<BlockList>> {
-    const response = await this.request.get(
-      `/v1/blocks?page=${page}&page_size=${pageSize}&sort=${sort}`,
-    );
     return response.data;
   }
 
@@ -162,20 +145,10 @@ export class CkbExplorerService {
 
   @Cacheable({
     namespace: 'CkbExplorerService',
-    key: (heightOrHash: string, { page = 1, pageSize = 10 }: BasePaginationParams = {}) =>
-      `getBlockTransactions:${heightOrHash},${page},${pageSize}`,
-    ttl: ONE_MONTH_MS,
+    key: (address: string, leapDirection, page = 1, pageSize = 10) =>
+      `getRgbppTransactions:${address},${page},${pageSize},${leapDirection}`,
+    ttl: 10_000,
   })
-  public async getBlockTransactions(
-    blockHash: string,
-    { page = 1, pageSize = 10 }: BasePaginationParams = {},
-  ): Promise<PaginatedResponse<Transaction>> {
-    const response = await this.request.get(
-      `/v1/block_transactions/${blockHash}?page=${page}&page_size=${pageSize}`,
-    );
-    return response.data;
-  }
-
   public async getRgbppTransactions({
     sort = TransactionSortType.NumberDesc,
     page = 1,
@@ -231,31 +204,12 @@ export class CkbExplorerService {
     return response.data;
   }
 
-  public async getTransactionList({
-    page = 1,
-    pageSize = 10,
-    sort = 'height.desc',
-  }: GetTransactionListParams): Promise<PaginatedResponse<TransactionListItem>> {
-    const response = await this.request.get('/v1/transactions', {
-      params: {
-        page,
-        page_size: pageSize,
-        sort,
-      },
-    });
-    return response.data;
-  }
-
   @Cacheable({
     namespace: 'CkbExplorerService',
-    key: (txHash: string) => `getRgbppDigest:${txHash}`,
-    ttl: ONE_MONTH_MS,
+    key: (address: string, tags = [], sort, page = 1, pageSize = 10) =>
+      `getXUDTList:${address},${tags.join('|')},${sort},${page},${pageSize}`,
+    ttl: 10_000,
   })
-  public async getRgbppDigest(txHash: string): Promise<CkbExplorerResponse<RgbppDigest>> {
-    const response = await this.request.get(`/v2/ckb_transactions/${txHash}/rgb_digest`);
-    return response.data;
-  }
-
   public async getXUDTList({
     symbol,
     tags,
@@ -284,6 +238,12 @@ export class CkbExplorerService {
     return response.data;
   }
 
+  @Cacheable({
+    namespace: 'CkbExplorerService',
+    key: (typeHash: string, { page = 1, pageSize = 10, txHash, addressHash }) =>
+      `getXUDTTransactions:${typeHash},${page},${pageSize},${txHash},${addressHash}`,
+    ttl: 10_000,
+  })
   public async getXUDTTransactions(
     typeHash: string,
     { page = 1, pageSize = 10, txHash, addressHash }: GetXUDTTransactionsParams = {},
@@ -308,7 +268,7 @@ export class CkbExplorerService {
     key: 'getStatistics',
     // Same as the ckb explorer frontend
     // https://github.com/nervosnetwork/ckb-explorer-frontend/blob/develop/src/constants/common.ts#L3
-    ttl: 4000,
+    ttl: 4_000,
   })
   public async getStatistics(): Promise<NonPaginatedResponse<Statistics>> {
     const response = await this.request.get('/v1/statistics');

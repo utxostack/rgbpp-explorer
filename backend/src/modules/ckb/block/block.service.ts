@@ -11,11 +11,6 @@ export class CkbBlockService {
     private ckbRpcService: CkbRpcWebsocketService,
   ) {}
 
-  public async getLatestBlockNumbers(): Promise<string[]> {
-    const blockList = await this.ckbExplorerService.getBlockList();
-    return blockList.data.map((block) => block.attributes.number);
-  }
-
   public async getBlockFromRpc(heightOrHash: string): Promise<CkbRpc.Block> {
     if (heightOrHash.startsWith('0x')) {
       return await this.ckbRpcService.getBlock(heightOrHash);
@@ -30,10 +25,5 @@ export class CkbBlockService {
 
   public async getBlockEconomicState(blockHash: string): Promise<CkbRpc.BlockEconomicState> {
     return await this.ckbRpcService.getBlockEconomicState(blockHash);
-  }
-
-  public async getBlockTransactions(blockHash: string): Promise<CkbExplorer.Transaction[]> {
-    const blockTransactions = await this.ckbExplorerService.getBlockTransactions(blockHash);
-    return blockTransactions.data.map((transaction) => transaction.attributes);
   }
 }
