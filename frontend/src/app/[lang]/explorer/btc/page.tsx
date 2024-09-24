@@ -11,9 +11,9 @@ import { graphQLClient } from '@/lib/graphql'
 
 export const revalidate = 5
 
-const queryRgbppLatestTransactions = graphql(`
-  query RgbppLatestL1Transactions($page: Int!, $pageSize: Int!) {
-    rgbppLatestL1Transactions(page: $page, pageSize: $pageSize) {
+const query = graphql(`
+  query RgbppLatestL1Transactions($limit: Int!) {
+    rgbppLatestL1Transactions(limit: $limit) {
       txs {
         ckbTxHash
         btcTxid
@@ -52,10 +52,7 @@ const queryRgbppLatestTransactions = graphql(`
 
 export default async function Page() {
   const i18n = getI18nFromHeaders()
-  const { rgbppLatestL1Transactions } = await graphQLClient.request(queryRgbppLatestTransactions, {
-    page: 1,
-    pageSize: 10,
-  })
+  const { rgbppLatestL1Transactions } = await graphQLClient.request(query, { limit: 10 })
 
   return (
     <Grid gridTemplateColumns="repeat(2, 1fr)" w="100%" maxW="content" p={{ base: '20px', xl: '30px' }} gap="30px">

@@ -100,7 +100,11 @@ export class CkbExplorerService {
     }
   }
 
-  // https://github.com/nervosnetwork/ckb-explorer-frontend/blob/b9dd537f836e8c827f1d4741e07c84484170d671/src/pages/Address/AddressPage.tsx#L50-L54
+  @Cacheable({
+    namespace: 'CkbExplorerService',
+    key: (address: string, page = 1, pageSize = 10) => `getAddress:${address},${page},${pageSize}`,
+    ttl: 10_000,
+  })
   public async getAddress({
     address,
     page = 1,

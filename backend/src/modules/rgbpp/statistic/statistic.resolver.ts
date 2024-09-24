@@ -1,9 +1,8 @@
 import { Args, Float, Int, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { Layer, RgbppHolder, RgbppStatistic } from './statistic.model';
 import { RgbppStatisticService } from './statistic.service';
-import { LeapDirection } from '../transaction/transaction.model';
 import { OrderType } from 'src/modules/api.model';
-import { Holder } from '@prisma/client';
+import { Holder, LeapDirection } from '@prisma/client';
 
 @Resolver(() => RgbppStatistic)
 export class RgbppStatisticResolver {
@@ -41,22 +40,13 @@ export class RgbppStatisticResolver {
     @Args('leapDirection', { type: () => LeapDirection, nullable: true })
     leapDirection?: LeapDirection,
   ): Promise<number | null> {
-    const txids = await this.rgbppStatisticService.getLatest24L1Transactions();
-    if (txids && leapDirection) {
-      const filteredTxhashs = await Promise.all(
-        txids.map(async (txid) => {
-          const direction = await this.rgbppStatisticService.getLeapDirectionByBtcTxid(txid);
-          return direction === leapDirection ? txid : null;
-        }),
-      );
-      return filteredTxhashs.filter((txhash) => txhash !== null).length;
-    }
-    return txids?.length ?? null;
+    const transactions = await this.rgbppStatisticService.getLatest24L1Transactions(leapDirection);
+    return transactions?.length ?? null;
   }
 
   @ResolveField(() => Float, { nullable: true })
   public async latest24HoursL2TransactionsCount(): Promise<number | null> {
-    const txhashs = await this.rgbppStatisticService.getLatest24L2Transactions();
-    return txhashs?.length ?? null;
+    const transactions = await this.rgbppStatisticService.getLatest24L2Transactions();
+    return transactions.length ?? null;
   }
 }

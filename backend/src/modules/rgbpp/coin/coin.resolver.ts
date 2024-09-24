@@ -3,7 +3,7 @@ import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
 import { TransactionListSortType, XUDTTag } from 'src/core/ckb-explorer/ckb-explorer.interface';
 import { RgbppTransaction } from '../transaction/transaction.model';
 import { RgbppCoin, RgbppCoinList } from './coin.model';
-import { Loader } from '@applifting-io/nestjs-dataloader';
+import { Loader } from 'src/common/dataloader';
 import {
   CkbExplorerXUDTTransactionsLoader,
   CkbExplorerXUDTTransactionsLoaderType,
