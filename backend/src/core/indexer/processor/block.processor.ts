@@ -21,6 +21,7 @@ export interface IndexerBlockJobData {
 
 @Processor(INDEXER_BLOCK_QUEUE, {
   concurrency: 100,
+  stalledInterval: 60_000,
 })
 export class IndexerBlockProcessor extends WorkerHost {
   private logger = new Logger(IndexerBlockProcessor.name);

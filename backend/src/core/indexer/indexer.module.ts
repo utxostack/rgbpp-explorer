@@ -19,12 +19,14 @@ import {
 } from './processor/transaction.processor';
 import { IndexerHealthIndicator } from './indexer.health';
 
-const commonAttemptsConfig: Pick<DefaultJobOptions, 'attempts' | 'backoff'> = {
+const defaultJobOptions: DefaultJobOptions = {
   attempts: 10,
   backoff: {
     type: 'exponential',
     delay: 1000,
   },
+  removeOnComplete: true,
+  removeOnFail: true,
 };
 
 @Global()
@@ -32,43 +34,27 @@ const commonAttemptsConfig: Pick<DefaultJobOptions, 'attempts' | 'backoff'> = {
   imports: [
     BullModule.registerQueue({
       name: INDEXER_ASSETS_QUEUE,
-      defaultJobOptions: {
-        ...commonAttemptsConfig,
-      },
+      defaultJobOptions,
     }),
     BullModule.registerQueue({
       name: INDEXER_BLOCK_ASSETS_QUEUE,
-      defaultJobOptions: {
-        removeOnComplete: true,
-        removeOnFail: true,
-        ...commonAttemptsConfig,
-      },
+      defaultJobOptions,
     }),
     BullModule.registerQueue({
       name: INDEXER_BLOCK_QUEUE,
-      defaultJobOptions: {
-        removeOnComplete: true,
-        ...commonAttemptsConfig,
-      },
+      defaultJobOptions,
     }),
     BullModule.registerQueue({
       name: INDEXER_TRANSACTION_QUEUE,
-      defaultJobOptions: {
-        removeOnComplete: true,
-        ...commonAttemptsConfig,
-      },
+      defaultJobOptions,
     }),
     BullModule.registerQueue({
       name: INDEXER_LOCK_QUEUE,
-      defaultJobOptions: {
-        ...commonAttemptsConfig,
-      },
+      defaultJobOptions,
     }),
     BullModule.registerQueue({
       name: INDEXER_TYPE_QUEUE,
-      defaultJobOptions: {
-        ...commonAttemptsConfig,
-      },
+      defaultJobOptions,
     }),
     forwardRef(() => CoreModule),
   ],
