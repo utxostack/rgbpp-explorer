@@ -24,7 +24,8 @@ export const envSchema = z
       }),
 
     DATABASE_URL: z.string(),
-    REDIS_URL: z.string(),
+    REDIS_CACHE_URL: z.string(),
+    REDIS_QUEUE_URL: z.string(),
 
     BITCOIN_PRIMARY_DATA_PROVIDER: z.enum(['mempool', 'electrs']).default('mempool'),
 
