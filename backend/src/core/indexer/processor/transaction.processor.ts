@@ -17,7 +17,6 @@ export interface IndexerTransactionJobData {
 }
 
 @Processor(INDEXER_TRANSACTION_QUEUE, {
-  concurrency: 100,
   stalledInterval: 60_000,
   useWorkerThreads: true,
 })

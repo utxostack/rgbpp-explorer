@@ -23,7 +23,6 @@ export interface IndexerAssetsJobData {
 const BATCH_SIZE = BI.from(400).toHexString();
 
 @Processor(INDEXER_ASSETS_QUEUE, {
-  concurrency: 100,
   stalledInterval: 60_000,
   useWorkerThreads: true,
 })

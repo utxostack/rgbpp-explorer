@@ -21,7 +21,6 @@ export interface IndexerBlockAssetsJobData {
 }
 
 @Processor(INDEXER_BLOCK_ASSETS_QUEUE, {
-  concurrency: 100,
   stalledInterval: 60_000,
   useWorkerThreads: true,
 })
