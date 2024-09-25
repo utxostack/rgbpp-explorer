@@ -88,9 +88,7 @@ export class IndexerAssetsFlow extends EventEmitter {
 
   private setupBlockAssetsIndexedListener() {
     this.on(IndexerAssetsEvent.BlockAssetsIndexed, () => {
-      setTimeout(() => {
-        this.startBlockAssetsIndexing();
-      }, 1000 * 10);
+      setTimeout(this.startBlockAssetsIndexing.bind(this), 1000 * 10);
     });
   }
 }
