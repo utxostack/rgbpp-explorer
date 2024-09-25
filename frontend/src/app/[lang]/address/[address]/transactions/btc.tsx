@@ -20,14 +20,6 @@ const query = graphql(`
         txid
         rgbppTransaction {
           ckbTransaction {
-            isCellbase
-            blockNumber
-            hash
-            fee
-            feeRate
-            size
-            confirmed
-            confirmations
             outputs {
               txHash
               index
@@ -81,10 +73,6 @@ const query = graphql(`
                 txHash
                 index
               }
-            }
-            block {
-              timestamp
-              hash
             }
           }
         }
