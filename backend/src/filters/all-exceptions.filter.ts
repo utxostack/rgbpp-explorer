@@ -15,8 +15,7 @@ export class AllExceptionsFilter extends SentryGlobalGraphQLFilter {
     const request = ctx.getRequest();
     if (SKIP_REQUEST_URLS.includes(request.url)) {
       const response = (exception as HttpException).getResponse();
-      const status = (exception as HttpException).getStatus();
-      this.httpAdapterHost.httpAdapter.reply(ctx.getResponse(), response, status);
+      this.httpAdapterHost.httpAdapter.reply(ctx.getResponse(), response, 200);
       return;
     }
 
