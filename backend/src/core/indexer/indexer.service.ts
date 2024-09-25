@@ -4,6 +4,7 @@ import { BlockchainService } from '../blockchain/blockchain.service';
 import { PrismaService } from '../database/prisma/prisma.service';
 import { IndexerQueueService } from './indexer.queue';
 import { IndexerTransactionsFlow } from './flow/transactions.flow';
+import { SchedulerRegistry } from '@nestjs/schedule';
 
 export class IndexerService {
   public assetsFlow: IndexerAssetsFlow;
