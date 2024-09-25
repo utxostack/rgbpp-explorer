@@ -27,12 +27,10 @@ services:
     # https://github.com/docker-library/redis/blob/b77450d/7.4/alpine/Dockerfile
     image: redis:7-alpine
     restart: unless-stopped
-    ports:
-      - '127.0.0.1:6379:6379'
     command: /usr/local/etc/redis/redis.conf
     volumes:
       # Redis' WORKDIR is /data
-      - redis-data:/data
+      - redis-cache-data:/data
       - ./backend/redis.conf:/usr/local/etc/redis/redis.conf:ro
     networks:
       - internal
@@ -41,8 +39,6 @@ services:
     # https://github.com/docker-library/redis/blob/b77450d/7.4/alpine/Dockerfile
     image: redis:7-alpine
     restart: unless-stopped
-    ports:
-      - '127.0.0.1:6380:6379'
     command: /usr/local/etc/redis/redis.conf
     volumes:
       # Redis' WORKDIR is /data
@@ -69,7 +65,7 @@ services:
       - internal
 
 volumes:
-  redis-data:
+  redis-cache-data:
   redis-queue-data:
   postgres_volume:
 
