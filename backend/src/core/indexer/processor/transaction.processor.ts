@@ -19,6 +19,7 @@ export interface IndexerTransactionJobData {
 @Processor(INDEXER_TRANSACTION_QUEUE, {
   concurrency: 100,
   stalledInterval: 60_000,
+  useWorkerThreads: true,
 })
 export class IndexerTransactionProcessor extends WorkerHost {
   private logger = new Logger(IndexerTransactionProcessor.name);

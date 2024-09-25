@@ -10,6 +10,7 @@ import { toNumber } from 'lodash';
 import { IndexerQueueService } from '../indexer.queue';
 import { IndexerServiceFactory } from '../indexer.factory';
 import { IndexerTransactionsEvent } from '../flow/transactions.flow';
+import cluster from 'node:cluster';
 
 export const INDEXER_BLOCK_QUEUE = 'indexer-block-queue';
 
@@ -22,6 +23,7 @@ export interface IndexerBlockJobData {
 @Processor(INDEXER_BLOCK_QUEUE, {
   concurrency: 100,
   stalledInterval: 60_000,
+  useWorkerThreads: true,
 })
 export class IndexerBlockProcessor extends WorkerHost {
   private logger = new Logger(IndexerBlockProcessor.name);

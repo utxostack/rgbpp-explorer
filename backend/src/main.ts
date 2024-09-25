@@ -5,6 +5,7 @@ import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify
 import { envSchema } from './env';
 import { BootstrapService } from './bootstrap.service';
 import { LogLevel } from '@nestjs/common';
+import cluster from 'node:cluster';
 
 const env = envSchema.parse(process.env);
 const LOGGER_LEVELS: LogLevel[] = ['verbose', 'debug', 'log', 'warn', 'error'];
@@ -28,8 +29,17 @@ async function bootstrap() {
     },
   );
 
-  const bootstrapService = app.get(BootstrapService);
-  await bootstrapService.bootstrapAssetsIndex();
+  if (cluster.isPrimary) {
+    const bootstrapService = app.get(BootstrapService);
+    await bootstrapService.bootstrapAssetsIndex();
+
+    cluster.fork();
+    cluster.on('exit', (worker) => {
+      console.log(`worker ${worker.process.pid} died`);
+      cluster.fork();
+    });
+    return;
+  }
 
   if (env.CORS_WHITELIST.length > 0) {
     app.enableCors({

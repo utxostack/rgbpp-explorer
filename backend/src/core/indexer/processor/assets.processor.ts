@@ -25,6 +25,7 @@ const BATCH_SIZE = BI.from(400).toHexString();
 @Processor(INDEXER_ASSETS_QUEUE, {
   concurrency: 100,
   stalledInterval: 60_000,
+  useWorkerThreads: true,
 })
 export class IndexerAssetsProcessor extends WorkerHost {
   private logger = new Logger(IndexerAssetsProcessor.name);
