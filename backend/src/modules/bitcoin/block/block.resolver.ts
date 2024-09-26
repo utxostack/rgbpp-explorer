@@ -12,7 +12,7 @@ import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 
 @Resolver(() => BitcoinBlock)
 export class BitcoinBlockResolver {
-  constructor(private bitcoinApiService: BitcoinApiService) {}
+  constructor(private bitcoinApiService: BitcoinApiService) { }
 
   @Query(() => BitcoinBlock, { name: 'btcBlock', nullable: true })
   public async getBlock(
@@ -83,7 +83,10 @@ export class BitcoinBlockResolver {
     };
   }
 
-  @ResolveField(() => [BitcoinTransaction], { nullable: true })
+  @ResolveField(() => [BitcoinTransaction], {
+    nullable: true,
+    complexity: ({ childComplexity }) => 10 + childComplexity,
+  })
   public async transactions(
     @Parent() block: BitcoinBlock,
     @Loader(BitcoinBlockTransactionsLoader) blockTxsLoader: BitcoinBlockTransactionsLoaderType,

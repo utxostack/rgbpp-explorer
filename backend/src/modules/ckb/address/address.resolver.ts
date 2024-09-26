@@ -50,7 +50,10 @@ export class CkbAddressResolver {
     return Number(addressInfo[0].transactions_count);
   }
 
-  @ResolveField(() => [CkbTransaction], { nullable: true })
+  @ResolveField(() => [CkbTransaction], {
+    nullable: true,
+    complexity: ({ args, childComplexity }) => (args.pageSize ?? 10) * childComplexity,
+  })
   public async transactions(
     @Parent() address: CkbAddress,
     @Loader(CkbAddressTransactionsLoader) addressTxsLoader: CkbAddressTransactionsLoaderType,

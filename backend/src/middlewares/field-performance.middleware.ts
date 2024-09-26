@@ -8,12 +8,7 @@ export const fieldPerformanceMiddleware: FieldMiddleware = async (
   const now = performance.now();
   const value = await next();
   const executionTime = performance.now() - now;
-
-  Sentry.setContext('graphql', {
-    executionTime,
-    field: ctx.info.fieldName,
-    parent: ctx.info.parentType.name,
-  });
+  Sentry.setTag('graphql.field', `${ctx.info.parentType.name}.${ctx.info.fieldName}`);
   Sentry.setMeasurement('graphql.executionTime', executionTime, 'millisecond');
   return value;
 };

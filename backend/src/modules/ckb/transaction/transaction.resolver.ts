@@ -27,9 +27,12 @@ export class CkbTransactionResolver {
   constructor(
     private ckbTransactionService: CkbTransactionService,
     private ckbScriptService: CkbScriptService,
-  ) {}
+  ) { }
 
-  @Query(() => [CkbTransaction], { name: 'ckbTransactions' })
+  @Query(() => [CkbTransaction], {
+    name: 'ckbTransactions',
+    complexity: ({ args, childComplexity }) => (args.limit ?? 10) * childComplexity,
+  })
   public async getTransactions(
     @Args('types', { type: () => [CellType], nullable: true }) types: CellType[] | null,
     @Args('scriptKey', { type: () => CkbSearchKeyInput, nullable: true })
@@ -104,7 +107,9 @@ export class CkbTransactionResolver {
     return CkbTransaction.from(tx);
   }
 
-  @ResolveField(() => [CkbCell], { nullable: true })
+  @ResolveField(() => [CkbCell], {
+    nullable: true,
+  })
   public async inputs(
     @Parent() tx: CkbTransaction,
     @Loader(CkbRpcTransactionLoader) rpcTxLoader: CkbRpcTransactionLoaderType,

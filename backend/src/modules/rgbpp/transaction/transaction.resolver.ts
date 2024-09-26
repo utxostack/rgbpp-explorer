@@ -24,7 +24,10 @@ export class RgbppTransactionResolver {
     private bitcoinApiService: BitcoinApiService,
   ) { }
 
-  @Query(() => RgbppLatestTransactionList, { name: 'rgbppLatestTransactions' })
+  @Query(() => RgbppLatestTransactionList, {
+    name: 'rgbppLatestTransactions',
+    complexity: ({ args, childComplexity }) => (args.limit ?? 10) * childComplexity,
+  })
   public async getRecentTransactions(
     @Args('limit', { type: () => Int, nullable: true }) limit: number = 10,
   ): Promise<RgbppLatestTransactionList> {
@@ -37,7 +40,10 @@ export class RgbppTransactionResolver {
     };
   }
 
-  @Query(() => RgbppLatestTransactionList, { name: 'rgbppLatestL1Transactions' })
+  @Query(() => RgbppLatestTransactionList, {
+    name: 'rgbppLatestL1Transactions',
+    complexity: ({ args, childComplexity }) => (args.limit ?? 10) * childComplexity,
+  })
   public async getLatestL1Transactions(
     @Args('limit', { type: () => Int, nullable: true }) limit: number = 10,
   ): Promise<RgbppLatestTransactionList> {
@@ -49,7 +55,10 @@ export class RgbppTransactionResolver {
     };
   }
 
-  @Query(() => RgbppLatestTransactionList, { name: 'rgbppLatestL2Transactions' })
+  @Query(() => RgbppLatestTransactionList, {
+    name: 'rgbppLatestL2Transactions',
+    complexity: ({ args, childComplexity }) => (args.limit ?? 10) * childComplexity,
+  })
   public async getLatestL2Transactions(
     @Args('limit', { type: () => Int, nullable: true }) limit: number = 10,
   ): Promise<RgbppLatestTransactionList> {
