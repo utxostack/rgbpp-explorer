@@ -2,6 +2,8 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+directive @cacheControl(maxAge: Int, scope: CacheControlScope, inheritMaxAge: Boolean) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION | QUERY
+
 """CKB Script"""
 type CkbScript {
   codeHash: String!
@@ -362,4 +364,9 @@ enum TransactionListSortType {
   AddressCountDesc
   CreatedTimeAsc
   CreatedTimeDesc
+}
+
+enum CacheControlScope {
+  PUBLIC
+  PRIVATE
 }

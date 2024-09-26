@@ -14,7 +14,6 @@ import { ONE_MONTH_MS } from 'src/common/date';
 import { CKB_MIN_SAFE_CONFIRMATIONS } from 'src/constants';
 import * as Sentry from '@sentry/nestjs';
 import { Chain } from '@prisma/client';
-import { PLimit } from 'src/decorators/plimit.decorator';
 
 class WebsocketError extends Error {
   constructor(message: string) {
@@ -249,7 +248,6 @@ export class BlockchainService {
     return BI.from(tipBlockNumber).toNumber();
   }
 
-  @PLimit({ concurrency: 100 })
   public async getTransactions(
     searchKey: SearchKey,
     order: 'asc' | 'desc',
