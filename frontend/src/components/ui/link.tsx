@@ -39,10 +39,14 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link({ chi
 
   const href =
     typeof props.href === 'string'
-      ? `/${locale}${props.href}`
+      ? props.href.startsWith(`/${locale}`)
+        ? props.href
+        : `/${locale}${props.href}`
       : {
           ...props.href,
-          pathname: `/${locale}${props.href.pathname}`,
+          pathname: props.href.pathname?.startsWith(`/${locale}`)
+            ? props.href.pathname
+            : `/${locale}${props.href.pathname}`,
         }
   return (
     <StyledLink ref={ref} {...props} href={href}>

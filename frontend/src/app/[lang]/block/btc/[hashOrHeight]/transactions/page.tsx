@@ -2,14 +2,17 @@ import { t } from '@lingui/macro'
 import { notFound } from 'next/navigation'
 import { HStack, VStack } from 'styled-system/jsx'
 
+import { getI18nInstance } from '@/app/[lang]/appRouterI18n'
 import { BtcOutputsSum } from '@/components/btc/btc-outputs-sum'
 import { BtcUtxoTables } from '@/components/btc/btc-utxo-tables'
 import { TransactionHeaderInAddress } from '@/components/transaction-header-in-address'
 import { UtxoOrCellFooter } from '@/components/utxo-or-cell-footer'
 import { graphql } from '@/gql'
 import { BitcoinInput, BitcoinOutput } from '@/gql/graphql'
-import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { graphQLClient } from '@/lib/graphql'
+
+export const dynamic = 'force-static'
+export const revalidate = 10
 
 const query = graphql(`
   query BtcBlockTransaction($hashOrHeight: String!) {
@@ -76,8 +79,12 @@ const query = graphql(`
   }
 `)
 
-export default async function Page({ params: { hashOrHeight } }: { params: { hashOrHeight: string } }) {
-  const i18n = getI18nFromHeaders()
+export default async function Page({
+  params: { hashOrHeight, lang },
+}: {
+  params: { hashOrHeight: string; lang: string }
+}) {
+  const i18n = getI18nInstance(lang)
   const data = await graphQLClient.request(query, { hashOrHeight })
 
   if (!data?.btcBlock) notFound()

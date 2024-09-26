@@ -26,11 +26,11 @@ export default function RootLayout({ children }: PropsWithChildren) {
   const locale = getLocaleFromHeaders()
   return (
     <html lang={locale}>
-      <body className={montserrat.variable}>
+      <body className={`${montserrat.variable} dark`}>
         <Providers lang={locale}>
           <Navbar />
           {children}
-          <Footer />
+          <Footer lang={locale} />
         </Providers>
       </body>
     </html>

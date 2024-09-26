@@ -1,14 +1,15 @@
 import { t } from '@lingui/macro'
 import { Box, HStack, VStack } from 'styled-system/jsx'
 
+import { getI18nInstance } from '@/app/[lang]/appRouterI18n'
 import { CoinList } from '@/components/coin-list'
 import { IfBreakpoint } from '@/components/if-breakpoint'
 import { PaginationSearchParams } from '@/components/pagination-searchparams'
 import { Text } from '@/components/ui'
 import { graphql } from '@/gql'
-import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { graphQLClient } from '@/lib/graphql'
-import { resolveSearchParamsPage } from '@/lib/resolve-searchparams-page'
+import { resolvePage } from '@/lib/resolve-page'
+import { formatNumber } from '@/lib/string/format-number'
 
 const query = graphql(`
   query RgbppCoins($page: Int!, $pageSize: Int!) {
@@ -31,10 +32,15 @@ const query = graphql(`
   }
 `)
 
-export default async function Page() {
-  const i18n = getI18nFromHeaders()
-  const page = resolveSearchParamsPage()
-
+export default async function Page({
+  params,
+  searchParams,
+}: {
+  params: { lang: string }
+  searchParams: { page?: string }
+}) {
+  const i18n = getI18nInstance(params.lang)
+  const page = resolvePage(searchParams.page)
   const pageSize = 10
   const response = await graphQLClient.request(query, { page, pageSize })
 
@@ -45,7 +51,7 @@ export default async function Page() {
       </Box>
       <HStack gap="16px">
         <IfBreakpoint breakpoint="md">
-          <Text fontSize="14px">{t(i18n)`Total ${response.rgbppCoins.total} Items`}</Text>
+          <Text fontSize="14px">{t(i18n)`Total ${formatNumber(response.rgbppCoins.total)} Items`}</Text>
         </IfBreakpoint>
         <PaginationSearchParams count={response.rgbppCoins.total} pageSize={pageSize} />
       </HStack>
