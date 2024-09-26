@@ -9,6 +9,7 @@ import { Env } from 'src/env';
 import { CellType } from '../script.model';
 import { OrderType } from 'src/modules/api.model';
 import * as Sentry from '@sentry/nestjs';
+import { Cacheable } from 'src/decorators/cacheable.decorator';
 
 export abstract class BaseScriptService {
   protected logger = new Logger(BaseScriptService.name);
@@ -17,7 +18,7 @@ export abstract class BaseScriptService {
   constructor(
     protected configService: ConfigService<Env>,
     protected ckbRpcService: CkbRpcWebsocketService,
-  ) {}
+  ) { }
 
   public static sortTransactionCmp(a: CkbRpc.IndexerCell, b: CkbRpc.IndexerCell, order: OrderType) {
     const blockNumberCmp = BI.from(b.block_number).sub(BI.from(a.block_number)).toNumber();
@@ -35,6 +36,12 @@ export abstract class BaseScriptService {
     return scripts.some((s) => isScriptEqual(s, { ...script, args: '0x' }));
   }
 
+  @Cacheable({
+    namespace: 'BaseScriptService',
+    key: (limit: number, order: OrderType, after?: string) =>
+      `getTransactions:${limit}:${order}:${after}`,
+    ttl: 10_000,
+  })
   public async getTransactions(
     limit: number = 10,
     order: OrderType = OrderType.Desc,

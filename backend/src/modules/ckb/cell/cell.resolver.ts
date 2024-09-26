@@ -11,15 +11,16 @@ import { CkbCell, CkbXUDTInfo, CkbCellStatus } from './cell.model';
 import { CkbCellService } from './cell.service';
 import { CellType } from '../script/script.model';
 import { CkbScriptService } from '../script/script.service';
+import { ComplexityType } from 'src/modules/complexity.plugin';
 
 @Resolver(() => CkbCell)
 export class CkbCellResolver {
   constructor(
     private ckbCellService: CkbCellService,
     private ckbScriptService: CkbScriptService,
-  ) {}
+  ) { }
 
-  @ResolveField(() => CkbXUDTInfo, { nullable: true })
+  @ResolveField(() => CkbXUDTInfo, { nullable: true, complexity: ComplexityType.RequestField })
   public async xudtInfo(
     @Parent() cell: CkbCell,
     @Loader(CkbExplorerTransactionLoader) explorerTxLoader: CkbExplorerTransactionLoaderType,
@@ -32,7 +33,7 @@ export class CkbCellResolver {
     return this.ckbCellService.getXUDTInfoFromOutput(cell, output);
   }
 
-  @ResolveField(() => CkbCellStatus, { nullable: true })
+  @ResolveField(() => CkbCellStatus, { nullable: true, complexity: ComplexityType.RequestField })
   public async status(
     @Parent() cell: CkbCell,
     @Loader(CkbRpcTransactionLoader) rpcTxLoader: CkbRpcTransactionLoaderType,

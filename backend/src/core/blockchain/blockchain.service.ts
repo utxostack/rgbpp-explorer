@@ -258,12 +258,7 @@ export class BlockchainService {
     this.logger.debug(
       `get_transactions - searchKey: ${JSON.stringify(searchKey)}, order: ${order}, limit: ${limit}, after: ${after}`,
     );
-    const result = await this.websocket.call('get_transactions', [
-      searchKey,
-      order,
-      limit,
-      after,
-    ]);
+    const result = await this.websocket.call('get_transactions', [searchKey, order, limit, after]);
     const transactions = result as GetTransactionsResult;
     return transactions;
   }

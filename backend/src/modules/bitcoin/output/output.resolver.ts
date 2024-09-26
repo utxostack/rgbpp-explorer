@@ -6,6 +6,7 @@ import {
   BitcoinTransactionOutSpendsLoader,
   BitcoinTransactionOutSpendsLoaderType,
 } from '../transaction/transaction.dataloader';
+import { ComplexityType } from 'src/modules/complexity.plugin';
 
 @Resolver(() => BitcoinOutput)
 export class BitcoinOutputResolver {
@@ -20,7 +21,10 @@ export class BitcoinOutputResolver {
     };
   }
 
-  @ResolveField(() => BitcoinOutputStatus, { nullable: true })
+  @ResolveField(() => BitcoinOutputStatus, {
+    nullable: true,
+    complexity: ComplexityType.RequestField,
+  })
   public async status(
     @Parent() output: BitcoinOutput,
     @Loader(BitcoinTransactionOutSpendsLoader)

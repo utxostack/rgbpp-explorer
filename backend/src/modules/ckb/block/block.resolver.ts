@@ -18,12 +18,17 @@ import {
   CkbRpcTransactionLoaderType,
 } from '../transaction/transaction.dataloader';
 import { CkbRpcWebsocketService } from 'src/core/ckb-rpc/ckb-rpc-websocket.service';
+import { ComplexityType } from 'src/modules/complexity.plugin';
 
 @Resolver(() => CkbBlock)
 export class CkbBlockResolver {
-  constructor(private ckbRpcService: CkbRpcWebsocketService) {}
+  constructor(private ckbRpcService: CkbRpcWebsocketService) { }
 
-  @Query(() => CkbBlock, { name: 'ckbBlock', nullable: true })
+  @Query(() => CkbBlock, {
+    name: 'ckbBlock',
+    nullable: true,
+    complexity: ComplexityType.RequestField,
+  })
   public async getBlock(
     @Args('heightOrHash', { type: () => String }) heightOrHash: string,
     @Loader(CkbRpcBlockLoader) rpcBlockLoader: CkbRpcBlockLoaderType,
@@ -35,7 +40,7 @@ export class CkbBlockResolver {
     return CkbBlock.from(block);
   }
 
-  @ResolveField(() => Float, { nullable: true })
+  @ResolveField(() => Float, { nullable: true, complexity: ComplexityType.RequestField })
   public async totalFee(
     @Parent() block: CkbBlock,
     @Loader(CkbBlockEconomicStateLoader) blockEconomicLoader: CkbBlockEconomicStateLoaderType,
@@ -47,7 +52,7 @@ export class CkbBlockResolver {
     return BI.from(blockEconomicState.txs_fee).toNumber();
   }
 
-  @ResolveField(() => CkbAddress, { nullable: true })
+  @ResolveField(() => CkbAddress, { nullable: true, complexity: ComplexityType.RequestField })
   public async miner(
     @Parent() block: CkbBlock,
     @Loader(CkbExplorerBlockLoader) explorerBlockLoader: CkbExplorerBlockLoaderType,
@@ -59,7 +64,7 @@ export class CkbBlockResolver {
     return CkbAddress.from(explorerBlock.miner_hash);
   }
 
-  @ResolveField(() => Float, { nullable: true })
+  @ResolveField(() => Float, { nullable: true, complexity: ComplexityType.RequestField })
   public async reward(
     @Parent() block: CkbBlock,
     @Loader(CkbExplorerBlockLoader) explorerBlockLoader: CkbExplorerBlockLoaderType,
@@ -71,7 +76,10 @@ export class CkbBlockResolver {
     return toNumber(explorerBlock.miner_reward);
   }
 
-  @ResolveField(() => [CkbTransaction], { nullable: true })
+  @ResolveField(() => [CkbTransaction], {
+    nullable: true,
+    complexity: ({ childComplexity }) => ComplexityType.ListField + childComplexity,
+  })
   public async transactions(
     @Parent() { hash }: CkbBlock,
     @Loader(CkbRpcBlockLoader) rpcBlockLoader: CkbRpcBlockLoaderType,
@@ -92,7 +100,7 @@ export class CkbBlockResolver {
     );
   }
 
-  @ResolveField(() => Float)
+  @ResolveField(() => Float, { complexity: ComplexityType.RequestField })
   public async size(
     @Parent() block: CkbBlock,
     @Loader(CkbExplorerBlockLoader) explorerBlockLoader: CkbExplorerBlockLoaderType,
@@ -104,7 +112,7 @@ export class CkbBlockResolver {
     return explorerBlock.size;
   }
 
-  @ResolveField(() => Float)
+  @ResolveField(() => Float, { complexity: ComplexityType.RequestField })
   public async confirmations(
     @Parent() block: CkbBlock,
     @Loader(CkbExplorerBlockLoader) explorerBlockLoader: CkbExplorerBlockLoaderType,

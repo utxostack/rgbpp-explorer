@@ -7,6 +7,11 @@ import * as Sentry from '@sentry/nestjs';
 import { ConfigService } from '@nestjs/config';
 import { Env } from 'src/env';
 
+export enum ComplexityType {
+  RequestField = 3,
+  ListField = 10,
+}
+
 @Plugin()
 export class ComplexityPlugin implements ApolloServerPlugin {
   constructor(
@@ -33,15 +38,18 @@ export class ComplexityPlugin implements ApolloServerPlugin {
           return;
         }
 
+        Sentry.setMeasurement('graphql.complexity', complexity, 'none');
         if (complexity > maxComplexity) {
           Sentry.setContext('graphql', {
             query: request.query,
             variables: request.variables,
             complexity,
           });
-          throw new GraphQLError(
+          const error = new GraphQLError(
             `Query is too complex: ${complexity}. Maximum allowed complexity: ${maxComplexity}`,
           );
+          Sentry.captureException(error);
+          throw error;
         }
       },
     };

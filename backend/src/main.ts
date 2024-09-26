@@ -19,9 +19,15 @@ function getLoggerOptions() {
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), {
-    logger: getLoggerOptions(),
-  });
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter({
+      trustProxy: true,
+    }),
+    {
+      logger: getLoggerOptions(),
+    },
+  );
 
   const bootstrapService = app.get(BootstrapService);
   await bootstrapService.bootstrapAssetsIndex();
@@ -34,6 +40,8 @@ async function bootstrap() {
     });
   }
 
-  await app.listen(3000, '0.0.0.0');
+  if (cluster.isPrimary) {
+    await app.listen(3000, '0.0.0.0');
+  }
 }
 bootstrap();

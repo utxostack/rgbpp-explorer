@@ -10,12 +10,17 @@ import {
 } from 'src/modules/rgbpp/transaction/transaction.dataloader';
 import { BitcoinBlock } from '../block/block.model';
 import { BitcoinBlockLoader, BitcoinBlockLoaderType } from '../block/dataloader/block.dataloader';
+import { ComplexityType } from 'src/modules/complexity.plugin';
 
 @Resolver(() => BitcoinTransaction)
 export class BitcoinTransactionResolver {
-  constructor(private bitcoinApiService: BitcoinApiService) {}
+  constructor(private bitcoinApiService: BitcoinApiService) { }
 
-  @Query(() => BitcoinTransaction, { name: 'btcTransaction', nullable: true })
+  @Query(() => BitcoinTransaction, {
+    name: 'btcTransaction',
+    nullable: true,
+    complexity: ComplexityType.RequestField,
+  })
   public async getTransaction(
     @Args('txid') txid: string,
     @Loader(BitcoinTransactionLoader) txLoader: BitcoinTransactionLoaderType,
@@ -27,7 +32,9 @@ export class BitcoinTransactionResolver {
     return BitcoinTransaction.from(transaction);
   }
 
-  @ResolveField(() => Float)
+  @ResolveField(() => Float, {
+    complexity: ComplexityType.RequestField,
+  })
   public async confirmations(@Parent() tx: BitcoinTransaction): Promise<number> {
     if (!tx.confirmed) {
       return 0;
@@ -36,7 +43,7 @@ export class BitcoinTransactionResolver {
     return info.blocks - tx.blockHeight! + 1;
   }
 
-  @ResolveField(() => Date, { nullable: true })
+  @ResolveField(() => Date, { nullable: true, complexity: ComplexityType.RequestField })
   public async transactionTime(@Parent() tx: BitcoinTransaction): Promise<Date | null> {
     const [txTime] = await this.bitcoinApiService.getTransactionTimes({ txids: [tx.txid] });
     if (!txTime) {
@@ -45,7 +52,7 @@ export class BitcoinTransactionResolver {
     return new Date(txTime * 1000);
   }
 
-  @ResolveField(() => BitcoinBlock, { nullable: true })
+  @ResolveField(() => BitcoinBlock, { nullable: true, complexity: ComplexityType.RequestField })
   public async block(
     @Parent() tx: BitcoinTransaction,
     @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
@@ -60,7 +67,7 @@ export class BitcoinTransactionResolver {
     return BitcoinBlock.from(block);
   }
 
-  @ResolveField(() => RgbppTransaction, { nullable: true })
+  @ResolveField(() => RgbppTransaction, { nullable: true, complexity: ComplexityType.RequestField })
   public async rgbppTransaction(
     @Parent() tx: BitcoinTransaction,
     @Loader(RgbppTransactionLoader) txLoader: RgbppTransactionLoaderType,

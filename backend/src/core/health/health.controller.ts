@@ -5,7 +5,9 @@ import { BitcoinApiHealthIndicator } from '../bitcoin-api/bitcoin-api.health';
 import { CkbExplorerHealthIndicator } from '../ckb-explorer/ckb-explorer.health';
 import { IndexerHealthIndicator, IndexerHealthIndicatorKey } from '../indexer/indexer.health';
 import { DatabaseHealthIndicator } from '../database/database.health';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller('health')
 export class HealthController {
   constructor(
