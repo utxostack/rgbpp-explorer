@@ -137,6 +137,11 @@ export type BitcoinTransaction = {
   weight: Scalars['Float']['output'];
 };
 
+export enum CacheControlScope {
+  Private = 'PRIVATE',
+  Public = 'PUBLIC'
+}
+
 /** Cell type (XUDT, SUDT, Dobs, mNFT) */
 export enum CellType {
   Dob = 'DOB',

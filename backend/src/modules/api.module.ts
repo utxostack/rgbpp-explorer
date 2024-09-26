@@ -20,6 +20,7 @@ import responseCachePlugin from '@apollo/server-plugin-response-cache';
 import { AllExceptionsFilter } from 'src/filters/all-exceptions.filter';
 import { DirectiveLocation, GraphQLBoolean, GraphQLDirective, GraphQLEnumType } from 'graphql';
 import { LoggingPlugin } from './logging.plugin';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 
 @Injectable()
 export class GqlThrottlerGuard extends ThrottlerGuard {
@@ -45,8 +46,8 @@ export class GqlThrottlerGuard extends ThrottlerGuard {
     }),
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService<Env>) => ({
+      inject: [ConfigService, CACHE_MANAGER],
+      useFactory: async (configService: ConfigService<Env>, cacheManager: Cache) => ({
         playground: configService.get('ENABLED_GRAPHQL_PLAYGROUND'),
         installSubscriptionHandlers: true,
         introspection: true,
@@ -59,6 +60,20 @@ export class GqlThrottlerGuard extends ThrottlerGuard {
           }),
           responseCachePlugin(),
         ],
+        cache: {
+          async get(key: string) {
+            const val = await cacheManager.get(key);
+            return val as string | undefined;
+          },
+          async set(key: string, value: string, options?: { ttl: number | null }) {
+            console.log('setting cache', key, value, options);
+            const { ttl } = options || { ttl: null };
+            await cacheManager.set(key, value, ttl ? ttl * 1000 : undefined);
+          },
+          async delete(key: string) {
+            await cacheManager.del(key);
+          },
+        },
         buildSchemaOptions: {
           dateScalarMode: 'timestamp',
           fieldMiddleware: [fieldPerformanceMiddleware],
