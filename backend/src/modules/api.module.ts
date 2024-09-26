@@ -66,7 +66,6 @@ export class GqlThrottlerGuard extends ThrottlerGuard {
             return val as string | undefined;
           },
           async set(key: string, value: string, options?: { ttl: number | null }) {
-            console.log('setting cache', key, value, options);
             const { ttl } = options || { ttl: null };
             await cacheManager.set(key, value, ttl ? ttl * 1000 : undefined);
           },
