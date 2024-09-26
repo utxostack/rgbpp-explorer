@@ -60,7 +60,16 @@ export class IndexerHealthIndicator extends HealthIndicator {
     const blockchainService = this.blockchainServiceFactory.getService(CKB_CHAIN_ID);
     const tipBlockNumber = await blockchainService.getTipBlockNumber();
     const targetBlockNumber = tipBlockNumber - CKB_MIN_SAFE_CONFIRMATIONS;
-    const currentBlockNumber = await this.indexerQueueService.getLatestIndexedBlock(CKB_CHAIN_ID);
+
+    let currentBlockNumber = await this.indexerQueueService.getLatestIndexedAssetsBlock(CKB_CHAIN_ID);
+    if (!currentBlockNumber) {
+      const latestAsset = await this.prismaService.asset.findFirst({
+        select: { blockNumber: true },
+        where: { chainId: CKB_CHAIN_ID },
+        orderBy: { blockNumber: 'desc' },
+      });
+      currentBlockNumber = latestAsset?.blockNumber;
+    }
 
     const isHealthy =
       !!currentBlockNumber && currentBlockNumber >= targetBlockNumber - INDEEXR_HEALTH_THRESHOLD;
