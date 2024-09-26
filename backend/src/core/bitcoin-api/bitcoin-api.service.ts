@@ -10,7 +10,6 @@ import { ChainInfo, Transaction } from './bitcoin-api.schema';
 import { ONE_HOUR_MS, ONE_MONTH_MS, TEN_MINUTES_MS } from 'src/common/date';
 import { Cacheable } from 'src/decorators/cacheable.decorator';
 import * as Sentry from '@sentry/nestjs';
-import { PLimit } from 'src/decorators/plimit.decorator';
 
 type MethodParameters<T, K extends keyof T> = T[K] extends (...args: infer P) => any ? P : never;
 type MethodReturnType<T, K extends keyof T> = T[K] extends (...args: any[]) => infer R ? R : never;
@@ -180,7 +179,6 @@ export class BitcoinApiService {
     key: ({ address }) => `getAddress:${address}`,
     ttl: 10_000,
   })
-  @PLimit({ concurrency: 100 })
   public async getAddress({ address }: { address: string }) {
     return this.call('getAddress', { address });
   }
@@ -190,7 +188,6 @@ export class BitcoinApiService {
     key: ({ address }) => `getAddressTxsUtxo:${address}`,
     ttl: 10_000,
   })
-  @PLimit({ concurrency: 100 })
   public async getAddressTxsUtxo({ address }: { address: string }) {
     return this.call('getAddressTxsUtxo', { address });
   }
@@ -200,7 +197,6 @@ export class BitcoinApiService {
     key: ({ address, afterTxid }) => `getAddressTxs:${address}:${afterTxid}`,
     ttl: 10_000,
   })
-  @PLimit({ concurrency: 100 })
   public async getAddressTxs({ address, afterTxid }: { address: string; afterTxid?: string }) {
     return this.call('getAddressTxs', { address, afterTxid });
   }
@@ -236,7 +232,6 @@ export class BitcoinApiService {
     key: ({ txids }) => `getTransactionTimes:${txids.join(',')}`,
     ttl: 10_000,
   })
-  @PLimit({ concurrency: 100 })
   public async getTransactionTimes({ txids }: { txids: string[] }) {
     return this.call('getTransactionTimes', { txids });
   }
