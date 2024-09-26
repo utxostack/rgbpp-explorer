@@ -12,6 +12,8 @@ export const envSchema = z
       .transform((value) => value === 'true'),
     GRAPHQL_COMPLEXITY_LIMIT: z.coerce.number().default(100),
 
+    CLUSTER_WORKERS_NUM: z.coerce.number().default(2),
+
     /**
      * CORS origin whitelist (split by comma)
      */
