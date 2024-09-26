@@ -9,12 +9,17 @@ import {
   BitcoinBlockTransactionsLoaderType,
 } from './dataloader/block-transactions.dataloader';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
+import { ComplexityType } from 'src/modules/complexity.plugin';
 
 @Resolver(() => BitcoinBlock)
 export class BitcoinBlockResolver {
   constructor(private bitcoinApiService: BitcoinApiService) { }
 
-  @Query(() => BitcoinBlock, { name: 'btcBlock', nullable: true })
+  @Query(() => BitcoinBlock, {
+    name: 'btcBlock',
+    nullable: true,
+    complexity: ComplexityType.RequestField,
+  })
   public async getBlock(
     @Args('hashOrHeight', { type: () => String }) hashOrHeight: string,
     @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
@@ -26,7 +31,10 @@ export class BitcoinBlockResolver {
     return BitcoinBlock.from(block);
   }
 
-  @ResolveField(() => BitcoinAddress, { nullable: true })
+  @ResolveField(() => BitcoinAddress, {
+    nullable: true,
+    complexity: ComplexityType.RequestField,
+  })
   public async miner(
     @Parent() block: BitcoinBlock,
     @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
@@ -41,7 +49,10 @@ export class BitcoinBlockResolver {
     };
   }
 
-  @ResolveField(() => Float, { nullable: true })
+  @ResolveField(() => Float, {
+    nullable: true,
+    complexity: ComplexityType.RequestField,
+  })
   public async reward(
     @Parent() block: BitcoinBlock,
     @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
@@ -54,7 +65,7 @@ export class BitcoinBlockResolver {
     return detail.extras.reward;
   }
 
-  @ResolveField(() => Float, { nullable: true })
+  @ResolveField(() => Float, { nullable: true, complexity: ComplexityType.RequestField })
   public async totalFee(
     @Parent() block: BitcoinBlock,
     @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
@@ -67,7 +78,10 @@ export class BitcoinBlockResolver {
     return detail.extras.totalFees;
   }
 
-  @ResolveField(() => FeeRateRange, { nullable: true })
+  @ResolveField(() => FeeRateRange, {
+    nullable: true,
+    complexity: ComplexityType.RequestField,
+  })
   public async feeRateRange(
     @Parent() block: BitcoinBlock,
     @Loader(BitcoinBlockLoader) blockLoader: BitcoinBlockLoaderType,
@@ -85,7 +99,7 @@ export class BitcoinBlockResolver {
 
   @ResolveField(() => [BitcoinTransaction], {
     nullable: true,
-    complexity: ({ childComplexity }) => 10 + childComplexity,
+    complexity: ({ childComplexity }) => ComplexityType.ListField + childComplexity,
   })
   public async transactions(
     @Parent() block: BitcoinBlock,
@@ -106,7 +120,7 @@ export class BitcoinBlockResolver {
     return txs.map((tx) => BitcoinTransaction.from(tx));
   }
 
-  @ResolveField(() => Float, { nullable: true })
+  @ResolveField(() => Float, { nullable: true, complexity: ComplexityType.RequestField })
   public async confirmations(@Parent() block: BitcoinBlock): Promise<number | null> {
     const info = await this.bitcoinApiService.getBlockchainInfo();
     return info.blocks - block.height;

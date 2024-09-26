@@ -11,6 +11,7 @@ import {
 import { Layer, RgbppHolder } from '../statistic/statistic.model';
 import { OrderType } from 'src/modules/api.model';
 import { RgbppCoinService } from './coin.service';
+import { ComplexityType } from 'src/modules/complexity.plugin';
 
 @Resolver(() => RgbppCoin)
 export class RgbppCoinResolver {
@@ -77,7 +78,7 @@ export class RgbppCoinResolver {
     return transactions.data.map((tx) => RgbppTransaction.fromCkbTransaction(tx.attributes));
   }
 
-  @ResolveField(() => Float, { nullable: true })
+  @ResolveField(() => Float, { nullable: true, complexity: ComplexityType.RequestField })
   public async transactionsCount(
     @Parent() coin: RgbppCoin,
     @Loader(CkbExplorerXUDTTransactionsLoader) txsLoader: CkbExplorerXUDTTransactionsLoaderType,

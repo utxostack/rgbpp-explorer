@@ -7,6 +7,11 @@ import * as Sentry from '@sentry/nestjs';
 import { ConfigService } from '@nestjs/config';
 import { Env } from 'src/env';
 
+export enum ComplexityType {
+  RequestField = 3,
+  ListField = 10,
+}
+
 @Plugin()
 export class ComplexityPlugin implements ApolloServerPlugin {
   constructor(
@@ -33,8 +38,6 @@ export class ComplexityPlugin implements ApolloServerPlugin {
           return;
         }
 
-        console.log('Complexity:', complexity);
-        console.log(request);
         Sentry.setMeasurement('graphql.complexity', complexity, 'none');
         if (complexity > maxComplexity) {
           Sentry.setContext('graphql', {
