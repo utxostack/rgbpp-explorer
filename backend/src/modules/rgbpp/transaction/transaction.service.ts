@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
-import { RgbppTransaction, RgbppLatestTransactionList } from './transaction.model';
+import { RgbppTransaction } from './transaction.model';
 import { ConfigService } from '@nestjs/config';
 import { Env } from 'src/env';
 import { CkbRpcWebsocketService } from 'src/core/ckb-rpc/ckb-rpc-websocket.service';
@@ -12,10 +12,9 @@ import { RgbppService } from '../rgbpp.service';
 import { BI, HashType } from '@ckb-lumos/lumos';
 import { Cacheable } from 'src/decorators/cacheable.decorator';
 import { ONE_MONTH_MS } from 'src/common/date';
-import { CkbScriptService } from 'src/modules/ckb/script/script.service';
 import { LeapDirection } from '@prisma/client';
 import { PrismaService } from 'src/core/database/prisma/prisma.service';
-import { CKB_CHAIN_ID } from 'src/constants';
+import { CKB_CHAIN_ID, CKB_MIN_SAFE_CONFIRMATIONS } from 'src/constants';
 
 @Injectable()
 export class RgbppTransactionService {
@@ -29,6 +28,15 @@ export class RgbppTransactionService {
     private bitcoinApiService: BitcoinApiService,
     private configService: ConfigService<Env>,
   ) { }
+
+  private async isSafeConfirmations(blockNumber: string): Promise<boolean> {
+    try {
+      const tipBlockNumber = await this.ckbRpcService.getTipBlockNumber();
+      return BI.from(blockNumber).lt(BI.from(tipBlockNumber).sub(CKB_MIN_SAFE_CONFIRMATIONS));
+    } catch {
+      return false;
+    }
+  }
 
   public async getLatestTransactions(limit: number) {
     const transactions = await this.prismaService.transaction.findMany({
@@ -155,6 +163,17 @@ export class RgbppTransactionService {
     return null;
   }
 
+  @Cacheable({
+    namespace: 'RgbppTransactionService',
+    key: (btcTx: BitcoinApiInterface.Transaction) => `queryRgbppLockTx:${btcTx.txid}`,
+    ttl: ONE_MONTH_MS,
+    shouldCache: (tx: RgbppTransaction, that: RgbppTransactionService) => {
+      if (!tx) {
+        return false;
+      }
+      return that.isSafeConfirmations(BI.from(tx.blockNumber).toHexString());
+    },
+  })
   public async queryRgbppLockTx(btcTx: BitcoinApiInterface.Transaction) {
     const ckbTxs = await Promise.all(
       btcTx.vout.map(async (_, index) => {
@@ -192,6 +211,17 @@ export class RgbppTransactionService {
     return null;
   }
 
+  @Cacheable({
+    namespace: 'RgbppTransactionService',
+    key: (btcTx: BitcoinApiInterface.Transaction) => `queryRgbppBtcTimeLockTx:${btcTx.txid}`,
+    ttl: ONE_MONTH_MS,
+    shouldCache: (tx: RgbppTransaction, that: RgbppTransactionService) => {
+      if (!tx) {
+        return false;
+      }
+      return that.isSafeConfirmations(BI.from(tx.blockNumber).toHexString());
+    },
+  })
   public async queryRgbppBtcTimeLockTx(btcTx: BitcoinApiInterface.Transaction) {
     const ckbTxs = (
       await Promise.all(

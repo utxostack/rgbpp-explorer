@@ -6,6 +6,7 @@ import { CkbExplorerService } from 'src/core/ckb-explorer/ckb-explorer.service';
 import { CkbSearchKeyInput } from './transaction.model';
 import { BI } from '@ckb-lumos/bi';
 import { OrderType } from 'src/modules/api.model';
+import { Cacheable } from 'src/decorators/cacheable.decorator';
 
 @Injectable()
 export class CkbTransactionService {
@@ -29,6 +30,12 @@ export class CkbTransactionService {
     return this.ckbRpcService.getTipBlockNumber();
   }
 
+  @Cacheable({
+    namespace: 'CkbTransactionService',
+    key: (searchKey: CkbSearchKeyInput, order: OrderType, limit: number, after?: string) =>
+      `getTransactions:${JSON.stringify(searchKey)}:${order}:${limit}:${after}`,
+    ttl: 10_000,
+  })
   public async getTransactions(
     searchKey: CkbSearchKeyInput,
     order: OrderType = OrderType.Desc,
