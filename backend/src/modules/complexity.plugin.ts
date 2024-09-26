@@ -33,6 +33,7 @@ export class ComplexityPlugin implements ApolloServerPlugin {
           return;
         }
 
+        Sentry.setMeasurement('graphql.complexity', complexity, 'none');
         if (complexity > maxComplexity) {
           Sentry.setContext('graphql', {
             query: request.query,

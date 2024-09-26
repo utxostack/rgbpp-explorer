@@ -50,8 +50,14 @@ export function Cacheable(options: CustomCacheableRegisterOptions): MethodDecora
         const branch = configService.get('GIT_BRANCH') || 'unknown';
         const prefix = configService.get('CACHE_KEY_PREFIX');
 
+        const cacheKey = `${prefix}-${branch}/${key}`;
+        if (await cacheManager.get(cacheKey)) {
+          logger.debug(`Cache hit for key: ${key}`);
+          return cacheManager.get(cacheKey);
+        }
+
         const returnVal = await cacheableHandle(
-          `${prefix}-${branch}/${key}`,
+          cacheKey,
           () => originalMethod.apply(this, args),
           options.ttl,
         );
@@ -67,3 +73,4 @@ export function Cacheable(options: CustomCacheableRegisterOptions): MethodDecora
     };
   };
 }
+
