@@ -9,7 +9,6 @@ import { MempoolService } from './provider/mempool.service';
 import { ChainInfo, Transaction } from './bitcoin-api.schema';
 import { ONE_HOUR_MS, ONE_MONTH_MS, TEN_MINUTES_MS } from 'src/common/date';
 import { Cacheable } from 'src/decorators/cacheable.decorator';
-import { PLimit } from 'src/decorators/plimit.decorator';
 import * as Sentry from '@sentry/nestjs';
 
 type MethodParameters<T, K extends keyof T> = T[K] extends (...args: infer P) => any ? P : never;

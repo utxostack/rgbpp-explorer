@@ -19,6 +19,7 @@ import { CkbScriptService } from '../script/script.service';
 import { OrderType } from 'src/modules/api.model';
 import { BaseScriptService } from '../script/base/base-script.service';
 import * as Sentry from '@sentry/nestjs';
+import { ComplexityType } from 'src/modules/complexity.plugin';
 
 @Resolver(() => CkbTransaction)
 export class CkbTransactionResolver {
@@ -95,7 +96,11 @@ export class CkbTransactionResolver {
     throw new BadRequestException('One of types and scriptKey must be provided');
   }
 
-  @Query(() => CkbTransaction, { name: 'ckbTransaction', nullable: true })
+  @Query(() => CkbTransaction, {
+    name: 'ckbTransaction',
+    nullable: true,
+    complexity: ComplexityType.RequestField,
+  })
   public async getTransaction(
     @Args('txHash') txHash: string,
     @Loader(CkbRpcTransactionLoader) rpcTxLoader: CkbRpcTransactionLoaderType,
@@ -109,6 +114,7 @@ export class CkbTransactionResolver {
 
   @ResolveField(() => [CkbCell], {
     nullable: true,
+    complexity: ComplexityType.RequestField,
   })
   public async inputs(
     @Parent() tx: CkbTransaction,
@@ -134,7 +140,7 @@ export class CkbTransactionResolver {
     );
   }
 
-  @ResolveField(() => CkbBlock, { nullable: true })
+  @ResolveField(() => CkbBlock, { nullable: true, complexity: ComplexityType.RequestField })
   public async block(
     @Parent() tx: CkbTransaction,
     @Loader(CkbRpcBlockLoader) rpcBlockLoader: CkbRpcBlockLoaderType,
@@ -146,7 +152,7 @@ export class CkbTransactionResolver {
     return CkbBlock.from(block);
   }
 
-  @ResolveField(() => Float, { nullable: true })
+  @ResolveField(() => Float, { nullable: true, complexity: ComplexityType.RequestField })
   public async fee(
     @Parent() tx: CkbTransaction,
     @Loader(CkbExplorerTransactionLoader) explorerTxLoader: CkbExplorerTransactionLoaderType,
@@ -158,7 +164,7 @@ export class CkbTransactionResolver {
     return toNumber(explorerTx.transaction_fee);
   }
 
-  @ResolveField(() => Float, { nullable: true })
+  @ResolveField(() => Float, { nullable: true, complexity: ComplexityType.RequestField })
   public async feeRate(
     @Parent() tx: CkbTransaction,
     @Loader(CkbExplorerTransactionLoader) explorerTxLoader: CkbExplorerTransactionLoaderType,
@@ -173,7 +179,7 @@ export class CkbTransactionResolver {
     return fee.mul(ratio).div(size).toNumber();
   }
 
-  @ResolveField(() => Float)
+  @ResolveField(() => Float, { complexity: ComplexityType.RequestField })
   public async confirmations(@Parent() tx: CkbTransaction): Promise<number> {
     if (!tx.confirmed) {
       return 0;

@@ -14,6 +14,7 @@ import {
 } from '../transaction/transaction.dataloader';
 import { ValidateCkbAddressPipe } from 'src/pipes/validate-address.pipe';
 import { BI } from '@ckb-lumos/bi';
+import { ComplexityType } from 'src/modules/complexity.plugin';
 
 @Resolver(() => CkbAddress)
 export class CkbAddressResolver {
@@ -26,7 +27,7 @@ export class CkbAddressResolver {
     };
   }
 
-  @ResolveField(() => Float, { nullable: true })
+  @ResolveField(() => Float, { nullable: true, complexity: ComplexityType.RequestField })
   public async shannon(
     @Parent() address: CkbAddress,
     @Loader(CkbAddressLoader) addressLoader: CkbAddressLoaderType,
@@ -38,7 +39,7 @@ export class CkbAddressResolver {
     return Number(addressInfo[0].balance);
   }
 
-  @ResolveField(() => Float, { nullable: true })
+  @ResolveField(() => Float, { nullable: true, complexity: ComplexityType.RequestField })
   public async transactionsCount(
     @Parent() address: CkbAddress,
     @Loader(CkbAddressLoader) addressLoader: CkbAddressLoaderType,
@@ -80,7 +81,7 @@ export class CkbAddressResolver {
     );
   }
 
-  @ResolveField(() => CkbAddressBalance, { nullable: true })
+  @ResolveField(() => CkbAddressBalance, { nullable: true, complexity: ComplexityType.RequestField })
   public async balance(
     @Parent() address: CkbAddress,
     @Loader(CkbAddressLoader) addressLoader: CkbAddressLoaderType,

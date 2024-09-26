@@ -6,21 +6,22 @@ import {
   BitcoinBlockTxidsLoader,
   BitcoinBlockTxidsLoaderType,
 } from './block/dataloader/block-txids.dataloader';
+import { ComplexityType } from '../complexity.plugin';
 
 // 60 * 24 = 1440 minutes
 const BLOCK_NUMBER_OF_24_HOURS = 144;
 
 @Resolver(() => BitcoinChainInfo)
 export class BitcoinResolver {
-  constructor(private bitcoinApiService: BitcoinApiService) {}
+  constructor(private bitcoinApiService: BitcoinApiService) { }
 
-  @Query(() => BitcoinChainInfo, { name: 'btcChainInfo' })
+  @Query(() => BitcoinChainInfo, { name: 'btcChainInfo', complexity: ComplexityType.RequestField })
   public async chainInfo(): Promise<BitcoinBaseChainInfo> {
     const info = await this.bitcoinApiService.getBlockchainInfo();
     return BitcoinChainInfo.from(info);
   }
 
-  @ResolveField(() => Float)
+  @ResolveField(() => Float, { complexity: ComplexityType.RequestField })
   public async transactionsCountIn24Hours(
     @Parent() chainInfo: BitcoinBaseChainInfo,
     @Loader(BitcoinBlockTxidsLoader) blockTxidsLoader: BitcoinBlockTxidsLoaderType,
@@ -39,7 +40,7 @@ export class BitcoinResolver {
     return count;
   }
 
-  @ResolveField(() => BitcoinFees)
+  @ResolveField(() => BitcoinFees, { complexity: ComplexityType.RequestField })
   public async fees(): Promise<BitcoinFees> {
     const fees = await this.bitcoinApiService.getFeesRecommended();
     return BitcoinFees.from(fees);
