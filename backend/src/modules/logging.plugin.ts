@@ -13,6 +13,10 @@ export class LoggingPlugin implements ApolloServerPlugin {
 
   async requestDidStart(requestContext: GraphQLRequestContext<Context>): Promise<GraphQLRequestListener<any>> {
     const { request } = requestContext.contextValue;
+    if (request.url !== '/graphql') {
+      return {};
+    }
+
     const body = request.body as { operationName: string; variables: Record<string, any>, query: string };
     this.logger.log(`Request [${request.ip}] ${body.operationName} ${JSON.stringify(body.variables)}`);
 
