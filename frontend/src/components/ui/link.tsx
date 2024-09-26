@@ -20,7 +20,7 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link({ chi
 
   if (typeof props.href === 'string' && (props.href.startsWith('https://') || props.href.startsWith('http://'))) {
     return (
-      <StyledLink ref={ref} {...props} href={props.href}>
+      <StyledLink ref={ref} {...props} href={props.href} prefetch={false}>
         {children}
       </StyledLink>
     )
@@ -31,7 +31,7 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link({ chi
     (props.href.pathname?.startsWith('https://') || props.href.pathname?.startsWith('http://'))
   ) {
     return (
-      <StyledLink ref={ref} {...props} href={props.href}>
+      <StyledLink ref={ref} {...props} href={props.href} prefetch={false}>
         {children}
       </StyledLink>
     )
@@ -49,7 +49,7 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link({ chi
             : `/${locale}${props.href.pathname}`,
         }
   return (
-    <StyledLink ref={ref} {...props} href={href}>
+    <StyledLink ref={ref} {...props} href={href} prefetch={false}>
       {children}
     </StyledLink>
   )
