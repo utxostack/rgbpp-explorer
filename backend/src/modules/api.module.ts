@@ -21,6 +21,7 @@ import { AllExceptionsFilter } from 'src/filters/all-exceptions.filter';
 import { DirectiveLocation, GraphQLBoolean, GraphQLDirective, GraphQLEnumType } from 'graphql';
 import { LoggingPlugin } from './logging.plugin';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
 
 @Injectable()
 export class GqlThrottlerGuard extends ThrottlerGuard {
@@ -36,12 +37,16 @@ export class GqlThrottlerGuard extends ThrottlerGuard {
     ThrottlerModule.forRootAsync({
       inject: [ConfigService],
       useFactory: async (configService: ConfigService<Env>) => ({
+        getTracker: (req: Record<string, any>) => {
+          return req.ips.length ? req.ips[0] : req.ip;
+        },
         throttlers: [
           {
             ttl: configService.get('RATE_LIMIT_WINDOW_MS')!,
             limit: configService.get('RATE_LIMIT_PER_MINUTE')!,
           },
         ],
+        storage: new ThrottlerStorageRedisService(configService.get('REDIS_CACHE_URL')),
       }),
     }),
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
@@ -136,4 +141,4 @@ export class GqlThrottlerGuard extends ThrottlerGuard {
     LoggingPlugin,
   ],
 })
-export class ApiModule { }
+export class ApiModule {}
