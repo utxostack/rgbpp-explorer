@@ -14,15 +14,6 @@ export class BootstrapService {
 
   public async bootstrap() {
     if (cluster.isPrimary) {
-      cluster.fork();
-      cluster.on('exit', (worker, code, signal) => {
-        this.logger.error(
-          `Worker ${worker.process.pid} died with code ${code} and signal ${signal}`,
-        );
-        this.logger.log('Starting a new worker');
-        cluster.fork();
-      });
-    } else {
       await this.bootstrapAssetsIndex();
     }
   }
