@@ -57,7 +57,10 @@ export class BitcoinAddressResolver {
     return stats.chain_stats.tx_count;
   }
 
-  @ResolveField(() => [BitcoinTransaction], { nullable: true })
+  @ResolveField(() => [BitcoinTransaction], {
+    nullable: true,
+    complexity: ({ childComplexity }) => 10 + childComplexity,
+  })
   public async transactions(
     @Parent() address: BitcoinAddress,
     @Loader(BitcoinAddressTransactionsLoader)

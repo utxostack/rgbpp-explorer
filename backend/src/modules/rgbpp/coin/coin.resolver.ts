@@ -19,7 +19,10 @@ export class RgbppCoinResolver {
     private rgbppCoinService: RgbppCoinService,
   ) { }
 
-  @Query(() => RgbppCoinList, { name: 'rgbppCoins' })
+  @Query(() => RgbppCoinList, {
+    name: 'rgbppCoins',
+    complexity: ({ args, childComplexity }) => (args.pageSize ?? 10) * childComplexity,
+  })
   public async coins(
     @Args('page', { type: () => Int, nullable: true }) page: number = 1,
     @Args('pageSize', { type: () => Int, nullable: true }) pageSize: number = 10,
@@ -50,7 +53,10 @@ export class RgbppCoinResolver {
     return RgbppCoin.from(response.data.attributes);
   }
 
-  @ResolveField(() => [RgbppTransaction], { nullable: true })
+  @ResolveField(() => [RgbppTransaction], {
+    nullable: true,
+    complexity: ({ args, childComplexity }) => (args.pageSize ?? 10) * childComplexity,
+  })
   public async transactions(
     @Parent() coin: RgbppCoin,
     @Args('page', { type: () => Int, nullable: true }) page: number = 1,

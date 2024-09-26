@@ -33,15 +33,20 @@ export class ComplexityPlugin implements ApolloServerPlugin {
           return;
         }
 
+        console.log('Complexity:', complexity);
+        console.log(request);
+        Sentry.setMeasurement('graphql.complexity', complexity, 'none');
         if (complexity > maxComplexity) {
           Sentry.setContext('graphql', {
             query: request.query,
             variables: request.variables,
             complexity,
           });
-          throw new GraphQLError(
+          const error = new GraphQLError(
             `Query is too complex: ${complexity}. Maximum allowed complexity: ${maxComplexity}`,
           );
+          Sentry.captureException(error);
+          throw error;
         }
       },
     };

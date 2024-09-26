@@ -21,7 +21,7 @@ import { CkbRpcWebsocketService } from 'src/core/ckb-rpc/ckb-rpc-websocket.servi
 
 @Resolver(() => CkbBlock)
 export class CkbBlockResolver {
-  constructor(private ckbRpcService: CkbRpcWebsocketService) {}
+  constructor(private ckbRpcService: CkbRpcWebsocketService) { }
 
   @Query(() => CkbBlock, { name: 'ckbBlock', nullable: true })
   public async getBlock(
@@ -71,7 +71,10 @@ export class CkbBlockResolver {
     return toNumber(explorerBlock.miner_reward);
   }
 
-  @ResolveField(() => [CkbTransaction], { nullable: true })
+  @ResolveField(() => [CkbTransaction], {
+    nullable: true,
+    complexity: ({ childComplexity }) => 10 + childComplexity,
+  })
   public async transactions(
     @Parent() { hash }: CkbBlock,
     @Loader(CkbRpcBlockLoader) rpcBlockLoader: CkbRpcBlockLoaderType,
