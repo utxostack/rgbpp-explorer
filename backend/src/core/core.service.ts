@@ -14,8 +14,8 @@ import { Env } from 'src/env';
 import { Transaction } from './blockchain/blockchain.interface';
 import { BlockchainServiceFactory } from './blockchain/blockchain.factory';
 import { LeapDirection } from '@prisma/client';
-import { Cacheable } from 'nestjs-cacheable';
 import { ONE_MONTH_MS } from 'src/common/date';
+import { Cacheable } from 'src/decorators/cacheable.decorator';
 
 export const CELLBASE_TX_HASH =
   '0x0000000000000000000000000000000000000000000000000000000000000000';
