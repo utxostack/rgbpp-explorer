@@ -1,5 +1,6 @@
 import { Trans } from '@lingui/macro'
 import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { VStack } from 'styled-system/jsx'
 
@@ -83,18 +84,25 @@ const query = graphql(`
 `)
 
 export function CkbTransactionCardWithQueryInAddress({ hash, address }: { address: string; hash: string }) {
-  const [ref, inView] = useInView({
+  const [enabled, setEnabled] = useState(false)
+  const [ref] = useInView({
     threshold: 0,
+    onChange(view) {
+      if (view) setEnabled(true)
+    },
   })
   const { data, isLoading, error } = useQuery({
-    queryKey: [QueryKey.BtcTransactionCardWithQueryInAddress, hash],
+    queryKey: [QueryKey.CkbTransactionCardInAddressList, hash],
     async queryFn() {
       const { ckbTransaction } = await graphQLClient.request(query, {
         hash,
       })
       return ckbTransaction
     },
-    enabled: inView,
+    enabled,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+    retryOnMount: false,
   })
 
   if (error) return null

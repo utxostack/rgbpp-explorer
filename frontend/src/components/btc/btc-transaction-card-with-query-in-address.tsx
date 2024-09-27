@@ -1,6 +1,7 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 
 import { BtcTransactionCardInAddress } from '@/components/btc/btc-transaction-card-in-address'
@@ -125,8 +126,12 @@ interface Props {
 }
 
 export function BtcTransactionCardWithQueryInAddress({ txid, address }: Props) {
-  const [ref, inView] = useInView({
+  const [enabled, setEnabled] = useState(false)
+  const [ref] = useInView({
     threshold: 0,
+    onChange(view) {
+      if (view) setEnabled(true)
+    },
   })
   const { data, isLoading, error } = useQuery({
     queryKey: [QueryKey.BtcTransactionCardWithQueryInAddress, txid],
@@ -136,7 +141,10 @@ export function BtcTransactionCardWithQueryInAddress({ txid, address }: Props) {
       })
       return btcTransaction
     },
-    enabled: inView,
+    enabled,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+    retryOnMount: false,
   })
 
   const { data: ckbTx } = useQuery({
