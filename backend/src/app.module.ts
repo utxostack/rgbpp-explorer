@@ -7,7 +7,6 @@ import { redisStore } from 'cache-manager-redis-yet';
 import { Env } from './env';
 import { CoreModule } from './core/core.module';
 import { ApiModule } from './modules/api.module';
-import { CacheableModule } from 'nestjs-cacheable';
 import { ScheduleModule } from '@nestjs/schedule';
 import { BullModule } from '@nestjs/bullmq';
 import configModule from './config';
@@ -18,7 +17,6 @@ import { BootstrapService } from './bootstrap.service';
   imports: [
     configModule,
     SentryModule.forRoot(),
-    CacheableModule.register(),
     CacheModule.registerAsync<RedisClientOptions>({
       isGlobal: true,
       imports: [ConfigModule],
