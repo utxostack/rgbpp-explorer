@@ -80,6 +80,9 @@ export class BitcoinAddressTransactionsLoader
     };
   }
 }
-export type BitcoinAddressTransactionsLoaderType = DataLoader<GetAddressTxsParams, BitcoinTransaction[] | null>;
+export type BitcoinAddressTransactionsLoaderType = DataLoader<
+  GetAddressTxsParams,
+  BitcoinTransaction[] | null
+>;
 export type BitcoinAddressTransactionsLoaderResponse =
   DataLoaderResponse<BitcoinAddressTransactionsLoader>;

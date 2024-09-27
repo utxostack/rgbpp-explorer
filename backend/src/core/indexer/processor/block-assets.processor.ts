@@ -107,7 +107,7 @@ export class IndexerBlockAssetsProcessor extends WorkerHost {
     } else {
       const indexerServiceFactory = this.moduleRef.get(IndexerServiceFactory);
       const indexerService = await indexerServiceFactory.getService(chainId);
-      indexerService.assetsFlow.emit(IndexerAssetsEvent.BlockAssetsIndexed, block);
+      indexerService.assetsFlow.emit(IndexerAssetsEvent.BlockAssetsIndexed, blockNumber);
       return;
     }
   }

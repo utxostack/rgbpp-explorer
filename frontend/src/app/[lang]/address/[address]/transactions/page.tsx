@@ -1,19 +1,19 @@
 import { notFound } from 'next/navigation'
 
-import { BtcTransactionsByAddress } from '@/app/[lang]/address/[address]/transactions/btc'
-import { CkbTransactionsByAddress } from '@/app/[lang]/address/[address]/transactions/ckb'
+import { BtcTxList } from '@/app/[lang]/address/[address]/transactions/btc-tx-list'
+import { CKBTxList } from '@/app/[lang]/address/[address]/transactions/ckb-tx-list'
 import { isValidBTCAddress } from '@/lib/btc/is-valid-btc-address'
 import { isValidCkbAddress } from '@/lib/ckb/is-valid-ckb-address'
 
 export const maxDuration = 30
 
-export default function Page({ params: { address } }: { params: { address: string } }) {
+export default async function Page({ params: { address } }: { params: { address: string; lang: string } }) {
   if (isValidBTCAddress(address)) {
-    return <BtcTransactionsByAddress address={address} />
+    return <BtcTxList address={address} />
   }
 
   if (isValidCkbAddress(address)) {
-    return <CkbTransactionsByAddress address={address} />
+    return <CKBTxList address={address} />
   }
   return notFound()
 }

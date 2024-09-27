@@ -1,7 +1,9 @@
 services:
   preview-explorer-backend:
     depends_on:
-      preview-redis:
+      preview-redis-cache:
+        condition: service_started
+      preview-redis-queue:
         condition: service_started
       preview-postgres:
         condition: service_healthy
@@ -19,14 +21,27 @@ services:
     networks:
       - preview
 
-  preview-redis:
+  preview-redis-cache:
     # https://github.com/docker-library/redis/blob/b77450d/7.4/alpine/Dockerfile
     image: redis:7-alpine
     restart: unless-stopped
     volumes:
       # Redis' WORKDIR is /data
-      - preview-redis-data:/data
+      - preview-redis-cache-data:/data
       - ./backend/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    command: /usr/local/etc/redis/redis.conf
+    networks:
+      - preview
+
+
+  preview-redis-queue:
+    # https://github.com/docker-library/redis/blob/b77450d/7.4/alpine/Dockerfile
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      # Redis' WORKDIR is /data
+      - preview-redis-queue-data:/data
+      - ./backend/redis-queue.conf:/usr/local/etc/redis/redis.conf:ro
     command: /usr/local/etc/redis/redis.conf
     networks:
       - preview
@@ -47,7 +62,8 @@ services:
       - preview
 
 volumes:
-  preview-redis-data:
+  preview-redis-cache-data:
+  preview-redis-queue-data:
   preview-pg-volume:
 
 networks:

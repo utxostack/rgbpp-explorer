@@ -4,7 +4,7 @@
   "private": true,
   "packageManager": "pnpm@9.4.0+sha512.f549b8a52c9d2b8536762f99c0722205efc5af913e77835dbccc3b0b0b2ca9e7dc8022b78062c17291c48e88749c70ce88eb5a74f1fa8c4bf5e18bb46c8bd83a",
   "scripts": {
-    "prepare": "panda codegen",
+    "prepare": "panda codegen && graphql-codegen",
     "dev": "next dev",
     "build": "npm run lingui && next build",
     "start": "next start",
@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.11.2",
-    "@ark-ui/react": "^3.5.0",
+    "@ark-ui/react": "^3.12.1",
     "@bitcoinerlab/secp256k1": "^1.1.1",
     "@ckb-lumos/lumos": "^0.23.0",
     "@graphql-typed-document-node/core": "^3.2.0",
@@ -35,8 +35,10 @@
     "lodash-es": "^4.17.21",
     "negotiator": "^0.6.3",
     "next": "14.2.4",
+    "next-nprogress-bar": "^2.3.13",
     "react": "^18",
     "react-dom": "^18",
+    "react-intersection-observer": "^9.13.1",
     "typed.js": "^2.1.0",
     "usehooks-ts": "^3.1.0",
     "zod": "^3.23.8"

@@ -1,3 +1,4 @@
+import type { I18n } from '@lingui/core'
 import { t } from '@lingui/macro'
 import BigNumber from 'bignumber.js'
 import { Box, Grid, HStack, VStack } from 'styled-system/jsx'
@@ -11,21 +12,20 @@ import { Heading, Text, Tooltip } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { BitcoinBlock } from '@/gql/graphql'
 import { resolveBtcTime } from '@/lib/btc/resolve-btc-time'
-import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { formatNumber } from '@/lib/string/format-number'
 import { truncateMiddle } from '@/lib/string/truncate-middle'
 
 export function BtcBlockOverview({
   block,
+  i18n,
 }: {
   block: Pick<
     BitcoinBlock,
     'timestamp' | 'size' | 'transactionsCount' | 'feeRateRange' | 'totalFee' | 'miner' | 'height'
   >
+  i18n: I18n
 }) {
   if (!block) return null
-  const i18n = getI18nFromHeaders()
-  console.log(block.feeRateRange)
   return (
     <VStack gap={0} w="100%" bg="bg.card" rounded="8px">
       <HStack

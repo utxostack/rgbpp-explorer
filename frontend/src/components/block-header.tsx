@@ -1,10 +1,10 @@
+import type { I18n } from '@lingui/core'
 import { t } from '@lingui/macro'
 
 import BlockIcon from '@/assets/block.svg'
 import { Copier } from '@/components/copier'
 import { Heading, Text } from '@/components/ui'
 import { Icon } from '@/components/ui/primitives/icon'
-import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { formatNumber } from '@/lib/string/format-number'
 
 import { Box, Grid } from '../../styled-system/jsx'
@@ -13,13 +13,13 @@ export function BlockHeader({
   id,
   height,
   confirmations,
+  i18n,
 }: {
   id: string
   height: number
   confirmations?: number | null
+  i18n: I18n
 }) {
-  const i18n = getI18nFromHeaders()
-
   return (
     <Grid
       gridTemplateColumns={{ base: 'auto 1fr', lg: '56px auto 1fr' }}

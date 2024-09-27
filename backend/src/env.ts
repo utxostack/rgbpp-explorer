@@ -10,7 +10,10 @@ export const envSchema = z
       .string()
       .default('true')
       .transform((value) => value === 'true'),
-    GRAPHQL_COMPLEXITY_LIMIT: z.coerce.number().default(100),
+
+    GRAPHQL_COMPLEXITY_LIMIT: z.coerce.number().default(1000),
+
+    CLUSTER_WORKERS_NUM: z.coerce.number().default(2),
 
     /**
      * CORS origin whitelist (split by comma)
@@ -24,7 +27,8 @@ export const envSchema = z
       }),
 
     DATABASE_URL: z.string(),
-    REDIS_URL: z.string(),
+    REDIS_CACHE_URL: z.string(),
+    REDIS_QUEUE_URL: z.string(),
 
     BITCOIN_PRIMARY_DATA_PROVIDER: z.enum(['mempool', 'electrs']).default('mempool'),
 

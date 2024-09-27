@@ -1,32 +1,48 @@
 'use client'
 
-import { redirect, usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { Trans } from '@lingui/macro'
+import { redirect, usePathname, useSearchParams } from 'next/navigation'
+import { useState } from 'react'
 
-import { Pagination, type PaginationProps } from '@/components/ui'
+import { Button } from '@/components/ui'
+import Link from '@/components/ui/link'
+import { NumberInput } from '@/components/ui/number-input'
 
-// TODO: recode RSC by Link
-export function PaginationSearchParams(props: PaginationProps) {
-  const router = useRouter()
+export function PaginationSearchParams(props: { count: number; pageSize: number }) {
+  const { count, pageSize } = props
   const searchParams = useSearchParams()
-  const page = Number(searchParams.get('page') ?? '1')
+  const initialPage = Number(searchParams.get('page') ?? '1')
   const pathname = usePathname()
 
-  if (isNaN(page)) {
+  if (isNaN(initialPage)) {
     const params = new URLSearchParams(searchParams.toString())
     params.delete('page')
-    throw redirect(`${pathname}?${params.toString()}`)
+    redirect(`${pathname}?${params.toString()}`)
   }
 
+  const [page, setPage] = useState(initialPage)
+
   return (
-    <Pagination
-      {...props}
-      siblingCount={1}
-      page={page}
-      onPageChange={(details) => {
-        const params = new URLSearchParams(searchParams.toString())
-        params.set('page', `${details.page}`)
-        router.replace(`${pathname}?${params.toString()}`)
-      }}
-    />
+    <>
+      <NumberInput
+        value={`${page}`}
+        onValueChange={(e) => setPage(e.valueAsNumber)}
+        min={1}
+        max={Math.ceil(count / pageSize)}
+        w="150px"
+      />
+      <Link
+        href={{
+          pathname,
+          query: {
+            page,
+          },
+        }}
+      >
+        <Button>
+          <Trans>Go</Trans>
+        </Button>
+      </Link>
+    </>
   )
 }

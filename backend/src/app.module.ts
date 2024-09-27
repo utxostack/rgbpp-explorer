@@ -7,7 +7,6 @@ import { redisStore } from 'cache-manager-redis-yet';
 import { Env } from './env';
 import { CoreModule } from './core/core.module';
 import { ApiModule } from './modules/api.module';
-import { CacheableModule } from 'nestjs-cacheable';
 import { ScheduleModule } from '@nestjs/schedule';
 import { BullModule } from '@nestjs/bullmq';
 import configModule from './config';
@@ -18,13 +17,12 @@ import { BootstrapService } from './bootstrap.service';
   imports: [
     configModule,
     SentryModule.forRoot(),
-    CacheableModule.register(),
     CacheModule.registerAsync<RedisClientOptions>({
       isGlobal: true,
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService<Env>) => {
         const store = (await redisStore({
-          url: configService.get('REDIS_URL'),
+          url: configService.get('REDIS_CACHE_URL'),
           isCacheable: (value) => value !== undefined,
         })) as unknown as CacheStore;
         return {
@@ -36,7 +34,7 @@ import { BootstrapService } from './bootstrap.service';
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService<Env>) => {
-        const url = new URL(configService.get('REDIS_URL')!);
+        const url = new URL(configService.get('REDIS_QUEUE_URL')!);
         return {
           connection: {
             host: url.hostname,

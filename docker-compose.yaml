@@ -8,7 +8,9 @@ services:
     ports:
       - '3000:3000'
     depends_on:
-      redis:
+      redis-cache:
+        condition: service_started
+      redis-queue:
         condition: service_started
       postgres:
         condition: service_healthy
@@ -21,17 +23,27 @@ services:
     networks:
       - internal
 
-  redis:
+  redis-cache:
     # https://github.com/docker-library/redis/blob/b77450d/7.4/alpine/Dockerfile
     image: redis:7-alpine
     restart: unless-stopped
-    ports:
-      - '127.0.0.1:6379:6379'
     command: /usr/local/etc/redis/redis.conf
     volumes:
       # Redis' WORKDIR is /data
-      - redis-data:/data
+      - redis-cache-data:/data
       - ./backend/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    networks:
+      - internal
+
+  redis-queue:
+    # https://github.com/docker-library/redis/blob/b77450d/7.4/alpine/Dockerfile
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: /usr/local/etc/redis/redis.conf
+    volumes:
+      # Redis' WORKDIR is /data
+      - redis-queue-data:/data
+      - ./backend/redis-queue.conf:/usr/local/etc/redis/redis.conf:ro
     networks:
       - internal
 
@@ -53,7 +65,8 @@ services:
       - internal
 
 volumes:
-  redis-data:
+  redis-cache-data:
+  redis-queue-data:
   postgres_volume:
 
 networks:

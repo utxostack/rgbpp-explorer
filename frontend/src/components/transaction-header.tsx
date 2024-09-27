@@ -1,3 +1,4 @@
+import type { I18n } from '@lingui/core'
 import { t } from '@lingui/macro'
 import BigNumber from 'bignumber.js'
 
@@ -5,7 +6,6 @@ import { Copier } from '@/components/copier'
 import { IfBreakpoint } from '@/components/if-breakpoint'
 import { LayerType, LayerTypeProps } from '@/components/layer-type'
 import { Heading, Text } from '@/components/ui'
-import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { formatNumber } from '@/lib/string/format-number'
 
 import { Box, Grid } from '../../styled-system/jsx'
@@ -14,12 +14,13 @@ export function TransactionHeader({
   type,
   txid,
   confirmations,
+  i18n,
 }: {
   type: LayerTypeProps['type']
   txid: string
   confirmations?: BigNumber.Value
+  i18n: I18n
 }) {
-  const i18n = getI18nFromHeaders()
   const layerType = type ? <LayerType display="inline-flex" type={type} /> : null
   return (
     <Grid

@@ -1,10 +1,12 @@
 import { Logger } from '@nestjs/common';
 import { AssetType, Chain } from '@prisma/client';
 import { EventEmitter } from 'node:events';
-import { CKB_MIN_SAFE_CONFIRMATIONS } from 'src/constants';
+import { CKB_MIN_SAFE_CONFIRMATIONS, CKB_ONE_DAY_BLOCKS } from 'src/constants';
 import { BlockchainService } from 'src/core/blockchain/blockchain.service';
 import { PrismaService } from 'src/core/database/prisma/prisma.service';
 import { IndexerQueueService } from '../indexer.queue';
+import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
+import { CronJob } from 'cron';
 
 export enum IndexerAssetsEvent {
   AssetIndexed = 'asset-indexed',
@@ -19,17 +21,42 @@ export class IndexerAssetsFlow extends EventEmitter {
     private blockchainService: BlockchainService,
     private prismaService: PrismaService,
     private indexerQueueService: IndexerQueueService,
+    private schedulerRegistry: SchedulerRegistry,
   ) {
     super();
   }
 
   public async start() {
+    const latestAsset = await this.getLatestAsset();
+    if (latestAsset) {
+      this.logger.log(`Latest asset block number: ${latestAsset.blockNumber}`);
+      const tipBlockNumber = await this.blockchainService.getTipBlockNumber();
+      if (
+        tipBlockNumber - CKB_MIN_SAFE_CONFIRMATIONS - latestAsset.blockNumber <
+        CKB_ONE_DAY_BLOCKS
+      ) {
+        this.logger.log(`Latest asset is near tip block number, skip indexing assets...`);
+        this.startBlockAssetsIndexing();
+        this.setupBlockAssetsIndexedListener();
+        return;
+      }
+    }
+
     const assetTypeScripts = await this.prismaService.assetType.findMany({
       where: { chainId: this.chain.id },
     });
     this.logger.log(`Indexing ${assetTypeScripts.length} asset type scripts`);
     assetTypeScripts.map((assetType) => this.indexAssets(assetType));
     this.setupAssetIndexedListener(assetTypeScripts.length);
+  }
+
+  private async getLatestAsset() {
+    const latestAsset = await this.prismaService.asset.findFirst({
+      select: { blockNumber: true },
+      where: { chainId: this.chain.id },
+      orderBy: { blockNumber: 'desc' },
+    });
+    return latestAsset;
   }
 
   private async indexAssets(assetType: AssetType) {
@@ -62,7 +89,7 @@ export class IndexerAssetsFlow extends EventEmitter {
   private async startBlockAssetsIndexing() {
     const tipBlockNumber = await this.blockchainService.getTipBlockNumber();
 
-    let latestIndexedBlockNumber = await this.indexerQueueService.getLatestIndexedBlock(
+    let latestIndexedBlockNumber = await this.indexerQueueService.getLatestIndexedAssetsBlock(
       this.chain.id,
     );
     if (!latestIndexedBlockNumber) {
@@ -75,7 +102,7 @@ export class IndexerAssetsFlow extends EventEmitter {
     }
     const targetBlockNumber = tipBlockNumber - CKB_MIN_SAFE_CONFIRMATIONS;
     if (targetBlockNumber <= latestIndexedBlockNumber) {
-      this.emit(IndexerAssetsEvent.BlockAssetsIndexed);
+      this.emit(IndexerAssetsEvent.BlockAssetsIndexed, latestIndexedBlockNumber);
       return;
     }
 
@@ -88,9 +115,16 @@ export class IndexerAssetsFlow extends EventEmitter {
 
   private setupBlockAssetsIndexedListener() {
     this.on(IndexerAssetsEvent.BlockAssetsIndexed, () => {
-      setTimeout(() => {
+      if (this.schedulerRegistry.doesExist('cron', 'indexer-block-assets')) {
+        return;
+      }
+
+      this.logger.log(`Scheduling block assets indexing cron job`);
+      const job = new CronJob(CronExpression.EVERY_10_SECONDS, () => {
         this.startBlockAssetsIndexing();
-      }, 1000 * 10);
+      });
+      this.schedulerRegistry.addCronJob('indexer-block-assets', job);
+      job.start();
     });
   }
 }

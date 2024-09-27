@@ -11,12 +11,15 @@ export class AllExceptionsFilter extends SentryGlobalGraphQLFilter {
   }
 
   catch(exception: unknown, host: ArgumentsHost) {
-    const ctx = host.switchToHttp();
-    const request = ctx.getRequest();
-    if (SKIP_REQUEST_URLS.includes(request.url)) {
-      const response = (exception as HttpException).getResponse();
-      this.httpAdapterHost.httpAdapter.reply(ctx.getResponse(), response, 200);
-      return;
+    const type = host.getType();
+    if (type === 'http') {
+      const ctx = host.switchToHttp();
+      const request = ctx.getRequest();
+      if (SKIP_REQUEST_URLS.includes(request.url)) {
+        const response = (exception as HttpException).getResponse();
+        this.httpAdapterHost.httpAdapter.reply(ctx.getResponse(), response, 200);
+        return;
+      }
     }
 
     super.catch(exception, host);

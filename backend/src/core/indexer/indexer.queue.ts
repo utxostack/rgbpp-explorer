@@ -76,11 +76,15 @@ export class IndexerQueueService {
     await this.cacheManager.set(`${INDEXER_ASSETS_QUEUE}:${typeHash}`, cursor || '');
   }
 
-  public async getLatestIndexedBlock(chainId: number) {
+  public async getLatestIndexedAssetsBlock(chainId: number) {
     const blockNumber = await this.cacheManager.get<number>(
       `${INDEXER_BLOCK_ASSETS_QUEUE}:${chainId}`,
     );
     return blockNumber;
+  }
+
+  public async setLatestIndexedAssetsBlock(chainId: number, blockNumber: number) {
+    await this.cacheManager.set(`${INDEXER_BLOCK_ASSETS_QUEUE}:${chainId}`, blockNumber);
   }
 
   public async addBlockAssetsJob(data: IndexerBlockAssetsJobData) {
@@ -95,7 +99,7 @@ export class IndexerQueueService {
       `Added block assets job ${jobId} for chain ${chainId} with block number ${blockNumber}`,
     );
     await this.blockAssetsQueue.add(jobId, data, { jobId });
-    await this.cacheManager.set(`${INDEXER_BLOCK_ASSETS_QUEUE}:${chainId}`, blockNumber);
+    await this.setLatestIndexedAssetsBlock(chainId, blockNumber);
   }
 
   public async addLockJob(data: IndexerLockJobData) {
