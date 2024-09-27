@@ -17,6 +17,7 @@ import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import { BI } from '@ckb-lumos/bi';
 import { LeapDirection } from '@prisma/client';
 import { ComplexityType } from 'src/modules/complexity.plugin';
+import { isDate } from 'lodash';
 
 @Resolver(() => RgbppTransaction)
 export class RgbppTransactionResolver {
@@ -112,7 +113,7 @@ export class RgbppTransactionResolver {
       const ckbTx = await ckbTxLoader.load(tx.ckbTxHash);
       return new Date(BI.from(ckbTx?.time_added_to_pool).toNumber());
     }
-    return tx.blockTime;
+    return isDate(tx.blockTime) ? tx.blockTime : new Date(tx.blockTime);
   }
 
   @ResolveField(() => LeapDirection, { nullable: true, complexity: ComplexityType.RequestField })

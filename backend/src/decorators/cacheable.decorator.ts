@@ -1,76 +1,84 @@
-// eslint-disable-next-line no-restricted-imports
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { CacheableRegisterOptions, Cacheable as _Cacheable } from 'nestjs-cacheable';
-import { cacheableHandle, generateComposedKey } from 'nestjs-cacheable/dist/cacheable.helper';
 import { Env } from 'src/env';
-
-export interface CustomCacheableRegisterOptions extends CacheableRegisterOptions {
-  shouldCache?: (result: any, target: any) => boolean | Promise<boolean>;
-}
+import serialize from 'serialize-javascript';
+import { createHash } from 'crypto';
 
 const logger = new Logger('Cacheable');
 
-/**
- * Cacheable decorator with custom options, based on the original Cacheable decorator from the nestjs-cacheable package.
- * Adds a shouldCache option to determine whether the result should be cached.
- *
- * @example
- * @Cacheable({
- *   ttl: 1000,
- *   key: (args: any[]) => args[0],
- *   shouldCache: (result: any) => result !== null,
- * });
- */
-export function Cacheable(options: CustomCacheableRegisterOptions): MethodDecorator {
-  const injectCacheService = Inject(CACHE_MANAGER);
-  const injectConfigService = Inject(ConfigService);
+type KeyBuilder = string | ((...args: any[]) => string | string[]);
 
-  return function (target, propertyKey, descriptor) {
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    const originalMethod = descriptor.value as unknown as Function;
-
-    injectCacheService(target, '__cacheManager');
-    injectConfigService(target, '__configService');
-    return {
-      ...descriptor,
-      value: async function (...args: any[]) {
-        const cacheManager = this.__cacheManager as Cache;
-        if (!cacheManager) return originalMethod.apply(this, args);
-        const composeOptions: Parameters<typeof generateComposedKey>[0] = {
-          methodName: String(propertyKey),
-          key: options.key,
-          namespace: options.namespace,
-          args,
-        };
-        const [key] = generateComposedKey(composeOptions);
-
-        const configService = this.__configService as ConfigService<Env>;
-        const branch = configService.get('GIT_BRANCH') || 'unknown';
-        const prefix = configService.get('CACHE_KEY_PREFIX');
-
-        const cacheKey = `${prefix}-${branch}/${key}`;
-        if (await cacheManager.get(cacheKey)) {
-          logger.debug(`Cache hit for key: ${key}`);
-          return cacheManager.get(cacheKey);
-        }
-
-        const returnVal = await cacheableHandle(
-          cacheKey,
-          () => originalMethod.apply(this, args),
-          options.ttl,
-        );
-
-        // Remove the cache if shouldCache returns false
-        const shouldCache = options.shouldCache ? await options.shouldCache(returnVal, this) : true;
-        if (!shouldCache) {
-          logger.debug(`Removing cache for key: ${key}`);
-          await cacheManager.del(key);
-        }
-        return returnVal;
-      } as any,
-    };
-  };
+interface CacheOptions {
+  key?: KeyBuilder;
+  namespace?: KeyBuilder;
+  ttl?: number;
+  shouldCache?: (result: any, target: any) => boolean | Promise<boolean>;
 }
 
+function extractKeys(keyBuilder: KeyBuilder, args: any[]): string[] {
+  const keys = typeof keyBuilder === 'function' ? keyBuilder(...args) : keyBuilder;
+  return Array.isArray(keys) ? keys : [keys];
+}
+
+function generateCacheKey(options: {
+  key?: KeyBuilder;
+  namespace?: KeyBuilder;
+  methodName: string;
+  args: any[];
+}): string {
+  let keys: string[];
+  if (options.key) {
+    keys = extractKeys(options.key, options.args);
+  } else {
+    const hash = createHash('md5').update(serialize(options.args)).digest('hex');
+    keys = [`${options.methodName}@${hash}`];
+  }
+
+  const namespace = options.namespace && extractKeys(options.namespace, options.args);
+  const composedKey = keys.map((key) => (namespace ? `${namespace[0]}:${key}` : key))[0];
+
+  return composedKey;
+}
+
+export function Cacheable(options: CacheOptions = {}): MethodDecorator {
+  return function(target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value;
+
+    Inject(CACHE_MANAGER)(target, '__cacheManager');
+    Inject(ConfigService)(target, '__configService');
+
+    descriptor.value = async function(...args: any[]) {
+      const cacheManager = this.__cacheManager as Cache;
+      if (!cacheManager) return originalMethod.apply(this, args);
+
+      const configService = this.__configService as ConfigService<Env>;
+      const branch = configService.get('GIT_BRANCH') || 'unknown';
+      const prefix = configService.get('CACHE_KEY_PREFIX');
+
+      const baseKey = generateCacheKey({
+        methodName: String(propertyKey),
+        key: options.key,
+        namespace: options.namespace,
+        args,
+      });
+      const fullCacheKey = `${prefix}-${branch}/${baseKey}`;
+
+      const cachedValue = await cacheManager.get(fullCacheKey);
+      if (cachedValue) {
+        logger.debug(`Cache hit for key: ${baseKey}`);
+        return cachedValue;
+      }
+
+      const result = await originalMethod.apply(this, args);
+      const shouldCache = options.shouldCache ? await options.shouldCache(result, this) : true;
+
+      if (shouldCache) {
+        await cacheManager.set(fullCacheKey, result, options.ttl);
+      }
+
+      return result;
+    };
+    return descriptor;
+  };
+}

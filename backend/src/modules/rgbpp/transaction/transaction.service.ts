@@ -14,7 +14,7 @@ import { Cacheable } from 'src/decorators/cacheable.decorator';
 import { ONE_MONTH_MS } from 'src/common/date';
 import { LeapDirection } from '@prisma/client';
 import { PrismaService } from 'src/core/database/prisma/prisma.service';
-import { CKB_CHAIN_ID, CKB_MIN_SAFE_CONFIRMATIONS } from 'src/constants';
+import { CKB_CHAIN_ID } from 'src/constants';
 
 @Injectable()
 export class RgbppTransactionService {
@@ -28,15 +28,6 @@ export class RgbppTransactionService {
     private bitcoinApiService: BitcoinApiService,
     private configService: ConfigService<Env>,
   ) { }
-
-  private async isSafeConfirmations(blockNumber: string): Promise<boolean> {
-    try {
-      const tipBlockNumber = await this.ckbRpcService.getTipBlockNumber();
-      return BI.from(blockNumber).lt(BI.from(tipBlockNumber).sub(CKB_MIN_SAFE_CONFIRMATIONS));
-    } catch {
-      return false;
-    }
-  }
 
   public async getLatestTransactions(limit: number) {
     const transactions = await this.prismaService.transaction.findMany({
@@ -167,12 +158,6 @@ export class RgbppTransactionService {
     namespace: 'RgbppTransactionService',
     key: (btcTx: BitcoinApiInterface.Transaction) => `queryRgbppLockTx:${btcTx.txid}`,
     ttl: ONE_MONTH_MS,
-    shouldCache: (tx: RgbppTransaction, that: RgbppTransactionService) => {
-      if (!tx) {
-        return false;
-      }
-      return that.isSafeConfirmations(BI.from(tx.blockNumber).toHexString());
-    },
   })
   public async queryRgbppLockTx(btcTx: BitcoinApiInterface.Transaction) {
     const ckbTxs = await Promise.all(
@@ -215,12 +200,6 @@ export class RgbppTransactionService {
     namespace: 'RgbppTransactionService',
     key: (btcTx: BitcoinApiInterface.Transaction) => `queryRgbppBtcTimeLockTx:${btcTx.txid}`,
     ttl: ONE_MONTH_MS,
-    shouldCache: (tx: RgbppTransaction, that: RgbppTransactionService) => {
-      if (!tx) {
-        return false;
-      }
-      return that.isSafeConfirmations(BI.from(tx.blockNumber).toHexString());
-    },
   })
   public async queryRgbppBtcTimeLockTx(btcTx: BitcoinApiInterface.Transaction) {
     const ckbTxs = (
