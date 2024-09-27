@@ -26,7 +26,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
   const locale = getLocaleFromHeaders()
   return (
     <html lang={locale}>
-      <body className={`${montserrat.variable} dark`}>
+      <body className={`${montserrat.variable}`}>
         <Providers lang={locale}>
           <Navbar />
           {children}

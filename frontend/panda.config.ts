@@ -7,6 +7,7 @@ import { iconButton } from '@/configs/ui-preset/icon-button'
 import { numberInput } from '@/configs/ui-preset/number-input'
 import { pagination } from '@/configs/ui-preset/pagination'
 import { popover } from '@/configs/ui-preset/popover'
+import { skeleton } from '@/configs/ui-preset/skeleton'
 import { table } from '@/configs/ui-preset/table'
 import { tabs } from '@/configs/ui-preset/tabs'
 import { tooltip } from '@/configs/ui-preset/tooltip'
@@ -54,6 +55,7 @@ export default defineConfig({
       recipes: {
         button,
         iconButton,
+        skeleton,
       },
       slotRecipes: {
         table,

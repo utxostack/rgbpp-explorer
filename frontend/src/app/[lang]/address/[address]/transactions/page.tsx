@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { Center, HStack, VStack } from 'styled-system/jsx'
 
 import { getI18nInstance } from '@/app/[lang]/appRouterI18n'
-import { BtcTransactionCardInAddress } from '@/components/btc/btc-transaction-card-in-address'
+import { BtcTransactionCardWithQueryInAddress } from '@/components/btc/btc-transaction-card-with-query-in-address'
 import { CkbCellTables } from '@/components/ckb/ckb-cell-tables'
 import { IfBreakpoint } from '@/components/if-breakpoint'
 import { NoData } from '@/components/no-data'
@@ -14,7 +14,6 @@ import { Button, Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { UtxoOrCellFooter } from '@/components/utxo-or-cell-footer'
 import { graphql } from '@/gql'
-import { BitcoinTransaction, CkbTransaction } from '@/gql/graphql'
 import { isValidBTCAddress } from '@/lib/btc/is-valid-btc-address'
 import { isValidCkbAddress } from '@/lib/ckb/is-valid-ckb-address'
 import { graphQLClient } from '@/lib/graphql'
@@ -28,120 +27,6 @@ const btcAddressTxsQuery = graphql(`
     btcAddress(address: $address) {
       transactions(afterTxid: $afterTxid) {
         txid
-        rgbppTransaction {
-          ckbTransaction {
-            outputs {
-              txHash
-              index
-              capacity
-              cellType
-              type {
-                codeHash
-                hashType
-                args
-              }
-              lock {
-                codeHash
-                hashType
-                args
-              }
-              status {
-                consumed
-                txHash
-                index
-              }
-              xudtInfo {
-                symbol
-                amount
-                decimal
-                typeHash
-              }
-            }
-            inputs {
-              txHash
-              index
-              capacity
-              cellType
-              type {
-                codeHash
-                hashType
-                args
-              }
-              lock {
-                codeHash
-                hashType
-                args
-              }
-              xudtInfo {
-                symbol
-                amount
-                decimal
-                typeHash
-              }
-              status {
-                consumed
-                txHash
-                index
-              }
-            }
-          }
-        }
-        blockHeight
-        blockHash
-        txid
-        version
-        size
-        locktime
-        weight
-        fee
-        feeRate
-        confirmed
-        confirmations
-        transactionTime
-        vin {
-          txid
-          vout
-          scriptsig
-          scriptsigAsm
-          isCoinbase
-          sequence
-          prevout {
-            scriptpubkey
-            scriptpubkeyAsm
-            scriptpubkeyType
-            scriptpubkeyAddress
-            value
-            status {
-              spent
-              txid
-              vin
-            }
-            address {
-              address
-              satoshi
-              pendingSatoshi
-              transactionsCount
-            }
-          }
-        }
-        vout {
-          scriptpubkey
-          scriptpubkeyAsm
-          scriptpubkeyType
-          scriptpubkeyAddress
-          value
-          status {
-            spent
-            txid
-            vin
-          }
-          address {
-            address
-            satoshi
-            pendingSatoshi
-            transactionsCount
-          }
-        }
       }
     }
   }
@@ -247,14 +132,15 @@ export default async function Page({
             <NoData>{t(i18n)`No Transaction`}</NoData>
           </Center>
         ) : (
-          btcAddress.transactions?.map(({ rgbppTransaction, ...tx }) => {
+          btcAddress.transactions?.map(({ txid }) => {
             return (
-              <BtcTransactionCardInAddress
-                address={address}
-                tx={tx as BitcoinTransaction}
-                ckbCell={rgbppTransaction?.ckbTransaction as Pick<CkbTransaction, 'inputs' | 'outputs'>}
-                key={tx.txid}
-              />
+              <BtcTransactionCardWithQueryInAddress address={address} txid={txid} />
+              // <BtcTransactionCardInAddress
+              //   address={address}
+              //   tx={tx as BitcoinTransaction}
+              //   ckbCell={rgbppTransaction?.ckbTransaction as Pick<CkbTransaction, 'inputs' | 'outputs'>}
+              //   key={tx.txid}
+              // />
             )
           })
         )}
