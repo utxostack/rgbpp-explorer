@@ -1,3 +1,5 @@
+import { Trans } from '@lingui/macro'
+
 import { IntersectionObserver } from '@/components/intersection-observer'
 import { Loading } from '@/components/loading'
 
@@ -11,6 +13,8 @@ export function InfiniteListBottom({ fetchNextPage, hasNextPage, isFetchingNextP
   return (
     <IntersectionObserver
       w="100%"
+      h="100px"
+      lineHeight="100px"
       display="flex"
       justifyContent="center"
       alignItems="center"
@@ -22,6 +26,7 @@ export function InfiniteListBottom({ fetchNextPage, hasNextPage, isFetchingNextP
       }}
     >
       {isFetchingNextPage ? <Loading mt="20px" /> : null}
+      {!isFetchingNextPage && !hasNextPage ? <Trans>No More</Trans> : null}
     </IntersectionObserver>
   )
 }

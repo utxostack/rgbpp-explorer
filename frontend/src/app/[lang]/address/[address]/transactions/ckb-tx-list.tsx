@@ -5,7 +5,7 @@ import { useInfiniteQuery } from '@tanstack/react-query'
 import { compact } from 'lodash-es'
 import { Center } from 'styled-system/jsx'
 
-import { BtcTransactionCardWithQueryInAddress } from '@/components/btc/btc-transaction-card-with-query-in-address'
+import { CkbTransactionCardWithQueryInAddress } from '@/components/ckb/ckb-transaction-card-with-query-in-address'
 import { InfiniteListBottom } from '@/components/infinite-list-bottom'
 import { Loading } from '@/components/loading'
 import { NoData } from '@/components/no-data'
@@ -13,35 +13,37 @@ import { QueryKey } from '@/constants/query-key'
 import { graphql } from '@/gql'
 import { graphQLClient } from '@/lib/graphql'
 
-const btcAddressTxsQuery = graphql(`
-  query BtcTransactionByAddress($address: String!, $afterTxid: String) {
-    btcAddress(address: $address) {
-      transactions(afterTxid: $afterTxid) {
-        txid
+const ckbAddressTxsQuery = graphql(`
+  query CkbTransactionByAddress($address: String!, $page: Int!, $pageSize: Int!) {
+    ckbAddress(address: $address) {
+      transactionsCount
+      transactions(page: $page, pageSize: $pageSize) {
+        hash
       }
     }
   }
 `)
 
-export function BtcTxList({ address }: { address: string }) {
+export function CKBTxList({ address }: { address: string }) {
   const { data, isLoading, ...query } = useInfiniteQuery({
-    queryKey: [QueryKey.BtcTransactionCardInAddressList, address],
+    queryKey: [QueryKey.CkbTransactionCardInAddressList, address],
     async queryFn({ pageParam }) {
-      const { btcAddress } = await graphQLClient.request(btcAddressTxsQuery, {
+      const { ckbAddress } = await graphQLClient.request(ckbAddressTxsQuery, {
         address,
-        afterTxid: pageParam ? pageParam : undefined,
+        page: pageParam,
+        pageSize: 10,
       })
-      return btcAddress
+      return ckbAddress
     },
     select(data) {
       return compact(data.pages.flatMap((page) => page?.transactions))
     },
-    getNextPageParam(lastPage) {
-      if (!lastPage?.transactions?.length) return
-      return lastPage?.transactions?.[lastPage?.transactions?.length - 1].txid
+    getNextPageParam(lastPage, _, pageParam) {
+      if (lastPage?.transactionsCount && pageParam * 10 >= lastPage?.transactionsCount) return
+      return pageParam + 1
     },
     initialData: undefined,
-    initialPageParam: '',
+    initialPageParam: 1,
   })
 
   if (isLoading) {
@@ -60,7 +62,7 @@ export function BtcTxList({ address }: { address: string }) {
 
   return (
     <>
-      {data?.map(({ txid }) => <BtcTransactionCardWithQueryInAddress address={address} txid={txid} key={txid} />)}
+      {data?.map(({ hash }) => <CkbTransactionCardWithQueryInAddress address={address} hash={hash} key={hash} />)}
       <InfiniteListBottom {...query} />
     </>
   )
