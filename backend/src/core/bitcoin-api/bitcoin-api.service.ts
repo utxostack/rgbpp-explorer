@@ -10,6 +10,7 @@ import { ChainInfo, Transaction } from './bitcoin-api.schema';
 import { ONE_HOUR_MS, ONE_MONTH_MS, TEN_MINUTES_MS } from 'src/common/date';
 import { Cacheable } from 'src/decorators/cacheable.decorator';
 import * as Sentry from '@sentry/nestjs';
+import { PLimit } from 'src/decorators/plimit.decorator';
 
 type MethodParameters<T, K extends keyof T> = T[K] extends (...args: infer P) => any ? P : never;
 type MethodReturnType<T, K extends keyof T> = T[K] extends (...args: any[]) => infer R ? R : never;
@@ -87,6 +88,7 @@ export class BitcoinApiService {
     }
   }
 
+  @PLimit({ concurrency: 200 })
   private async call<K extends keyof IBitcoinDataProvider>(
     method: K,
     ...args: MethodParameters<IBitcoinDataProvider, K>

@@ -1,7 +1,7 @@
 'use client'
 
-import { t } from '@lingui/macro'
-import { useLingui } from '@lingui/react'
+import { Trans } from '@lingui/macro'
+import { forwardRef } from 'react'
 import { VStack } from 'styled-system/jsx'
 
 import { BtcUtxoTables } from '@/components/btc/btc-utxo-tables'
@@ -9,18 +9,16 @@ import { TransactionHeaderInAddress } from '@/components/transaction-header-in-a
 import { UtxoOrCellFooter } from '@/components/utxo-or-cell-footer'
 import { BitcoinInput, BitcoinOutput, BitcoinTransaction, CkbTransaction } from '@/gql/graphql'
 
-export function BtcTransactionCardInAddress({
-  tx,
-  address,
-  ckbCell,
-}: {
-  tx: BitcoinTransaction
-  ckbCell?: Pick<CkbTransaction, 'inputs' | 'outputs'>
-  address: string
-}) {
-  const { i18n } = useLingui()
+export const BtcTransactionCardInAddress = forwardRef<
+  HTMLDivElement,
+  {
+    tx: Pick<BitcoinTransaction, 'transactionTime' | 'txid' | 'vin' | 'vout' | 'fee' | 'feeRate' | 'confirmations'>
+    ckbCell?: Pick<CkbTransaction, 'inputs' | 'outputs'>
+    address: string
+  }
+>(function BtcTransactionCardInAddress({ tx, address, ckbCell }, ref) {
   return (
-    <VStack key={tx.txid} w="100%" gap={0} bg="bg.card" rounded="8px">
+    <VStack key={tx.txid} w="100%" gap={0} bg="bg.card" rounded="8px" ref={ref}>
       <TransactionHeaderInAddress time={tx.transactionTime} txid={tx.txid} btcTime />
       <BtcUtxoTables
         txid={tx.txid}
@@ -34,11 +32,11 @@ export function BtcTransactionCardInAddress({
         fee={tx.fee}
         confirmations={tx.confirmations}
         feeRate={tx.feeRate}
-        feeUnit={t(i18n)`sats`}
+        feeUnit={<Trans>sats</Trans>}
         address={address}
         btcUtxo={{ vin: tx.vin as BitcoinInput[], vout: tx.vout as BitcoinOutput[] }}
         ckbCell={ckbCell}
       />
     </VStack>
   )
-}
+})

@@ -13,12 +13,6 @@ export class BitcoinAddressLoader implements NestDataLoader<string, Address | nu
 
   constructor(private bitcoinApiService: BitcoinApiService) {}
 
-  public getOptions() {
-    return {
-      maxBatchSize: 20,
-    };
-  }
-
   public getBatchFunction() {
     return async (addresses: string[]) => {
       this.logger.debug(`Loading bitcoin addresses stats: ${addresses.join(', ')}`);

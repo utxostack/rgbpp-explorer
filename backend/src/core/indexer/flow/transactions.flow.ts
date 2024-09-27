@@ -6,6 +6,8 @@ import { BlockchainService } from 'src/core/blockchain/blockchain.service';
 import { PrismaService } from 'src/core/database/prisma/prisma.service';
 import { IndexerQueueService } from '../indexer.queue';
 import { ONE_DAY_MS } from 'src/common/date';
+import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
+import { CronJob } from 'cron';
 
 const CKB_24_HOURS_BLOCK_NUMBER = ONE_DAY_MS / 10000;
 
@@ -21,16 +23,17 @@ export class IndexerTransactionsFlow extends EventEmitter {
     private blockchainService: BlockchainService,
     private prismaService: PrismaService,
     private indexerQueueService: IndexerQueueService,
+    private schedulerRegistry: SchedulerRegistry,
   ) {
     super();
   }
 
   public async start() {
-    this.startBlockAssetsIndexing();
-    this.setupBlockAssetsIndexedListener();
+    this.startBlockIndexing();
+    this.setupBlockIndexedListener();
   }
 
-  public async startBlockAssetsIndexing() {
+  public async startBlockIndexing() {
     const tipBlockNumber = await this.blockchainService.getTipBlockNumber();
     let startBlockNumber = tipBlockNumber - CKB_24_HOURS_BLOCK_NUMBER;
     const targetBlockNumber = tipBlockNumber - CKB_MIN_SAFE_CONFIRMATIONS;
@@ -55,9 +58,18 @@ export class IndexerTransactionsFlow extends EventEmitter {
     });
   }
 
-  private setupBlockAssetsIndexedListener() {
+  private setupBlockIndexedListener() {
     this.on(IndexerTransactionsEvent.BlockIndexed, () => {
-      setTimeout(this.startBlockAssetsIndexing.bind(this), 1000 * 10);
+      if (this.schedulerRegistry.doesExist('cron', 'indexer-transactions')) {
+        return;
+      }
+
+      this.logger.log(`Scheduling block transactions indexing cron job`);
+      const job = new CronJob(CronExpression.EVERY_10_SECONDS, () => {
+        this.startBlockIndexing();
+      });
+      this.schedulerRegistry.addCronJob('indexer-transactions', job);
+      job.start();
     });
   }
 }

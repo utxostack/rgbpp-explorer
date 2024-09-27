@@ -5,6 +5,8 @@ import { CKB_MIN_SAFE_CONFIRMATIONS, CKB_ONE_DAY_BLOCKS } from 'src/constants';
 import { BlockchainService } from 'src/core/blockchain/blockchain.service';
 import { PrismaService } from 'src/core/database/prisma/prisma.service';
 import { IndexerQueueService } from '../indexer.queue';
+import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
+import { CronJob } from 'cron';
 
 export enum IndexerAssetsEvent {
   AssetIndexed = 'asset-indexed',
@@ -19,6 +21,7 @@ export class IndexerAssetsFlow extends EventEmitter {
     private blockchainService: BlockchainService,
     private prismaService: PrismaService,
     private indexerQueueService: IndexerQueueService,
+    private schedulerRegistry: SchedulerRegistry,
   ) {
     super();
   }
@@ -112,7 +115,16 @@ export class IndexerAssetsFlow extends EventEmitter {
 
   private setupBlockAssetsIndexedListener() {
     this.on(IndexerAssetsEvent.BlockAssetsIndexed, () => {
-      setTimeout(this.startBlockAssetsIndexing.bind(this), 1000 * 10);
+      if (this.schedulerRegistry.doesExist('cron', 'indexer-block-assets')) {
+        return;
+      }
+
+      this.logger.log(`Scheduling block assets indexing cron job`);
+      const job = new CronJob(CronExpression.EVERY_10_SECONDS, () => {
+        this.startBlockAssetsIndexing();
+      });
+      this.schedulerRegistry.addCronJob('indexer-block-assets', job);
+      job.start();
     });
   }
 }

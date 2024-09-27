@@ -14,6 +14,7 @@ import { ONE_MONTH_MS } from 'src/common/date';
 import { CKB_MIN_SAFE_CONFIRMATIONS } from 'src/constants';
 import * as Sentry from '@sentry/nestjs';
 import { Chain } from '@prisma/client';
+import { PLimit } from 'src/decorators/plimit.decorator';
 
 class WebsocketError extends Error {
   constructor(message: string) {
@@ -70,6 +71,12 @@ export class BlockchainService {
     });
   }
 
+  @PLimit({ concurrency: 200 })
+  private async call(method: string, params: any[]): Promise<any> {
+    await this.websocketReady;
+    return this.websocket.call(method, params);
+  }
+
   private handleReconnection() {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
@@ -122,7 +129,7 @@ export class BlockchainService {
   ): Promise<TransactionWithStatusResponse> {
     await this.websocketReady;
     this.logger.debug(`get_transaction - txHash: ${txHash}`);
-    const response = await this.websocket.call('get_transaction', [txHash]);
+    const response = await this.call('get_transaction', [txHash]);
     const tx = response as TransactionWithStatusResponse;
     // XXX: we don't need these fields by default, remove them to save cache/memory space
     if (!withData) {
@@ -162,7 +169,7 @@ export class BlockchainService {
   ): Promise<Block> {
     await this.websocketReady;
     this.logger.debug(`get_block - blockHash: ${blockHash}`);
-    const response = await this.websocket.call('get_block', [blockHash]);
+    const response = await this.call('get_block', [blockHash]);
     const block = response as Block;
     if (!withTxData) {
       block.transactions = block.transactions.map((tx) => {
@@ -204,7 +211,7 @@ export class BlockchainService {
   ): Promise<Block> {
     await this.websocketReady;
     this.logger.debug(`get_block_by_number - blockNumber: ${blockNumber}`);
-    const response = await this.websocket.call('get_block_by_number', [
+    const response = await this.call('get_block_by_number', [
       BI.from(blockNumber).toHexString(),
     ]);
     const block = response as Block;
@@ -231,7 +238,7 @@ export class BlockchainService {
   public async getBlockEconomicState(blockHash: string): Promise<BlockEconomicState> {
     await this.websocketReady;
     this.logger.debug(`get_block_economic_state - blockHash: ${blockHash}`);
-    const blockEconomicState = await this.websocket.call('get_block_economic_state', [blockHash]);
+    const blockEconomicState = await this.call('get_block_economic_state', [blockHash]);
     return blockEconomicState as BlockEconomicState;
   }
 
@@ -244,10 +251,16 @@ export class BlockchainService {
   public async getTipBlockNumber(): Promise<number> {
     await this.websocketReady;
     this.logger.debug('get_tip_block_number');
-    const tipBlockNumber = await this.websocket.call('get_tip_block_number', []);
+    const tipBlockNumber = await this.call('get_tip_block_number', []);
     return BI.from(tipBlockNumber).toNumber();
   }
 
+  @Cacheable({
+    namespace: 'BlockchainService',
+    key: (searchKey: SearchKey, order: 'asc' | 'desc', limit: string, after?: string) =>
+      `getTransactions:${JSON.stringify(searchKey)}:${order}:${limit}:${after}`,
+    ttl: 10_000,
+  })
   public async getTransactions(
     searchKey: SearchKey,
     order: 'asc' | 'desc',
@@ -258,11 +271,17 @@ export class BlockchainService {
     this.logger.debug(
       `get_transactions - searchKey: ${JSON.stringify(searchKey)}, order: ${order}, limit: ${limit}, after: ${after}`,
     );
-    const result = await this.websocket.call('get_transactions', [searchKey, order, limit, after]);
+    const result = await this.call('get_transactions', [searchKey, order, limit, after]);
     const transactions = result as GetTransactionsResult;
     return transactions;
   }
 
+  @Cacheable({
+    namespace: 'BlockchainService',
+    key: (searchKey: SearchKey, order: 'asc' | 'desc', limit: string, after?: string) =>
+      `getCells:${JSON.stringify(searchKey)}:${order}:${limit}:${after}`,
+    ttl: 10_000,
+  })
   public async getCells(
     searchKey: SearchKey,
     order: 'asc' | 'desc',
@@ -274,7 +293,7 @@ export class BlockchainService {
     this.logger.debug(
       `get_cells - searchKey: ${JSON.stringify(searchKey)}, order: ${order}, limit: ${limit}, after: ${after}`,
     );
-    const result = await this.websocket.call('get_cells', [searchKey, order, limit, after]);
+    const result = await this.call('get_cells', [searchKey, order, limit, after]);
     const cells = result as GetCellsResult;
     cells.objects = cells.objects.map((cell) => {
       if (!withData) {
