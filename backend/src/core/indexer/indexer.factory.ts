@@ -4,6 +4,7 @@ import { IndexerService } from './indexer.service';
 import { BlockchainServiceFactory } from '../blockchain/blockchain.factory';
 import { IndexerQueueService } from './indexer.queue';
 import { ModuleRef } from '@nestjs/core';
+import { SchedulerRegistry } from '@nestjs/schedule';
 
 export class IndexerServiceFactoryError extends Error {
   constructor(message: string) {
@@ -19,6 +20,7 @@ export class IndexerServiceFactory implements OnModuleDestroy {
   constructor(
     private blockchainServiceFactory: BlockchainServiceFactory,
     private prismaService: PrismaService,
+    private schedulerRegistry: SchedulerRegistry,
     private moduleRef: ModuleRef,
   ) {}
 
@@ -43,6 +45,7 @@ export class IndexerServiceFactory implements OnModuleDestroy {
         blockchainService,
         this.prismaService,
         indexerQueueService,
+        this.schedulerRegistry,
       );
       this.services.set(chain.id, service);
     }
