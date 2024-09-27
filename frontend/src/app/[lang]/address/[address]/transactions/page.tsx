@@ -1,17 +1,15 @@
 import { t } from '@lingui/macro'
-import { last } from 'lodash-es'
 import { notFound } from 'next/navigation'
 import { Center, HStack, VStack } from 'styled-system/jsx'
 
+import { BtcTxList } from '@/app/[lang]/address/[address]/transactions/btc-tx-list'
 import { getI18nInstance } from '@/app/[lang]/appRouterI18n'
-import { BtcTransactionCardWithQueryInAddress } from '@/components/btc/btc-transaction-card-with-query-in-address'
 import { CkbCellTables } from '@/components/ckb/ckb-cell-tables'
 import { IfBreakpoint } from '@/components/if-breakpoint'
 import { NoData } from '@/components/no-data'
 import { PaginationSearchParams } from '@/components/pagination-searchparams'
 import { TransactionHeaderInAddress } from '@/components/transaction-header-in-address'
-import { Button, Text } from '@/components/ui'
-import Link from '@/components/ui/link'
+import { Text } from '@/components/ui'
 import { UtxoOrCellFooter } from '@/components/utxo-or-cell-footer'
 import { graphql } from '@/gql'
 import { isValidBTCAddress } from '@/lib/btc/is-valid-btc-address'
@@ -21,16 +19,6 @@ import { resolvePage } from '@/lib/resolve-page'
 import { formatNumber } from '@/lib/string/format-number'
 
 export const maxDuration = 30
-
-const btcAddressTxsQuery = graphql(`
-  query BtcTransactionByAddress($address: String!, $afterTxid: String) {
-    btcAddress(address: $address) {
-      transactions(afterTxid: $afterTxid) {
-        txid
-      }
-    }
-  }
-`)
 
 const ckbAddressTxsQuery = graphql(`
   query CkbAddress($address: String!, $page: Int!, $pageSize: Int!) {
@@ -113,60 +101,9 @@ export default async function Page({
   params: { address: string; lang: string }
   searchParams: { page?: string; afterTxid?: string }
 }) {
-  const { afterTxid } = searchParams
   const i18n = getI18nInstance(lang)
   if (isValidBTCAddress(address)) {
-    const { btcAddress } = await graphQLClient.request(btcAddressTxsQuery, {
-      address,
-      afterTxid,
-    })
-
-    const nextCursor = last(btcAddress?.transactions)?.txid
-
-    if (!btcAddress) notFound()
-
-    return (
-      <>
-        {!btcAddress.transactions?.length ? (
-          <Center w="100%" bg="bg.card" pt="80px" pb="120px" rounded="8px">
-            <NoData>{t(i18n)`No Transaction`}</NoData>
-          </Center>
-        ) : (
-          btcAddress.transactions?.map(({ txid }) => {
-            return (
-              <BtcTransactionCardWithQueryInAddress address={address} txid={txid} />
-              // <BtcTransactionCardInAddress
-              //   address={address}
-              //   tx={tx as BitcoinTransaction}
-              //   ckbCell={rgbppTransaction?.ckbTransaction as Pick<CkbTransaction, 'inputs' | 'outputs'>}
-              //   key={tx.txid}
-              // />
-            )
-          })
-        )}
-        <Center w="100%">
-          <HStack gap="16px">
-            {afterTxid ? (
-              <Link href={`/address/${address}/transactions`}>
-                <Button>{t(i18n)`Back to first page`}</Button>
-              </Link>
-            ) : null}
-            {nextCursor ? (
-              <Link
-                href={{
-                  pathname: `/address/${address}/transactions`,
-                  query: {
-                    afterTxid: nextCursor,
-                  },
-                }}
-              >
-                <Button>{t(i18n)`Next`}</Button>
-              </Link>
-            ) : null}
-          </HStack>
-        </Center>
-      </>
-    )
+    return <BtcTxList address={address} />
   }
 
   if (isValidCkbAddress(address)) {
