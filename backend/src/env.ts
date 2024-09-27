@@ -10,7 +10,8 @@ export const envSchema = z
       .string()
       .default('true')
       .transform((value) => value === 'true'),
-    GRAPHQL_COMPLEXITY_LIMIT: z.coerce.number().default(100),
+
+    GRAPHQL_COMPLEXITY_LIMIT: z.coerce.number().default(1000),
 
     CLUSTER_WORKERS_NUM: z.coerce.number().default(2),
 
