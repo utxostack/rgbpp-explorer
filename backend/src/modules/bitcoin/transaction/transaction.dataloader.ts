@@ -14,6 +14,12 @@ export class BitcoinTransactionLoader
 
   constructor(private bitcoinApiService: BitcoinApiService) {}
 
+  public getOptions() {
+    return {
+      maxBatchSize: 20,
+    };
+  }
+
   public getBatchFunction() {
     return async (ids: string[]) => {
       this.logger.debug(`Loading bitcoin transactions: ${ids.join(', ')}`);

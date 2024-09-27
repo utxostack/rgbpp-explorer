@@ -21,7 +21,8 @@ export interface IndexerBlockAssetsJobData {
 }
 
 @Processor(INDEXER_BLOCK_ASSETS_QUEUE, {
-  concurrency: 100,
+  stalledInterval: 60_000,
+  useWorkerThreads: true,
 })
 export class IndexerBlockAssetsProcessor extends WorkerHost {
   private logger = new Logger(IndexerBlockAssetsProcessor.name);
@@ -61,6 +62,7 @@ export class IndexerBlockAssetsProcessor extends WorkerHost {
     const assetTypeScripts = await this.prismaService.assetType.findMany({ where: { chainId } });
     await Promise.all(
       block.transactions.map(async (tx, txIndex) => {
+        await job.updateProgress((txIndex / block.transactions.length) * 100);
         await this.updateInputAssetCellStatus(chainId, tx);
 
         for (let index = 0; index < tx.outputs.length; index += 1) {
@@ -105,7 +107,7 @@ export class IndexerBlockAssetsProcessor extends WorkerHost {
     } else {
       const indexerServiceFactory = this.moduleRef.get(IndexerServiceFactory);
       const indexerService = await indexerServiceFactory.getService(chainId);
-      indexerService.assetsFlow.emit(IndexerAssetsEvent.BlockAssetsIndexed, block);
+      indexerService.assetsFlow.emit(IndexerAssetsEvent.BlockAssetsIndexed, blockNumber);
       return;
     }
   }

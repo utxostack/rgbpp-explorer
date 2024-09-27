@@ -3,7 +3,7 @@
 import { Trans } from '@lingui/macro'
 import BigNumber from 'bignumber.js'
 import { compact, sum, uniqBy } from 'lodash-es'
-import { memo } from 'react'
+import { Fragment, memo } from 'react'
 import { Flex } from 'styled-system/jsx'
 
 import MoneyIcon from '@/assets/money.svg'
@@ -33,7 +33,7 @@ export const CkbDiffTags = memo(function CkbDiffTags({
 
   // xudt
   const allXudt = uniqBy(compact(inputs.map((x) => x.xudtInfo)), (x) => x?.symbol)
-  const xudtTags = allXudt.map((xudt) => {
+  const xudtTags = allXudt.map((xudt, i) => {
     const balance = inputs
       .filter((x) => scriptToAddress(x.lock) === address && x.xudtInfo?.symbol === xudt?.symbol)
       .reduce((acc, x) => acc.plus(x.xudtInfo?.amount || 0), BigNumber(0))
@@ -41,23 +41,28 @@ export const CkbDiffTags = memo(function CkbDiffTags({
       .filter((x) => scriptToAddress(x.lock) === address && x.xudtInfo?.symbol === xudt?.symbol)
       .reduce((acc, x) => acc.plus(x.xudtInfo?.amount || 0), BigNumber(0))
     const diff = BigNumber(xudtBalanceWithoutThisAddress).minus(BigNumber(balance))
-    return !diff.isZero() ? (
-      <Flex
-        align="center"
-        py="8px"
-        fontSize="14px"
-        lineHeight="16px"
-        px="16px"
-        rounded="4px"
-        bg={diff.isGreaterThan(0) ? 'success' : 'danger'}
-      >
-        <Trans>
-          {diff.isGreaterThan(0) ? '+' : ''}
-          {formatNumber(diff, xudt?.decimal)} {xudt?.symbol}
-        </Trans>
-        <MoneyIcon w="16px" h="16px" ml="6px" />
-      </Flex>
-    ) : null
+    return (
+      <Fragment key={i}>
+        {!diff.isZero() ? (
+          <Flex
+            align="center"
+            py="8px"
+            fontSize="14px"
+            lineHeight="16px"
+            px="16px"
+            rounded="4px"
+            bg={diff.isGreaterThan(0) ? 'success' : 'danger'}
+            key={i}
+          >
+            <Trans>
+              {diff.isGreaterThan(0) ? '+' : ''}
+              {formatNumber(diff, xudt?.decimal)} {xudt?.symbol}
+            </Trans>
+            <MoneyIcon w="16px" h="16px" ml="6px" />
+          </Flex>
+        ) : null}
+      </Fragment>
+    )
   })
 
   // dob

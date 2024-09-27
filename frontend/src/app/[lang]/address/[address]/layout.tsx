@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import type { PropsWithChildren, ReactNode } from 'react'
 import { Flex, HStack, VStack } from 'styled-system/jsx'
 
+import { getI18nInstance } from '@/app/[lang]/appRouterI18n'
 import { BtcAddressOverview } from '@/components/btc/btc-address-overview'
 import { BtcAddressType } from '@/components/btc/btc-address-type'
 import { CkbAddressOverview } from '@/components/ckb/ckb-address-overview'
@@ -13,7 +14,6 @@ import { Heading, Text } from '@/components/ui'
 import { graphql } from '@/gql'
 import { isValidBTCAddress } from '@/lib/btc/is-valid-btc-address'
 import { isValidCkbAddress } from '@/lib/ckb/is-valid-ckb-address'
-import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { graphQLClient } from '@/lib/graphql'
 
 const btcAddressQuery = graphql(`
@@ -44,9 +44,11 @@ const ckbAddressQuery = graphql(`
 
 export default async function Layout({
   children,
-  params: { address },
-}: PropsWithChildren & { params: { address: string } }) {
-  const i18n = getI18nFromHeaders()
+  params: { address, lang },
+}: PropsWithChildren<{
+  params: { address: string; lang: string }
+}>) {
+  const i18n = getI18nInstance(lang)
   const isBtcAddress = isValidBTCAddress(address)
   const isCkbAddress = isValidCkbAddress(address)
 
@@ -56,12 +58,12 @@ export default async function Layout({
   if (isBtcAddress) {
     const data = await graphQLClient.request(btcAddressQuery, { address })
     if (data?.btcAddress) {
-      overflow = <BtcAddressOverview btcAddress={data?.btcAddress} />
+      overflow = <BtcAddressOverview lang={lang} btcAddress={data?.btcAddress} />
     }
   } else if (isCkbAddress) {
     const data = await graphQLClient.request(ckbAddressQuery, { address })
     if (data?.ckbAddress) {
-      overflow = <CkbAddressOverview ckbAddress={data?.ckbAddress} />
+      overflow = <CkbAddressOverview ckbAddress={data?.ckbAddress} lang={lang} />
     }
   }
 

@@ -5,7 +5,7 @@ import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify
 import { envSchema } from './env';
 import { BootstrapService } from './bootstrap.service';
 import { LogLevel } from '@nestjs/common';
-import cluster from 'node:cluster';
+import { ClusterService } from './cluster.service';
 
 const env = envSchema.parse(process.env);
 const LOGGER_LEVELS: LogLevel[] = ['verbose', 'debug', 'log', 'warn', 'error'];
@@ -19,9 +19,15 @@ function getLoggerOptions() {
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), {
-    logger: getLoggerOptions(),
-  });
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter({
+      trustProxy: true,
+    }),
+    {
+      logger: getLoggerOptions(),
+    },
+  );
 
   const bootstrapService = app.get(BootstrapService);
   await bootstrapService.bootstrapAssetsIndex();
@@ -36,4 +42,4 @@ async function bootstrap() {
 
   await app.listen(3000, '0.0.0.0');
 }
-bootstrap();
+ClusterService.clusterize(bootstrap);

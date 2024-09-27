@@ -16,6 +16,7 @@ import { RgbppTransactionLoader, RgbppTransactionLoaderType } from './transactio
 import { BitcoinApiService } from 'src/core/bitcoin-api/bitcoin-api.service';
 import { BI } from '@ckb-lumos/bi';
 import { LeapDirection } from '@prisma/client';
+import { ComplexityType } from 'src/modules/complexity.plugin';
 
 @Resolver(() => RgbppTransaction)
 export class RgbppTransactionResolver {
@@ -24,7 +25,10 @@ export class RgbppTransactionResolver {
     private bitcoinApiService: BitcoinApiService,
   ) { }
 
-  @Query(() => RgbppLatestTransactionList, { name: 'rgbppLatestTransactions' })
+  @Query(() => RgbppLatestTransactionList, {
+    name: 'rgbppLatestTransactions',
+    complexity: ({ args, childComplexity }) => (args.limit ?? 10) * childComplexity,
+  })
   public async getRecentTransactions(
     @Args('limit', { type: () => Int, nullable: true }) limit: number = 10,
   ): Promise<RgbppLatestTransactionList> {
@@ -37,7 +41,10 @@ export class RgbppTransactionResolver {
     };
   }
 
-  @Query(() => RgbppLatestTransactionList, { name: 'rgbppLatestL1Transactions' })
+  @Query(() => RgbppLatestTransactionList, {
+    name: 'rgbppLatestL1Transactions',
+    complexity: ({ args, childComplexity }) => (args.limit ?? 10) * childComplexity,
+  })
   public async getLatestL1Transactions(
     @Args('limit', { type: () => Int, nullable: true }) limit: number = 10,
   ): Promise<RgbppLatestTransactionList> {
@@ -49,7 +56,10 @@ export class RgbppTransactionResolver {
     };
   }
 
-  @Query(() => RgbppLatestTransactionList, { name: 'rgbppLatestL2Transactions' })
+  @Query(() => RgbppLatestTransactionList, {
+    name: 'rgbppLatestL2Transactions',
+    complexity: ({ args, childComplexity }) => (args.limit ?? 10) * childComplexity,
+  })
   public async getLatestL2Transactions(
     @Args('limit', { type: () => Int, nullable: true }) limit: number = 10,
   ): Promise<RgbppLatestTransactionList> {
@@ -61,7 +71,11 @@ export class RgbppTransactionResolver {
     };
   }
 
-  @Query(() => RgbppTransaction, { name: 'rgbppTransaction', nullable: true })
+  @Query(() => RgbppTransaction, {
+    name: 'rgbppTransaction',
+    nullable: true,
+    complexity: ComplexityType.RequestField,
+  })
   public async getTransaction(
     @Args('txidOrTxHash') txidOrTxHash: string,
     @Loader(RgbppTransactionLoader) txLoader: RgbppTransactionLoaderType,
@@ -70,7 +84,7 @@ export class RgbppTransactionResolver {
     return tx || null;
   }
 
-  @ResolveField(() => Date)
+  @ResolveField(() => Date, { complexity: ComplexityType.RequestField })
   public async timestamp(
     @Parent() tx: RgbppTransaction,
     @Loader(BitcoinTransactionLoader) btcTxLoader: BitcoinTransactionLoaderType,
@@ -101,7 +115,7 @@ export class RgbppTransactionResolver {
     return tx.blockTime;
   }
 
-  @ResolveField(() => LeapDirection, { nullable: true })
+  @ResolveField(() => LeapDirection, { nullable: true, complexity: ComplexityType.RequestField })
   public async leapDirection(
     @Parent() tx: RgbppTransaction,
     @Loader(CkbRpcTransactionLoader) ckbRpcTxLoader: CkbRpcTransactionLoaderType,
@@ -113,7 +127,7 @@ export class RgbppTransactionResolver {
     return this.rgbppTransactionService.getLeapDirectionByCkbTx(ckbTx.transaction);
   }
 
-  @ResolveField(() => CkbTransaction, { nullable: true })
+  @ResolveField(() => CkbTransaction, { nullable: true, complexity: ComplexityType.RequestField })
   public async ckbTransaction(
     @Parent() tx: RgbppTransaction,
     @Loader(CkbRpcTransactionLoader) ckbRpcTxLoader: CkbRpcTransactionLoaderType,
@@ -125,7 +139,10 @@ export class RgbppTransactionResolver {
     return CkbTransaction.from(ckbTx);
   }
 
-  @ResolveField(() => BitcoinTransaction, { nullable: true })
+  @ResolveField(() => BitcoinTransaction, {
+    nullable: true,
+    complexity: ComplexityType.RequestField,
+  })
   public async btcTransaction(
     @Parent() tx: RgbppTransaction,
     @Loader(BitcoinTransactionLoader) txLoader: BitcoinTransactionLoaderType,

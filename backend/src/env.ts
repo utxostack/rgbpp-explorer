@@ -12,6 +12,8 @@ export const envSchema = z
       .transform((value) => value === 'true'),
     GRAPHQL_COMPLEXITY_LIMIT: z.coerce.number().default(100),
 
+    CLUSTER_WORKERS_NUM: z.coerce.number().default(2),
+
     /**
      * CORS origin whitelist (split by comma)
      */
@@ -24,7 +26,8 @@ export const envSchema = z
       }),
 
     DATABASE_URL: z.string(),
-    REDIS_URL: z.string(),
+    REDIS_CACHE_URL: z.string(),
+    REDIS_QUEUE_URL: z.string(),
 
     BITCOIN_PRIMARY_DATA_PROVIDER: z.enum(['mempool', 'electrs']).default('mempool'),
 
@@ -34,6 +37,9 @@ export const envSchema = z
     SENTRY_DSN: z.string().optional(),
 
     CACHE_KEY_PREFIX: z.string().default('rgbpp-explorer@v1'),
+
+    RATE_LIMIT_WINDOW_MS: z.coerce.number().default(60_000),
+    RATE_LIMIT_PER_MINUTE: z.coerce.number().default(100),
 
     GIT_BRANCH: z.string().optional(),
   })

@@ -15,7 +15,7 @@ export function BtcTransactionCardInAddress({
   ckbCell,
 }: {
   tx: BitcoinTransaction
-  ckbCell?: CkbTransaction
+  ckbCell?: Pick<CkbTransaction, 'inputs' | 'outputs'>
   address: string
 }) {
   const { i18n } = useLingui()

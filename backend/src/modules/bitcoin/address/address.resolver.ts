@@ -10,6 +10,7 @@ import {
   BitcoinAddressTransactionsLoaderType,
 } from './address.dataloader';
 import { ValidateBtcAddressPipe } from 'src/pipes/validate-address.pipe';
+import { ComplexityType } from 'src/modules/complexity.plugin';
 
 @Resolver(() => BitcoinAddress)
 export class BitcoinAddressResolver {
@@ -20,7 +21,7 @@ export class BitcoinAddressResolver {
     return BitcoinAddress.from(address);
   }
 
-  @ResolveField(() => Float)
+  @ResolveField(() => Float, { complexity: ComplexityType.RequestField })
   public async satoshi(
     @Parent() address: BitcoinAddress,
     @Loader(BitcoinAddressLoader) addressLoader: BitcoinAddressLoaderType,
@@ -32,7 +33,7 @@ export class BitcoinAddressResolver {
     return addressStats.chain_stats.funded_txo_sum - addressStats.chain_stats.spent_txo_sum;
   }
 
-  @ResolveField(() => Float)
+  @ResolveField(() => Float, { complexity: ComplexityType.RequestField })
   public async pendingSatoshi(
     @Parent() address: BitcoinAddress,
     @Loader(BitcoinAddressLoader) addressLoader: BitcoinAddressLoaderType,
@@ -44,7 +45,7 @@ export class BitcoinAddressResolver {
     return addressStats.mempool_stats.funded_txo_sum - addressStats.mempool_stats.spent_txo_sum;
   }
 
-  @ResolveField(() => Float, { nullable: true })
+  @ResolveField(() => Float, { nullable: true, complexity: ComplexityType.RequestField })
   public async transactionsCount(
     @Parent() address: BitcoinAddress,
     @Loader(BitcoinAddressLoader) addressLoader: BitcoinAddressLoaderType,
@@ -57,7 +58,10 @@ export class BitcoinAddressResolver {
     return stats.chain_stats.tx_count;
   }
 
-  @ResolveField(() => [BitcoinTransaction], { nullable: true })
+  @ResolveField(() => [BitcoinTransaction], {
+    nullable: true,
+    complexity: ({ childComplexity }) => ComplexityType.ListField + childComplexity,
+  })
   public async transactions(
     @Parent() address: BitcoinAddress,
     @Loader(BitcoinAddressTransactionsLoader)

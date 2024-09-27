@@ -7,12 +7,13 @@ import {
 } from 'src/modules/bitcoin/transaction/transaction.dataloader';
 import { RgbppService } from '../rgbpp.service';
 import { Loader } from 'src/common/dataloader';
+import { ComplexityType } from 'src/modules/complexity.plugin';
 
 @Resolver(() => RgbppAsset)
 export class RgbppAssetResolver {
-  constructor(private rgbppService: RgbppService) {}
+  constructor(private rgbppService: RgbppService) { }
 
-  @ResolveField(() => BitcoinOutput, { nullable: true })
+  @ResolveField(() => BitcoinOutput, { nullable: true, complexity: ComplexityType.RequestField })
   public async utxo(
     @Parent() asset: RgbppAsset,
     @Loader(BitcoinTransactionLoader) txLoader: BitcoinTransactionLoaderType,

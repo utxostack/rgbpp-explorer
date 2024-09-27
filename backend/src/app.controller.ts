@@ -2,7 +2,9 @@ import { Controller, Get } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Env } from './env';
 import { version } from '../package.json';
+import { SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller()
 export class AppController {
   private gitCommitHash: string;

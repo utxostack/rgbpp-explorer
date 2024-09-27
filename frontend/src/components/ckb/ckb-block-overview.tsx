@@ -1,3 +1,4 @@
+import type { I18n } from '@lingui/core'
 import { t } from '@lingui/macro'
 import { Grid, HStack, VStack } from 'styled-system/jsx'
 
@@ -9,16 +10,16 @@ import { Heading, Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { CkbBlock } from '@/gql/graphql'
 import { formatCkbAddress } from '@/lib/address/format-ckb-address'
-import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { formatNumber } from '@/lib/string/format-number'
 
 export function CkbBlockOverview({
   block,
+  i18n,
 }: {
   block: Pick<CkbBlock, 'timestamp' | 'transactionsCount' | 'miner' | 'reward' | 'size' | 'confirmations'>
+  i18n: I18n
 }) {
   if (!block) return null
-  const i18n = getI18nFromHeaders()
   return (
     <VStack gap={0} w="100%" bg="bg.card" rounded="8px">
       <HStack w="100%" px="30px" py="16px" gap="12px" borderBottom="1px solid" borderBottomColor="border.primary">

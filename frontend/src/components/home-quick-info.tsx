@@ -1,14 +1,13 @@
+import type { I18n } from '@lingui/core'
 import { t } from '@lingui/macro'
 import { sum } from 'lodash-es'
 import { Box, Grid, VStack } from 'styled-system/jsx'
 
 import { graphql } from '@/gql'
-import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { graphQLClient } from '@/lib/graphql'
 import { formatNumber } from '@/lib/string/format-number'
 
-export async function HomeQuickInfo() {
-  const i18n = getI18nFromHeaders()
+export async function HomeQuickInfo({ i18n }: { i18n: I18n }) {
   const { rgbppStatistic } = await graphQLClient
     .request(
       graphql(`

@@ -1,3 +1,4 @@
+import type { I18n } from '@lingui/core'
 import { t } from '@lingui/macro'
 import { Flex, HStack, VStack } from 'styled-system/jsx'
 
@@ -8,16 +9,15 @@ import { Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { ViewMemPool } from '@/components/view-mempool'
 import { BitcoinInput, BitcoinOutput, BitcoinTransaction, CkbTransaction } from '@/gql/graphql'
-import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { truncateMiddle } from '@/lib/string/truncate-middle'
 
 export interface BtcUtxosProps extends Pick<BitcoinTransaction, 'txid' | 'vin' | 'vout'> {
   isBinding?: boolean
   ckbCell?: Pick<CkbTransaction, 'inputs' | 'outputs'>
+  i18n: I18n
 }
 
-export function BtcUtxos({ txid, vin, vout, isBinding, ckbCell }: BtcUtxosProps) {
-  const i18n = getI18nFromHeaders()
+export function BtcUtxos({ txid, vin, vout, isBinding, ckbCell, i18n }: BtcUtxosProps) {
   return (
     <VStack w="100%" gap={0} bg="bg.card" rounded="8px">
       <Flex

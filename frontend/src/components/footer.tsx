@@ -1,6 +1,7 @@
 import { t } from '@lingui/macro'
 import { Center, Flex, Grid, HStack, VStack } from 'styled-system/jsx'
 
+import { getI18nInstance } from '@/app/[lang]/appRouterI18n'
 import LogoSVG from '@/assets/logo.svg'
 import GithubSVG from '@/assets/social-medias/github.svg'
 import MediumIcon from '@/assets/social-medias/medium.svg'
@@ -8,10 +9,9 @@ import TwitterSVG from '@/assets/social-medias/x.svg'
 import { Heading, Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { env } from '@/constants/env'
-import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 
-export function Footer() {
-  const i18n = getI18nFromHeaders()
+export function Footer({ lang }: { lang: string }) {
+  const i18n = getI18nInstance(lang)
   const socialMedias = [
     {
       href: env.public.UTXO_STACK_TWITTER_URL,

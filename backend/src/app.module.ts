@@ -1,8 +1,7 @@
-import { APP_FILTER } from '@nestjs/core';
 import { CacheModule, CacheStore } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { SentryGlobalFilter, SentryModule } from '@sentry/nestjs/setup';
+import { SentryModule } from '@sentry/nestjs/setup';
 import type { RedisClientOptions } from 'redis';
 import { redisStore } from 'cache-manager-redis-yet';
 import { Env } from './env';
@@ -25,7 +24,7 @@ import { BootstrapService } from './bootstrap.service';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService<Env>) => {
         const store = (await redisStore({
-          url: configService.get('REDIS_URL'),
+          url: configService.get('REDIS_CACHE_URL'),
           isCacheable: (value) => value !== undefined,
         })) as unknown as CacheStore;
         return {
@@ -37,7 +36,7 @@ import { BootstrapService } from './bootstrap.service';
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService<Env>) => {
-        const url = new URL(configService.get('REDIS_URL')!);
+        const url = new URL(configService.get('REDIS_QUEUE_URL')!);
         return {
           connection: {
             host: url.hostname,
@@ -56,10 +55,6 @@ import { BootstrapService } from './bootstrap.service';
   providers: [
     AppController,
     BootstrapService,
-    {
-      provide: APP_FILTER,
-      useClass: SentryGlobalFilter,
-    },
   ],
   controllers: [AppController],
 })

@@ -1,3 +1,4 @@
+import type { I18n } from '@lingui/core'
 import { t } from '@lingui/macro'
 import { Grid, HStack, VStack } from 'styled-system/jsx'
 
@@ -9,11 +10,9 @@ import { Heading } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { CkbTransaction } from '@/gql/graphql'
 import { shannonToCKB } from '@/lib/ckb/shannon-to-ckb'
-import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { formatNumber } from '@/lib/string/format-number'
 
-export function CkbTransactionOverview({ ckbTransaction }: { ckbTransaction: CkbTransaction }) {
-  const i18n = getI18nFromHeaders()
+export function CkbTransactionOverview({ ckbTransaction, i18n }: { i18n: I18n; ckbTransaction: CkbTransaction }) {
   return (
     <VStack gap={0} w="100%" bg="bg.card" rounded="8px">
       <HStack

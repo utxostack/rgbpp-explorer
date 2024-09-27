@@ -1,3 +1,4 @@
+import type { I18n } from '@lingui/core'
 import { t } from '@lingui/macro'
 import { Flex, HStack, VStack } from 'styled-system/jsx'
 
@@ -8,17 +9,17 @@ import { Text } from '@/components/ui'
 import Link from '@/components/ui/link'
 import { ViewCkbExplorer } from '@/components/view-ckb-explorer'
 import { CkbTransaction } from '@/gql/graphql'
-import { getI18nFromHeaders } from '@/lib/get-i18n-from-headers'
 import { truncateMiddle } from '@/lib/string/truncate-middle'
 
 export function CkbCells({
   ckbTransaction,
   isBinding,
+  i18n,
 }: {
   ckbTransaction: Pick<CkbTransaction, 'hash' | 'outputs' | 'inputs'>
   isBinding?: boolean
+  i18n: I18n
 }) {
-  const i18n = getI18nFromHeaders()
   return (
     <VStack w="100%" gap={0} bg="bg.card" rounded="8px">
       <Flex
