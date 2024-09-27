@@ -12,7 +12,7 @@ import { BitcoinInput, BitcoinOutput, BitcoinTransaction, CkbTransaction } from 
 export const BtcTransactionCardInAddress = forwardRef<
   HTMLDivElement,
   {
-    tx: BitcoinTransaction
+    tx: Pick<BitcoinTransaction, 'transactionTime' | 'txid' | 'vin' | 'vout' | 'fee' | 'feeRate' | 'confirmations'>
     ckbCell?: Pick<CkbTransaction, 'inputs' | 'outputs'>
     address: string
   }

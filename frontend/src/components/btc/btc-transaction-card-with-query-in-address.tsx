@@ -1,3 +1,5 @@
+'use client'
+
 import { useQuery } from '@tanstack/react-query'
 import { useInView } from 'react-intersection-observer'
 
@@ -11,60 +13,40 @@ import { graphQLClient } from '@/lib/graphql'
 const btcTransactionQuery = graphql(`
   query BtcTransactionByTxId($txid: String!) {
     btcTransaction(txid: $txid) {
-      blockHeight
-      blockHash
       txid
-      version
-      size
-      locktime
-      weight
       fee
       feeRate
-      confirmed
       confirmations
       transactionTime
       vin {
         txid
         vout
-        scriptsig
-        scriptsigAsm
         isCoinbase
-        sequence
         prevout {
-          scriptpubkey
-          scriptpubkeyAsm
-          scriptpubkeyType
-          scriptpubkeyAddress
+          txid
+          vout
           value
+          address {
+            address
+          }
           status {
             spent
             txid
             vin
           }
-          address {
-            address
-            satoshi
-            pendingSatoshi
-            transactionsCount
-          }
         }
       }
       vout {
-        scriptpubkey
-        scriptpubkeyAsm
-        scriptpubkeyType
-        scriptpubkeyAddress
+        txid
+        vout
         value
+        address {
+          address
+        }
         status {
           spent
           txid
           vin
-        }
-        address {
-          address
-          satoshi
-          pendingSatoshi
-          transactionsCount
         }
       }
     }
@@ -81,17 +63,21 @@ export function BtcTransactionCardWithQueryInAddress({ txid, address }: Props) {
   const [ref, inView] = useInView({
     threshold: 0,
   })
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: [QueryKey.BtcTransactionCardWithQueryInAddress, txid],
     async queryFn() {
-      const { btcTransaction } = await graphQLClient.request(btcTransactionQuery)
+      const { btcTransaction } = await graphQLClient.request(btcTransactionQuery, {
+        txid,
+      })
       return btcTransaction
     },
     enabled: inView,
   })
 
+  if (error) return null
+
   return (
-    <Skeleton ref={ref} isLoaded={!!data} h={isLoading ? '480px' : 'auto'}>
+    <Skeleton ref={ref} isLoaded={!isLoading} minH={!data ? '480px' : 'auto'} w="100%">
       {data ? <BtcTransactionCardInAddress tx={data as BitcoinTransaction} address={address} /> : null}
     </Skeleton>
   )

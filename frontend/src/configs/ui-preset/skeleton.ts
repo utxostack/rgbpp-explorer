@@ -5,7 +5,7 @@ export const skeleton = defineRecipe({
   base: {
     animation: 'skeleton-pulse',
     backgroundClip: 'padding-box',
-    backgroundColor: 'gray.a4',
+    backgroundColor: 'white.a2',
     borderRadius: 'l3',
     color: 'transparent',
     cursor: 'default',
