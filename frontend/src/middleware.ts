@@ -14,6 +14,7 @@ export async function middleware(request: NextRequest) {
   const pathnameHasLocale = locales.find((locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`)
   const headers = new Headers(request.headers)
   headers.set('x-url', request.url)
+  if (request.ip) headers.set('x-ip', request.ip)
   headers.set('x-pathname', request.nextUrl.pathname)
   if (pathnameHasLocale) {
     headers.set('locale', pathnameHasLocale)
