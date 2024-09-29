@@ -29,8 +29,8 @@ export class IndexerTransactionsFlow extends EventEmitter {
   }
 
   public async start() {
-    this.startBlockIndexing();
     this.setupBlockIndexedListener();
+    this.startBlockIndexing();
   }
 
   public async startBlockIndexing() {
@@ -59,8 +59,9 @@ export class IndexerTransactionsFlow extends EventEmitter {
   }
 
   private setupBlockIndexedListener() {
+    const cronJobName = `indexer-transactions-${this.chain.id}-${process.pid}`;
     this.on(IndexerTransactionsEvent.BlockIndexed, () => {
-      if (this.schedulerRegistry.doesExist('cron', 'indexer-transactions')) {
+      if (this.schedulerRegistry.doesExist('cron', cronJobName)) {
         return;
       }
 
@@ -68,7 +69,7 @@ export class IndexerTransactionsFlow extends EventEmitter {
       const job = new CronJob(CronExpression.EVERY_10_SECONDS, () => {
         this.startBlockIndexing();
       });
-      this.schedulerRegistry.addCronJob('indexer-transactions', job);
+      this.schedulerRegistry.addCronJob(cronJobName, job);
       job.start();
     });
   }

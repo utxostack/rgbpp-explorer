@@ -36,8 +36,8 @@ export class IndexerAssetsFlow extends EventEmitter {
         CKB_ONE_DAY_BLOCKS
       ) {
         this.logger.log(`Latest asset is near tip block number, skip indexing assets...`);
-        this.startBlockAssetsIndexing();
         this.setupBlockAssetsIndexedListener();
+        this.startBlockAssetsIndexing();
         return;
       }
     }
@@ -79,8 +79,8 @@ export class IndexerAssetsFlow extends EventEmitter {
       this.logger.log(`Asset type ${assetType.codeHash} indexed`);
       if (completed === totalAssetTypes) {
         this.off(IndexerAssetsEvent.AssetIndexed, onAssetIndexed);
-        this.startBlockAssetsIndexing();
         this.setupBlockAssetsIndexedListener();
+        this.startBlockAssetsIndexing();
       }
     };
     this.on(IndexerAssetsEvent.AssetIndexed, onAssetIndexed);
@@ -102,6 +102,7 @@ export class IndexerAssetsFlow extends EventEmitter {
     }
     const targetBlockNumber = tipBlockNumber - CKB_MIN_SAFE_CONFIRMATIONS;
     if (targetBlockNumber <= latestIndexedBlockNumber) {
+      this.logger.log(`Block assets are up to date, latest indexed block number: ${latestIndexedBlockNumber}`);
       this.emit(IndexerAssetsEvent.BlockAssetsIndexed, latestIndexedBlockNumber);
       return;
     }
@@ -114,8 +115,9 @@ export class IndexerAssetsFlow extends EventEmitter {
   }
 
   private setupBlockAssetsIndexedListener() {
+    const cronJobName = `indexer-block-assets-${this.chain.id}-${process.pid}`;
     this.on(IndexerAssetsEvent.BlockAssetsIndexed, () => {
-      if (this.schedulerRegistry.doesExist('cron', 'indexer-block-assets')) {
+      if (this.schedulerRegistry.doesExist('cron', cronJobName)) {
         return;
       }
 
@@ -123,7 +125,7 @@ export class IndexerAssetsFlow extends EventEmitter {
       const job = new CronJob(CronExpression.EVERY_10_SECONDS, () => {
         this.startBlockAssetsIndexing();
       });
-      this.schedulerRegistry.addCronJob('indexer-block-assets', job);
+      this.schedulerRegistry.addCronJob(cronJobName, job);
       job.start();
     });
   }
