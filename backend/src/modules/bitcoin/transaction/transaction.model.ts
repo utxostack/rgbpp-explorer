@@ -2,6 +2,7 @@ import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import * as BitcoinApi from 'src/core/bitcoin-api/bitcoin-api.schema';
 import { BitcoinOutput } from '../output/output.model';
 import { BitcoinInput } from '../input/input.model';
+import { ComplexityType } from 'src/modules/complexity.plugin';
 
 @ObjectType({ description: 'Bitcoin Transaction' })
 export class BitcoinTransaction {
@@ -20,10 +21,10 @@ export class BitcoinTransaction {
   @Field(() => Int)
   version: number;
 
-  @Field(() => [BitcoinInput], { nullable: true })
+  @Field(() => [BitcoinInput], { nullable: true, complexity: ComplexityType.ListField })
   vin: BitcoinInput[];
 
-  @Field(() => [BitcoinOutput])
+  @Field(() => [BitcoinOutput], { complexity: ComplexityType.ListField })
   vout: BitcoinOutput[];
 
   @Field(() => Float)

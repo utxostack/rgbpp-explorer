@@ -99,7 +99,7 @@ export class BitcoinBlockResolver {
 
   @ResolveField(() => [BitcoinTransaction], {
     nullable: true,
-    complexity: ({ childComplexity }) => ComplexityType.ListField + childComplexity,
+    complexity: ({ childComplexity }) => ComplexityType.ListField * childComplexity,
   })
   public async transactions(
     @Parent() block: BitcoinBlock,
