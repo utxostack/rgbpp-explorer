@@ -102,6 +102,7 @@ export class IndexerAssetsFlow extends EventEmitter {
     }
     const targetBlockNumber = tipBlockNumber - CKB_MIN_SAFE_CONFIRMATIONS;
     if (targetBlockNumber <= latestIndexedBlockNumber) {
+      this.logger.log(`Block assets are up to date, latest indexed block number: ${latestIndexedBlockNumber}`);
       this.emit(IndexerAssetsEvent.BlockAssetsIndexed, latestIndexedBlockNumber);
       return;
     }
