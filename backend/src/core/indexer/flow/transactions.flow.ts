@@ -29,8 +29,8 @@ export class IndexerTransactionsFlow extends EventEmitter {
   }
 
   public async start() {
-    this.startBlockIndexing();
     this.setupBlockIndexedListener();
+    this.startBlockIndexing();
   }
 
   public async startBlockIndexing() {

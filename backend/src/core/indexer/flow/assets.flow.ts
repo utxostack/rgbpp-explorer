@@ -36,8 +36,8 @@ export class IndexerAssetsFlow extends EventEmitter {
         CKB_ONE_DAY_BLOCKS
       ) {
         this.logger.log(`Latest asset is near tip block number, skip indexing assets...`);
-        this.startBlockAssetsIndexing();
         this.setupBlockAssetsIndexedListener();
+        this.startBlockAssetsIndexing();
         return;
       }
     }
@@ -79,8 +79,8 @@ export class IndexerAssetsFlow extends EventEmitter {
       this.logger.log(`Asset type ${assetType.codeHash} indexed`);
       if (completed === totalAssetTypes) {
         this.off(IndexerAssetsEvent.AssetIndexed, onAssetIndexed);
-        this.startBlockAssetsIndexing();
         this.setupBlockAssetsIndexedListener();
+        this.startBlockAssetsIndexing();
       }
     };
     this.on(IndexerAssetsEvent.AssetIndexed, onAssetIndexed);
