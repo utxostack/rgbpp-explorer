@@ -114,8 +114,9 @@ export class IndexerAssetsFlow extends EventEmitter {
   }
 
   private setupBlockAssetsIndexedListener() {
+    const cronJobName = `indexer-block-assets-${this.chain.id}-${process.pid}`;
     this.on(IndexerAssetsEvent.BlockAssetsIndexed, () => {
-      if (this.schedulerRegistry.doesExist('cron', 'indexer-block-assets')) {
+      if (this.schedulerRegistry.doesExist('cron', cronJobName)) {
         return;
       }
 
@@ -123,7 +124,7 @@ export class IndexerAssetsFlow extends EventEmitter {
       const job = new CronJob(CronExpression.EVERY_10_SECONDS, () => {
         this.startBlockAssetsIndexing();
       });
-      this.schedulerRegistry.addCronJob('indexer-block-assets', job);
+      this.schedulerRegistry.addCronJob(cronJobName, job);
       job.start();
     });
   }
