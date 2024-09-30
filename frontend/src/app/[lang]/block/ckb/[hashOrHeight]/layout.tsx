@@ -11,9 +11,6 @@ import { graphql } from '@/gql'
 import { CkbBlock } from '@/gql/graphql'
 import { graphQLClient } from '@/lib/graphql'
 
-export const dynamic = 'force-static'
-export const revalidate = 10
-
 const query = graphql(`
   query CkbBlock($hashOrHeight: String!) {
     ckbBlock(heightOrHash: $hashOrHeight) {

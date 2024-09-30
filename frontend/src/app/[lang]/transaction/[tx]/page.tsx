@@ -16,127 +16,17 @@ const rgbppTxQuery = graphql(`
       ckbTxHash
       btcTxid
       leapDirection
-      blockNumber
-      timestamp
-      btcTransaction {
-        txid
-        blockHeight
-        blockHash
-        size
-        fee
-        feeRate
-        confirmed
-        confirmations
-        vin {
-          txid
-          vout
-          isCoinbase
-          prevout {
-            txid
-            vout
-            value
-            address {
-              address
-            }
-            status {
-              spent
-              txid
-              vin
-            }
-          }
-        }
-        vout {
-          txid
-          vout
-          value
-          address {
-            address
-          }
-          status {
-            spent
-            txid
-            vin
-          }
-        }
-      }
-      ckbTransaction {
-        isCellbase
-        blockNumber
-        hash
-        fee
-        feeRate
-        outputs {
-          txHash
-          index
-          capacity
-          cellType
-          type {
-            codeHash
-            hashType
-            args
-          }
-          lock {
-            codeHash
-            hashType
-            args
-          }
-          status {
-            consumed
-            txHash
-            index
-          }
-          xudtInfo {
-            symbol
-            amount
-            decimal
-            typeHash
-          }
-        }
-        inputs {
-          txHash
-          index
-          capacity
-          cellType
-          type {
-            codeHash
-            hashType
-            args
-          }
-          lock {
-            codeHash
-            hashType
-            args
-          }
-          xudtInfo {
-            symbol
-            amount
-            decimal
-            typeHash
-          }
-          status {
-            consumed
-            txHash
-            index
-          }
-        }
-        block {
-          timestamp
-          hash
-        }
-      }
     }
   }
 `)
+
 const btcTxQuery = graphql(`
   query BtcTx($txid: String!) {
     btcTransaction(txid: $txid) {
+      txid
       blockHeight
       blockHash
-      txid
-      version
       size
-      transactionTime
-      weight
       fee
       feeRate
       confirmed
@@ -144,23 +34,13 @@ const btcTxQuery = graphql(`
       vin {
         txid
         vout
-        scriptsig
-        scriptsigAsm
         isCoinbase
-        sequence
         prevout {
           txid
           vout
-          scriptpubkey
-          scriptpubkeyAsm
-          scriptpubkeyType
-          scriptpubkeyAddress
           value
           address {
             address
-            satoshi
-            pendingSatoshi
-            transactionsCount
           }
           status {
             spent
@@ -172,16 +52,9 @@ const btcTxQuery = graphql(`
       vout {
         txid
         vout
-        scriptpubkey
-        scriptpubkeyAsm
-        scriptpubkeyType
-        scriptpubkeyAddress
         value
         address {
           address
-          satoshi
-          pendingSatoshi
-          transactionsCount
         }
         status {
           spent
@@ -200,9 +73,6 @@ const ckbTxQuery = graphql(`
       hash
       fee
       feeRate
-      size
-      confirmed
-      confirmations
       outputs {
         txHash
         index
@@ -270,7 +140,12 @@ export default async function Page({ params: { tx, lang } }: { params: { tx: str
   const { rgbppTransaction } = await graphQLClient.request(rgbppTxQuery, { txidOrTxHash: tx })
 
   if (rgbppTransaction) {
-    const { btcTransaction, ckbTransaction } = rgbppTransaction
+    const [btcTxRes, ckbTxRes] = await Promise.all([
+      rgbppTransaction?.btcTxid ? graphQLClient.request(btcTxQuery, { txid: rgbppTransaction.btcTxid }) : undefined,
+      rgbppTransaction?.ckbTxHash ? graphQLClient.request(ckbTxQuery, { hash: rgbppTransaction.ckbTxHash }) : undefined,
+    ])
+    const btcTransaction = btcTxRes?.btcTransaction
+    const ckbTransaction = ckbTxRes?.ckbTransaction
     if (btcTransaction && !tx.startsWith('0x')) {
       return (
         <BTCTransactionPage
