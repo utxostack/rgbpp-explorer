@@ -17,6 +17,7 @@ import {
   INDEXER_TRANSACTION_QUEUE,
   IndexerTransactionJobData,
 } from './processor/transaction.processor';
+import * as Sentry from '@sentry/nestjs';
 
 @Injectable()
 export class IndexerQueueService {
@@ -46,14 +47,21 @@ export class IndexerQueueService {
   }
 
   public async getLatestAssetJobCursor(assetType: AssetType) {
-    const script: Script = {
-      codeHash: assetType.codeHash,
-      hashType: assetType.hashType as HashType,
-      args: '0x',
-    };
-    const typeHash = computeScriptHash(script);
-    const key = `${INDEXER_ASSETS_QUEUE}:${typeHash}`;
-    return this.cacheManager.get<string>(key);
+    try {
+      const script: Script = {
+        codeHash: assetType.codeHash,
+        hashType: assetType.hashType as HashType,
+        args: '0x',
+      };
+      const typeHash = computeScriptHash(script);
+      const key = `${INDEXER_ASSETS_QUEUE}:${typeHash}`;
+      const cursor = await this.cacheManager.get<string>(key);
+      return cursor;
+    } catch (e) {
+      this.logger.error(e);
+      Sentry.captureException(e);
+      return undefined;
+    }
   }
 
   public async addAssetJob(data: IndexerAssetsJobData) {
@@ -72,8 +80,8 @@ export class IndexerQueueService {
     const jobId = params.toString();
 
     this.logger.debug(`Added asset job ${jobId} for chain ${chainId} with cursor ${cursor}`);
-    await this.assetsQueue.add(jobId, data, { jobId });
     await this.cacheManager.set(`${INDEXER_ASSETS_QUEUE}:${typeHash}`, cursor || '');
+    await this.assetsQueue.add(jobId, data, { jobId });
   }
 
   public async getLatestIndexedAssetsBlock(chainId: number) {

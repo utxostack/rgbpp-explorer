@@ -30,7 +30,7 @@ async function bootstrap() {
   );
 
   const bootstrapService = app.get(BootstrapService);
-  await bootstrapService.bootstrapAssetsIndex();
+  await bootstrapService.bootstrap();
 
   if (env.CORS_WHITELIST.length > 0) {
     app.enableCors({
