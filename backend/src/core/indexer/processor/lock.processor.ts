@@ -27,7 +27,6 @@ class IndexerLockError extends Error {
 
 @Processor(INDEXER_LOCK_QUEUE, {
   stalledInterval: 60_000,
-  useWorkerThreads: true,
 })
 export class IndexerLockProcessor extends WorkerHost {
   private logger = new Logger(IndexerLockProcessor.name);

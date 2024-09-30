@@ -43,9 +43,13 @@ export class CkbRpcHealthIndicator extends HealthIndicator {
     isHealthy: boolean;
     result: HealthIndicatorResult;
   }> {
+    const now = performance.now();
     const tipBlockNumber = await this.ckbRpcWebsocketService.getTipBlockNumber();
     const isHealthy = !!tipBlockNumber;
-    const result = this.getStatus('ckb-rpc.websocket', isHealthy, { tipBlockNumber });
+    const result = this.getStatus('ckb-rpc.websocket', isHealthy, {
+      tipBlockNumber,
+      latency: performance.now() - now,
+    });
     return {
       isHealthy,
       result,

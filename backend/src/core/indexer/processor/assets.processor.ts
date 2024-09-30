@@ -10,7 +10,7 @@ import { ModuleRef } from '@nestjs/core';
 import { IndexerServiceFactory } from '../indexer.factory';
 import { IndexerAssetsService } from '../service/assets.service';
 import * as Sentry from '@sentry/node';
-import { IndexerAssetsEvent } from '../flow/assets.flow';
+import { IndexerAssetsFlow } from '../flow/assets.flow';
 
 export const INDEXER_ASSETS_QUEUE = 'indexer-assets-queue';
 
@@ -24,7 +24,6 @@ const BATCH_SIZE = BI.from(400).toHexString();
 
 @Processor(INDEXER_ASSETS_QUEUE, {
   stalledInterval: 60_000,
-  useWorkerThreads: true,
 })
 export class IndexerAssetsProcessor extends WorkerHost {
   private logger = new Logger(IndexerAssetsProcessor.name);
@@ -67,7 +66,7 @@ export class IndexerAssetsProcessor extends WorkerHost {
     if (cursor === '0x') {
       const indexerServiceFactory = this.moduleRef.get(IndexerServiceFactory);
       const indexerService = await indexerServiceFactory.getService(chainId);
-      indexerService.assetsFlow.emit(IndexerAssetsEvent.AssetIndexed, assetType);
+      indexerService.assetsFlow.eventEmitter.emit(IndexerAssetsFlow.Event.AssetIndexed, assetType);
       return;
     }
 
