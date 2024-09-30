@@ -5,18 +5,19 @@ import * as Sentry from '@sentry/nestjs';
 
 @Injectable()
 export class BitcoinApiHealthIndicator extends HealthIndicator {
-  constructor(
-    private bitcoinApiService: BitcoinApiService,
-
-  ) {
+  constructor(private bitcoinApiService: BitcoinApiService) {
     super();
   }
 
   public async isHealthy(): Promise<HealthIndicatorResult> {
     try {
+      const now = performance.now();
       const info = await this.bitcoinApiService.getBlockchainInfo();
       const isHealthy = !!info.blocks;
-      const result = this.getStatus('bitcoin-api', isHealthy, { info });
+      const result = this.getStatus('bitcoin-api', isHealthy, {
+        info,
+        latency: performance.now() - now,
+      });
       if (isHealthy) {
         return result;
       }

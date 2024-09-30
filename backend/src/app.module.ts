@@ -12,6 +12,7 @@ import { BullModule } from '@nestjs/bullmq';
 import configModule from './config';
 import { AppController } from './app.controller';
 import { BootstrapService } from './bootstrap.service';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { BootstrapService } from './bootstrap.service';
       },
       inject: [ConfigService],
     }),
+    EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
     CoreModule,
     ApiModule,
