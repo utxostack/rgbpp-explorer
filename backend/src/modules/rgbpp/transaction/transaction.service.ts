@@ -11,7 +11,7 @@ import * as CkbRpcInterface from 'src/core/ckb-rpc/ckb-rpc.interface';
 import { RgbppService } from '../rgbpp.service';
 import { BI, HashType } from '@ckb-lumos/lumos';
 import { Cacheable } from 'src/decorators/cacheable.decorator';
-import { ONE_MONTH_MS } from 'src/common/date';
+import { ONE_DAY_MS } from 'src/common/date';
 import { LeapDirection } from '@prisma/client';
 import { PrismaService } from 'src/core/database/prisma/prisma.service';
 import { CKB_CHAIN_ID } from 'src/constants';
@@ -105,7 +105,7 @@ export class RgbppTransactionService {
   @Cacheable({
     namespace: 'RgbppTransactionService',
     key: (tx: CkbRpcInterface.Transaction) => `getLeapDirectionByCkbTx:${tx.hash}`,
-    ttl: ONE_MONTH_MS,
+    ttl: ONE_DAY_MS,
   })
   public async getLeapDirectionByCkbTx(ckbTx: CkbRpcInterface.Transaction) {
     const inputCells = await Promise.all(
@@ -157,7 +157,7 @@ export class RgbppTransactionService {
   @Cacheable({
     namespace: 'RgbppTransactionService',
     key: (btcTx: BitcoinApiInterface.Transaction) => `queryRgbppLockTx:${btcTx.txid}`,
-    ttl: ONE_MONTH_MS,
+    ttl: ONE_DAY_MS,
   })
   public async queryRgbppLockTx(btcTx: BitcoinApiInterface.Transaction) {
     const ckbTxs = await Promise.all(
@@ -199,7 +199,7 @@ export class RgbppTransactionService {
   @Cacheable({
     namespace: 'RgbppTransactionService',
     key: (btcTx: BitcoinApiInterface.Transaction) => `queryRgbppBtcTimeLockTx:${btcTx.txid}`,
-    ttl: ONE_MONTH_MS,
+    ttl: ONE_DAY_MS,
   })
   public async queryRgbppBtcTimeLockTx(btcTx: BitcoinApiInterface.Transaction) {
     const ckbTxs = (
