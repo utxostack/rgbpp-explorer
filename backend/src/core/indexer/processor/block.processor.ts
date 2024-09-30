@@ -8,8 +8,6 @@ import { PrismaService } from 'src/core/database/prisma/prisma.service';
 import * as Sentry from '@sentry/node';
 import { toNumber } from 'lodash';
 import { IndexerQueueService } from '../indexer.queue';
-import { IndexerServiceFactory } from '../indexer.factory';
-import { IndexerTransactionsEvent } from '../flow/transactions.flow';
 
 export const INDEXER_BLOCK_QUEUE = 'indexer-block-queue';
 
@@ -21,7 +19,6 @@ export interface IndexerBlockJobData {
 
 @Processor(INDEXER_BLOCK_QUEUE, {
   stalledInterval: 60_000,
-  useWorkerThreads: true,
 })
 export class IndexerBlockProcessor extends WorkerHost {
   private logger = new Logger(IndexerBlockProcessor.name);
@@ -90,11 +87,6 @@ export class IndexerBlockProcessor extends WorkerHost {
         blockNumber: blockNumber + 1,
         targetBlockNumber,
       });
-    } else {
-      const indexerServiceFactory = this.moduleRef.get(IndexerServiceFactory);
-      const indexerService = await indexerServiceFactory.getService(chainId);
-      indexerService.transactionsFlow.emit(IndexerTransactionsEvent.BlockIndexed, block);
-      return;
     }
   }
 

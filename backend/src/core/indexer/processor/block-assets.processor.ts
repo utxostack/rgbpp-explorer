@@ -8,9 +8,7 @@ import { PrismaService } from 'src/core/database/prisma/prisma.service';
 import { IndexerQueueService } from '../indexer.queue';
 import { IndexerAssetsService } from '../service/assets.service';
 import { Cell, Transaction } from 'src/core/blockchain/blockchain.interface';
-import { IndexerServiceFactory } from '../indexer.factory';
 import * as Sentry from '@sentry/node';
-import { IndexerAssetsEvent } from '../flow/assets.flow';
 
 export const INDEXER_BLOCK_ASSETS_QUEUE = 'indexer-block-assets-queue';
 
@@ -22,7 +20,6 @@ export interface IndexerBlockAssetsJobData {
 
 @Processor(INDEXER_BLOCK_ASSETS_QUEUE, {
   stalledInterval: 60_000,
-  useWorkerThreads: true,
 })
 export class IndexerBlockAssetsProcessor extends WorkerHost {
   private logger = new Logger(IndexerBlockAssetsProcessor.name);
@@ -104,11 +101,6 @@ export class IndexerBlockAssetsProcessor extends WorkerHost {
         blockNumber: blockNumber + 1,
         targetBlockNumber,
       });
-    } else {
-      const indexerServiceFactory = this.moduleRef.get(IndexerServiceFactory);
-      const indexerService = await indexerServiceFactory.getService(chainId);
-      indexerService.assetsFlow.emit(IndexerAssetsEvent.BlockAssetsIndexed, blockNumber);
-      return;
     }
   }
 
