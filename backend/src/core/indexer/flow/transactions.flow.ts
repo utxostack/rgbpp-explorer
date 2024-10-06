@@ -2,35 +2,32 @@ import { Logger } from '@nestjs/common';
 import { Chain } from '@prisma/client';
 import { EventEmitter } from 'node:events';
 import { CKB_MIN_SAFE_CONFIRMATIONS } from 'src/constants';
-import { BlockchainService } from 'src/core/blockchain/blockchain.service';
 import { PrismaService } from 'src/core/database/prisma/prisma.service';
 import { IndexerQueueService } from '../indexer.queue';
 import { ONE_DAY_MS } from 'src/common/date';
 import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { BlockchainService } from 'src/core/blockchain/blockchain.service';
 
 const CKB_24_HOURS_BLOCK_NUMBER = ONE_DAY_MS / 10000;
-
-export enum IndexerTransactionsEvent {
-  BlockIndexed = 'block-indexed',
-}
 
 export class IndexerTransactionsFlow extends EventEmitter {
   private readonly logger = new Logger(IndexerTransactionsFlow.name);
 
   constructor(
     private chain: Chain,
+    private indexerQueueService: IndexerQueueService,
     private blockchainService: BlockchainService,
     private prismaService: PrismaService,
-    private indexerQueueService: IndexerQueueService,
     private schedulerRegistry: SchedulerRegistry,
+    public eventEmitter: EventEmitter2,
   ) {
     super();
   }
 
   public async start() {
     this.startBlockIndexing();
-    this.setupBlockIndexedListener();
   }
 
   public async startBlockIndexing() {
@@ -46,30 +43,28 @@ export class IndexerTransactionsFlow extends EventEmitter {
       startBlockNumber = Math.max(startBlockNumber, block.number + 1);
     }
 
-    if (startBlockNumber >= targetBlockNumber) {
-      this.emit(IndexerTransactionsEvent.BlockIndexed);
-      return;
+    if (startBlockNumber < targetBlockNumber) {
+      this.logger.log(`Indexing blocks from ${startBlockNumber} to ${targetBlockNumber}`);
+      this.indexerQueueService.addBlockJob({
+        chainId: this.chain.id,
+        blockNumber: startBlockNumber,
+        targetBlockNumber,
+      });
     }
-    this.logger.log(`Indexing blocks from ${startBlockNumber} to ${targetBlockNumber}`);
-    this.indexerQueueService.addBlockJob({
-      chainId: this.chain.id,
-      blockNumber: startBlockNumber,
-      targetBlockNumber,
-    });
+    this.setupBlockIndexCronJob();
   }
 
-  private setupBlockIndexedListener() {
-    this.on(IndexerTransactionsEvent.BlockIndexed, () => {
-      if (this.schedulerRegistry.doesExist('cron', 'indexer-transactions')) {
-        return;
-      }
+  private setupBlockIndexCronJob() {
+    const cronJobName = `indexer-transactions-${this.chain.id}-${process.pid}`;
+    if (this.schedulerRegistry.doesExist('cron', cronJobName)) {
+      return;
+    }
 
-      this.logger.log(`Scheduling block transactions indexing cron job`);
-      const job = new CronJob(CronExpression.EVERY_10_SECONDS, () => {
-        this.startBlockIndexing();
-      });
-      this.schedulerRegistry.addCronJob('indexer-transactions', job);
-      job.start();
+    this.logger.log(`Scheduling block transactions indexing cron job`);
+    const job = new CronJob(CronExpression.EVERY_10_SECONDS, () => {
+      this.startBlockIndexing();
     });
+    this.schedulerRegistry.addCronJob(cronJobName, job);
+    job.start();
   }
 }

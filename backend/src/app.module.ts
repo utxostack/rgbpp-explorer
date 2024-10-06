@@ -12,6 +12,25 @@ import { BullModule } from '@nestjs/bullmq';
 import configModule from './config';
 import { AppController } from './app.controller';
 import { BootstrapService } from './bootstrap.service';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+
+async function createCacheStore(redisUrl: string) {
+  const store = await redisStore({
+    url: redisUrl,
+    isCacheable: (value: unknown) => value !== undefined,
+  });
+  return {
+    async set<T>(key: string, value: T, ttl?: number): Promise<void> {
+      return store.set(key, value, ttl);
+    },
+    async get<T>(key: string): Promise<T | undefined> {
+      return store.get(key);
+    },
+    async del(key: string): Promise<void> {
+      return store.del(key);
+    },
+  } satisfies CacheStore;
+}
 
 @Module({
   imports: [
@@ -21,10 +40,7 @@ import { BootstrapService } from './bootstrap.service';
       isGlobal: true,
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService<Env>) => {
-        const store = (await redisStore({
-          url: configService.get('REDIS_CACHE_URL'),
-          isCacheable: (value) => value !== undefined,
-        })) as unknown as CacheStore;
+        const store = await createCacheStore(configService.get('REDIS_CACHE_URL')!);
         return {
           store,
         };
@@ -46,14 +62,12 @@ import { BootstrapService } from './bootstrap.service';
       },
       inject: [ConfigService],
     }),
+    EventEmitterModule.forRoot(),
     ScheduleModule.forRoot(),
     CoreModule,
     ApiModule,
   ],
-  providers: [
-    AppController,
-    BootstrapService,
-  ],
+  providers: [AppController, BootstrapService],
   controllers: [AppController],
 })
 export class AppModule { }

@@ -37,6 +37,10 @@ export class BlockchainService {
     private chainPromise: Promise<Chain | null>,
   ) {
     this.createConnection();
+
+    process.on('exit', () => {
+      this.close();
+    });
   }
 
   private createConnection() {
@@ -211,9 +215,7 @@ export class BlockchainService {
   ): Promise<Block> {
     await this.websocketReady;
     this.logger.debug(`get_block_by_number - blockNumber: ${blockNumber}`);
-    const response = await this.call('get_block_by_number', [
-      BI.from(blockNumber).toHexString(),
-    ]);
+    const response = await this.call('get_block_by_number', [BI.from(blockNumber).toHexString()]);
     const block = response as Block;
     if (!withTxData) {
       block.transactions = block.transactions.map((tx) => {
