@@ -1,3 +1,9 @@
+User-agent: meta-externalagent
+Disallow: /
+
+User-agent: DataForSeoBot
+Disallow: /
+
 User-agent: *
 Disallow: /en/explorer/btc
 Disallow: /en/explorer/ckb
