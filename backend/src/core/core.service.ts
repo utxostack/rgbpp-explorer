@@ -14,7 +14,7 @@ import { Env } from 'src/env';
 import { Transaction } from './blockchain/blockchain.interface';
 import { BlockchainServiceFactory } from './blockchain/blockchain.factory';
 import { LeapDirection } from '@prisma/client';
-import { ONE_MONTH_MS } from 'src/common/date';
+import { ONE_DAY_MS } from 'src/common/date';
 import { Cacheable } from 'src/decorators/cacheable.decorator';
 
 export const CELLBASE_TX_HASH =
@@ -79,7 +79,7 @@ export class CoreService {
     key: (chainId: number, ckbTx: Transaction) => {
       return `getLeapDirectionByCkbTx:${chainId}:${ckbTx.hash}`;
     },
-    ttl: ONE_MONTH_MS,
+    ttl: ONE_DAY_MS,
   })
   public async getLeapDirectionByCkbTx(chainId: number, ckbTx: Transaction) {
     const blockchainService = this.blockchainServiceFactory.getService(chainId);

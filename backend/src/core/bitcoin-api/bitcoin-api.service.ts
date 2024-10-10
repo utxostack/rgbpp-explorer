@@ -7,7 +7,7 @@ import { IBitcoinDataProvider } from './bitcoin-api.interface';
 import { ElectrsService } from './provider/electrs.service';
 import { MempoolService } from './provider/mempool.service';
 import { ChainInfo, Transaction } from './bitcoin-api.schema';
-import { ONE_HOUR_MS, ONE_MONTH_MS, TEN_MINUTES_MS } from 'src/common/date';
+import { ONE_HOUR_MS, ONE_DAY_MS, TEN_MINUTES_MS } from 'src/common/date';
 import { Cacheable } from 'src/decorators/cacheable.decorator';
 import * as Sentry from '@sentry/nestjs';
 import { PLimit } from 'src/decorators/plimit.decorator';
@@ -206,7 +206,7 @@ export class BitcoinApiService {
   @Cacheable({
     namespace: 'bitcoinApiService',
     key: ({ txid }) => `getTx:${txid}`,
-    ttl: ONE_MONTH_MS,
+    ttl: ONE_DAY_MS,
     shouldCache: (tx: Transaction) =>
       tx.status.confirmed &&
       !!tx.status.block_time &&
@@ -223,7 +223,7 @@ export class BitcoinApiService {
   @Cacheable({
     namespace: 'bitcoinApiService',
     key: ({ txid }) => `getTxOutSpends:${txid}`,
-    ttl: ONE_MONTH_MS,
+    ttl: ONE_DAY_MS,
   })
   public async getTxOutSpends({ txid }: { txid: string }) {
     return this.call('getTxOutSpends', { txid });
@@ -241,7 +241,7 @@ export class BitcoinApiService {
   @Cacheable({
     namespace: 'bitcoinApiService',
     key: ({ hash }) => `getBlock:${hash}`,
-    ttl: ONE_MONTH_MS,
+    ttl: ONE_DAY_MS,
   })
   public async getBlock({ hash }: { hash: string }) {
     return this.call('getBlock', { hash });
@@ -250,7 +250,7 @@ export class BitcoinApiService {
   @Cacheable({
     namespace: 'bitcoinApiService',
     key: ({ hash, startIndex }) => `getBlockTxs:${hash}:${startIndex}`,
-    ttl: ONE_MONTH_MS,
+    ttl: ONE_DAY_MS,
   })
   public async getBlockTxs({ hash, startIndex }: { hash: string; startIndex?: number }) {
     return this.call('getBlockTxs', { hash, startIndex });
@@ -268,7 +268,7 @@ export class BitcoinApiService {
   @Cacheable({
     namespace: 'bitcoinApiService',
     key: ({ hash }) => `getBlockTxids:${hash}`,
-    ttl: ONE_MONTH_MS,
+    ttl: ONE_DAY_MS,
   })
   public async getBlockTxids({ hash }: { hash: string }) {
     return this.call('getBlockTxids', { hash });
