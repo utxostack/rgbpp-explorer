@@ -109,8 +109,8 @@ msgid "Available"
 msgstr "Available"
 
 #: src/app/[lang]/address/[address]/transactions/page.tsx:265
-msgid "Back to first page"
-msgstr "Back to first page"
+#~ msgid "Back to first page"
+#~ msgstr "Back to first page"
 
 #: src/app/not-found.tsx:19
 msgid "Back to Home"
@@ -211,7 +211,7 @@ msgstr "Coming"
 msgid "Coming Soon"
 msgstr "Coming Soon"
 
-#: src/app/[lang]/assets/coins/[typeHash]/holders/page.tsx:13
+#: src/app/[lang]/assets/coins/[typeHash]/holders/page.tsx:14
 #: src/components/coming-soon.tsx:14
 msgid "Coming soon, please stay tuned"
 msgstr "Coming soon, please stay tuned"
@@ -312,7 +312,7 @@ msgstr "Fee rate:<0>{0}</0>{feeUnit}/vB"
 #~ msgid "Fee rate:<0>{0}</0>sats/vB"
 #~ msgstr "Fee rate:<0>{0}</0>sats/vB"
 
-#: src/components/pagination-searchparams.tsx:44
+#: src/components/pagination-searchparams.tsx:43
 msgid "Go"
 msgstr "Go"
 
@@ -431,15 +431,19 @@ msgid "Nervos CKB"
 msgstr "Nervos CKB"
 
 #: src/app/[lang]/address/[address]/transactions/page.tsx:277
-msgid "Next"
-msgstr "Next"
+#~ msgid "Next"
+#~ msgstr "Next"
 
 #: src/components/no-data.tsx:14
 msgid "No Data"
 msgstr "No Data"
 
-#: src/app/[lang]/address/[address]/transactions/page.tsx:247
-#: src/app/[lang]/address/[address]/transactions/page.tsx:303
+#: src/components/infinite-list-bottom.tsx:29
+msgid "No More"
+msgstr "No More"
+
+#: src/app/[lang]/address/[address]/transactions/btc-tx-list.tsx:55
+#: src/app/[lang]/address/[address]/transactions/ckb-tx-list.tsx:57
 msgid "No Transaction"
 msgstr "No Transaction"
 
@@ -522,10 +526,10 @@ msgstr "RGB++ Txns"
 msgid "sat/VB"
 msgstr "sat/VB"
 
-#: src/app/[lang]/block/btc/[hashOrHeight]/transactions/page.tsx:99
-#: src/app/[lang]/block/ckb/[hashOrHeight]/transactions/page.tsx:102
-#: src/components/btc/btc-transaction-card-in-address.tsx:37
+#: src/components/btc/btc-transaction-card-in-address.tsx:35
+#: src/components/btc/btc-transaction-card-with-query-in-block.tsx:20
 #: src/components/btc/btc-transaction-overview.tsx:57
+#: src/components/ckb/ckb-transaction-card-with-query-in-block.tsx:20
 msgid "sats"
 msgstr "sats"
 
@@ -563,7 +567,7 @@ msgstr "SDK"
 msgid "Search by Address/Tx Hash/Block Hash/AssetID"
 msgstr "Search by Address/Tx Hash/Block Hash/AssetID"
 
-#: src/app/[lang]/address/[address]/transactions/page.tsx:316
+#: src/components/ckb/ckb-transaction-card-with-query-in-address.tsx:24
 msgid "shannons"
 msgstr "shannons"
 
@@ -621,9 +625,8 @@ msgstr "Testnet"
 msgid "Time"
 msgstr "Time"
 
-#: src/app/[lang]/address/[address]/transactions/page.tsx:325
 #: src/app/[lang]/assets/coins/[typeHash]/transactions/page.tsx:106
-#: src/app/[lang]/assets/coins/page.tsx:53
+#: src/app/[lang]/assets/coins/page.tsx:54
 msgid "Total {0} Items"
 msgstr "Total {0} Items"
 
@@ -635,7 +638,7 @@ msgstr "Transaction"
 #: src/app/[lang]/address/[address]/layout.tsx:103
 #: src/app/[lang]/assets/coins/[typeHash]/layout.tsx:76
 #: src/app/[lang]/block/btc/[hashOrHeight]/layout.tsx:67
-#: src/app/[lang]/block/ckb/[hashOrHeight]/layout.tsx:62
+#: src/app/[lang]/block/ckb/[hashOrHeight]/layout.tsx:59
 #: src/components/transaction-header.tsx:45
 msgid "Transactions"
 msgstr "Transactions"
