@@ -1,5 +1,5 @@
 import { CacheModule, CacheStore } from '@nestjs/cache-manager';
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SentryModule } from '@sentry/nestjs/setup';
 import type { RedisClientOptions } from 'redis';
@@ -14,6 +14,8 @@ import { AppController } from './app.controller';
 import { BootstrapService } from './bootstrap.service';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 
+const logger = new Logger('CacheStore');
+
 async function createCacheStore(redisUrl: string) {
   const store = await redisStore({
     url: redisUrl,
@@ -21,10 +23,20 @@ async function createCacheStore(redisUrl: string) {
   });
   return {
     async set<T>(key: string, value: T, ttl?: number): Promise<void> {
-      return store.set(key, value, ttl);
+      try {
+        return store.set(key, value, ttl);
+      } catch (e) {
+        logger.error(`Failed to set cache key ${key}: ${e}`);
+        return undefined;
+      }
     },
     async get<T>(key: string): Promise<T | undefined> {
-      return store.get(key);
+      try {
+        return store.get(key);
+      } catch (e) {
+        logger.error(`Failed to get cache key ${key}: ${e}`);
+        return undefined;
+      }
     },
     async del(key: string): Promise<void> {
       return store.del(key);

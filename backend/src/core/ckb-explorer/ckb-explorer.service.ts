@@ -19,7 +19,7 @@ import {
   TransactionFeesStatistic,
   TransactionListSortType,
 } from './ckb-explorer.interface';
-import { ONE_MONTH_MS } from 'src/common/date';
+import { ONE_DAY_MS } from 'src/common/date';
 import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { Cacheable } from 'src/decorators/cacheable.decorator';
 import { CkbRpcWebsocketService } from '../ckb-rpc/ckb-rpc-websocket.service';
@@ -132,7 +132,7 @@ export class CkbExplorerService {
   @Cacheable({
     namespace: 'CkbExplorerService',
     key: (heightOrHash: string) => `getBlock:${heightOrHash}`,
-    ttl: ONE_MONTH_MS,
+    ttl: ONE_DAY_MS,
     shouldCache: async (block: NonPaginatedResponse<Block>, that: CkbExplorerService) => {
       const { number } = block.data.attributes;
       return that.isSafeConfirmations(number);
@@ -192,7 +192,7 @@ export class CkbExplorerService {
   @Cacheable({
     namespace: 'CkbExplorerService',
     key: (txHash: string) => `getTransaction:${txHash}`,
-    ttl: ONE_MONTH_MS,
+    ttl: ONE_DAY_MS,
     shouldCache: async (tx: NonPaginatedResponse<DetailTransaction>, that: CkbExplorerService) => {
       const { tx_status, block_number } = tx.data.attributes;
       const isSafeConfirmations = await that.isSafeConfirmations(block_number);
