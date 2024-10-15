@@ -20,7 +20,7 @@ const publicEnvSchema = z.object({
     .default('https://github.com/ckb-cell/RGBPlusPlus-design/blob/main/docs/lockscript-design-prd-en.md'),
   RGBPP_SDK_URL: z.string().default('https://github.com/ckb-cell/rgbpp-sdk'),
   UTXO_STACK_TWITTER_URL: z.string().default('https://x.com/utxostack'),
-  CKB_CELL_GITHUB_URL: z.string().default('https://github.com/ckb-cell'),
+  CKB_CELL_GITHUB_URL: z.string().default('https://github.com/utxostack'),
   UTXO_STACK_MEDIUM_URL: z.string().default('https://medium.com/@utxostack'),
   RGBPP_EXPLORER_TESTNET_URL: z.string().default('https://testnet.explorer.utxostack.network'),
   RGBPP_EXPLORER_MAINNET_URL: z.string().default('https://explorer.utxostack.network'),
@@ -33,11 +33,13 @@ const publicEnvSchema = z.object({
 
 const sharedEnvSchema = z.object({
   RGBPP_EXPLORER_API_URL: z.string().default('https://testnet-api.explorer.rgbpp.io/graphql'),
+  GA_ID: z.string().optional(),
 })
 
 export const env = {
   share: sharedEnvSchema.parse({
     RGBPP_EXPLORER_API_URL: process.env.NEXT_PUBLIC_RGBPP_EXPLORER_API_URL,
+    GA_ID: process.env.NEXT_PUBLIC_GA_ID,
   }),
   internal: (typeof window === 'undefined' ? internalEnvSchema.parse(process.env) : {}) as z.infer<
     typeof internalEnvSchema
@@ -52,5 +54,6 @@ export const env = {
     RGBPP_SCRIPT_URL: process.env.NEXT_PUBLIC_RGBPP_SCRIPT_URL,
     RGBPP_SDK_URL: process.env.NEXT_PUBLIC_RGBPP_SDK_URL,
     RGBPP_DOMAINS: process.env.NEXT_PUBLIC_RGBPP_DOMAINS,
+    CKB_CELL_GITHUB_URL: process.env.NEXT_PUBLIC_CKB_CELL_GITHUB_URL,
   }),
 }

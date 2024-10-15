@@ -1,0 +1,19 @@
+User-agent: meta-externalagent
+Disallow: /
+
+User-agent: DataForSeoBot
+Disallow: /
+
+User-agent: *
+Disallow: /en/explorer/btc
+Disallow: /en/explorer/ckb
+Disallow: /en/assets/coins
+Disallow: /en/block
+Disallow: /en/transaction
+Disallow: /en/address
+Disallow: /explorer/btc
+Disallow: /explorer/ckb
+Disallow: /assets/coins
+Disallow: /block
+Disallow: /transaction
+Disallow: /address

@@ -10,7 +10,7 @@ import {
   TransactionWithStatusResponse,
 } from './blockchain.interface';
 import { Cacheable } from 'src/decorators/cacheable.decorator';
-import { ONE_MONTH_MS } from 'src/common/date';
+import { ONE_DAY_MS } from 'src/common/date';
 import { CKB_MIN_SAFE_CONFIRMATIONS } from 'src/constants';
 import * as Sentry from '@sentry/nestjs';
 import { Chain } from '@prisma/client';
@@ -118,7 +118,7 @@ export class BlockchainService {
       }
       return key;
     },
-    ttl: ONE_MONTH_MS,
+    ttl: ONE_DAY_MS,
     shouldCache: async (tx: TransactionWithStatusResponse, that: BlockchainService) => {
       if (tx.tx_status.status !== 'committed' || !tx.tx_status.block_number) {
         return false;
@@ -157,7 +157,7 @@ export class BlockchainService {
       }
       return key;
     },
-    ttl: ONE_MONTH_MS,
+    ttl: ONE_DAY_MS,
     shouldCache: async (block: Block, that: BlockchainService) => {
       if (!block?.header) {
         return false;
@@ -202,7 +202,7 @@ export class BlockchainService {
       }
       return key;
     },
-    ttl: ONE_MONTH_MS,
+    ttl: ONE_DAY_MS,
     shouldCache: async (block: Block, that: BlockchainService) => {
       const { number } = block.header;
       return that.isSafeConfirmations(number);
@@ -235,7 +235,7 @@ export class BlockchainService {
   @Cacheable({
     namespace: 'BlockchainService',
     key: (blockHash: string) => `getBlockEconomicState:${blockHash}`,
-    ttl: ONE_MONTH_MS,
+    ttl: ONE_DAY_MS,
   })
   public async getBlockEconomicState(blockHash: string): Promise<BlockEconomicState> {
     await this.websocketReady;
