@@ -1,39 +1,66 @@
-# RGB++ Explorer
+# RGB++ Explorer Frontend
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Component Library
 
-## Getting Started
+This project uses **Park UI** and **Pandacss** as the component library, providing a set of reusable UI components that enhance the overall user experience.
 
-First, run the development server:
+## Multilingual Solution
+
+For handling multilingual support, we use **Lingui**. This library allows for efficient extraction, compilation, and management of translations in the application.
+
+## Minimum Version Requirements
+
+To run this project, ensure you have the following minimum versions installed:
+
+- **Node.js**: 20.x or higher
+- **pnpm**: v9.4 or higher
+
+### Package Manager
+
+This project uses `pnpm` as the package manager. Ensure you have `pnpm` installed. If not, you can install it globally with:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install -g pnpm
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
+```bash
+pnpm install
+```
 
-You can start editing the page by modifying `app/layout.tsx`. The page auto-updates as you edit the file.
+### Startup Instructions
+To start the development server, run:
+```bash
+pnpm dev
+```
+This command will start the Next.js application in development mode. You can access the application at [`http://localhost:3000`](http://localhost:3000).
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+### Build
+To create a production build, run:
+```bash
+pnpm build
+```
 
-## Learn More
+After building, you can start the production server with:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm start
+```
+### Linting and Code Formatting
+To lint your code, use:
+```bash
+pnpm lint
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+To check for spelling errors, run:
+```bash
+pnpm cspell
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+To extract and compile translations, use:
+```bash
+pnpm lingui
+```
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
-
+## Contributing
+Contributions are welcome! Please open an issue or submit a pull request.
