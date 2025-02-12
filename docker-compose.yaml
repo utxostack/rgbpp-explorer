@@ -49,6 +49,7 @@ services:
 
   postgres:
     image: postgres:13
+    restart: unless-stopped
     env_file:
       # Need POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB to be set in .env
       - ./backend/.env
